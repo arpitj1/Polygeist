@@ -822,17 +822,35 @@ bool mayAlias(Value v, Value v2) {
   if ((isAlloca[0] || isGlobal[0]) && (isAlloca[1] || isGlobal[1]))
     return false;
 
-  bool isArg[2];
-  isArg[0] = v.isa<BlockArgument>() &&
-             isa<FunctionOpInterface>(
-                 v.cast<BlockArgument>().getOwner()->getParentOp());
+  bool isArg[2] = {false, false};
+  bool isNoAliasArg[2] = {false, false};
 
-  isArg[1] = v.isa<BlockArgument>() &&
-             isa<FunctionOpInterface>(
-                 v.cast<BlockArgument>().getOwner()->getParentOp());
+  if (auto ba = dyn_cast<BlockArgument>(v)) {
+    if (auto fn = dyn_cast<FunctionOpInterface>(ba.getOwner()->getParentOp())) {
+      isArg[0] = true;
+      if (fn.getArgAttr(ba.getArgNumber(), LLVM::LLVMDialect::getNoAliasAttrName())) {
+        isNoAliasArg[0] = true;
+      }
+    }
+  }
+
+  if (auto ba = dyn_cast<BlockArgument>(v2)) {
+    if (auto fn = dyn_cast<FunctionOpInterface>(ba.getOwner()->getParentOp())) {
+      isArg[0] = true;
+      if (fn.getArgAttr(ba.getArgNumber(), LLVM::LLVMDialect::getNoAliasAttrName())) {
+        isNoAliasArg[0] = true;
+      }
+    }
+  }
 
   // Stack allocations cannot have been passed as an argument.
   if ((isAlloca[0] && isArg[1]) || (isAlloca[1] && isArg[0]))
+    return false;
+
+  if ((isArg[0] && isNoAliasArg[1]) || (isArg[1] && isNoAliasArg[0]))
+    return false;
+  
+  if ((isGlobal[0] && isNoAliasArg[1]) || (isGlobal[1] && isNoAliasArg[0]))
     return false;
 
   // Non captured base allocas cannot conflict with another base value.

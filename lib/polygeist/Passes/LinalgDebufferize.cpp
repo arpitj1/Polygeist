@@ -16,6 +16,7 @@
 #include "mlir/IR/Operation.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "polygeist/Ops.h"
 #include "polygeist/Passes/Passes.h"
 #include "llvm/Support/Debug.h"
 
@@ -29,10 +30,25 @@ using namespace linalg;
 using namespace tensor;
 using namespace bufferization;
 
-std::vector<Operation *> getSortedUsers(Operation *op) {
-  if (!op)
-    return {};
 
+bool isCaptured(Value v, Operation *potentialUser = nullptr,
+                bool *seenuse = nullptr);
+
+std::vector<Operation *> getSortedUsers(Value val) {
+   std::vector<Operation*> users;
+  for (Operation *user : val.getUsers()) {
+    users.push_back(user);
+  }
+
+  // Sort the users based on their topological order
+  std::sort(users.begin(), users.end(), [](Operation *a, Operation *b) {
+    return a->isBeforeInBlock(b);
+  });
+
+  return users;
+}
+
+std::vector<Operation *> getSortedUsers(Operation *op) {
   // Find the parent function
   auto funcOp = op->getParentOfType<func::FuncOp>();
   if (!funcOp)
@@ -54,6 +70,44 @@ std::vector<Operation *> getSortedUsers(Operation *op) {
   return sortedUsers;
 }
 
+struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> {
+  using OpRewritePattern<memref::AllocaOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(memref::AllocaOp allocaOp,
+                                PatternRewriter &rewriter) const final {
+    Value allocaResult = allocaOp.getResult();
+    bool userToTensorOp = false;
+    bool userCopyOp = false;
+    bool userOtherOp = false;
+    Value copyOp;
+    Value toTensorOp;
+    for (Operation *user : allocaResult.getUsers()) {
+      if (isa<bufferization::ToTensorOp>(user)) {
+        userToTensorOp = true;
+        toTensorOp = user->getResult(0);
+      }
+      else if (isa<memref::CopyOp>(user)) {
+        userCopyOp = true;
+        copyOp = user->getResult(0);
+      }
+      else
+        userOtherOp = true;
+    }
+    
+    if(!(!userOtherOp&&userCopyOp&&userToTensorOp))
+      return failure();
+
+    auto emptyTensor =
+    rewriter.create<tensor::EmptyOp>(allocaOp.getLoc(),allocaOp.getType().getShape(),
+    allocaOp.getType().getElementType());
+
+    rewriter.replaceAllUsesWith(toTensorOp, emptyTensor.getResult());
+    rewriter.eraseOp(copyOp.getDefiningOp());
+    rewriter.eraseOp(toTensorOp.getDefiningOp());
+    return success();
+  }
+}; 
+
 struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
   using OpRewritePattern<func::FuncOp>::OpRewritePattern;
 
@@ -68,30 +122,70 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
     // in ins and outs
     llvm::SmallPtrSet<Operation *, 16> processedGenericOps;
 
-    LogicalResult passResult = success();
-    funcOp.walk([&](mlir::memref::AllocaOp allocaOp) -> WalkResult {
-      auto module = allocaOp->getParentOfType<ModuleOp>();
-      rewriter.setInsertionPointAfter(allocaOp);
-      auto tensorType = RankedTensorType::get(
-          allocaOp.getType().getShape(), allocaOp.getType().getElementType());
+    LogicalResult passResult = failure();
 
-      // Check to see if only linalg.generic are users of the allocaOp for now.
+    auto handleMemref = [&](Value memVal) -> LogicalResult {
+      auto module = memVal.getParentRegion()->getParentOfType<ModuleOp>();
+      
+      if (!memVal.getType().isa<MemRefType>()) {
+        return failure(); 
+      }
+
+      bool isNoalias = false;
+      if (auto mem = memVal.getDefiningOp<MemoryEffectOpInterface>()) {
+        if (auto defOp = memVal.getDefiningOp()) {//if (mem has allocation like) {
+          if (isa<memref::AllocaOp>(defOp)) {
+            isNoalias = true;
+          }
+        }
+      } else if (auto ba = dyn_cast<BlockArgument>(memVal)) {
+        if (auto fn = dyn_cast<FunctionOpInterface>(ba.getOwner()->getParentOp())) {
+          if (fn.getArgAttr(ba.getArgNumber(), LLVM::LLVMDialect::getNoAliasAttrName())) {
+            isNoalias = true;
+          }
+        }
+      } else if (memVal.getDefiningOp<memref::GetGlobalOp>() ||
+                memVal.getDefiningOp<LLVM::AddressOfOp>()) {
+        isNoalias = true; //TODO: is this correct?
+      }
+
+      // if we are no alias we can just look at all users of the value
+      // if we are not noalias, or we are captured, then we have to look at all users that
+      // could read or write
+      if (!isNoalias) { //|| isCaptured(memVal)) { TODO: need to improve isCaptured to include linalg.generic 
+        return failure(); //|| isCaptured(memVal)) { TODO: need to improve isCaptured to include linalg.generic
+      }
+      
+      MemRefType memrefType;
+      if (auto blockArg = memVal.dyn_cast<BlockArgument>()) {
+        memrefType = blockArg.getType().dyn_cast<MemRefType>();
+      } else if (auto allocaOp = memVal.getDefiningOp<memref::AllocaOp>()) {
+        memrefType = allocaOp.getType();
+      } else {
+        return failure();
+      } 
+      
+      
+      rewriter.setInsertionPointAfterValue(memVal);
+      auto tensorType = RankedTensorType::get(
+          memrefType.getShape(), memrefType.getElementType());
+
+      // Check to see if only linalg.generic are users of the Value op for now.
       // TODO: Extend this
-      if (!llvm::all_of(allocaOp->getUsers(), [](Operation *op) {
+      if (!llvm::all_of(memVal.getUsers(), [](Operation *op) {
             return isa<linalg::GenericOp>(op);
           })) {
-        passResult = failure();
-        return WalkResult::interrupt();
+        return failure();
       }
 
       // auto emptyTensor =
       // rewriter.create<tensor::EmptyOp>(allocaOp.getLoc(),allocaOp.getType().getShape(),
       // allocaOp.getType().getElementType());
       auto toTensorOp = rewriter.create<bufferization::ToTensorOp>(
-          allocaOp.getLoc(), tensorType, allocaOp);
+          memVal.getLoc(), tensorType, memVal);
       Value currentTensor = toTensorOp;
 
-      auto sortedUsers = getSortedUsers(allocaOp);
+      auto sortedUsers = getSortedUsers(memVal);
 
       // Check if allocaOp is an output in current genericOp
       for (auto user : sortedUsers) {
@@ -109,17 +203,17 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
           ArrayAttr indexingMaps = genericOp.getIndexingMaps();
           for (auto input : genericOp.getInputs()) {
-            newInputs.push_back(input == allocaOp ? currentTensor : input);
+            newInputs.push_back(input == memVal ? currentTensor : input);
           }
 
           // ArrayRef<Type> resultTypes;
           int newCurrentTensorIndex = -1;
           int index = 0;
           for (auto output : genericOp.getOutputs()) {
-            newOutputs.push_back(output == allocaOp ? currentTensor : output);
-            resultTypes.push_back(output == allocaOp ? currentTensor.getType()
+            newOutputs.push_back(output == memVal ? currentTensor : output);
+            resultTypes.push_back(output == memVal ? currentTensor.getType()
                                                      : output.getType());
-            if (output == allocaOp) {
+            if (output == memVal) {
               newCurrentTensorIndex = index;
             }
             index++;
@@ -138,34 +232,48 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
                                      newGenericOp.getRegion().end());
 
           // Replace all uses of original generic op with the new one
-          // int idxOldGeneric=0;
-          // int idxNewGeneric=0;
           for (unsigned i = 0; i < genericOp->getNumResults(); ++i) {
-            // if(i == newCurrentTensorIndex) {
-            //   idxNewGeneric++;
-            // }
-            // genericOp->getResult(idxOldGeneric).replaceAllUsesWith(newGenericOp->getResult(idxNewGeneric));
-            // idxOldGeneric++;
-            // idxNewGeneric++;
             genericOp->getResult(i).replaceAllUsesWith(
                 newGenericOp->getResult(i));
           }
 
           // Delete the original genericOp
-          opsToDelete.push_back(genericOp.getOperation());
           if (newCurrentTensorIndex != -1)
             currentTensor = newGenericOp.getResult(newCurrentTensorIndex);
 
           processedGenericOps.insert(genericOp.getOperation());
+          // Delete the original genericOp
+          //genericOp.erase();
+          //WalkResult::interrupt();
+          opsToDelete.push_back(genericOp.getOperation());
         }
       }
 
       auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
-          allocaOp.getLoc(), allocaOp.getType(), currentTensor);
-      rewriter.create<memref::CopyOp>(allocaOp.getLoc(), toMemrefOp, allocaOp);
+          memVal.getLoc(), memrefType, currentTensor);
+      rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
       // opsToDelete.push_back(allocaOp.getOperation());
-      return WalkResult::advance();
-    });
+      return success();
+    };
+
+    
+    bool changed;
+    do {
+      changed = funcOp.walk([&](memref::AllocaOp alloca) {
+        //if (handleMemref(alloca.getResult()).succeeded())
+        //  return WalkResult::advance();
+        //return WalkResult::interrupt();
+        handleMemref(alloca.getResult()).succeeded();
+        return WalkResult::advance();
+      }).wasInterrupted();
+      
+      if (changed)
+        passResult = success();
+    } while (changed);
+    
+    if (llvm::any_of(llvm::map_range(funcOp.getArguments(), handleMemref), [](LogicalResult res) {return res.succeeded();}))
+    
+    passResult = success();
     for (Operation *op : opsToDelete) {
       op->erase();
     }
@@ -184,6 +292,7 @@ struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
 void LinalgDebufferize::runOnOperation() {
   RewritePatternSet patterns(&getContext());
   patterns.insert<LinalgDebufferization>(&getContext());
+  //patterns.insert<debufferizationAllocaRemoval>(&getContext());
   GreedyRewriteConfig config;
   (void)applyPatternsAndFoldGreedily(getOperation(), std::move(patterns),
                                      config);
