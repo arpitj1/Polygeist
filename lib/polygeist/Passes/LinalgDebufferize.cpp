@@ -79,16 +79,16 @@ struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> 
     bool userToTensorOp = false;
     bool userCopyOp = false;
     bool userOtherOp = false;
-    Value copyOp;
-    Value toTensorOp;
+    memref::CopyOp copyOp;
+    bufferization::ToTensorOp toTensorOp;
     for (Operation *user : allocaResult.getUsers()) {
       if (isa<bufferization::ToTensorOp>(user)) {
         userToTensorOp = true;
-        toTensorOp = user->getResult(0);
+        toTensorOp = cast<bufferization::ToTensorOp>(user);
       }
       else if (isa<memref::CopyOp>(user)) {
         userCopyOp = true;
-        copyOp = user->getResult(0);
+        copyOp = cast<memref::CopyOp>(user);
       }
       else
         userOtherOp = true;
@@ -101,9 +101,10 @@ struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> 
     rewriter.create<tensor::EmptyOp>(allocaOp.getLoc(),allocaOp.getType().getShape(),
     allocaOp.getType().getElementType());
 
-    rewriter.replaceAllUsesWith(toTensorOp, emptyTensor.getResult());
-    rewriter.eraseOp(copyOp.getDefiningOp());
-    rewriter.eraseOp(toTensorOp.getDefiningOp());
+    rewriter.replaceAllUsesWith(toTensorOp.getResult(), emptyTensor.getResult());
+
+    rewriter.eraseOp(copyOp);
+    rewriter.eraseOp(toTensorOp);
     return success();
   }
 }; 
@@ -292,7 +293,7 @@ struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
 void LinalgDebufferize::runOnOperation() {
   RewritePatternSet patterns(&getContext());
   patterns.insert<LinalgDebufferization>(&getContext());
-  //patterns.insert<debufferizationAllocaRemoval>(&getContext());
+  patterns.insert<debufferizationAllocaRemoval>(&getContext());
   GreedyRewriteConfig config;
   (void)applyPatternsAndFoldGreedily(getOperation(), std::move(patterns),
                                      config);
