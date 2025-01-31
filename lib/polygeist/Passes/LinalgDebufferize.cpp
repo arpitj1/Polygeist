@@ -51,76 +51,6 @@ bool comesBefore(Operation *a, Operation *b) {
     if (isAncestor(a, b)) return true;
     if (isAncestor(b, a)) return false;
 
-    //Block *aBlock = a->getBlock();
-    //Block *bBlock = b->getBlock();
-    
-    //// Same block: compare operation order
-    //if (aBlock == bBlock) {
-    //    for (Operation &op : aBlock->getOperations()) {
-    //        if (&op == a) return true;
-    //        if (&op == b) return false;
-    //    }
-    //    llvm_unreachable("Operations not found in their parent block");
-    //}
-
-    //// Different blocks: compare region hierarchy
-    //Region *aRegion = aBlock->getParent();
-    //Region *bRegion = bBlock->getParent();
-    
-    //// Same region: compare block order
-    //if (aRegion == bRegion) {
-    //    //auto aBlockIt = std::find(aRegion->begin(), aRegion->end(), aBlock);
-    //    //auto bBlockIt = std::find(aRegion->begin(), aRegion->end(), bBlock);
-    //    //return aBlockIt < bBlockIt;
-    //    //const int aIndex = std::distance(aRegion->begin(), aRegion->find(aBlock));
-    //    //const int bIndex = std::distance(aRegion->begin(), aRegion->find(bBlock));
-    //    //return  aIndex < bIndex;
-    //    auto get_block_pos = [](Region *region, Block *block) {
-    //      auto &blocks = region->getBlocks();
-    //      auto it = llvm::find_if(blocks, [block](Block &b) {
-    //        return &b == block; // Address comparison
-    //      });
-    //      assert(it != blocks.end() && "Block not found in region");
-    //      return std::distance(blocks.begin(), it);
-    //      //return std::distance(region->getBlocks().begin(), 
-    //      //                     llvm::find(region->getBlocks(), block));
-    //    };
-    //    return get_block_pos(aRegion, aBlock) < 
-    //           get_block_pos(aRegion, bBlock);
-    //}
-
-    //// Different regions: compare parent operations
-    //Operation *aParent = aRegion->getParentOp();
-    //Operation *bParent = bRegion->getParentOp();
-    
-    //// Same parent op: compare region order
-    //if (aParent == bParent) {
-    //    //auto aRegionIt = std::find(aParent->getRegions().begin(), 
-    //    //                         aParent->getRegions().end(), aRegion);
-    //    //auto bRegionIt = std::find(bParent->getRegions().begin(),
-    //    //                         bParent->getRegions().end(), bRegion);
-    //    //return aRegionIt < bRegionIt;
-    //    //auto get_region_position = [](Operation *parent, Region *target) {
-    //    //return std::distance(
-    //    //    parent->getRegions.begin(),
-    //    //    llvm::find_if(parent->getRegions(), [&](Region &r) {
-    //    //        return &r == target; // Compare region addresses
-    //    //    })
-    //    //  );
-    //    //};
-
-    //    auto get_region_position = [](Operation *parent, Region *target) {
-    //      auto regions = parent->getRegions(); // Get reference to region list
-    //      auto begin = regions.begin();
-    //      auto it = llvm::find_if(regions, [&](Region &r) {
-    //          return &r == target;
-    //      });
-    //      return std::distance(begin, it);
-    //    };
-    //  return get_region_position(aParent, aRegion) < 
-    //       get_region_position(aParent, bRegion);
-    //}
-
     Operation *aParent = a->getParentOp();
     Operation *bParent = b->getParentOp();
     // Walk up b's hierarchy until we reach a's level
@@ -224,50 +154,42 @@ bool comesBefore(Operation *a, Operation *b) {
 std::vector<Operation *> getSortedUsers(Value val) {
    std::vector<Operation*> users;
   for (Operation *user : val.getUsers()) {
-    users.push_back(user);
+    auto it = std::find_if(users.begin(), users.end(),
+                           [user](const Operation* op) {
+                               return op == user;
+                           });
+    if(it == users.end())
+      users.push_back(user);
   }
 
-  //TODO: problem is this only works for 1 level
-  // Sort the users based on their topological order
   std::sort(users.begin(), users.end(), [](Operation *a, Operation *b) {
     return comesBefore(a,b);
-    //if (a->getBlock() == b->getBlock()) {
-    //  return a->isBeforeInBlock(b);
-    //}
-    //if (a->getParentRegion() == b->getParentRegion()) {
-    //  Block *blockA = a->getBlock();
-    //  Block *blockB = b->getBlock();
-    //  return std::distance(blockA->getParent()->begin(), blockA->getIterator()) <
-    //       std::distance(blockB->getParent()->begin(), blockB->getIterator());
-    //}
-
-    //return a->getParentRegion()->isAncestor(b->getParentRegion());
   });
 
   return users;
 }
 
-std::vector<Operation *> getSortedUsers(Operation *op) {
-  // Find the parent function
-  auto funcOp = op->getParentOfType<func::FuncOp>();
-  if (!funcOp)
-    return {};
+// std::vector<Operation *> getSortedUsers(Operation *op) {
+//   // Find the parent function
+//   auto funcOp = op->getParentOfType<func::FuncOp>();
+//   if (!funcOp)
+//     return {};
 
-  // Map to store order of operations
-  llvm::DenseMap<Operation *, size_t> opOrder;
-  size_t order = 0;
+//   // Map to store order of operations
+//   llvm::DenseMap<Operation *, size_t> opOrder;
+//   size_t order = 0;
 
-  funcOp.walk([&](Operation *curOp) { opOrder[curOp] = order++; });
+//   funcOp.walk([&](Operation *curOp) { opOrder[curOp] = order++; });
 
-  std::vector<Operation *> sortedUsers(op->getUsers().begin(),
-                                       op->getUsers().end());
+//   std::vector<Operation *> sortedUsers(op->getUsers().begin(),
+//                                        op->getUsers().end());
 
-  std::sort(
-      sortedUsers.begin(), sortedUsers.end(),
-      [&](Operation *a, Operation *b) { return opOrder[a] < opOrder[b]; });
+//   std::sort(
+//       sortedUsers.begin(), sortedUsers.end(),
+//       [&](Operation *a, Operation *b) { return opOrder[a] < opOrder[b]; });
 
-  return sortedUsers;
-}
+//   return sortedUsers;
+// }
 
 Region* findCommonAncestorRegion(Operation* a, Operation* b) {
     DenseMap<Region*, size_t> regionCounts;
@@ -351,15 +273,15 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
     auto module = funcOp->getParentOfType<ModuleOp>();
 
-    SmallVector<Operation *> opsToDelete;
-    llvm::SmallPtrSet<Operation *, 16> opsToDeleteSet;
+    //SmallVector<Operation *> opsToDelete;
+    //llvm::SmallPtrSet<Operation *, 16> opsToDeleteSet;
     // Tracks both old linalg.generics and linalg.generics with repeated values
     // in ins and outs
-    llvm::SmallPtrSet<Operation *, 16> processedGenericOps;
 
     LogicalResult passResult = failure();
 
     auto handleMemref = [&](Value memVal) -> LogicalResult {
+      llvm::SmallPtrSet<Operation *, 16> processedGenericOps;
       auto module = memVal.getParentRegion()->getParentOfType<ModuleOp>();
       
       if (!memVal.getType().isa<MemRefType>()) {
@@ -428,8 +350,8 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
         if (auto genericOp = dyn_cast<linalg::GenericOp>(user)) {
 
           // auto genericOp = cast<linalg::GenericOp>(user);
-          if (processedGenericOps.count(genericOp) > 0)
-            continue;
+          //if (processedGenericOps.count(genericOp) > 0)
+          //  continue;
           rewriter.setInsertionPointAfter(genericOp);
 
           SmallVector<Value, 4> newInputs;
@@ -556,17 +478,22 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
             currentTensor = newGenericOp.getResult(newCurrentTensorIndex);
           }
 
-          processedGenericOps.insert(genericOp.getOperation());
+          //processedGenericOps.insert(genericOp.getOperation());
           // Delete the original genericOp
-          genericOp.erase();
+          //unsigned numUsers = std::distance(genericOp.getResults().getUsers().begin(), genericOp.getResults().getUsers().end());
+          //llvm::outs() << "Number of generic op uses: " << numUsers << "\n"; 
+          //genericOp.erase();
+          rewriter.eraseOp(genericOp);
           //WalkResult::interrupt();
           //opsToDelete.push_back(genericOp.getOperation());
         }
       }
-
-      auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
-          memVal.getLoc(), memrefType, currentTensor);
-      rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
+      
+      //if(currentTensor != prevTensor) {
+        auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
+            memVal.getLoc(), memrefType, currentTensor);
+        rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
+      //}
       // opsToDelete.push_back(allocaOp.getOperation());
       return success();
     };
@@ -584,13 +511,15 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
       handleMemref(alloca);
     }
 
-    if (llvm::any_of(llvm::map_range(funcOp.getArguments(), handleMemref), [](LogicalResult res) {return res.succeeded();}))
+    for(auto arg: funcOp.getArguments()){
+      handleMemref(arg);
+    }
     
     passResult = success();
-    for (Operation *op : opsToDelete) {
-      op->erase();
-    }
-    opsToDelete.clear();
+    //for (Operation *op : opsToDelete) {
+    //  op->erase();
+    //}
+    //opsToDelete.clear();
 
     return passResult;
   }
@@ -603,6 +532,7 @@ struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
 } // namespace
 
 void LinalgDebufferize::runOnOperation() {
+  auto module = getOperation()->getParentOfType<ModuleOp>();
   RewritePatternSet patterns(&getContext());
   patterns.insert<LinalgDebufferization>(&getContext());
   patterns.insert<debufferizationAllocaRemoval>(&getContext());
