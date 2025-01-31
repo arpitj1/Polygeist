@@ -146,9 +146,9 @@ bool comesBefore(Operation *a, Operation *b) {
         aAncestor = parent;
       }
 
-    llvm_unreachable("Operations do not share a common ancestor");
+    //llvm_unreachable("Operations do not share a common ancestor");
     //// Recursive case: compare parent operations
-    //return comesBefore(aParent, bParent);
+    return comesBefore(aParent, bParent);
 }
 
 std::vector<Operation *> getSortedUsers(Value val) {
@@ -375,7 +375,7 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
           // Propagate value through each region
           Value currentValue = currentTensor;
-          for (Region* region : llvm::reverse(regions)) {
+          for (Region* region : regions) {
               Block& block = region->front();
               Operation* terminator = block.getTerminator();
               Operation *parentOp = region->getParentOp();
