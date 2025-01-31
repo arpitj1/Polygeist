@@ -674,6 +674,8 @@ bool isCaptured(Value v, Operation *potentialUser = nullptr,
     for (auto u : v.getUsers()) {
       if (seenuse && u == potentialUser)
         *seenuse = true;
+      if (isa<linalg::GenericOp>(u))
+        continue;
       if (isa<memref::LoadOp, LLVM::LoadOp, affine::AffineLoadOp,
               polygeist::CacheLoad>(u))
         continue;
