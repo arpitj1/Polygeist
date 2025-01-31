@@ -309,8 +309,8 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
       // if we are no alias we can just look at all users of the value
       // if we are not noalias, or we are captured, then we have to look at all users that
       // could read or write
-      if ((!isNoalias) || isCaptured(memVal)) { //TODO: need to improve isCaptured to include linalg.generic 
-        return failure(); //|| isCaptured(memVal)) { TODO: need to improve isCaptured to include linalg.generic
+      if ((!isNoalias) || isCaptured(memVal)) {  
+        return failure(); 
       }
       
       MemRefType memrefType;
@@ -432,6 +432,9 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
                 currentValue = newIf->getResult(newIf->getNumResults() - 1); 
               }
+              // else if( auto prevFor = dyn_cast_or_null<scf::ForOp>(parentOp)) {
+                
+              // }
           }
           currentTensor = currentValue;
 
