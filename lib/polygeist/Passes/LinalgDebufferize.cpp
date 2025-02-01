@@ -432,9 +432,6 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
                 currentValue = newIf->getResult(newIf->getNumResults() - 1); 
               }
-              // else if( auto prevFor = dyn_cast_or_null<scf::ForOp>(parentOp)) {
-                
-              // }
           }
           currentTensor = currentValue;
 

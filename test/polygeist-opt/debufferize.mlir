@@ -1,4 +1,4 @@
-//polygeist-opt --linalg-debufferize debufferize.mlir 
+//polygeist-opt --canonicalize --linalg-debufferize --canonicalize debufferize.mlir 
 
 #map16 = affine_map<(d0, d1, d2) -> (d2, d1)>
 #map17 = affine_map<(d0, d1, d2, d3) -> (d1 + d3, d0 + d2)>
@@ -80,7 +80,6 @@
       }
   }
 
-  //TODO: not debufferized
   //Case when buffer is captured
   module @in_place_add_for_loop_carried{
       func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
@@ -104,7 +103,6 @@
       }
   }
 
-  //TODO: not debufferized
   module @in_place_add_for_loop_carried2{
       func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
         %c0 = arith.constant 0 : index
