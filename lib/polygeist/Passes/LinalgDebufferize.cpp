@@ -250,6 +250,181 @@ struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> 
     return success();
   }
 }; 
+          
+void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVector<Region*> regions, PatternRewriter &rewriter) {
+  auto module = currentValue.getDefiningOp()->getParentOfType<ModuleOp>();
+  for (Region* region : regions) {
+      Block& block = region->front();
+      Operation* terminator = block.getTerminator();
+      Operation *parentOp = region->getParentOp();
+
+      if( auto prevIf = dyn_cast_or_null<scf::IfOp>(parentOp)) {
+        auto prevResults = prevIf.getResults();
+        SmallVector<Type> newResultTypes;
+        for (auto res : prevResults)
+            newResultTypes.push_back(res.getType());
+        newResultTypes.push_back(currentValue.getType());
+
+        // Yield original results + new value
+        auto thenYieldArgs = prevIf.thenYield().getOperands();
+        SmallVector<Value> thenYieldValues;
+        for (const auto &it :thenYieldArgs) {
+          thenYieldValues.push_back(it);
+        }
+        thenYieldValues.push_back(currentValue);
+
+        SmallVector<Value> elseYieldValues;
+        if(!prevIf.getElseRegion().empty()){
+          auto elseYieldArgs = prevIf.elseYield().getOperands();
+          for (const auto &it :elseYieldArgs) {
+            elseYieldValues.push_back(it);
+          }
+        }
+        elseYieldValues.push_back(prevTensor);//TODO: Need to replace this with earliest use of op in the
+        // given region, prevTensor doesn't work - since this won't work for a chain of connected ops.
+
+        //Create new Ifop
+        rewriter.setInsertionPoint(prevIf);
+        auto newIf = rewriter.create<scf::IfOp>(prevIf.getLoc(),
+                                                newResultTypes, // Combined types
+                                                prevIf.getCondition(),      // New condition value
+                                                true
+                                            ); 
+        if (newIf.thenBlock())
+          rewriter.eraseBlock(newIf.thenBlock());
+
+        newIf.getThenRegion().takeBody(prevIf.getThenRegion());
+        if(!prevIf.getElseRegion().empty())
+          newIf.getElseRegion().takeBody(prevIf.getElseRegion());
+
+
+        //Update yield ops 
+        rewriter.setInsertionPointToEnd(newIf.thenBlock());
+        rewriter.replaceOpWithNewOp<scf::YieldOp>(newIf.thenYield(), thenYieldValues);
+        if(!prevIf.getElseRegion().empty()) {
+          rewriter.setInsertionPointToEnd(newIf.elseBlock());
+          rewriter.replaceOpWithNewOp<scf::YieldOp>(newIf.elseYield(), elseYieldValues);
+        } else {
+          rewriter.setInsertionPointToEnd(newIf.elseBlock());
+          rewriter.create<scf::YieldOp>(newIf.getLoc(), elseYieldValues);
+        }
+        
+        //TODO: need to update results of prevIf and else with the new ones
+        currentValue = newIf->getResult(newIf->getNumResults() - 1); 
+      }
+      else if (auto prevFor = dyn_cast_or_null<scf::ForOp>(parentOp)) {
+        SmallVector<Value> newInitOperands = prevFor.getInitArgs();
+        newInitOperands.push_back(prevTensor); //Needs to be the earliest use inside the region.
+        //TODO: Does this require fix in if as well?
+
+        SmallVector<Type, 5> newResultTypes(prevFor.getResultTypes().begin(), prevFor.getResultTypes().end());
+        newResultTypes.push_back(currentValue.getType());
+
+        rewriter.setInsertionPoint(prevFor);
+        scf::ForOp newLoop = rewriter.create<scf::ForOp>(
+            prevFor.getLoc(),
+            prevFor.getLowerBound(),
+            prevFor.getUpperBound(),
+            prevFor.getStep(),
+            newInitOperands
+        );
+        newLoop->setAttrs(prevFor.getOperation()->getAttrs());
+
+        // Create block with induction variable + original args + new arg
+        SmallVector<Type> blockArgTypes;
+        blockArgTypes.push_back(newLoop.getInductionVar().getType());  // IV
+        llvm::append_range(blockArgTypes, newLoop.getResultTypes());    // Original args
+        //blockArgTypes.push_back(prevTensor.getType());                      // New arg
+        
+        //Block *newBlock = rewriter.createBlock(
+        //    &newLoop.getRegion(),
+        //    newLoop.getRegion().end(),
+        //    blockArgTypes,
+        //    {newLoop.getLoc(), newLoop.getLoc()}  // Locations
+        //); 
+
+        //rewriter.inlineRegionBefore(
+        //    prevFor.getRegion(),
+        //    newLoop.getRegion(),
+        //    newLoop.getRegion().end()
+        //);
+
+        // Transfer operations from original block to new block
+        Block *newBlock = &newLoop.getRegion().front();
+        Block *originalBlock = &prevFor.getRegion().front();
+        newBlock->getOperations().splice(
+            newBlock->end(),
+            originalBlock->getOperations()
+        );
+
+        // Replace uses of original block arguments with new ones
+        for (unsigned i = 0; i < originalBlock->getNumArguments()-1; ++i) {
+            originalBlock->getArgument(i + 1)  // +1 for IV
+                .replaceAllUsesWith(newBlock->getArgument(i + 1));
+        }
+
+        auto yieldOp = cast<scf::YieldOp>(newBlock->getTerminator());
+        SmallVector<Value> newYieldValues = yieldOp.getOperands();
+        // Add new iteration arg from block arguments
+        newYieldValues.push_back(currentValue);
+        
+        //OpBuilder::InsertionGuard g(rewriter);
+        rewriter.setInsertionPoint(yieldOp);
+
+        rewriter.replaceOpWithNewOp<scf::YieldOp>(yieldOp, newYieldValues);
+        // rewriter.replaceOp(prevFor, newLoop.getResults());
+        //Update block args
+        //newLoop.getBody()->getArguments().front().replaceAllUsesWith(newLoop.getInductionVar());
+        // IRMapping mapper;
+        // mapper.map(prevFor.getInductionVar(), newLoop.getInductionVar());
+        // rewriter.setInsertionPointToStart(newLoop.getBody());
+        // for (auto [oldArg, newArg] : llvm::zip(prevFor.getRegionIterArgs(),
+        //                               newLoop.getRegionIterArgs().drop_back())) {
+        //     mapper.map(oldArg, newArg);
+        // }
+        // //for (unsigned i = 0, e = prevFor.getNumRegionIterArgs(); i < e; ++i)
+        // //  newLoop.getBody()->getArguments()[i + 1].replaceAllUsesWith(newLoop.getRegionIterArg(i));
+        
+        
+        // //rewriter.inlineRegionBefore(prevFor.getRegion(), newLoop.getRegion(), newLoop.getRegion().end());
+        // for (auto &op : prevFor.getBody()->without_terminator()) {
+        //   rewriter.clone(op, mapper);
+        // }
+        
+        // //Update use of new iter arg
+        // Value newIterArg = newLoop.getRegionIterArgs().back(); 
+        
+        // auto origYield = cast<scf::YieldOp>(prevFor.getBody()->getTerminator());
+        // SmallVector<Value> newYieldOperands;
+        // for (Value operand : origYield.getOperands()) {
+        //     newYieldOperands.push_back(mapper.lookupOrDefault(operand));
+        // }
+        // // Add value for new iteration argument
+        // newYieldOperands.push_back(currentValue);
+
+        // rewriter.setInsertionPointToEnd(newLoop.getBody());
+        // rewriter.create<scf::YieldOp>(origYield.getLoc(), newYieldOperands);
+        
+        // for (auto [oldResult, newResult] : 
+        //   llvm::zip(prevFor.getResults(), newLoop.getResults().drop_back())) {
+        //   rewriter.replaceAllUsesWith(oldResult, newResult);
+        // }
+        // //auto yieldOp = cast<scf::YieldOp>(newLoop.getBody()->getTerminator());
+        // //OpBuilder::InsertionGuard g(rewriter);
+        // //rewriter.setInsertionPoint(yieldOp);
+
+        // //SmallVector<Value> newYieldedValues = yieldOp.getResults();
+        // //newYieldedValues.push_back(currentValue);
+
+        // //rewriter.replaceOpWithNewOp<scf::YieldOp>(yieldOp, newYieldedValues);
+        // rewriter.replaceOp(prevFor, newLoop.getResults());
+        rewriter.eraseOp(prevFor);
+        //Update the current value
+        currentValue = newLoop.getResults().back(); 
+      }
+  }
+}
+
 
 // Problems with this implementation: The way this implementation works is by jumping over users
 // of alloca/args. The users we get are not in sorted order. We write a function to sort out the users across
@@ -374,67 +549,9 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
           }
 
           // Propagate value through each region
+          //TODO: Need this in function form so we can call this after the loop as well
           Value currentValue = currentTensor;
-          for (Region* region : regions) {
-              Block& block = region->front();
-              Operation* terminator = block.getTerminator();
-              Operation *parentOp = region->getParentOp();
-
-              if( auto prevIf = dyn_cast_or_null<scf::IfOp>(parentOp)) {
-                auto prevResults = prevIf.getResults();
-                SmallVector<Type> newResultTypes;
-                for (auto res : prevResults)
-                    newResultTypes.push_back(res.getType());
-                newResultTypes.push_back(currentValue.getType());
-              
-                // Yield original results + new value
-                auto thenYieldArgs = prevIf.thenYield().getOperands();
-                SmallVector<Value> thenYieldValues;
-                for (const auto &it :thenYieldArgs) {
-                  thenYieldValues.push_back(it);
-                }
-                thenYieldValues.push_back(currentValue);
-              
-                SmallVector<Value> elseYieldValues;
-                if(!prevIf.getElseRegion().empty()){
-                  auto elseYieldArgs = prevIf.elseYield().getOperands();
-                  for (const auto &it :elseYieldArgs) {
-                    elseYieldValues.push_back(it);
-                  }
-                }
-                elseYieldValues.push_back(prevTensor);
-              
-                //Create new Ifop
-                rewriter.setInsertionPoint(prevIf);
-                auto newIf = rewriter.create<scf::IfOp>(prevIf.getLoc(),
-                                                        newResultTypes, // Combined types
-                                                        prevIf.getCondition(),      // New condition value
-                                                        true
-                                                    ); 
-                if (newIf.thenBlock())
-                  rewriter.eraseBlock(newIf.thenBlock());
-              
-                newIf.getThenRegion().takeBody(prevIf.getThenRegion());
-                if(!prevIf.getElseRegion().empty())
-                  newIf.getElseRegion().takeBody(prevIf.getElseRegion());
-              
-
-                //Update yield ops 
-                rewriter.setInsertionPointToEnd(newIf.thenBlock());
-                rewriter.replaceOpWithNewOp<scf::YieldOp>(newIf.thenYield(), thenYieldValues);
-                if(!prevIf.getElseRegion().empty()) {
-                  rewriter.setInsertionPointToEnd(newIf.elseBlock());
-                  rewriter.replaceOpWithNewOp<scf::YieldOp>(newIf.elseYield(), elseYieldValues);
-                } else {
-                  rewriter.setInsertionPointToEnd(newIf.elseBlock());
-                  rewriter.create<scf::YieldOp>(newIf.getLoc(), elseYieldValues);
-                }
-
-                currentValue = newIf->getResult(newIf->getNumResults() - 1); 
-              }
-          }
-          currentTensor = currentValue;
-
+          propagateValueThroughRegion(currentTensor, prevTensor, regions, rewriter);
           ArrayAttr indexingMaps = genericOp.getIndexingMaps();
           for (auto input : genericOp.getInputs()) {
             newInputs.push_back(input == memVal ? currentTensor : input);
@@ -489,10 +606,28 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
         }
       }
       
+      //For adding yields for the last use all the way to the outer most region
+      auto commonRegion =  findCommonAncestorRegion(currentTensor.getDefiningOp(), toTensorOp);
+      if (!commonRegion) return failure();
+      // Collect regions from source to common ancestor
+      SmallVector<Region*> regions;
+      for (Region* r = currentTensor.getParentRegion(); r != commonRegion; 
+           r = r->getParentOp()->getParentRegion()) {
+          regions.push_back(r);
+      }
+
+      propagateValueThroughRegion(currentTensor, prevTensor, regions, rewriter);
+
+      //if(!regions.empty()) {
+      //  auto lastRegion = regions.back(); 
+      //  Operation *parentOp = lastRegion->getParentOp();
+      //  rewriter.setInsertionPointAfter(parentOp);
+      //}
       //if(currentTensor != prevTensor) {
-        auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
-            memVal.getLoc(), memrefType, currentTensor);
-        rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
+      rewriter.setInsertionPointAfter(currentTensor.getDefiningOp());
+      auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
+          memVal.getLoc(), memrefType, currentTensor);
+      rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
       //}
       // opsToDelete.push_back(allocaOp.getOperation());
       return success();
