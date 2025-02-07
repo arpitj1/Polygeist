@@ -30,6 +30,7 @@ using namespace linalg;
 using namespace tensor;
 using namespace bufferization;
 
+using opTuple = std::tuple<Value, Value>; //First: result, Second: prev_tensor ?
 
 bool isCaptured(Value v, Operation *potentialUser = nullptr,
                 bool *seenuse = nullptr);
@@ -154,6 +155,7 @@ bool comesBefore(Operation *a, Operation *b) {
 std::vector<Operation *> getSortedUsers(Value val) {
    std::vector<Operation*> users;
   for (Operation *user : val.getUsers()) {
+    //This logic is to prevent duplication of users
     auto it = std::find_if(users.begin(), users.end(),
                            [user](const Operation* op) {
                                return op == user;
@@ -251,12 +253,15 @@ struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> 
   }
 }; 
           
-void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVector<Region*> regions, PatternRewriter &rewriter) {
+void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVector<Region*> regions, std::vector<Operation *> expandedUserList, llvm::DenseMap<Operation*, opTuple> opResultMap, PatternRewriter &rewriter) {
   auto module = currentValue.getDefiningOp()->getParentOfType<ModuleOp>();
   for (Region* region : regions) {
       Block& block = region->front();
       Operation* terminator = block.getTerminator();
       Operation *parentOp = region->getParentOp();
+
+      //Find prevTensor
+      //Compare use Values with
 
       if( auto prevIf = dyn_cast_or_null<scf::IfOp>(parentOp)) {
         auto prevResults = prevIf.getResults();
@@ -310,11 +315,31 @@ void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVe
         }
         
         //TODO: need to update results of prevIf and else with the new ones
+        opResultMap[newIf] = std::make_tuple(newIf->getResult(newIf->getNumResults() - 1), currentValue);
         currentValue = newIf->getResult(newIf->getNumResults() - 1); 
+        
       }
       else if (auto prevFor = dyn_cast_or_null<scf::ForOp>(parentOp)) {
+        mlir::Value initTensor;
+        int insertIdx = 0;
+        int opOperandIdx = 0;
+        mlir::Operation * earliestUser; 
+        for(auto user: expandedUserList) {
+          mlir::Region *opRegion = user->getParentRegion();
+          if(region->isAncestor(opRegion)) {
+            //Maintain a map data structure for tracking every user and if they have been processed then the corresponding result
+            auto it = opResultMap.find(user);
+            earliestUser = user;
+            auto keys_value = it->second;
+            auto op_result = std::get<0>(keys_value);
+            initTensor = std::get<1>(keys_value);
+            break;
+          }
+          insertIdx++; 
+        } 
+        
         SmallVector<Value> newInitOperands = prevFor.getInitArgs();
-        newInitOperands.push_back(prevTensor); //Needs to be the earliest use inside the region.
+        newInitOperands.push_back(initTensor); //Needs to be the earliest use inside the region.
         //TODO: Does this require fix in if as well?
 
         SmallVector<Type, 5> newResultTypes(prevFor.getResultTypes().begin(), prevFor.getResultTypes().end());
@@ -334,20 +359,6 @@ void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVe
         SmallVector<Type> blockArgTypes;
         blockArgTypes.push_back(newLoop.getInductionVar().getType());  // IV
         llvm::append_range(blockArgTypes, newLoop.getResultTypes());    // Original args
-        //blockArgTypes.push_back(prevTensor.getType());                      // New arg
-        
-        //Block *newBlock = rewriter.createBlock(
-        //    &newLoop.getRegion(),
-        //    newLoop.getRegion().end(),
-        //    blockArgTypes,
-        //    {newLoop.getLoc(), newLoop.getLoc()}  // Locations
-        //); 
-
-        //rewriter.inlineRegionBefore(
-        //    prevFor.getRegion(),
-        //    newLoop.getRegion(),
-        //    newLoop.getRegion().end()
-        //);
 
         // Transfer operations from original block to new block
         Block *newBlock = &newLoop.getRegion().front();
@@ -368,63 +379,32 @@ void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVe
         // Add new iteration arg from block arguments
         newYieldValues.push_back(currentValue);
         
-        //OpBuilder::InsertionGuard g(rewriter);
         rewriter.setInsertionPoint(yieldOp);
-
         rewriter.replaceOpWithNewOp<scf::YieldOp>(yieldOp, newYieldValues);
-        // rewriter.replaceOp(prevFor, newLoop.getResults());
-        //Update block args
-        //newLoop.getBody()->getArguments().front().replaceAllUsesWith(newLoop.getInductionVar());
-        // IRMapping mapper;
-        // mapper.map(prevFor.getInductionVar(), newLoop.getInductionVar());
-        // rewriter.setInsertionPointToStart(newLoop.getBody());
-        // for (auto [oldArg, newArg] : llvm::zip(prevFor.getRegionIterArgs(),
-        //                               newLoop.getRegionIterArgs().drop_back())) {
-        //     mapper.map(oldArg, newArg);
-        // }
-        // //for (unsigned i = 0, e = prevFor.getNumRegionIterArgs(); i < e; ++i)
-        // //  newLoop.getBody()->getArguments()[i + 1].replaceAllUsesWith(newLoop.getRegionIterArg(i));
         
-        
-        // //rewriter.inlineRegionBefore(prevFor.getRegion(), newLoop.getRegion(), newLoop.getRegion().end());
-        // for (auto &op : prevFor.getBody()->without_terminator()) {
-        //   rewriter.clone(op, mapper);
-        // }
-        
-        // //Update use of new iter arg
-        // Value newIterArg = newLoop.getRegionIterArgs().back(); 
-        
-        // auto origYield = cast<scf::YieldOp>(prevFor.getBody()->getTerminator());
-        // SmallVector<Value> newYieldOperands;
-        // for (Value operand : origYield.getOperands()) {
-        //     newYieldOperands.push_back(mapper.lookupOrDefault(operand));
-        // }
-        // // Add value for new iteration argument
-        // newYieldOperands.push_back(currentValue);
+        //Update prevTensor to use iter_arg
+        OpOperand &operand = earliestUser->getOpOperand(opOperandIdx);
+        Value newValue = newLoop.getRegionIterArg(newLoop.getRegion().front().getNumArguments()-2); //-1 for IV
+        operand.set(newValue);
 
-        // rewriter.setInsertionPointToEnd(newLoop.getBody());
-        // rewriter.create<scf::YieldOp>(origYield.getLoc(), newYieldOperands);
-        
-        // for (auto [oldResult, newResult] : 
-        //   llvm::zip(prevFor.getResults(), newLoop.getResults().drop_back())) {
-        //   rewriter.replaceAllUsesWith(oldResult, newResult);
-        // }
-        // //auto yieldOp = cast<scf::YieldOp>(newLoop.getBody()->getTerminator());
-        // //OpBuilder::InsertionGuard g(rewriter);
-        // //rewriter.setInsertionPoint(yieldOp);
-
-        // //SmallVector<Value> newYieldedValues = yieldOp.getResults();
-        // //newYieldedValues.push_back(currentValue);
-
-        // //rewriter.replaceOpWithNewOp<scf::YieldOp>(yieldOp, newYieldedValues);
-        // rewriter.replaceOp(prevFor, newLoop.getResults());
         rewriter.eraseOp(prevFor);
-        //Update the current value
         currentValue = newLoop.getResults().back(); 
+        
+        //Store this in the user list for this region, need to create a data structure for users
+        opResultMap[newLoop] = std::make_tuple(currentValue, initTensor);
+        //Update the user list with the for Loop
+        expandedUserList.insert(expandedUserList.begin() + insertIdx, newLoop);
       }
   }
 }
 
+bool isDirectUser(Operation *consumer, Operation *producer) {
+    for (Value operand : consumer->getOperands()) {
+        if (operand.getDefiningOp() == producer)
+            return true;
+    }
+    return false;
+}
 
 // Problems with this implementation: The way this implementation works is by jumping over users
 // of alloca/args. The users we get are not in sorted order. We write a function to sort out the users across
@@ -520,7 +500,22 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
       auto sortedUsers = getSortedUsers(memVal);
 
+      //Other algorithm:
+      // 1. Walk over all ops
+      // 2. If you find a directUser - function defined then do the things for sortedUsers
+      // 3. If you encounter region based ops, like scf.for op and scf.if op, then track the 
+      //    op to be used for yield in scf.if
+      //    For scf.for track the the op to be used for init, as well as the op to be updated by init.
+      //    Op to be used by yield comes at the end.
+      // Problem walk.break will break things and won't be able to track recursive stuff - so would have to restart every time!
+
+      //Variables to track results and init value with an operation that has been changed to tensor from memref        
+      llvm::DenseMap<Operation*, opTuple> opResultMap;
+        
+
       // Check if allocaOp is an output in current genericOp
+      std::vector<Operation *> expandedUserList(sortedUsers);
+      int userIdx = 0;
       for (auto user : sortedUsers) {
         if (auto genericOp = dyn_cast<linalg::GenericOp>(user)) {
 
@@ -550,8 +545,8 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
 
           // Propagate value through each region
           //TODO: Need this in function form so we can call this after the loop as well
-          Value currentValue = currentTensor;
-          propagateValueThroughRegion(currentTensor, prevTensor, regions, rewriter);
+          propagateValueThroughRegion(currentTensor, prevTensor, regions, expandedUserList, opResultMap, rewriter);
+          
           ArrayAttr indexingMaps = genericOp.getIndexingMaps();
           for (auto input : genericOp.getInputs()) {
             newInputs.push_back(input == memVal ? currentTensor : input);
@@ -592,17 +587,15 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
           // Delete the original genericOp
           if (newCurrentTensorIndex != -1){
             prevTensor = currentTensor;
+            opResultMap[newGenericOp] = std::make_tuple(newGenericOp.getResult(newCurrentTensorIndex), currentTensor);
             currentTensor = newGenericOp.getResult(newCurrentTensorIndex);
           }
 
-          //processedGenericOps.insert(genericOp.getOperation());
-          // Delete the original genericOp
-          //unsigned numUsers = std::distance(genericOp.getResults().getUsers().begin(), genericOp.getResults().getUsers().end());
-          //llvm::outs() << "Number of generic op uses: " << numUsers << "\n"; 
-          //genericOp.erase();
           rewriter.eraseOp(genericOp);
-          //WalkResult::interrupt();
-          //opsToDelete.push_back(genericOp.getOperation());
+          //Updated expanded user list, as this op is deleted
+          expandedUserList.insert(expandedUserList.begin() + userIdx, newGenericOp);
+          userIdx++;
+          expandedUserList.erase(expandedUserList.begin() + userIdx);
         }
       }
       
@@ -616,7 +609,7 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
           regions.push_back(r);
       }
 
-      propagateValueThroughRegion(currentTensor, prevTensor, regions, rewriter);
+      propagateValueThroughRegion(currentTensor, prevTensor, regions, expandedUserList, opResultMap, rewriter);
 
       //if(!regions.empty()) {
       //  auto lastRegion = regions.back(); 
