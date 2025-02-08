@@ -419,3 +419,78 @@
        return %c0_i32 : i32
      }
    }
+   
+     module @for_loop_within_for_loop{
+      func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
+        %c0 = arith.constant 0 : index
+        %c1 = arith.constant 1 : index
+        %c10 = arith.constant 10 : index
+        //%buffer = memref.alloca() : memref<128xf32>
+        scf.for %i = %c0 to %c10 step %c1 {
+          scf.for %j = %c0 to %c10 step %c1 {
+            linalg.generic {
+              indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+              iterator_types = ["parallel"]
+            } ins(%buffer : memref<128xf32>) 
+              outs(%buffer : memref<128xf32>) {
+            ^bb0(%in: f32, %out: f32):
+              %sum = arith.addf %in, %value : f32
+              linalg.yield %sum : f32
+            }
+          }
+          linalg.generic {
+            indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+            iterator_types = ["parallel"]
+          } ins(%buffer : memref<128xf32>) 
+            outs(%buffer : memref<128xf32>) {
+          ^bb0(%in: f32, %out: f32):
+            %sum = arith.addf %in, %value : f32
+            linalg.yield %sum : f32
+          }
+        }
+        return
+      }
+  }
+   
+     module @for_loop_with_if_with_for{
+      func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
+        %c0 = arith.constant 0 : index
+        %c1 = arith.constant 1 : index
+        %c10 = arith.constant 10 : index
+        //%buffer = memref.alloca() : memref<128xf32>
+        scf.for %i = %c0 to %c10 step %c1 {
+          scf.if %cond {
+            linalg.generic {
+              indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+              iterator_types = ["parallel"]
+            } ins(%buffer : memref<128xf32>) 
+              outs(%buffer : memref<128xf32>) {
+            ^bb0(%in: f32, %out: f32):
+              %sum = arith.addf %in, %value : f32
+              linalg.yield %sum : f32
+            }
+            scf.for %j = %c0 to %c10 step %c1 {
+              linalg.generic {
+                indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+                iterator_types = ["parallel"]
+              } ins(%buffer : memref<128xf32>) 
+                outs(%buffer : memref<128xf32>) {
+              ^bb0(%in: f32, %out: f32):
+                %sum = arith.addf %in, %value : f32
+                linalg.yield %sum : f32
+              }
+            }
+            linalg.generic {
+              indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+              iterator_types = ["parallel"]
+            } ins(%buffer : memref<128xf32>) 
+              outs(%buffer : memref<128xf32>) {
+            ^bb0(%in: f32, %out: f32):
+              %sum = arith.addf %in, %value : f32
+              linalg.yield %sum : f32
+            }
+          }
+        }
+        return
+      }
+  }
