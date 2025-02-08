@@ -252,7 +252,29 @@ struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> 
     return success();
   }
 }; 
-          
+
+void findUsersInRegion(
+    mlir::Value value, 
+    mlir::Region& region, 
+    llvm::SmallVectorImpl<mlir::Operation*>& users
+) {
+    for (mlir::Block& block : region) {
+        for (mlir::Operation& op : block) {
+            for (mlir::Value operand : op.getOperands()) {
+                if (operand == value) {
+                    users.push_back(&op);
+                    break; // No need to check other operands for this op
+                }
+            }
+
+            // Recursively check all sub-regions of this operation
+            for (mlir::Region& subRegion : op.getRegions()) {
+                findUsersInRegion(value, subRegion, users);
+            }
+        }
+    }
+}
+
 void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVector<Region*> regions, std::vector<Operation *> expandedUserList, llvm::DenseMap<Operation*, opTuple> opResultMap, PatternRewriter &rewriter) {
   auto module = currentValue.getDefiningOp()->getParentOfType<ModuleOp>();
   for (Region* region : regions) {
@@ -322,21 +344,27 @@ void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVe
       else if (auto prevFor = dyn_cast_or_null<scf::ForOp>(parentOp)) {
         mlir::Value initTensor;
         int insertIdx = 0;
-        int opOperandIdx = 0;
-        mlir::Operation * earliestUser; 
+
+        //Find init Tensor for the given for loop, i.e first match to expanded user list
         for(auto user: expandedUserList) {
           mlir::Region *opRegion = user->getParentRegion();
           if(region->isAncestor(opRegion)) {
             //Maintain a map data structure for tracking every user and if they have been processed then the corresponding result
             auto it = opResultMap.find(user);
-            earliestUser = user;
+            if(it == opResultMap.end())
+              continue;
             auto keys_value = it->second;
             auto op_result = std::get<0>(keys_value);
             initTensor = std::get<1>(keys_value);
             break;
           }
+          //TODO: Fix this- need to be only updated until we get first region ancestor match
           insertIdx++; 
-        } 
+        }
+
+        //After first match, now find all the users of the init Tensor in a region.
+        llvm::SmallVector<mlir::Operation*> initOpUsers;
+        findUsersInRegion(initTensor, *region, initOpUsers);
         
         SmallVector<Value> newInitOperands = prevFor.getInitArgs();
         newInitOperands.push_back(initTensor); //Needs to be the earliest use inside the region.
@@ -383,10 +411,21 @@ void propagateValueThroughRegion(Value &currentValue, Value &prevTensor, SmallVe
         rewriter.replaceOpWithNewOp<scf::YieldOp>(yieldOp, newYieldValues);
         
         //Update prevTensor to use iter_arg
-        OpOperand &operand = earliestUser->getOpOperand(opOperandIdx);
-        Value newValue = newLoop.getRegionIterArg(newLoop.getRegion().front().getNumArguments()-2); //-1 for IV
-        operand.set(newValue);
+        for(auto initOpUser: initOpUsers) {
+          // Iterate over all operands (both inputs and outputs)
+          for (const auto &en : llvm::enumerate(initOpUser->getOperands())) {
+            if (en.value() == initTensor) {
+              OpOperand &operand = initOpUser->getOpOperand(en.index());
+              Value newValue = newLoop.getRegionIterArg(newLoop.getRegion().front().getNumArguments()-2); //-1 for IV
+              operand.set(newValue);
+            }
+          }
+        }
 
+        //Update users of prev For loops results 
+        for (auto [oldResult, newResult] : llvm::zip(prevFor.getResults(), newLoop.getResults().drop_back())) {
+          oldResult.replaceAllUsesWith(newResult);
+        }
         rewriter.eraseOp(prevFor);
         currentValue = newLoop.getResults().back(); 
         
