@@ -102,8 +102,36 @@
         return
       }
   }
-
-  module @in_place_add_for_loop_carried2{
+  module @cross_buffer_add{
+      func.func @in_place_add(%buf:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
+        %c0 = arith.constant 0 : index
+        %c1 = arith.constant 1 : index
+        %c10 = arith.constant 10 : index
+        %buf2 = memref.alloca() : memref<128xf32>
+        linalg.generic {
+          indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+          iterator_types = ["parallel"]
+        } ins(%buf : memref<128xf32>) 
+          outs(%buf2 : memref<128xf32>) {
+        ^bb0(%in: f32, %out: f32):
+          %sum = arith.addf %in, %value : f32
+          linalg.yield %sum : f32
+        }
+        linalg.generic {
+          indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+          iterator_types = ["parallel"]
+        } ins(%buf2 : memref<128xf32>) 
+          outs(%buf : memref<128xf32>) {
+        ^bb0(%in: f32, %out: f32):
+          %sum = arith.addf %in, %value : f32
+          %sum2 = arith.addf %sum, %value : f32
+          linalg.yield %sum2 : f32
+        }
+        return
+      }
+  }
+  
+  module @in_place_add_for_loop_carried_cross_buffer{
       func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
         %c0 = arith.constant 0 : index
         %c1 = arith.constant 1 : index
@@ -134,35 +162,71 @@
         return
       }
   }
-  
-    module @cross_buffer_add{
-      func.func @in_place_add(%buf:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
-        %c0 = arith.constant 0 : index
-        %c1 = arith.constant 1 : index
-        %c10 = arith.constant 10 : index
-        %buf2 = memref.alloca() : memref<128xf32>
-        linalg.generic {
-          indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
-          iterator_types = ["parallel"]
-        } ins(%buf : memref<128xf32>) 
-          outs(%buf2 : memref<128xf32>) {
-        ^bb0(%in: f32, %out: f32):
-          %sum = arith.addf %in, %value : f32
-          linalg.yield %sum : f32
-        }
-        linalg.generic {
-          indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
-          iterator_types = ["parallel"]
-        } ins(%buf2 : memref<128xf32>) 
-          outs(%buf : memref<128xf32>) {
-        ^bb0(%in: f32, %out: f32):
-          %sum = arith.addf %in, %value : f32
-          %sum2 = arith.addf %sum, %value : f32
-          linalg.yield %sum2 : f32
-        }
-        return
-      }
-  }
+
+//    //TODO: Doesn't bufferize --affine loop carried iter_args doesn't canonicalizes (missing pattern?)
+//    module @in_place_add_for_loop_carried3{
+//       func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
+//         %c0 = arith.constant 0 : index
+//         %c1 = arith.constant 1 : index
+//         %c10 = arith.constant 10 : index
+//         %buffer2 = memref.alloca() : memref<128xf32>
+//         %result:2 =  affine.for %i = %c0 to %c10 iter_args(%buf = %buffer, %buf2 = %buffer2) -> (memref<128xf32>, memref<128xf32>) {
+//           linalg.generic {
+//             indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+//             iterator_types = ["parallel"]
+//           } ins(%buf : memref<128xf32>) 
+//             outs(%buf2 : memref<128xf32>) {
+//           ^bb0(%in: f32, %out: f32):
+//             %sum = arith.addf %in, %value : f32
+//             linalg.yield %sum : f32
+//           }
+//           linalg.generic {
+//             indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+//             iterator_types = ["parallel"]
+//           } ins(%buf2 : memref<128xf32>) 
+//             outs(%buf : memref<128xf32>) {
+//           ^bb0(%in: f32, %out: f32):
+//             %sum = arith.addf %in, %value : f32
+//             %sum2 = arith.addf %sum, %value : f32
+//             linalg.yield %sum2 : f32
+//           }
+//           affine.yield %buf, %buf2 : memref<128xf32>, memref<128xf32>
+//         }
+//         return
+//       }
+//   }
+
+//   module @in_place_add_for_loop_affine{
+//       func.func @in_place_add(%buf:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
+//         %c0 = arith.constant 0 : index
+//         %c1 = arith.constant 1 : index
+//         %c10 = arith.constant 10 : index
+//         %buf2 = memref.alloca() : memref<128xf32>
+//         affine.for %i = %c0 to %c10 {
+//           linalg.generic {
+//             indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+//             iterator_types = ["parallel"]
+//           } ins(%buf : memref<128xf32>) 
+//             outs(%buf2 : memref<128xf32>) {
+//           ^bb0(%in: f32, %out: f32):
+//             %sum = arith.addf %in, %value : f32
+//             linalg.yield %sum : f32
+//           }
+//           linalg.generic {
+//             indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+//             iterator_types = ["parallel"]
+//           } ins(%buf2 : memref<128xf32>) 
+//             outs(%buf : memref<128xf32>) {
+//           ^bb0(%in: f32, %out: f32):
+//             %sum = arith.addf %in, %value : f32
+//             %sum2 = arith.addf %sum, %value : f32
+//             linalg.yield %sum2 : f32
+//           }
+//         }
+//         return
+//       }
+//   }
+
 
      module @in_place_cond_add_followed_by_add{
        func.func @in_place_add(%buffer:  memref<128xf32> {llvm.noalias}, %value: f32, %cond: i1) {
@@ -198,6 +262,17 @@
          %c0 = arith.constant 0 : index
          //%buffer = memref.alloca() : memref<128xf32>
          scf.if %cond2 {
+          linalg.generic {
+            indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+            iterator_types = ["parallel"]
+          } ins(%buffer : memref<128xf32>) 
+            outs(%buffer : memref<128xf32>) {
+          ^bb0(%in: f32, %out: f32):
+            %sum = arith.addf %in, %value : f32
+            %sum2 = arith.addf %sum, %value : f32
+            %sum3 = arith.addf %sum2, %value : f32
+            linalg.yield %sum3 : f32
+          }
           scf.if %cond {
             linalg.generic {
               indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
@@ -211,6 +286,18 @@
             }
           }
          }
+          scf.if %cond {
+            linalg.generic {
+              indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
+              iterator_types = ["parallel"]
+            } ins(%buffer : memref<128xf32>) 
+              outs(%buffer : memref<128xf32>) {
+            ^bb0(%in: f32, %out: f32):
+              %sum = arith.addf %in, %value : f32
+              %sum2 = arith.addf %sum, %value : f32
+              linalg.yield %sum2 : f32
+            }
+          }
          linalg.generic {
            indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>],
            iterator_types = ["parallel"]
