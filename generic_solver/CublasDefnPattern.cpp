@@ -31,19 +31,31 @@ bool areRegionsEquivalent(Region &first, Region &second) {
     if (firstBlock.getNumArguments() != secondBlock.getNumArguments())
       return false;
 
-    // Compare argument types
+    //// Compare argument types
+    //for (auto argPair : llvm::zip(firstBlock.getArguments(), 
+    //                              secondBlock.getArguments())) {
+    //  if (std::get<0>(argPair).getType() != std::get<1>(argPair).getType())
+    //    return false;
+    //}
+
+    //Traverse the use-def chain of the arguments and compare the operation names
     for (auto argPair : llvm::zip(firstBlock.getArguments(), 
                                   secondBlock.getArguments())) {
-      if (std::get<0>(argPair).getType() != std::get<1>(argPair).getType())
+      if (std::get<0>(argPair).getName() != std::get<1>(argPair).getName())
         return false;
+      //Traverse the use-def chain of the argument
+      for (auto use : std::get<0>(argPair).getUses()) {
+        if (use.getOwner().getName() != std::get<1>(argPair).getName())
+          return false;
+      }
     }
 
-    // Compare operations (simplified - real implementation would be more complex)
-    if (firstBlock.getOperations().size() != secondBlock.getOperations().size())
-      return false;
+    //// Compare operations (simplified - real implementation would be more complex)
+    //if (firstBlock.getOperations().size() != secondBlock.getOperations().size())
+    //  return false;
 
-    // For a full implementation, you'd need more sophisticated operation comparison
-    // based on operands, attributes, and result types
+    //// For a full implementation, you'd need more sophisticated operation comparison
+    //// based on operands, attributes, and result types
   }
 
   return true;
@@ -81,6 +93,83 @@ bool areIteratorTypesEquivalent(ArrayAttr firstTypes, ArrayAttr secondTypes) {
   return true;
 }
 
+// Cases:
+// 1. What if they do a*(b+c) as a*b+a*c ?
+// 2. What is they do  (a+b)/c as a/c+b/c ?
+//    - The required best form can vary based on a cost model for a given architecture
+//    - The expectation is that kernel.defn is the best form an op is expected to take
+//    - The generic solver will employ heuristics to match the best form
+//    - Heuristics can be as simple as "is the op a commutative operation ?",
+//      "is the op an associative operation ?", "is the op distributive ?", etc.
+// 3. What if the order of operations is different ? add(a,b) as add(b,a)
+//    - This requires a commutative check for operations, i.e in commutative ops
+//      we don't need to match positions
+// 4. What if order of uses are different for an op? Eg- 
+//    a1 = ...    |    a2 = ...
+//    b1 = a1/c1  |    d2 = a2*c2
+//    d1 = a1*c1  |    b2 = a2/c2
+//    - In this case, we need to find the corresponding uses of the operands
+// 5. 
+
+// Non-recursive traversal of use-def chain using a stack
+bool compareUseDefChains(Value firstValue, Value secondValue) {
+  // Use a std::stack to track operations we need to visit
+  std::stack<std::pair<Value, Value>> workList;
+  std::set<std::pair<void*, void*>> visited;
+  
+  // Start with the initial values
+  workList.push({firstValue, secondValue});
+  
+  while (!workList.empty()) {
+    auto [value1, value2] = workList.top();
+    workList.pop();
+    
+    // Skip if we've already processed this pair
+    auto valuePtrPair = std::make_pair(value1.getImpl(), value2.getImpl());
+    if (visited.count(valuePtrPair))
+      continue;
+    visited.insert(valuePtrPair);
+    
+    // Compare the values themselves
+    if (value1.getType() != value2.getType())
+      return false;
+    
+    // Compare all uses
+    auto uses1 = value1.getUses();
+    auto uses2 = value2.getUses();
+    
+    // Process each use
+    for (auto &use1 : uses1) {
+      Operation *op1 = use1.getOwner();
+      
+      // Find corresponding use in second value
+      bool foundMatch = false;
+      for (auto &use2 : uses2) {
+        Operation *op2 = use2.getOwner();
+        
+        // Compare operations (customize based on your definition of equivalence)
+        if (op1->getName() == op2->getName() &&
+        //This requires a commutative check
+            use1.getOperandNumber() == use2.getOperandNumber()) {
+          foundMatch = true;
+          
+          // Add results to worklist to continue traversal
+          for (unsigned i = 0; i < op1->getNumResults(); ++i) {
+            if (i < op2->getNumResults())
+              workList.push({op1->getResult(i), op2->getResult(i)});
+          }
+          break;
+        }
+      }
+      
+      if (!foundMatch)
+        return false;
+    }
+  }
+  
+  return true;
+}
+
 // Check if a linalg.generic operation matches a kernel.defn in a collection
 FailureOr<std::string> matchGenericWithDefn(
     GenericOp genericOp, 
@@ -107,12 +196,22 @@ FailureOr<std::string> matchGenericWithDefn(
       // Check if this linalg.generic matches our target
       if (candidateOp.getNumDpsInputs() == numInputs &&
           candidateOp.getNumDpsInits() == numOutputs &&
-          //TODO: Generalize to a single dialect, with no special ops
+          //DONE: Generalize to a single dialect, with no special ops
           //TODO: Indexing maps and orders might differ
           //TODO: More complex case- where extra loops exists around the ops we have
           //TODO: Custom cost model ?
           //TODO: Constants might require special handling such as bounds
           //IDEA: Descheduling / removing tiles
+          int numOfIndexingMaps = indexingMaps.size();
+          int combinations = calculate_combinations(numOfIndexingMaps);
+          int calculatedCombinations(int numOfPos) {
+            //Calculate factorial of numOfPos
+            int result = 1;
+            for (int i = 1; i <= numOfPos; i++) {
+              result *= i;
+            }
+            return result;
+          }
           areIndexingMapsEquivalent(candidateOp.getIndexingMapsAttr(), indexingMaps) &&
           areIteratorTypesEquivalent(candidateOp.getIteratorTypesAttr(), iteratorTypes) &&
           areRegionsEquivalent(candidateOp.getRegion(), genericOp.getRegion())) {
