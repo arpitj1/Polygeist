@@ -619,7 +619,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
             stores_map[load] = store;
             continue;
           }
-          return failure();
+          //return failure();
         }
       }
       for (auto &&[_, store2] : stores) {
@@ -915,7 +915,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
     // This index will replace the use of the affine index
     auto idx = rewriter.create<linalg::IndexOp>(loop.getLoc(),
-                                                rewriter.getIndexAttr(0));
+                                                0);
     rewriter.replaceAllUsesWith(loop.getInductionVar(), idx);
 
     auto &body = genericOp.getRegion();

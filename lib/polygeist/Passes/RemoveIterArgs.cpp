@@ -144,128 +144,108 @@ struct RemoveSCFIterArgs : public OpRewritePattern<scf::ForOp> {
   }
 };
 
+// General Case(TODO):
+// ALGo:
+//  1. Create an alloca(stack) variable
+//     How to know it's dims? It should be based on number of reduction
+//     loops
+//  2. Initialize it with init value just outside the for loop if init
+//  value is non-zero
+//  3. memref.load that value in the for loop
+//  4. Replace all the uses of the iter_arg with the loaded value
+//  5. Add a memref.store for the value to be yielded
+//  6. Replace all uses of for-loops yielded value with a single inserted
+//  memref.load
+// Special case:
+// ALGo:
+// Optimize away memref.store and memref.load, if the only users of
+// memref.load are memref.store (can use affine-scalrep pass for that ? No
+// it does store to load forwarding) What we need is forwarding of local
+// store to final store and deleting the intermediate alloca created. This
+// is only possible if the user of alloca is a storeOp.
+//  1. Identify the single store of the for loop result
+//  2. Initialize it with iter arg init, outside the for loop. (TODO)
+//  3. Do a load from the memref
+//  4. move the store to memref inside the loop.
+
 struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
   using OpRewritePattern<affine::AffineForOp>::OpRewritePattern;
   LogicalResult matchAndRewrite(affine::AffineForOp forOp,
                                 PatternRewriter &rewriter) const override {
 
     ModuleOp module = forOp->getParentOfType<ModuleOp>();
-    if (!forOp.getRegion().hasOneBlock())
-      return failure();
+    rewriter.setInsertionPoint(forOp);
+    
     unsigned numIterArgs = forOp.getNumRegionIterArgs();
+    if (numIterArgs == 0)
+      return failure();
+   
     auto loc = forOp->getLoc();
-    bool changed = false;
-    llvm::SetVector<unsigned> removed;
-    llvm::MapVector<unsigned, Value> steps;
     auto yieldOp =
         cast<affine::AffineYieldOp>(forOp.getBody()->getTerminator());
-    for (unsigned i = 0; i < numIterArgs; i++) {
-      auto ba = forOp.getRegionIterArgs()[i];
-      auto init = forOp.getInits()[i];
-      auto lastOp = yieldOp->getOperand(i);
 
-      // General Case(TODO):
-      // ALGo:
-      //  1. Create an alloca(stack) variable
-      //     How to know it's dims? It should be based on number of reduction
-      //     loops
-      //  2. Initialize it with init value just outside the for loop if init
-      //  value is non-zero
-      //  3. memref.load that value in the for loop
-      //  4. Replace all the uses of the iter_arg with the loaded value
-      //  5. Add a memref.store for the value to be yielded
-      //  6. Replace all uses of for-loops yielded value with a single inserted
-      //  memref.load
-      // Special case:
-      // ALGo:
-      // Optimize away memref.store and memref.load, if the only users of
-      // memref.load are memref.store (can use affine-scalrep pass for that ? No
-      // it does store to load forwarding) What we need is forwarding of local
-      // store to final store and deleting the intermediate alloca created. This
-      // is only possible if the user of alloca is a storeOp.
-      //  1. Identify the single store of the for loop result
-      //  2. Initialize it with iter arg init, outside the for loop. (TODO)
-      //  3. Do a load from the memref
-      //  4. move the store to memref inside the loop.
+    auto ba = forOp.getRegionIterArgs()[numIterArgs - 1];
+    auto init = forOp.getInits()[numIterArgs - 1];
+    auto lastOp = yieldOp->getOperand(numIterArgs - 1);
 
-      auto result = forOp.getResult(i);
-      if (result.hasOneUse()) {
-        auto storeOp =
-            dyn_cast<affine::AffineStoreOp>(*result.getUsers().begin());
-        if (storeOp) {
-          {
-            rewriter.setInsertionPointToStart(forOp.getBody());
-            auto memrefLoad = rewriter.create<affine::AffineLoadOp>(
-                forOp.getLoc(), storeOp.getMemref(), storeOp.getMap(),
-                storeOp.getMapOperands());
-            rewriter.replaceAllUsesWith(ba, memrefLoad.getResult());
-          }
-          {
-            rewriter.setInsertionPoint(yieldOp);
-            rewriter.create<affine::AffineStoreOp>(
-                forOp.getLoc(), lastOp, storeOp.getMemref(), storeOp.getMap(),
-                storeOp.getMapOperands());
-            storeOp.erase();
-          }
-        } else {
-          return failure();
+    auto result = forOp.getResult(numIterArgs - 1);
+    if (result.hasOneUse()) {
+      auto storeOp =
+          dyn_cast<affine::AffineStoreOp>(*result.getUsers().begin());
+      if (storeOp) {
+        {
+          OpBuilder::InsertionGuard guard(rewriter);
+          rewriter.setInsertionPointToStart(forOp.getBody());
+          auto memrefLoad = rewriter.create<affine::AffineLoadOp>(
+              forOp.getLoc(), storeOp.getMemref(), storeOp.getMap(),
+              storeOp.getMapOperands());
+          rewriter.replaceAllUsesWith(ba, memrefLoad.getResult());
         }
+        {
+          OpBuilder::InsertionGuard guard(rewriter);
+          rewriter.setInsertionPoint(yieldOp);
+          rewriter.create<affine::AffineStoreOp>(
+              forOp.getLoc(), lastOp, storeOp.getMemref(), storeOp.getMap(),
+              storeOp.getMapOperands());
+          storeOp.erase();
+        }
+      } else {
+        return failure();
       }
-      // else{
-      //   alloca = rewriter.create<memref::AllocaOp>(
-      //         forOp.getLoc(), MemRefType::get(ArrayRef<int64_t>(),
-      //         forOp.getType()), ValueRange());
-      //   //Skipping init for now
-
-      //  auto memrefLoad = rewriter.create<affine::AffineLoadOp>(
-      //      forOp.getLoc(), alloca.getMemref(), op.getIndices());
-      //  rewriter.replaceOp(op, memrefLoad.getResult());
-
-      //  rewriter.create<affine::AffineStoreOp>(forOp.getLoc(), lastOp, alloca,
-      //                                   forOp.getBody()->getArguments());
-
-      //  rewriter.replaceAllUsesWith(result,)
-      //}
-
-      rewriter.setInsertionPointToStart(forOp.getBody());
-      // rewriter.replaceAllUsesWith(ba, replacementIV);
-      changed = true;
+    }
+    else{
+      return failure();
     }
 
-    if (!changed)
-      return failure();
-
-    rewriter.setInsertionPoint(forOp);
+    SmallVector<Value> newIterArgs(forOp.getInits().drop_back());
     auto newForOp = rewriter.create<affine::AffineForOp>(
         loc, forOp.getLowerBoundOperands(), forOp.getLowerBoundMap(),
         forOp.getUpperBoundOperands(), forOp.getUpperBoundMap(),
-        forOp.getStep());
+        forOp.getStep(), newIterArgs);
 
     if (!newForOp.getRegion().empty())
       newForOp.getRegion().front().erase();
-    assert(newForOp.getRegion().empty());
     rewriter.inlineRegionBefore(forOp.getRegion(), newForOp.getRegion(),
                                 newForOp.getRegion().begin());
 
     // Delete region args
     llvm::BitVector toDelete(numIterArgs + 1);
-    for (unsigned i = 0; i < numIterArgs; i++)
-      toDelete[i + 1] = true;
+    toDelete[numIterArgs] = true;
     newForOp.getBody()->eraseArguments(toDelete);
 
     SmallVector<Value> newYields;
     {
+      OpBuilder::InsertionGuard guard(rewriter);
       ValueRange empty;
       rewriter.setInsertionPoint(yieldOp);
-      auto newYieldOp = rewriter.create<affine::AffineYieldOp>(loc);
-      // rewriter.replaceOpWithNewOp<affine::AffineYieldOp>(yieldOp,
-      // newYieldOp);
-      rewriter.eraseOp(yieldOp);
+      rewriter.replaceOpWithNewOp<affine::AffineYieldOp>(yieldOp, yieldOp.getOperands().drop_back());
     }
 
-    rewriter.setInsertionPoint(newForOp);
-    rewriter.eraseOp(forOp);
+    for(int i = 0; i < numIterArgs-1; i++){
+      rewriter.replaceAllUsesWith(forOp.getResult(i), newForOp.getResult(i));
+    }
 
+    rewriter.eraseOp(forOp);
     return success();
   }
 };

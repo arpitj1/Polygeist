@@ -16,83 +16,6 @@ using namespace mlir::linalg;
 
 namespace {
 
-// Helper function to check if two regions are structurally equivalent
-bool areRegionsEquivalent(Region &first, Region &second) {
-  // Compare number of blocks
-  if (first.getBlocks().size() != second.getBlocks().size())
-    return false;
-
-  // Compare corresponding blocks
-  for (auto blockPair : llvm::zip(first.getBlocks(), second.getBlocks())) {
-    Block &firstBlock = std::get<0>(blockPair);
-    Block &secondBlock = std::get<1>(blockPair);
-
-    // Compare number of arguments
-    if (firstBlock.getNumArguments() != secondBlock.getNumArguments())
-      return false;
-
-    //// Compare argument types
-    //for (auto argPair : llvm::zip(firstBlock.getArguments(), 
-    //                              secondBlock.getArguments())) {
-    //  if (std::get<0>(argPair).getType() != std::get<1>(argPair).getType())
-    //    return false;
-    //}
-
-    //Traverse the use-def chain of the arguments and compare the operation names
-    for (auto argPair : llvm::zip(firstBlock.getArguments(), 
-                                  secondBlock.getArguments())) {
-      if (std::get<0>(argPair).getName() != std::get<1>(argPair).getName())
-        return false;
-      //Traverse the use-def chain of the argument
-      for (auto use : std::get<0>(argPair).getUses()) {
-        if (use.getOwner().getName() != std::get<1>(argPair).getName())
-          return false;
-      }
-    }
-
-    //// Compare operations (simplified - real implementation would be more complex)
-    //if (firstBlock.getOperations().size() != secondBlock.getOperations().size())
-    //  return false;
-
-    //// For a full implementation, you'd need more sophisticated operation comparison
-    //// based on operands, attributes, and result types
-  }
-
-  return true;
-}
-
-// Helper to check if indexing maps are equivalent
-bool areIndexingMapsEquivalent(ArrayAttr firstMaps, ArrayAttr secondMaps) {
-  if (firstMaps.size() != secondMaps.size())
-    return false;
-
-  for (auto mapPair : llvm::zip(firstMaps, secondMaps)) {
-    auto firstMap = std::get<0>(mapPair).cast<AffineMapAttr>().getValue();
-    auto secondMap = std::get<1>(mapPair).cast<AffineMapAttr>().getValue();
-    
-    if (firstMap != secondMap)
-      return false;
-  }
-
-  return true;
-}
-
-// Helper to check if iterator types are equivalent
-bool areIteratorTypesEquivalent(ArrayAttr firstTypes, ArrayAttr secondTypes) {
-  if (firstTypes.size() != secondTypes.size())
-    return false;
-
-  for (auto typePair : llvm::zip(firstTypes, secondTypes)) {
-    auto firstType = std::get<0>(typePair).cast<StringAttr>().getValue();
-    auto secondType = std::get<1>(typePair).cast<StringAttr>().getValue();
-    
-    if (firstType != secondType)
-      return false;
-  }
-
-  return true;
-}
-
 // Cases:
 // 1. What if they do a*(b+c) as a*b+a*c ?
 // 2. What is they do  (a+b)/c as a/c+b/c ?
@@ -167,6 +90,84 @@ bool compareUseDefChains(Value firstValue, Value secondValue) {
     }
   }
   
+  return true;
+}
+
+
+// Helper function to check if two regions are structurally equivalent
+bool areRegionsEquivalent(Region &first, Region &second) {
+  // Compare number of blocks
+  if (first.getBlocks().size() != second.getBlocks().size())
+    return false;
+
+  // Compare corresponding blocks
+  for (auto blockPair : llvm::zip(first.getBlocks(), second.getBlocks())) {
+    Block &firstBlock = std::get<0>(blockPair);
+    Block &secondBlock = std::get<1>(blockPair);
+
+    // Compare number of arguments
+    if (firstBlock.getNumArguments() != secondBlock.getNumArguments())
+      return false;
+
+    //// Compare argument types
+    //for (auto argPair : llvm::zip(firstBlock.getArguments(), 
+    //                              secondBlock.getArguments())) {
+    //  if (std::get<0>(argPair).getType() != std::get<1>(argPair).getType())
+    //    return false;
+    //}
+
+    //Traverse the use-def chain of the arguments and compare the operation names
+    for (auto argPair : llvm::zip(firstBlock.getArguments(), 
+                                  secondBlock.getArguments())) {
+      if (std::get<0>(argPair).getName() != std::get<1>(argPair).getName())
+        return false;
+      //Traverse the use-def chain of the argument
+      for (auto use : std::get<0>(argPair).getUses()) {
+        if (use.getOwner().getName() != std::get<1>(argPair).getName())
+          return false;
+      }
+    }
+
+    //// Compare operations (simplified - real implementation would be more complex)
+    //if (firstBlock.getOperations().size() != secondBlock.getOperations().size())
+    //  return false;
+
+    //// For a full implementation, you'd need more sophisticated operation comparison
+    //// based on operands, attributes, and result types
+  }
+
+  return true;
+}
+
+// Helper to check if indexing maps are equivalent
+bool areIndexingMapsEquivalent(ArrayAttr firstMaps, ArrayAttr secondMaps) {
+  if (firstMaps.size() != secondMaps.size())
+    return false;
+
+  for (auto mapPair : llvm::zip(firstMaps, secondMaps)) {
+    auto firstMap = std::get<0>(mapPair).cast<AffineMapAttr>().getValue();
+    auto secondMap = std::get<1>(mapPair).cast<AffineMapAttr>().getValue();
+    
+    if (firstMap != secondMap)
+      return false;
+  }
+
+  return true;
+}
+
+// Helper to check if iterator types are equivalent
+bool areIteratorTypesEquivalent(ArrayAttr firstTypes, ArrayAttr secondTypes) {
+  if (firstTypes.size() != secondTypes.size())
+    return false;
+
+  for (auto typePair : llvm::zip(firstTypes, secondTypes)) {
+    auto firstType = std::get<0>(typePair).cast<StringAttr>().getValue();
+    auto secondType = std::get<1>(typePair).cast<StringAttr>().getValue();
+    
+    if (firstType != secondType)
+      return false;
+  }
+
   return true;
 }
 
