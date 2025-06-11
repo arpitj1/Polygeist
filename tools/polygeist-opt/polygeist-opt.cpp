@@ -33,6 +33,8 @@
 
 #include "polygeist/Dialect.h"
 #include "polygeist/Passes/Passes.h"
+#include "polygeist/Kernel/KernelDialect.h"
+#include "polygeist/Kernel/KernelOps.h"
 
 using namespace mlir;
 
@@ -62,6 +64,7 @@ int main(int argc, char **argv) {
   registry.insert<mlir::cf::ControlFlowDialect>();
   registry.insert<mlir::linalg::LinalgDialect>();
   registry.insert<mlir::polygeist::PolygeistDialect>();
+  registry.insert<mlir::polygeist::kernel::KernelDialect>();
   registry.insert<DLTIDialect>();
 
   mlir::registerpolygeistPasses();
