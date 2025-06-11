@@ -12,12 +12,15 @@
 include "polygeist/Kernel/KernelDialect.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/Interfaces/ControlFlowInterfaces.td"
+include "mlir/Interfaces/FunctionInterfaces.td"
+include "mlir/IR/SymbolInterfaces.td"
+include "mlir/IR/OpAsmInterface.td"
 
 //===----------------------------------------------------------------------===//
 // Kernel operation definitions
 //===----------------------------------------------------------------------===//
 
-def Kernel_DefnCollectionOp : Kernel_Op<"defn_collection", []> {
+def Kernel_DefnCollectionOp : Kernel_Op<"defn_collection", [NoTerminator]> {
   let summary = "Collection of kernel operation definitions";
   let description = [{
     A collection of operation definitions that can be referenced elsewhere.
@@ -32,7 +35,13 @@ def Kernel_DefnCollectionOp : Kernel_Op<"defn_collection", []> {
   }];
 }
 
-def Kernel_DefnOp : Kernel_Op<"defn", [SingleBlockImplicitTerminator<"YieldOp">]> {
+def Kernel_DefnOp : Kernel_Op<"defn", [
+  AffineScope,
+  AutomaticAllocationScope,
+  IsolatedFromAbove, 
+  FunctionOpInterface, 
+  Symbol
+]> {
   let summary = "Definition of a kernel operation";
   let description = [{
     A definition of a kernel operation with inputs and arbitrary body code.
@@ -44,41 +53,54 @@ def Kernel_DefnOp : Kernel_Op<"defn", [SingleBlockImplicitTerminator<"YieldOp">]
     
     Example:
     ```mlir
-    %result = kernel.defn {
-    ^bb0(%A: memref<?x?xf32>, %B: memref<?x?xf32>, 
-         %C: memref<?x?xf32>, %alpha: f32):
+    kernel.defn @custom_gemm(%A: memref<?x?xf32>, %B: memref<?x?xf32>, 
+                             %C: memref<?x?xf32>, %alpha: f32) -> tensor<f32> {
       // Kernel implementation
       kernel.yield %some_result : tensor<f32>
-    } {name = "custom_gemm"} -> tensor<f32>
+    }
     ```
   }];
 
-  // TODO: can look into gpu call op (separte namespace) 
   let arguments = (ins
-    StrAttr:$name,
-    TypeAttrOf<FunctionType>:$function_type
+    SymbolNameAttr:$sym_name,
+    TypeAttrOf<FunctionType>:$function_type,
+    OptionalAttr<StrAttr>:$sym_visibility,
+    OptionalAttr<DictArrayAttr>:$arg_attrs,
+    OptionalAttr<DictArrayAttr>:$res_attrs
   );
 
-  let results = (outs Variadic<AnyType>:$results);
+  let regions = (region AnyRegion:$body);
   
-  let regions = (region SizedRegion<1>:$body);
+  let builders = [OpBuilder<(ins
+    "StringRef":$name, "FunctionType":$type,
+    CArg<"ArrayRef<NamedAttribute>", "{}">:$attrs,
+    CArg<"ArrayRef<DictionaryAttr>", "{}">:$argAttrs)
+  >];
   
-  let assemblyFormat = [{
-    $body attr-dict `->` type($results)
-  }];
+  let hasCustomAssemblyFormat = 1;
   
   let hasVerifier = 1;
 
   let extraClassDeclaration = [{
-    TypeRange getFunctionResultTypes() {
-      auto fType = getFunctionType();
-      return fType.getResults();
-    }
+    /// Returns the argument types of this kernel.
+    ArrayRef<Type> getArgumentTypes() { return getFunctionType().getInputs(); }
+
+    /// Returns the result types of this kernel.
+    ArrayRef<Type> getResultTypes() { return getFunctionType().getResults(); }
+
+    /// Returns the region on the current operation that is callable.
+    ::mlir::Region *getCallableRegion() { return &getBody(); }
+
+    //===------------------------------------------------------------------===//
+    // SymbolOpInterface Methods
+    //===------------------------------------------------------------------===//
+
+    bool isDeclaration() { return getBody().empty(); }
   }];
 }
 
-def Kernel_YieldOp : Kernel_Op<"yield", [Pure, Terminator, 
-                                          ParentOneOf<["DefnOp"]>]> {
+def Kernel_YieldOp : Kernel_Op<"yield", [Pure, HasParent<"DefnOp">,
+                                MemRefsNormalizable, ReturnLike, Terminator]> {
   let summary = "Terminator for kernel.defn operation";
   let description = [{
     The `kernel.yield` operation terminates regions within kernel operations.
@@ -87,9 +109,7 @@ def Kernel_YieldOp : Kernel_Op<"yield", [Pure, Terminator,
 
   let arguments = (ins Variadic<AnyType>:$operands);
 
-  let assemblyFormat = [{
-    ($operands^ `:` type($operands))? attr-dict
-  }];
+  let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
 
   let builders = [
     OpBuilder<(ins), [{
