@@ -14,6 +14,7 @@ add_mlir_dialect_library(MLIRPolygeistTransforms
   RemoveIterArgs.cpp
   RaiseToLinalg.cpp
   LinalgDebufferize.cpp
+  LinalgToKernel.cpp
   ParallelLower.cpp
   TrivialUse.cpp
   ConvertPolygeistToLLVM.cpp
@@ -45,15 +46,18 @@ add_mlir_dialect_library(MLIRPolygeistTransforms
   MLIRGPUToNVVMTransforms
   MLIRIR
   MLIRLLVMDialect
+  MLIRLinalgDialect
   MLIRMathDialect
   MLIRMathToLLVM
   MLIRMemRefDialect
   MLIRNVVMDialect
   MLIRPass
   MLIRPolygeist
+  MLIRPolygeistKernel
   MLIRSideEffectInterfaces
   MLIRSCFToControlFlow
   MLIRTargetLLVMIRImport
+  MLIRTensorDialect
   MLIRTransformUtils
   MLIRGPUToROCDLTransforms
   MLIRControlFlowToLLVM

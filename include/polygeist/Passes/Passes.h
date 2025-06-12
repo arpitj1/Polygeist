@@ -73,6 +73,8 @@ createGpuSerializeToHsacoPass(StringRef arch, StringRef features,
                               int llvmOptLevel, int hsaOptLevel,
                               std::string rocmPath, bool outputIntermediate);
 
+std::unique_ptr<Pass> createLinalgToKernelPass();
+
 void registerGpuSerializeToCubinPass();
 void registerGpuSerializeToHsacoPass();
 
@@ -98,6 +100,11 @@ namespace omp {
 class OpenMPDialect;
 } // end namespace omp
 
+namespace polygeist {
+namespace kernel {
+class KernelDialect;
+} // end namespace kernel
+}
 namespace polygeist {
 class PolygeistDialect;
 } // end namespace polygeist
@@ -128,6 +135,10 @@ class AffineDialect;
 
 namespace linalg {
 class LinalgDialect;
+}
+
+namespace tensor {
+class TensorDialect;
 }
 
 namespace bufferization {

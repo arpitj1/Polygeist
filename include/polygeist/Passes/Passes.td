@@ -255,6 +255,47 @@ def RemoveTrivialUse : Pass<"trivialuse"> {
   let constructor = "mlir::polygeist::createRemoveTrivialUsePass()";
 }
 
+def LinalgToKernel : Pass<"linalg-to-kernel", "mlir::ModuleOp"> {
+  let summary = "Convert linalg.generic operations to kernel operations by matching with kernel.defn patterns";
+  let description = [{
+    This pass matches linalg.generic operations against patterns defined in 
+    kernel.defn_collection operations and converts them to the corresponding 
+    specialized kernel operations (e.g., kernel.gemm, kernel.batched_gemm).
+    
+    The pass performs semantic matching of linalg.generic operations by:
+    - Comparing indexing maps and iterator types
+    - Matching the operation structure within regions
+    - Checking input/output operand counts
+    
+    Example transformation:
+    ```mlir
+    // Input: linalg.generic performing matrix multiplication
+    linalg.generic {
+      indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d2)>,
+                       affine_map<(d0, d1, d2) -> (d2, d1)>,
+                       affine_map<(d0, d1, d2) -> (d0, d1)>],
+      iterator_types = ["parallel", "parallel", "reduction"]
+    } ins(%A, %B : tensor<?x?xf32>, tensor<?x?xf32>)
+      outs(%C : tensor<?x?xf32>) {
+    ^bb0(%a: f32, %b: f32, %c: f32):
+      %mul = arith.mulf %a, %b : f32
+      %add = arith.addf %mul, %c : f32
+      linalg.yield %add : f32
+    } -> tensor<?x?xf32>
+    
+    // Output: Specialized kernel operation
+    %result = kernel.gemm %C, %A, %B, %alpha, %beta : tensor<?x?xf32>
+    ```
+  }];
+  let constructor = "mlir::polygeist::createLinalgToKernelPass()";
+  let dependentDialects = [
+    "linalg::LinalgDialect",
+    "polygeist::kernel::KernelDialect",
+    "tensor::TensorDialect",
+    "arith::ArithDialect",
+  ];
+}
+
 def ConvertPolygeistToLLVM : Pass<"convert-polygeist-to-llvm", "mlir::ModuleOp"> {
   let summary = "Convert scalar and vector operations from the Standard to the "
                 "LLVM dialect";
