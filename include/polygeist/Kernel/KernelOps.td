@@ -68,7 +68,7 @@ def Kernel_DefnOp : Kernel_Op<"defn", [
     OptionalAttr<DictArrayAttr>:$arg_attrs,
     OptionalAttr<DictArrayAttr>:$res_attrs
   );
-
+  
   let regions = (region AnyRegion:$body);
   
   let builders = [OpBuilder<(ins
@@ -96,6 +96,83 @@ def Kernel_DefnOp : Kernel_Op<"defn", [
     //===------------------------------------------------------------------===//
 
     bool isDeclaration() { return getBody().empty(); }
+  }];
+}
+
+//===----------------------------------------------------------------------===//
+// LaunchOp
+//===----------------------------------------------------------------------===//
+
+def Kernel_LaunchOp : Kernel_Op<"launch",
+    [CallOpInterface, MemRefsNormalizable,
+     DeclareOpInterfaceMethods<SymbolUserOpInterface>]> {
+  let summary = "kernel launch operation";
+  let description = [{
+    The `kernel.launch` operation represents a launch of a kernel that is
+    within the same symbol scope as the launch. The operands and result types of
+    the launch must match the specified kernel type. The kernel is encoded as a
+    symbol reference attribute named "kernel".
+
+    Example:
+
+    ```mlir
+    %result = kernel.launch @custom_gemm(%A, %B, %C, %alpha) : (memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, f32) -> tensor<f32>
+    ```
+  }];
+
+  let arguments = (ins FlatSymbolRefAttr:$kernel, Variadic<AnyType>:$operands);
+  let results = (outs Variadic<AnyType>);
+
+  let builders = [
+    OpBuilder<(ins "DefnOp":$kernel, CArg<"ValueRange", "{}">:$operands), [{
+      $_state.addOperands(operands);
+      $_state.addAttribute("kernel", SymbolRefAttr::get(kernel));
+      $_state.addTypes(kernel.getFunctionType().getResults());
+    }]>,
+    OpBuilder<(ins "SymbolRefAttr":$kernel, "TypeRange":$results,
+      CArg<"ValueRange", "{}">:$operands), [{
+      $_state.addOperands(operands);
+      $_state.addAttribute("kernel", kernel);
+      $_state.addTypes(results);
+    }]>,
+    OpBuilder<(ins "StringAttr":$kernel, "TypeRange":$results,
+      CArg<"ValueRange", "{}">:$operands), [{
+      build($_builder, $_state, SymbolRefAttr::get(kernel), results, operands);
+    }]>,
+    OpBuilder<(ins "StringRef":$kernel, "TypeRange":$results,
+      CArg<"ValueRange", "{}">:$operands), [{
+      build($_builder, $_state, StringAttr::get($_builder.getContext(), kernel),
+            results, operands);
+    }]>];
+
+  let extraClassDeclaration = [{
+    FunctionType getKernelType();
+
+    /// Get the argument operands to the launched kernel.
+    operand_range getArgOperands() {
+      return {arg_operand_begin(), arg_operand_end()};
+    }
+
+    MutableOperandRange getArgOperandsMutable() {
+      return getOperandsMutable();
+    }
+
+    operand_iterator arg_operand_begin() { return operand_begin(); }
+    operand_iterator arg_operand_end() { return operand_end(); }
+
+    /// Return the kernel of this operation.
+    CallInterfaceCallable getCallableForCallee() {
+      return (*this)->getAttrOfType<SymbolRefAttr>("kernel");
+    }
+
+    /// Set the kernel for this operation.
+    void setCalleeFromCallable(CallInterfaceCallable callee) {
+      (*this)->setAttr("kernel", callee.get<SymbolRefAttr>());
+    }
+  }];
+
+  let assemblyFormat = [{
+    $kernel `(` $operands `)` attr-dict `:` functional-type($operands, results)
   }];
 }
 

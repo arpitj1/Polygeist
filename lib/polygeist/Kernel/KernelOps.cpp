@@ -85,6 +85,64 @@ LogicalResult YieldOp::verify() {
 }
 
 //===----------------------------------------------------------------------===//
+// LaunchOp
+//===----------------------------------------------------------------------===//
+
+FunctionType LaunchOp::getKernelType() {
+  // Get the kernel symbol reference
+  auto kernelAttr = (*this)->getAttrOfType<FlatSymbolRefAttr>("kernel");
+  if (!kernelAttr)
+    return nullptr;
+  
+  // Look up the kernel DefnOp in the symbol table
+  auto *symbolTableOp = (*this)->getParentWithTrait<OpTrait::SymbolTable>();
+  if (!symbolTableOp)
+    return nullptr;
+    
+  auto kernelOp = dyn_cast_or_null<DefnOp>(
+      SymbolTable::lookupSymbolIn(symbolTableOp, kernelAttr));
+  if (!kernelOp)
+    return nullptr;
+    
+  return kernelOp.getFunctionType();
+}
+
+LogicalResult LaunchOp::verifySymbolUses(SymbolTableCollection &symbolTable) {
+  // Check that the kernel attribute was specified.
+  auto kernelAttr = (*this)->getAttrOfType<FlatSymbolRefAttr>("kernel");
+  if (!kernelAttr)
+    return emitOpError("requires a 'kernel' symbol reference attribute");
+
+  // Check that the kernel symbol exists and is a DefnOp.
+  auto kernelOp = symbolTable.lookupNearestSymbolFrom<DefnOp>(*this, kernelAttr);
+  if (!kernelOp)
+    return emitOpError() << "'" << kernelAttr.getValue()
+                         << "' does not reference a valid kernel";
+
+  // Verify that the operand and result types match the kernel signature.
+  auto kernelType = kernelOp.getFunctionType();
+  if (kernelType.getNumInputs() != getNumOperands())
+    return emitOpError("incorrect number of operands for kernel");
+
+  for (unsigned i = 0, e = kernelType.getNumInputs(); i != e; ++i)
+    if (getOperand(i).getType() != kernelType.getInput(i))
+      return emitOpError("operand type mismatch: expected operand type ")
+             << kernelType.getInput(i) << ", but provided "
+             << getOperand(i).getType() << " for operand number " << i;
+
+  if (kernelType.getNumResults() != getNumResults())
+    return emitOpError("incorrect number of results for kernel");
+
+  for (unsigned i = 0, e = kernelType.getNumResults(); i != e; ++i)
+    if (getResult(i).getType() != kernelType.getResult(i))
+      return emitOpError("result type mismatch: expected result type ")
+             << kernelType.getResult(i) << ", but provided "
+             << getResult(i).getType() << " for result number " << i;
+  
+  return success();
+}
+
+//===----------------------------------------------------------------------===//
 // TableGen'd op definitions
 //===----------------------------------------------------------------------===//
 

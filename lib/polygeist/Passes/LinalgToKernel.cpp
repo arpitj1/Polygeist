@@ -81,8 +81,8 @@ bool areIteratorTypesEquivalent(ArrayAttr firstTypes, ArrayAttr secondTypes) {
     return false;
 
   for (auto typePair : llvm::zip(firstTypes, secondTypes)) {
-    auto firstType = std::get<0>(typePair).cast<StringAttr>().getValue();
-    auto secondType = std::get<1>(typePair).cast<StringAttr>().getValue();
+    auto firstType = std::get<0>(typePair).cast<linalg::IteratorTypeAttr>().getValue();
+    auto secondType = std::get<1>(typePair).cast<linalg::IteratorTypeAttr>().getValue();
     
     if (firstType != secondType)
       return false;
@@ -102,32 +102,43 @@ FailureOr<StringRef> matchGenericWithDefn(
   unsigned numInputs = genericOp.getNumDpsInputs();
   unsigned numOutputs = genericOp.getNumDpsInits();
   
+  // Variables to capture the match result
+  StringRef matchedOpName;
+  
+  SmallVector<kernel::DefnOp> defnOps;
+
+  collectionOp.walk([&](kernel::DefnOp defnOp) {
+      defnOps.push_back(defnOp);
+  });
+
+  bool foundMatch = false;
+  
   // Walk through each defn in the collection
-  for (Operation &op : collectionOp.getDefns()) {
-    auto defnOp = cast<kernel::DefnOp>(op);
-    StringRef opName = defnOp.getSymName();
+  for (auto defnOp : defnOps) {
     
+    StringRef opName = defnOp.getSymName();
     // Check for linalg.generic in the defn's body
-    bool foundMatch = false;
-    defnOp.getBody().walk([&](GenericOp candidateOp) {
-      // Skip if already found a match
-      if (foundMatch)
-        return;
-      
-      // Check if this linalg.generic matches our target
-      if (candidateOp.getNumDpsInputs() == numInputs &&
-          candidateOp.getNumDpsInits() == numOutputs &&
-          areIndexingMapsEquivalent(candidateOp.getIndexingMapsAttr(), indexingMaps) &&
-          areIteratorTypesEquivalent(candidateOp.getIteratorTypesAttr(), iteratorTypes) &&
-          areRegionsEquivalent(candidateOp.getRegion(), genericOp.getRegion())) {
-        foundMatch = true;
-      }
+    GenericOp candidateOp;
+
+    defnOp.walk([&](GenericOp genericOp) {
+        candidateOp = genericOp; //TODO: Add checks to make sure there is only single linalg.generic in the defn
     });
     
-    if (foundMatch)
-      return opName;
+    // Check if this linalg.generic matches our target
+    if (candidateOp.getNumDpsInputs() == numInputs &&
+        candidateOp.getNumDpsInits() == numOutputs &&
+        areIndexingMapsEquivalent(candidateOp.getIndexingMapsAttr(), indexingMaps) &&
+        areIteratorTypesEquivalent(candidateOp.getIteratorTypesAttr(), iteratorTypes) &&
+        areRegionsEquivalent(candidateOp.getRegion(), genericOp.getRegion())) {
+      foundMatch = true;
+      matchedOpName = opName;
+    }
+    
+    if (foundMatch) {
+      return matchedOpName;
+    }
   }
-  
+
   return failure();
 }
 
@@ -140,6 +151,15 @@ public:
 
   LogicalResult matchAndRewrite(GenericOp genericOp,
                                 PatternRewriter &rewriter) const override {
+    
+    auto module = genericOp->getParentOfType<ModuleOp>();
+    //Check if the parent of the generic op is a kernel.defn
+    if (auto parentOp = genericOp->getParentOp()) {
+      if (isa<kernel::DefnOp>(parentOp)) {
+        return failure();
+      }
+    }
+    
     // Try to match with a defn in the collection
     auto matchResult = matchGenericWithDefn(genericOp, collectionOp);
     if (failed(matchResult))
@@ -147,12 +167,66 @@ public:
     
     StringRef opName = *matchResult;
     
-    // For now, just emit a diagnostic indicating we found a match
-    // In the future, this would create the appropriate kernel operation
-    genericOp.emitRemark() << "Matched linalg.generic with kernel pattern: " << opName;
+    // Find the matched kernel.defn operation
+    kernel::DefnOp matchedDefnOp;
+    // Use const_cast to work around the const issue
+    const_cast<kernel::DefnCollectionOp&>(collectionOp).walk([&](kernel::DefnOp defnOp) {
+      if (defnOp.getSymName() == opName) {
+        matchedDefnOp = defnOp;
+        return WalkResult::interrupt();
+      }
+      return WalkResult::advance();
+    });
     
-    // TODO: Create the appropriate kernel operation based on the matched pattern
-    // This would require implementing kernel operations in the kernel dialect
+    if (!matchedDefnOp) {
+      return failure();
+    }
+    
+    // Check if the kernel.defn already exists in the target module
+    kernel::DefnOp existingDefn;
+    module.walk([&](kernel::DefnOp defnOp) {
+      if (defnOp.getSymName() == opName) {
+        // Check if this defn is inside a defn_collection (template) or at module level (callable)
+        if (!defnOp->getParentOfType<kernel::DefnCollectionOp>()) {
+          existingDefn = defnOp;
+          return WalkResult::interrupt();
+        }
+      }
+      return WalkResult::advance();
+    });
+    
+    // If the kernel.defn doesn't exist in the module, copy it
+    if (!existingDefn) {
+      // Clone the matched kernel.defn operation
+      rewriter.setInsertionPointToStart(module.getBody());
+      auto clonedDefn = rewriter.clone(*matchedDefnOp.getOperation());
+      (void)clonedDefn; // Suppress unused variable warning
+    }
+    
+    // Create kernel.launch operation to replace the genericOp
+    Location loc = genericOp.getLoc();
+    
+    // Set insertion point to the genericOp location
+    rewriter.setInsertionPoint(genericOp);
+    
+    // Get operands from the generic operation (inputs and outputs)
+    SmallVector<Value> operands;
+    operands.append(genericOp.getInputs().begin(), genericOp.getInputs().end());
+    operands.append(genericOp.getOutputs().begin(), genericOp.getOutputs().end());
+    
+    // Get result types from the generic operation
+    TypeRange resultTypes = genericOp.getResultTypes();
+    
+    // Create the kernel.launch operation
+    auto launchOp = rewriter.create<kernel::LaunchOp>(
+        loc, 
+        resultTypes,
+        opName,
+        operands
+    );
+    
+    // Replace the generic operation with the launch operation
+    rewriter.replaceOp(genericOp, launchOp.getResults());
     
     return success();
   }
