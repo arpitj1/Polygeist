@@ -294,6 +294,12 @@ def LinalgToKernel : Pass<"linalg-to-kernel", "mlir::ModuleOp"> {
     "tensor::TensorDialect",
     "arith::ArithDialect",
   ];
+  let options = [
+    Option<"kernelLibraryPath", "kernel-library-path", "std::string", 
+           /*default=*/"\"\"", 
+           "Path to external MLIR file containing kernel.defn_collection definitions. "
+           "If empty, looks for kernel.defn_collection in the input module.">
+  ];
 }
 
 def ConvertPolygeistToLLVM : Pass<"convert-polygeist-to-llvm", "mlir::ModuleOp"> {

@@ -74,6 +74,7 @@ createGpuSerializeToHsacoPass(StringRef arch, StringRef features,
                               std::string rocmPath, bool outputIntermediate);
 
 std::unique_ptr<Pass> createLinalgToKernelPass();
+std::unique_ptr<Pass> createLinalgToKernelPass(const std::string& kernelLibraryPath);
 
 void registerGpuSerializeToCubinPass();
 void registerGpuSerializeToHsacoPass();

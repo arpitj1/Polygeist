@@ -11,7 +11,11 @@
 #include "mlir/Dialect/Tensor/IR/Tensor.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "mlir/Parser/Parser.h"
+#include "mlir/Support/FileUtilities.h"
 #include "llvm/ADT/TypeSwitch.h"
+#include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/ToolOutputFile.h"
 #include "polygeist/Kernel/KernelDialect.h"
 #include "polygeist/Kernel/KernelOps.h"
 #include "polygeist/Passes/Passes.h"
@@ -123,6 +127,10 @@ FailureOr<StringRef> matchGenericWithDefn(
     defnOp.walk([&](GenericOp genericOp) {
         candidateOp = genericOp; //TODO: Add checks to make sure there is only single linalg.generic in the defn
     });
+
+    if(!candidateOp) {
+      continue;
+    }
     
     // Check if this linalg.generic matches our target
     if (candidateOp.getNumDpsInputs() == numInputs &&
@@ -237,19 +245,86 @@ private:
 
 // Pass to apply the rewrite pattern
 struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
+  using LinalgToKernelBase::LinalgToKernelBase;
+  
+  // Constructor that allows setting the kernel library path
+  LinalgToKernelPass() = default;
+  LinalgToKernelPass(const std::string& libraryPath) : externalLibraryPath(libraryPath) {}
+  
   void runOnOperation() override {
     ModuleOp module = getOperation();
     
-    // Find the kernel.defn_collection in the module
     kernel::DefnCollectionOp collectionOp;
-    module.walk([&](kernel::DefnCollectionOp op) {
-      collectionOp = op;
-      return WalkResult::interrupt();
-    });
     
-    if (!collectionOp) {
-      module.emitError("No kernel.defn_collection found in module");
-      return signalPassFailure();
+    // Determine which path to use for kernel library
+    std::string effectiveLibraryPath = externalLibraryPath;
+    // If no external path was provided via constructor, try the command line option
+    if (effectiveLibraryPath.empty()) {
+      effectiveLibraryPath = std::string(kernelLibraryPath);
+    }
+    
+    // Debug output
+    llvm::errs() << "DEBUG: externalLibraryPath = '" << externalLibraryPath << "'\n";
+    llvm::errs() << "DEBUG: kernelLibraryPath = '" << std::string(kernelLibraryPath) << "'\n";
+    llvm::errs() << "DEBUG: effectiveLibraryPath = '" << effectiveLibraryPath << "'\n";
+    
+    // Check if we should load kernel definitions from an external file
+    if (!effectiveLibraryPath.empty()) {
+      //llvm::errs() << "DEBUG: Loading kernel definitions from external file: " << effectiveLibraryPath << "\n";
+      // Load kernel definitions from external file
+      std::string errorMessage;
+      auto memoryBuffer = mlir::openInputFile(effectiveLibraryPath, &errorMessage);
+      if (!memoryBuffer) {
+        module.emitError("Failed to open kernel library file: ") << effectiveLibraryPath 
+                         << " - " << errorMessage;
+        return signalPassFailure();
+      }
+      
+      // Parse the external file
+      llvm::SourceMgr sourceMgr;
+      sourceMgr.AddNewSourceBuffer(std::move(memoryBuffer), llvm::SMLoc());
+      
+      auto externalModule = mlir::parseSourceFile<ModuleOp>(sourceMgr, &getContext());
+      if (!externalModule) {
+        module.emitError("Failed to parse kernel library file: ") << effectiveLibraryPath;
+        return signalPassFailure();
+      }
+      
+      // Debug: Print the loaded external module
+      //llvm::errs() << "DEBUG: Successfully loaded external module:\n";
+      //externalModule->print(llvm::errs());
+      //llvm::errs() << "\n";
+      
+      // Find the kernel.defn_collection in the external module
+      externalModule->walk([&](kernel::DefnCollectionOp op) {
+        collectionOp = op;
+        llvm::errs() << "DEBUG: Found kernel.defn_collection in external module\n";
+        return WalkResult::interrupt();
+      });
+      
+      if (!collectionOp) {
+        module.emitError("No kernel.defn_collection found in external kernel library: ") 
+                         << effectiveLibraryPath;
+        return signalPassFailure();
+      }
+      
+      // Debug: Print the found collection
+      //llvm::errs() << "DEBUG: kernel.defn_collection contents:\n";
+      //collectionOp.print(llvm::errs());
+      //llvm::errs() << "\n";
+    } else {
+      // Find the kernel.defn_collection in the current module (original behavior)
+      module.walk([&](kernel::DefnCollectionOp op) {
+        collectionOp = op;
+        return WalkResult::interrupt();
+      });
+      
+      if (!collectionOp) {
+        module.emitError("No kernel.defn_collection found in module. "
+                         "Either include one in the input module or specify "
+                         "--kernel-library-path to load from external file.");
+        return signalPassFailure();
+      }
     }
     
     // Apply the rewrite pattern
@@ -259,6 +334,9 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
     if (failed(applyPatternsAndFoldGreedily(module, std::move(patterns))))
       return signalPassFailure();
   }
+
+private:
+  std::string externalLibraryPath;
 };
 
 } // namespace
@@ -268,6 +346,11 @@ namespace mlir::polygeist {
 // Create a pass to convert linalg.generic to kernel
 std::unique_ptr<Pass> createLinalgToKernelPass() {
   return std::make_unique<LinalgToKernelPass>();
+}
+
+// Create a pass to convert linalg.generic to kernel with kernel library path
+std::unique_ptr<Pass> createLinalgToKernelPass(const std::string& kernelLibraryPath) {
+  return std::make_unique<LinalgToKernelPass>(kernelLibraryPath);
 }
 
 } // namespace mlir::polygeist 
