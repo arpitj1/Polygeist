@@ -111,6 +111,10 @@ FailureOr<StringRef> matchGenericWithDefn(
   
   SmallVector<kernel::DefnOp> defnOps;
 
+      //llvm::errs() << "DEBUG: kernel.defn_collection contents:\n";
+      //llvm::errs() << collectionOp;
+      //llvm::errs() << collectionOp.getOperation();
+      //llvm::errs() << "\n";
   collectionOp.walk([&](kernel::DefnOp defnOp) {
       defnOps.push_back(defnOp);
   });
@@ -254,8 +258,8 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
   void runOnOperation() override {
     ModuleOp module = getOperation();
     
-    kernel::DefnCollectionOp collectionOp;
-    
+    kernel::DefnCollectionOp collectionOp = nullptr;
+    OwningOpRef<ModuleOp> externalModule;
     // Determine which path to use for kernel library
     std::string effectiveLibraryPath = externalLibraryPath;
     // If no external path was provided via constructor, try the command line option
@@ -263,10 +267,10 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
       effectiveLibraryPath = std::string(kernelLibraryPath);
     }
     
-    // Debug output
-    llvm::errs() << "DEBUG: externalLibraryPath = '" << externalLibraryPath << "'\n";
-    llvm::errs() << "DEBUG: kernelLibraryPath = '" << std::string(kernelLibraryPath) << "'\n";
-    llvm::errs() << "DEBUG: effectiveLibraryPath = '" << effectiveLibraryPath << "'\n";
+    //// Debug output
+    //llvm::errs() << "DEBUG: externalLibraryPath = '" << externalLibraryPath << "'\n";
+    //llvm::errs() << "DEBUG: kernelLibraryPath = '" << std::string(kernelLibraryPath) << "'\n";
+    //llvm::errs() << "DEBUG: effectiveLibraryPath = '" << effectiveLibraryPath << "'\n";
     
     // Check if we should load kernel definitions from an external file
     if (!effectiveLibraryPath.empty()) {
@@ -284,7 +288,7 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
       llvm::SourceMgr sourceMgr;
       sourceMgr.AddNewSourceBuffer(std::move(memoryBuffer), llvm::SMLoc());
       
-      auto externalModule = mlir::parseSourceFile<ModuleOp>(sourceMgr, &getContext());
+      externalModule = mlir::parseSourceFile<ModuleOp>(sourceMgr, &getContext());
       if (!externalModule) {
         module.emitError("Failed to parse kernel library file: ") << effectiveLibraryPath;
         return signalPassFailure();
@@ -310,7 +314,8 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
       
       // Debug: Print the found collection
       //llvm::errs() << "DEBUG: kernel.defn_collection contents:\n";
-      //collectionOp.print(llvm::errs());
+      //llvm::errs() << collectionOp;
+      //llvm::errs() << collectionOp.getOperation();
       //llvm::errs() << "\n";
     } else {
       // Find the kernel.defn_collection in the current module (original behavior)
@@ -330,6 +335,12 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
     // Apply the rewrite pattern
     RewritePatternSet patterns(&getContext());
     patterns.add<LinalgGenericToKernelPattern>(&getContext(), collectionOp);
+      
+      //llvm::errs() << "DEBUG: kernel.defn_collection contents:\n";
+      //llvm::errs() << collectionOp.getOperation();
+      //llvm::errs() << "\n";
+      //llvm::errs() << collectionOp;
+      //llvm::errs() << "\n";
     
     if (failed(applyPatternsAndFoldGreedily(module, std::move(patterns))))
       return signalPassFailure();
