@@ -27,10 +27,7 @@ module {
     }
 
     // Scaled GEMM operation definition with alpha and beta coefficients
-    kernel.defn @gemm_linalg(%A: tensor<?x?xf32>, %B: tensor<?x?xf32>, %C: tensor<?x?xf32>) -> tensor<?x?xf32> {
-      %alpha = arith.constant 1.0 : f32
-      %beta = arith.constant 0.0 : f32
-      
+    kernel.defn @gemm_linalg(%A: tensor<?x?xf32>, %B: tensor<?x?xf32>, %C: tensor<?x?xf32>, %alpha: f32, %beta: f32) -> tensor<?x?xf32> {
       // GEMM with scaling: C = alpha * A * B + beta * C
       %result = linalg.generic {
         indexing_maps = [
@@ -52,11 +49,7 @@ module {
     }
 
     // Sum of absolute values operation (ASUM)
-    kernel.defn @asum_linalg(%X: tensor<?xf32>) -> tensor<f32> {
-      %c0 = arith.constant 0.0 : f32
-      %init = tensor.empty() : tensor<f32>
-      %fill = linalg.fill ins(%c0 : f32) outs(%init : tensor<f32>) -> tensor<f32>
-      
+    kernel.defn @asum_linalg(%X: tensor<?xf32>, %init: tensor<f32>) -> tensor<f32> {
       // Sum of absolute values: result = sum_i |x_i|
       %result = linalg.generic {
         indexing_maps = [
@@ -65,7 +58,7 @@ module {
         ],
         iterator_types = ["reduction"]
       } ins(%X : tensor<?xf32>) 
-        outs(%fill : tensor<f32>) {
+        outs(%init : tensor<f32>) {
         ^bb0(%in: f32, %out: f32):
           %abs_val = math.absf %in : f32
           %result = arith.addf %abs_val, %out : f32
@@ -75,11 +68,7 @@ module {
     }
 
     // Vector dot product
-    kernel.defn @dot_linalg(%X: tensor<?xf32>, %Y: tensor<?xf32>) -> tensor<f32> {
-      %c0 = arith.constant 0.0 : f32
-      %init = tensor.empty() : tensor<f32>
-      %fill = linalg.fill ins(%c0 : f32) outs(%init : tensor<f32>) -> tensor<f32>
-      
+    kernel.defn @dot_linalg(%X: tensor<?xf32>, %Y: tensor<?xf32>, %init: tensor<f32>) -> tensor<f32> {
       // Dot product: result = sum_i x_i * y_i
       %result = linalg.generic {
         indexing_maps = [
@@ -89,13 +78,63 @@ module {
         ],
         iterator_types = ["reduction"]
       } ins(%X, %Y : tensor<?xf32>, tensor<?xf32>) 
-        outs(%fill : tensor<f32>) {
+        outs(%init : tensor<f32>) {
         ^bb0(%x: f32, %y: f32, %out: f32):
           %product = arith.mulf %x, %y : f32
           %result = arith.addf %product, %out : f32
           linalg.yield %result : f32
       } -> tensor<f32>
       kernel.yield %result : tensor<f32>
+    }
+
+    // Index of maximum absolute value operation definition with linalg.generic representation
+    kernel.defn @iamax_linalg(%X: tensor<?xf32>, %init: tensor<i32>) -> tensor<i32> {
+      // Implementation using linalg.generic
+      %result = linalg.generic {
+        indexing_maps = [
+          affine_map<(i) -> (i)>,      // Input vector
+          affine_map<(i) -> ()>        // Result scalar (index)
+        ],
+        iterator_types = ["reduction"]
+      } ins(%X : tensor<?xf32>) 
+        outs(%init : tensor<i32>) {
+        ^bb0(%in: f32, %out: i32):
+          %idx = linalg.index 0 : index
+          %abs_val = math.absf %in : f32
+          %curr_max_idx = arith.index_cast %out : i32 to index
+          %curr_max = tensor.extract %X[%curr_max_idx] : tensor<?xf32>
+          %curr_max_abs = math.absf %curr_max : f32
+          %cmp = arith.cmpf ogt, %abs_val, %curr_max_abs : f32
+          %new_idx = arith.select %cmp, %idx, %curr_max_idx : index
+          %result = arith.index_cast %new_idx : index to i32
+          linalg.yield %result : i32
+      } -> tensor<i32>
+      kernel.yield %result : tensor<i32>
+    }
+
+    // Index of minimum absolute value operation definition with linalg.generic representation
+    kernel.defn @iamin_linalg(%X: tensor<?xf32>, %init: tensor<i32>) -> tensor<i32> {
+      // Implementation using linalg.generic
+      %result = linalg.generic {
+        indexing_maps = [
+          affine_map<(i) -> (i)>,      // Input vector
+          affine_map<(i) -> ()>        // Result scalar (index)
+        ],
+        iterator_types = ["reduction"]
+      } ins(%X : tensor<?xf32>) 
+        outs(%init : tensor<i32>) {
+        ^bb0(%in: f32, %out: i32):
+          %idx = linalg.index 0 : index
+          %abs_val = math.absf %in : f32
+          %curr_min_idx = arith.index_cast %out : i32 to index
+          %curr_min = tensor.extract %X[%curr_min_idx] : tensor<?xf32>
+          %curr_min_abs = math.absf %curr_min : f32
+          %cmp = arith.cmpf olt, %abs_val, %curr_min_abs : f32
+          %new_idx = arith.select %cmp, %idx, %curr_min_idx : index
+          %result = arith.index_cast %new_idx : index to i32
+          linalg.yield %result : i32
+      } -> tensor<i32>
+      kernel.yield %result : tensor<i32>
     }
   }
 } 
