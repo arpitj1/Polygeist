@@ -100,6 +100,82 @@ AffineMap shiftDimsDown1(AffineMap expr, unsigned numDim, unsigned offset) {
                         expr.getContext());
 }
 
+// Helper function to check if an operation dominates the target region
+bool dominatesTarget(Operation* op, Region* targetRegion) {
+    return op->getParentRegion()->isAncestor(targetRegion);
+}
+
+Value recursiveCloneWithDominanceCheck(
+    OpBuilder& builder, 
+    Value value, 
+    Region* targetRegion,
+    IRMapping& mapping,
+    DenseSet<Operation*>& processedOps) {
+    
+    // If value is already mapped, return the mapped value
+    if (mapping.contains(value)) {
+        return mapping.lookup(value);
+    }
+    
+    // Handle block arguments
+    if (auto blockArg = dyn_cast<BlockArgument>(value)) {
+        if (blockArg.getParentBlock()->getParent()->isAncestor(targetRegion)) {
+            mapping.map(value, value);
+            return value;
+        } else {
+            llvm::errs() << "Non-dominating block argument encountered\n";
+            return nullptr;
+        }
+    }
+    
+    Operation* defOp = value.getDefiningOp();
+    if (!defOp) {
+        return value;
+    }
+    
+    // Check if this operation dominates the target region
+    if (dominatesTarget(defOp, targetRegion)) {
+        // Operation dominates, use it directly
+        mapping.map(value, value);
+        return value;
+    }
+    
+    // Avoid processing the same operation multiple times
+    if (processedOps.contains(defOp)) {
+        // Operation was already processed, should be in mapping
+        auto resultNum = cast<OpResult>(value).getResultNumber();
+        auto mappedOp = mapping.lookup(defOp->getResult(0)).getDefiningOp();
+        auto clonedValue = mappedOp->getResult(resultNum);
+        mapping.map(value, clonedValue);
+        return clonedValue;
+    }
+    
+    // Check if operation is safe to clone
+    if (!isReadOnly(defOp)) {
+        llvm::errs() << "Cannot clone non-read-only operation: " << *defOp << "\n";
+        return nullptr;
+    }
+    
+    processedOps.insert(defOp);
+    
+    // Recursively process ALL operands first to populate the mapping
+    for (Value operand : defOp->getOperands()) {
+        Value clonedOperand = recursiveCloneWithDominanceCheck(
+            builder, operand, targetRegion, mapping, processedOps);
+        if (!clonedOperand) {
+            return nullptr;
+        }
+        // clonedOperand is automatically added to mapping by recursive call
+    }
+    
+    // Now clone the operation using the populated mapping
+    Operation* clonedOp = builder.clone(*defOp, mapping);
+    
+    // The clone automatically maps all results, so we can just return what we need
+    auto resultNum = cast<OpResult>(value).getResultNumber();
+    return clonedOp->getResult(resultNum);
+}
+
 // Given an affine map `oldmap`, memref `val`, and corresponding input values
 // (which are a list of indicies, then symbols), and a set of loop indices
 // `indices` produce the following:
@@ -241,42 +317,50 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
   legal = true;
   SmallVector<int64_t> sizes(idx_sizes.size(), mlir::ShapedType::kDynamic);
   for (auto sz : idx_sizes) {
-    // Check if the symbol value is read-only or defined in a scope where it is
-    // always visible.
-    if (auto ba = dyn_cast<BlockArgument>(sz)) {
-      // check if it dominates the current scope
-      if (ba.getParentBlock()->getParent()->isAncestor(
-              builder.getBlock()->getParent()))
-        operands_without_indices.push_back(sz);
-      else {
-        llvm::errs() << " value is a non-dominating block arg: " << sz << "\n";
-        legal = false;
-        assert(false);
-        return nullptr;
-      }
-    } else {
-      auto op = sz.getDefiningOp();
-      // check if this dominates the current scope
-      if (op->getParentRegion()->isAncestor(builder.getBlock()->getParent())) {
-        operands_without_indices.push_back(sz);
-      } else if (isReadOnly(op)) {
-        // if not, check if it is readnone
-        // Technically this isn't quite sufficient yet, and does require that
-        // the operands to this op are also able to be hoisted, but for now we
-        // will assume this
-        auto op2 = builder.clone(*op);
-        operands_without_indices.push_back(
-            op2->getResult(cast<OpResult>(sz).getResultNumber()));
-      } else {
-        llvm::errs() << " op is not readonly: " << *op << "\n";
-        // if so clone it in the right scope
-        // otherwise set illegal and don't continue
-        legal = false;
-        assert(false);
-        return nullptr;
-      }
-    }
+    DenseSet<Operation*> processedOps;
+    IRMapping mapping;
+    auto clonedOp = recursiveCloneWithDominanceCheck(builder, sz, builder.getBlock()->getParent(), mapping, processedOps);
+    operands_without_indices.push_back(clonedOp);
   }
+
+  //for (auto sz : idx_sizes) {
+  //  // Check if the symbol value is read-only or defined in a scope where it is
+  //  // always visible.
+  //  if (auto ba = dyn_cast<BlockArgument>(sz)) {
+  //    // check if it dominates the current scope
+  //    if (ba.getParentBlock()->getParent()->isAncestor(
+  //            builder.getBlock()->getParent()))
+  //      operands_without_indices.push_back(sz);
+  //    else {
+  //      llvm::errs() << " value is a non-dominating block arg: " << sz << "\n";
+  //      legal = false;
+  //      assert(false);
+  //      return nullptr;
+  //    }
+  //  } else {
+  //    auto op = sz.getDefiningOp();
+  //    // check if this dominates the current scope
+  //    if (op->getParentRegion()->isAncestor(builder.getBlock()->getParent())) {
+  //      operands_without_indices.push_back(sz);
+  //    } else if (isReadOnly(op)) {
+  //      // if not, check if it is readnone
+  //      // Technically this isn't quite sufficient yet, and does require that
+  //      // the operands to this op are also able to be hoisted, but for now we
+  //      // will assume this
+  //      // We need to clone the op along and check if it's operands are dominating or not, else do a recursive clone
+  //      auto op2 = builder.clone(*op);
+  //      operands_without_indices.push_back(
+  //          op2->getResult(cast<OpResult>(sz).getResultNumber()));
+  //    } else {
+  //      llvm::errs() << " op is not readonly: " << *op << "\n";
+  //      // if so clone it in the right scope
+  //      // otherwise set illegal and don't continue
+  //      legal = false;
+  //      assert(false);
+  //      return nullptr;
+  //    }
+  //  }
+  //}
   auto ty = MemRefType::get(
       sizes, cast<MemRefType>(memref_val.getType()).getElementType());
 
@@ -871,7 +955,6 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     // TODO presently  if linalg generic exists, assert there are no load/stores
     if ((linalgGenerics.size() > 0) &&
         ((loads.size() != 0) || (stores.size() != 0))) {
-      assert(false);
       return failure();
     }
 
@@ -953,6 +1036,8 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
     for (auto genPair : linalgGenerics) {
       auto genOp = genPair.second;
+      OpBuilder::InsertionGuard guard(rewriter);
+      rewriter.setInsertionPoint(genOp);
       auto &genBlock = genOp->getRegion(0).front();
       auto term = genBlock.getTerminator();
       mlir::IRMapping map;
@@ -964,7 +1049,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         rewriter.clone(op, map);
       }
       for (auto op : term->getOperands()) {
-        toreturn.push_back(map.lookup(op));
+        toreturn.push_back(map.lookupOrDefault(op));
       }
       // llvm::errs() << genOp->getParentOfType<func::FuncOp>() << "\n";
       rewriter.eraseOp(genOp);
