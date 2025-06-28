@@ -4508,7 +4508,6 @@ struct MergeNestedAffineParallelIf
     return success();
   }
 };
-
 struct MergeParallelInductions
     : public OpRewritePattern<affine::AffineParallelOp> {
   using OpRewritePattern<affine::AffineParallelOp>::OpRewritePattern;
@@ -5805,6 +5804,156 @@ struct SubMapOpCanonicalize : public OpRewritePattern<polygeist::SubmapOp> {
   }
 };
 
+struct StrideAndBound {
+  int64_t stride;
+  int64_t lowerBound;
+  unsigned dimOrSymbol; // Which dimension/symbol this applies to
+  bool isDimension;     // true if dimension, false if symbol
+  
+  StrideAndBound(int64_t s, int64_t lb, unsigned idx, bool isDim) 
+    : stride(s), lowerBound(lb), dimOrSymbol(idx), isDimension(isDim) {}
+};
+
+struct ExpressionAnalysis {
+  SmallVector<StrideAndBound> coefficients; // Coefficients for dims/symbols
+  int64_t constantTerm = 0;                  // Pure constant term
+  
+  void addDimCoeff(unsigned dim, int64_t coeff) {
+    coefficients.emplace_back(coeff, 0, dim, true);
+  }
+  
+  void addSymCoeff(unsigned sym, int64_t coeff) {
+    coefficients.emplace_back(coeff, 0, sym, false);
+  }
+};
+
+// Recursively analyze an affine expression to extract coefficients and constants
+static ExpressionAnalysis analyzeAffineExpression(AffineExpr expr) {
+  ExpressionAnalysis result;
+  
+  if (auto constExpr = expr.dyn_cast<AffineConstantExpr>()) {
+    // Pure constant
+    result.constantTerm = constExpr.getValue();
+    
+  } else if (auto dimExpr = expr.dyn_cast<AffineDimExpr>()) {
+    // Single dimension with coefficient 1
+    result.addDimCoeff(dimExpr.getPosition(), 1);
+    
+  } else if (auto symExpr = expr.dyn_cast<AffineSymbolExpr>()) {
+    // Single symbol with coefficient 1
+    result.addSymCoeff(symExpr.getPosition(), 1);
+    
+  } else if (auto binaryExpr = expr.dyn_cast<AffineBinaryOpExpr>()) {
+    auto lhs = binaryExpr.getLHS();
+    auto rhs = binaryExpr.getRHS();
+    
+    if (binaryExpr.getKind() == AffineExprKind::Add) {
+      // Addition: combine results from both sides
+      auto lhsAnalysis = analyzeAffineExpression(lhs);
+      auto rhsAnalysis = analyzeAffineExpression(rhs);
+      
+      result.coefficients.append(lhsAnalysis.coefficients);
+      result.coefficients.append(rhsAnalysis.coefficients);
+      result.constantTerm = lhsAnalysis.constantTerm + rhsAnalysis.constantTerm;
+      
+    } else if (binaryExpr.getKind() == AffineExprKind::Mul) {
+      // Multiplication: one side should be constant, other should be dim/symbol
+      auto lhsConst = lhs.dyn_cast<AffineConstantExpr>();
+      auto rhsConst = rhs.dyn_cast<AffineConstantExpr>();
+      
+      if (lhsConst && !rhsConst) {
+        // Constant * expr
+        auto rhsAnalysis = analyzeAffineExpression(rhs);
+        for (auto &coeff : rhsAnalysis.coefficients) {
+          coeff.stride *= lhsConst.getValue();
+        }
+        result.coefficients = std::move(rhsAnalysis.coefficients);
+        result.constantTerm = rhsAnalysis.constantTerm * lhsConst.getValue();
+        
+      } else if (rhsConst && !lhsConst) {
+        // expr * Constant
+        auto lhsAnalysis = analyzeAffineExpression(lhs);
+        for (auto &coeff : lhsAnalysis.coefficients) {
+          coeff.stride *= rhsConst.getValue();
+        }
+        result.coefficients = std::move(lhsAnalysis.coefficients);
+        result.constantTerm = lhsAnalysis.constantTerm * rhsConst.getValue();
+        
+      } else if (lhsConst && rhsConst) {
+        // Constant * Constant
+        result.constantTerm = lhsConst.getValue() * rhsConst.getValue();
+      }
+      // Note: expr * expr is not affine, so we don't handle it
+      
+    } else if (binaryExpr.getKind() == AffineExprKind::Mod) {
+      // Modulo: more complex, for now just mark as having the base expression
+      auto lhsAnalysis = analyzeAffineExpression(lhs);
+      result.coefficients = std::move(lhsAnalysis.coefficients);
+      result.constantTerm = lhsAnalysis.constantTerm;
+      
+    } else if (binaryExpr.getKind() == AffineExprKind::FloorDiv || 
+               binaryExpr.getKind() == AffineExprKind::CeilDiv) {
+      // Division: handle simple cases where RHS is constant
+      if (auto rhsConst = rhs.dyn_cast<AffineConstantExpr>()) {
+        auto lhsAnalysis = analyzeAffineExpression(lhs);
+        for (auto &coeff : lhsAnalysis.coefficients) {
+          coeff.stride = coeff.stride / rhsConst.getValue();
+        }
+        result.coefficients = std::move(lhsAnalysis.coefficients);
+        result.constantTerm = lhsAnalysis.constantTerm / rhsConst.getValue();
+      }
+    }
+  }
+  
+  return result;
+}
+
+struct MapAnalysis {
+  SmallVector<ExpressionAnalysis> outputAnalyses;
+  
+  // Get all unique strides from all outputs
+  SmallVector<int64_t> getAllStrides() const {
+    SmallVector<int64_t> strides;
+    llvm::DenseSet<int64_t> seen;
+    
+    for (const auto &analysis : outputAnalyses) {
+      for (const auto &coeff : analysis.coefficients) {
+        // TODO: Need to add a check that if more than one coeffs in an outputAnalysis
+        // then we need to return failure.
+        strides.push_back(coeff.stride);
+      }
+    }
+    return strides;
+  }
+  
+  // Get all lower bounds (constant terms) from all outputs
+  SmallVector<int64_t> getAllLowerBounds() const {
+    SmallVector<int64_t> bounds;
+    for (const auto &analysis : outputAnalyses) {
+      bounds.push_back(analysis.constantTerm);
+    }
+    return bounds;
+  }
+};
+
+// Main function to analyze an affine map
+static MapAnalysis analyzeAffineMap(AffineMap map) {
+  MapAnalysis result;
+  
+  for (auto expr : map.getResults()) {
+    result.outputAnalyses.push_back(analyzeAffineExpression(expr));
+  }
+  
+  return result;
+}
+
+// Extract both strides and bounds
+std::pair<SmallVector<int64_t>, SmallVector<int64_t>> 
+extractStridesAndBounds(AffineMap map) {
+  auto analysis = analyzeAffineMap(map);
+  return {analysis.getAllStrides(), analysis.getAllLowerBounds()};
+}
+
 struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
   using OpRewritePattern<linalg::GenericOp>::OpRewritePattern;
   LogicalResult matchAndRewrite(linalg::GenericOp genericOp,
@@ -5819,6 +5968,7 @@ struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
     SmallVector<memref::AllocaOp> listOfAllocas;
     SmallVector<AffineMap> listOfNewMaps;
     SmallVector<Value> listOfNewInputs, listOfNewOutputs;
+
     // auto mapAttrsArr = genericOp.getIndexingMaps();
     // for(auto mapAttr: mapAttrsArr) {
     //  AffineMap map = mapAttr.cast<AffineMapAttr>().getValue();
@@ -5831,13 +5981,46 @@ struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
       } else if (auto subMap =
                      dyn_cast<polygeist::SubmapOp>(inp.getDefiningOp())) {
         auto source_memref = subMap.getMemref();
-        // if (auto blockArg = dyn_cast_or_null<mlir::BlockArgument>(op)) {
+    
+        //Create a new memref.subview op from the given submap and sizes
+        Value stride = rewriter.create<arith::ConstantIndexOp>(source_memref.getLoc(), 1);
+        
+        //sizesauto blockArg = dyn_cast_or_null<mlir::BlockArgument>(op)) {
         // if(auto source_alloca =
         // dyn_cast<memref::AllocaOp>(source_memref.getDefiningOp()))
         //{
         auto map = subMap.getMap();
-        listOfNewMaps.push_back(map);
-        listOfNewInputs.push_back(source_memref);
+        
+        ////Create sizes from the submap
+        auto sizes = subMap.getSizes();
+
+        // Create a subview op using lower bound, stride and size
+        // Convert AffineApplyOp to its result Value and wrap in ValueRange
+        auto [strides, lowerBounds] = extractStridesAndBounds(map);
+        SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
+        for (int64_t offset : lowerBounds) {
+          offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
+        }
+        for (int64_t stride : strides) {
+          strideValues.push_back(rewriter.getI64IntegerAttr(stride));
+        }
+        for (Value size : sizes) {
+          sizeValues.push_back(size);
+        }
+        auto subViewOp = rewriter.create<memref::SubViewOp>(
+            source_memref.getLoc(),                              // Location
+            source_memref,                       // Source memref
+            offsetValues,      // Offsets (array)
+            sizeValues,                // Sizes (array)
+            strideValues                // Strides (array)
+        );
+        auto subViewType = subViewOp.getType().cast<MemRefType>();
+        unsigned rank = subViewType.getRank();
+        auto identityMap = AffineMap::getMultiDimIdentityMap(rank, rewriter.getContext());
+        
+        listOfNewMaps.push_back(identityMap);
+        listOfNewInputs.push_back(subViewOp);
+
         //}
         // else {
         //  assert(false && "Only expect allocaOp as source for submap
@@ -5855,8 +6038,36 @@ struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
                      dyn_cast<polygeist::SubmapOp>(out.getDefiningOp())) {
         auto source_memref = subMap.getMemref();
         auto map = subMap.getMap();
-        listOfNewMaps.push_back(map);
-        listOfNewOutputs.push_back(source_memref);
+        
+        //Create sizes from the submap
+        auto sizes = subMap.getSizes();
+
+        // Create a subview op using lower bound, stride and size
+        // Convert AffineApplyOp to its result Value and wrap in ValueRange
+        auto [strides, lowerBounds] = extractStridesAndBounds(map);
+        
+        SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
+        for (int64_t offset : lowerBounds) {
+          offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
+        }
+        for (int64_t stride : strides) {
+          strideValues.push_back(rewriter.getI64IntegerAttr(stride));
+        }
+        for (Value size : sizes) {
+          sizeValues.push_back(size);
+        }
+        auto subViewOp = rewriter.create<memref::SubViewOp>(
+            source_memref.getLoc(),                              // Location
+            source_memref,                       // Source memref
+            offsetValues,      // Offsets (array)
+            sizeValues,                // Sizes (array)
+            strideValues                // Strides (array)
+        );
+        auto subViewType = subViewOp.getType().cast<MemRefType>();
+        unsigned rank = subViewType.getRank();
+        auto identityMap = AffineMap::getMultiDimIdentityMap(rank, rewriter.getContext());
+        listOfNewMaps.push_back(identityMap);
+        listOfNewOutputs.push_back(subViewOp);
       } else {
         listOfNewOutputs.push_back(out);
       }
@@ -6433,3 +6644,4 @@ void polygeist::SubmapOp::getCanonicalizationPatterns(
   results.insert<LoadSubMap, StoreSubMap, DimSubMap, LinalgOfSubmap>(context);
   // results.insert<LoadSubMap, StoreSubMap, DimSubMap>(context);
 }
+

@@ -176,6 +176,29 @@ Value recursiveCloneWithDominanceCheck(
     return clonedOp->getResult(resultNum);
 }
 
+// Check if the affine apply is a constant and return the constant value
+std::optional<int64_t> getConstantFromAffineApply(AffineApplyOp applyOp) {
+    AffineMap map = applyOp.getAffineMap();
+    
+    // Must have no dimensions and no symbols
+    if (map.getNumDims() != 0 || map.getNumSymbols() != 0) {
+        return std::nullopt;
+    }
+    
+    // Must have exactly one result that is a constant
+    if (map.getNumResults() != 1) {
+        return std::nullopt;
+    }
+    
+    // Check if the single result is a constant expression
+    AffineExpr result = map.getResult(0);
+    if (auto constExpr = result.dyn_cast<AffineConstantExpr>()) {
+        return constExpr.getValue();
+    }
+    
+    return std::nullopt;
+}
+
 // Given an affine map `oldmap`, memref `val`, and corresponding input values
 // (which are a list of indicies, then symbols), and a set of loop indices
 // `indices` produce the following:
@@ -190,9 +213,12 @@ Value recursiveCloneWithDominanceCheck(
 // variable. And it is returned true, only if index was not encountered in
 // oldmap operands and check_reduction was set true.
 Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
-                          Value memref_val, Value index, Value bound,
+                          Value memref_val, Value index, Value bound, AffineApplyOp lower_bound,
                           int firstNDims, ValueRange oldmap_operands,
                           Value origmemref, bool &check_reduction) {
+
+  int lower_bound_val = getConstantFromAffineApply(lower_bound).value_or(0);
+
   assert(oldmap_operands.size() ==
          oldmap.getNumSymbols() + oldmap.getNumDims());
   // Operands which don't correspond to indices
@@ -256,7 +282,7 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
       dimReplacements.push_back(builder.getAffineDimExpr(validDims));
       validDims++;
     } else if (i == dimidx) {
-      dimReplacements.push_back(builder.getAffineDimExpr(validDims));
+      dimReplacements.push_back(builder.getAffineDimExpr(validDims) + builder.getAffineConstantExpr(lower_bound_val));
       validDims++;
     } else {
       // TODO: Why are we using symbol here instead of dim?
@@ -268,7 +294,7 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
   SmallVector<AffineExpr> symReplacements;
   for (int i = 0; i < oldmap.getNumSymbols(); i++) {
     if (i + oldmap.getNumDims() == dimidx) {
-      symReplacements.push_back(builder.getAffineDimExpr(validDims));
+      symReplacements.push_back(builder.getAffineDimExpr(validDims) + builder.getAffineConstantExpr(lower_bound_val));
       validDims++;
     } else {
       symReplacements.push_back(builder.getAffineSymbolExpr(validSims));
@@ -299,8 +325,8 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
   }
   assert(validSims == operands_without_indices.size());
   auto map2 = oldmap.replaceDimsAndSymbols(dimReplacements, symReplacements,
-                                           firstNDims + 1,
-                                           operands_without_indices.size());
+                                           firstNDims + 1/*Number of dims in new map*/,
+                                           operands_without_indices.size() /*Number of symbols in new map*/);
 
   SmallVector<Value> idx_sizes;
   for (size_t i = 0; i < firstNDims; i++) {
@@ -363,6 +389,22 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
   //}
   auto ty = MemRefType::get(
       sizes, cast<MemRefType>(memref_val.getType()).getElementType());
+
+  ////TODO: Can we have a case where stride is not 1?
+  //Value stride = builder.create<arith::ConstantIndexOp>(memref_val.getLoc(), 1);
+
+  //// Create a subview op using lower bound, stride and size
+  //// Convert AffineApplyOp to its result Value and wrap in ValueRange
+  //Value lowerBoundValue = lower_bound.getResult();
+  //auto subViewOp = builder.create<memref::SubViewOp>(
+  //    memref_val.getLoc(),                              // Location
+  //    memref_val,                       // Source memref
+  //    ValueRange{lowerBoundValue},      // Offsets (array)
+  //    ValueRange{bound},                // Sizes (array)
+  //    ValueRange{stride}                // Strides (array)
+  //);
+
+  //Value subview = subViewOp.getResult();
 
   return builder.create<polygeist::SubmapOp>(
       memref_val.getLoc(), ty, memref_val, operands_without_indices, map2);
@@ -843,7 +885,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         size_t firstNDims = lgMap.getNumDims();
         check_reduction = false;
         auto newMemref = remap_in_affine_dim(
-            legal, rewriter, lgMap, lgMemref, loop.getInductionVar(), loopSize,
+            legal, rewriter, lgMap, lgMemref, loop.getInductionVar(), loopSize, lbValue,
             firstNDims, ValueRange(lgOperands), input, check_reduction);
         if (!legal)
           return failure();
@@ -882,7 +924,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         size_t firstNDims = lgMap.getNumDims();
         check_reduction = true;
         auto newMemref = remap_in_affine_dim(
-            legal, rewriter, lgMap, lgMemref, loop.getInductionVar(), loopSize,
+            legal, rewriter, lgMap, lgMemref, loop.getInductionVar(), loopSize, lbValue,
             firstNDims, ValueRange(lgOperands), output, check_reduction);
         if (!legal)
           return failure();
@@ -911,7 +953,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
       check_reduction = false;
       auto newMemref = remap_in_affine_dim(
           legal, rewriter, load.getAffineMap(), load.getMemref(),
-          loop.getInductionVar(), loopSize, firstNDims, load.getMapOperands(),
+          loop.getInductionVar(), loopSize, lbValue, firstNDims, load.getMapOperands(),
           load.getMemref(), check_reduction);
 
       if (!legal)
@@ -939,7 +981,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
       check_reduction = true;
       auto newMemref = remap_in_affine_dim(
           legal, rewriter, store.getAffineMap(), store.getMemref(),
-          loop.getInductionVar(), loopSize, firstNDims, store.getMapOperands(),
+          loop.getInductionVar(), loopSize, lbValue, firstNDims, store.getMapOperands(),
           store.getMemref(), check_reduction);
 
       if (!legal) {
