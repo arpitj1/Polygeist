@@ -503,15 +503,18 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
       // if we are no alias we can just look at all users of the value
       // if we are not noalias, or we are captured, then we have to look at all users that
       // could read or write
-      if ((!isNoalias) || isCaptured(memVal)) {  
-        return failure(); 
-      }
+      //TODO: skipping noalias for now
+      //if ((!isNoalias) || isCaptured(memVal)) {  
+      //  return failure(); 
+      //}
       
       MemRefType memrefType;
       if (auto blockArg = memVal.dyn_cast<BlockArgument>()) {
         memrefType = blockArg.getType().dyn_cast<MemRefType>();
       } else if (auto allocaOp = memVal.getDefiningOp<memref::AllocaOp>()) {
         memrefType = allocaOp.getType();
+      } else if (auto allocOp = memVal.getDefiningOp<memref::AllocOp>()) {
+        memrefType = allocOp.getType();
       } else {
         return failure();
       } 
@@ -522,12 +525,12 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
           memrefType.getShape(), memrefType.getElementType());
 
       // Check to see if only linalg.generic are users of the Value op for now.
-      // TODO: Extend this
-      if (!llvm::all_of(memVal.getUsers(), [](Operation *op) {
-            return isa<linalg::GenericOp>(op);
-          })) {
-        return failure();
-      }
+      //// TODO: Extend this
+      //if (!llvm::all_of(memVal.getUsers(), [](Operation *op) {
+      //      return isa<linalg::GenericOp>(op) || isa<memref::DeallocOp>(op);
+      //    })) {
+      //  return failure();
+      //}
 
       // auto emptyTensor =
       // rewriter.create<tensor::EmptyOp>(allocaOp.getLoc(),allocaOp.getType().getShape(),
@@ -633,6 +636,12 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
           userIdx++;
           expandedUserList.erase(expandedUserList.begin() + userIdx);
         }
+        else if (auto subviewOp = dyn_cast<memref::SubViewOp>(user)) {
+          rewriter.setInsertionPointAfter(subviewOp);
+          auto newSubviewOp = rewriter.create<memref::SubViewOp>(
+              subviewOp.getLoc(), subviewOp.getType(), subviewOp.getSource(), subviewOp.getOffsets(), subviewOp.getSizes(), subviewOp.getStrides());
+          rewriter.replaceOp(subviewOp, newSubviewOp.getResult());
+        }
       }
       
       //For adding yields for the last use all the way to the outer most region
@@ -666,13 +675,22 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
     bool changed;
     //Fix instead of walk, just get the list of allocaOp users, so that you can easily delete ops inside
     SmallVector<memref::AllocaOp> listOfAllocaOps;
+    SmallVector<memref::AllocOp> listOfAllocOps;
     
     funcOp.walk([&](memref::AllocaOp alloca) {
       listOfAllocaOps.push_back(alloca);
     });
+    //TODO: Adding allocOp for now, without alias check
+    funcOp.walk([&](memref::AllocOp alloc) {
+      listOfAllocOps.push_back(alloc);
+    });
     
     for (auto alloca : listOfAllocaOps) {
       handleMemref(alloca);
+    }
+    
+    for (auto alloc : listOfAllocOps) {
+      handleMemref(alloc);
     }
 
     for(auto arg: funcOp.getArguments()){

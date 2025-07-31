@@ -785,17 +785,17 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     if (!lbMap || lbMap.getNumResults() != 1)
       return failure();
 
-    auto ub = loop.getSingleUpperBound();
-    if (!ub)
-      return failure();
+    //auto ub = loop.getSingleUpperBound();
+    //if (!ub)
+    //  return failure();
 
-    auto lb = loop.getSingleLowerBound();
-    if (!lb)
-      return failure();
+    //auto lb = loop.getSingleLowerBound();
+    //if (!lb)
+    //  return failure();
 
-    if (!loop.hasConstantUpperBound()) {
-      return failure();
-    }
+    //if (!loop.hasConstantUpperBound()) {
+    //  return failure();
+    //}
 
     // Retrieve the step size
     int64_t step = loop.getStep();
@@ -810,10 +810,10 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         rewriter.create<AffineApplyOp>(loop.getLoc(), lbMap, lbOperands);
 
     //// Ensure the bounds are constant expressions
-    auto ubConst = ubExpr.dyn_cast<AffineConstantExpr>();
-    auto lbConst = lbExpr.dyn_cast<AffineConstantExpr>();
-    if (!ubConst || !lbConst)
-      return failure();
+    //auto ubConst = ubExpr.dyn_cast<AffineConstantExpr>();
+    //auto lbConst = lbExpr.dyn_cast<AffineConstantExpr>();
+    //if (!ubConst || !lbConst)
+    //  return failure();
 
     // Compute the loop size
     // int64_t loopSize = ubConst.getValue() - lbConst.getValue();

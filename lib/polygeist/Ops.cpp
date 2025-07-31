@@ -4517,7 +4517,7 @@ struct MergeParallelInductions
     // Reductions are not supported yet.
     if (!op.getReductions().empty())
       return failure();
-
+    
     auto getIndUsage = [&op](AffineExpr cst, ValueRange operands,
                              std::map<size_t, AffineExpr> &indUsage,
                              bool &legal) -> AffineExpr {
@@ -5954,166 +5954,330 @@ extractStridesAndBounds(AffineMap map) {
   return {analysis.getAllStrides(), analysis.getAllLowerBounds()};
 }
 
-struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
-  using OpRewritePattern<linalg::GenericOp>::OpRewritePattern;
-  LogicalResult matchAndRewrite(linalg::GenericOp genericOp,
-                                PatternRewriter &rewriter) const override {
-    // Check body content
-    auto module = genericOp->getParentOfType<ModuleOp>();
-    Region &genericBody = genericOp.getRegion();
-    Block &entryBlock = genericBody.front();
-    ValueRange blockArgs = entryBlock.getArguments();
-    auto inputs = genericOp.getInputs();
-    auto outputs = genericOp.getOutputs();
-    SmallVector<memref::AllocaOp> listOfAllocas;
-    SmallVector<AffineMap> listOfNewMaps;
-    SmallVector<Value> listOfNewInputs, listOfNewOutputs;
-
-    // auto mapAttrsArr = genericOp.getIndexingMaps();
-    // for(auto mapAttr: mapAttrsArr) {
-    //  AffineMap map = mapAttr.cast<AffineMapAttr>().getValue();
-    //  if(map == convMap[0] && !mapped[0]) {
-    //  }
-    // }
-    for (auto inp : inputs) {
-      if (auto blkArg = dyn_cast<BlockArgument>(inp)) {
-        listOfNewInputs.push_back(inp);
-      } else if (auto subMap =
-                     dyn_cast<polygeist::SubmapOp>(inp.getDefiningOp())) {
-        auto source_memref = subMap.getMemref();
+// Helper function to check if an expression is a simple offset + stride pattern
+static bool isSimpleOffsetStride(AffineExpr expr) {
+  // Check if expression is of the form: d0 + constant, d0 * constant + constant, etc.
+  if (auto dimExpr = expr.dyn_cast<AffineDimExpr>()) {
+    return true; // Simple dimension access
+  }
+  
+  if (auto constExpr = expr.dyn_cast<AffineConstantExpr>()) {
+    return true; // Constant offset
+  }
+  
+  if (auto binaryExpr = expr.dyn_cast<AffineBinaryOpExpr>()) {
+    auto kind = binaryExpr.getKind();
     
-        //Create a new memref.subview op from the given submap and sizes
-        Value stride = rewriter.create<arith::ConstantIndexOp>(source_memref.getLoc(), 1);
-        
-        //sizesauto blockArg = dyn_cast_or_null<mlir::BlockArgument>(op)) {
-        // if(auto source_alloca =
-        // dyn_cast<memref::AllocaOp>(source_memref.getDefiningOp()))
-        //{
-        auto map = subMap.getMap();
-        
-        ////Create sizes from the submap
-        auto sizes = subMap.getSizes();
-
-        // Create a subview op using lower bound, stride and size
-        // Convert AffineApplyOp to its result Value and wrap in ValueRange
-        auto [strides, lowerBounds] = extractStridesAndBounds(map);
-        SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
-        for (int64_t offset : lowerBounds) {
-          offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
-        }
-        for (int64_t stride : strides) {
-          strideValues.push_back(rewriter.getI64IntegerAttr(stride));
-        }
-        for (Value size : sizes) {
-          sizeValues.push_back(size);
-        }
-        auto subViewOp = rewriter.create<memref::SubViewOp>(
-            source_memref.getLoc(),                              // Location
-            source_memref,                       // Source memref
-            offsetValues,      // Offsets (array)
-            sizeValues,                // Sizes (array)
-            strideValues                // Strides (array)
-        );
-        auto subViewType = subViewOp.getType().cast<MemRefType>();
-        unsigned rank = subViewType.getRank();
-        auto identityMap = AffineMap::getMultiDimIdentityMap(rank, rewriter.getContext());
-        
-        listOfNewMaps.push_back(identityMap);
-        listOfNewInputs.push_back(subViewOp);
-
-        //}
-        // else {
-        //  assert(false && "Only expect allocaOp as source for submap
-        //  canonicalization right now"); return failure();
-        //}
-      } else {
-        listOfNewInputs.push_back(inp);
+    // Allow simple addition and multiplication patterns
+    if (kind == AffineExprKind::Add || kind == AffineExprKind::Mul) {
+      return isSimpleOffsetStride(binaryExpr.getLHS()) && 
+             isSimpleOffsetStride(binaryExpr.getRHS());
+    }
+    
+    // Allow simple division by constants (for stride calculation)
+    if (kind == AffineExprKind::FloorDiv || kind == AffineExprKind::CeilDiv) {
+      if (auto rhsConst = binaryExpr.getRHS().dyn_cast<AffineConstantExpr>()) {
+        return rhsConst.getValue() > 0 && isSimpleOffsetStride(binaryExpr.getLHS());
       }
     }
+  }
+  
+  return false;
+}
 
-    for (auto out : outputs) {
-      if (auto blkArg = dyn_cast<BlockArgument>(out)) {
-        listOfNewOutputs.push_back(out);
-      } else if (auto subMap =
-                     dyn_cast<polygeist::SubmapOp>(out.getDefiningOp())) {
-        auto source_memref = subMap.getMemref();
-        auto map = subMap.getMap();
+// Main function to check if SubmapOp can be converted to SubViewOp
+static bool canConvertSubmapToSubView(polygeist::SubmapOp submapOp) {
+  auto map = submapOp.getMap();
+  auto sizes = submapOp.getSizes();
+  auto symbols = submapOp.getSymbols();
+  auto source_memref = submapOp.getMemref();
+  
+  // 1. Identity maps are always valid
+  if (map.isIdentity()) {
+    return true;
+  }
+  
+  // 2. Check if we can extract meaningful strides and bounds
+  auto [strides, lowerBounds] = extractStridesAndBounds(map);
+  if (strides.empty() || lowerBounds.empty()) {
+    return false;
+  }
+  
+  // 3. Ensure the number of results matches expected dimensions
+  if (map.getNumResults() != sizes.size()) {
+    return false;
+  }
+  
+  // 4. Check each expression in the map for complexity
+  for (auto expr : map.getResults()) {
+    if (!isSimpleOffsetStride(expr)) {
+      return false;
+    }
+  }
+  
+  // 5. Check for unsupported complex transformations
+  for (auto expr : map.getResults()) {
+    // Reject expressions that involve multiple dimensions in complex ways
+    if (auto binaryExpr = expr.dyn_cast<AffineBinaryOpExpr>()) {
+      // For now, reject modulo operations as they're hard to represent in SubView
+      if (binaryExpr.getKind() == AffineExprKind::Mod) {
+        return false;
+      }
+      
+      // Reject complex multi-dimensional expressions
+      if (binaryExpr.getKind() == AffineExprKind::Mul) {
+        auto lhs = binaryExpr.getLHS();
+        auto rhs = binaryExpr.getRHS();
         
-        //Create sizes from the submap
-        auto sizes = subMap.getSizes();
-
-        // Create a subview op using lower bound, stride and size
-        // Convert AffineApplyOp to its result Value and wrap in ValueRange
-        auto [strides, lowerBounds] = extractStridesAndBounds(map);
+        // Both sides are dimensions = complex interaction
+        if (lhs.isa<AffineDimExpr>() && rhs.isa<AffineDimExpr>()) {
+          return false;
+        }
         
-        SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
-        for (int64_t offset : lowerBounds) {
-          offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
+        // Multiplication by symbols might be too complex for simple SubView
+        if (lhs.isa<AffineSymbolExpr>() || rhs.isa<AffineSymbolExpr>()) {
+          // Allow simple symbol multiplication, but check it's not too complex
+          if (!lhs.isa<AffineConstantExpr>() && !rhs.isa<AffineConstantExpr>()) {
+            return false;
+          }
         }
-        for (int64_t stride : strides) {
-          strideValues.push_back(rewriter.getI64IntegerAttr(stride));
-        }
-        for (Value size : sizes) {
-          sizeValues.push_back(size);
-        }
-        auto subViewOp = rewriter.create<memref::SubViewOp>(
-            source_memref.getLoc(),                              // Location
-            source_memref,                       // Source memref
-            offsetValues,      // Offsets (array)
-            sizeValues,                // Sizes (array)
-            strideValues                // Strides (array)
-        );
-        auto subViewType = subViewOp.getType().cast<MemRefType>();
-        unsigned rank = subViewType.getRank();
-        auto identityMap = AffineMap::getMultiDimIdentityMap(rank, rewriter.getContext());
-        listOfNewMaps.push_back(identityMap);
-        listOfNewOutputs.push_back(subViewOp);
-      } else {
-        listOfNewOutputs.push_back(out);
       }
     }
-    ArrayRef<AffineMap> maps(listOfNewMaps);
-    // No submap ops detected
-    if (maps.size() == 0)
+  }
+  
+  // 6. Check for rank-changing transformations that SubView can't handle
+  auto sourceType = source_memref.getType().cast<MemRefType>();
+  auto resultType = submapOp.getType().cast<MemRefType>();
+  
+  // SubView can do rank-reduction, but not rank-expansion
+  if (resultType.getRank() > sourceType.getRank()) {
+    return false;
+  }
+  
+  return true;
+}
+
+// Convenience function to check and extract conversion info
+struct SubmapToSubViewConversionInfo {
+  bool isValid;
+  SmallVector<int64_t> strides;
+  SmallVector<int64_t> offsets;
+  SmallVector<Value> sizes;
+  SmallVector<Value> dynamicOffsets; // For symbol-based offsets
+  
+  SubmapToSubViewConversionInfo() : isValid(false) {}
+};
+
+static SubmapToSubViewConversionInfo 
+analyzeSubmapToSubViewConversion(polygeist::SubmapOp submapOp) {
+  SubmapToSubViewConversionInfo info;
+  
+  if (!canConvertSubmapToSubView(submapOp)) {
+    return info; // isValid = false
+  }
+  
+  auto map = submapOp.getMap();
+  auto [strides, lowerBounds] = extractStridesAndBounds(map);
+  
+  info.isValid = true;
+  info.strides = strides;
+  info.offsets = lowerBounds;
+  info.sizes.append(submapOp.getSizes().begin(), submapOp.getSizes().end());
+  
+  return info;
+}
+
+
+struct SubmapToSubviewOp : public OpRewritePattern<polygeist::SubmapOp> {
+  using OpRewritePattern<polygeist::SubmapOp>::OpRewritePattern;
+  LogicalResult matchAndRewrite(polygeist::SubmapOp submapOp,
+                                PatternRewriter &rewriter) const override {
+    auto conversionInfo = analyzeSubmapToSubViewConversion(submapOp);
+    if (!conversionInfo.isValid)
       return failure();
-    // If inverse permutation exists, then we can canonicalize the linalg of
-    // submap to linalg
-    // TODO: Fails for:
-    //  1. Maps with symbols
-    //  2. Maps which are not resolvable 1 to 1 with memref for all dims
-    if (inversePermutation(concatAffineMaps(maps))) {
-      StringAttr empty = StringAttr::get(genericOp.getContext());
-      auto newGenericOp = rewriter.create<linalg::GenericOp>(
-          genericOp.getLoc(), TypeRange(), listOfNewInputs, listOfNewOutputs,
-          listOfNewMaps, genericOp.getIteratorTypesArray(), empty, empty);
-      rewriter.inlineRegionBefore(genericOp.getRegion(),
-                                  newGenericOp.getRegion(),
-                                  newGenericOp.getRegion().end());
-
-      // auto &block = newGenericOp.getRegion().front();
-      // block.addArguments(newGenericOp.getOperandTypes(),
-      // SmallVector<Location, 4>(newGenericOp.getNumOperands(),
-      // genericOp.getLoc()));
-
-      rewriter.replaceOp(genericOp, newGenericOp.getResults());
-      return success();
+    
+    SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
+    for (int64_t offset : conversionInfo.offsets) {
+      offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
     }
-    // for(iterate over inputs)
-    //{
-    //   gather maps
-    //   gather submaps
-    //   Gather affine maps from submaps
-    //   Check over 2 iterations if all the indexes can be solved.
-    //   Use the same logic as linalg.generic to do this.
-    //   if success in getting vars
-    //     replace affine map from submap to linalg.generic
-    //     replace input memref as direct input to linalg.generic
-    // }
-    // assert(false && "inversePermutation doesn't exists for the given linalg
-    // generic");
-    return failure();
+    for (int64_t stride : conversionInfo.strides) {
+      strideValues.push_back(rewriter.getI64IntegerAttr(stride));
+    }
+    for (Value size : conversionInfo.sizes) {
+      sizeValues.push_back(size);
+    }
+    //auto subViewOp = rewriter.create<memref::SubViewOp>(
+    //    source_memref.getLoc(),                              // Location
+    //    source_memref,                       // Source memref
+    //    offsetValues,      // Offsets (array)
+    //    sizeValues,                // Sizes (array)
+    //    strideValues                // Strides (array)
+    //);
+    rewriter.replaceOpWithNewOp<memref::SubViewOp>(submapOp, submapOp.getType(), submapOp.getMemref(), offsetValues, sizeValues, strideValues);
+    return success();
   }
 };
+
+//struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
+//  using OpRewritePattern<linalg::GenericOp>::OpRewritePattern;
+//  LogicalResult matchAndRewrite(linalg::GenericOp genericOp,
+//                                PatternRewriter &rewriter) const override {
+//    // Check body content
+//    auto module = genericOp->getParentOfType<ModuleOp>();
+//    Region &genericBody = genericOp.getRegion();
+//    Block &entryBlock = genericBody.front();
+//    ValueRange blockArgs = entryBlock.getArguments();
+//    auto inputs = genericOp.getInputs();
+//    auto outputs = genericOp.getOutputs();
+//    SmallVector<memref::AllocaOp> listOfAllocas;
+//    SmallVector<AffineMap> listOfNewMaps;
+//    SmallVector<Value> listOfNewInputs, listOfNewOutputs;
+//
+//    // auto mapAttrsArr = genericOp.getIndexingMaps();
+//    // for(auto mapAttr: mapAttrsArr) {
+//    //  AffineMap map = mapAttr.cast<AffineMapAttr>().getValue();
+//    //  if(map == convMap[0] && !mapped[0]) {
+//    //  }
+//    // }
+//    for (auto inp : inputs) {
+//      if (auto blkArg = dyn_cast<BlockArgument>(inp)) {
+//        listOfNewInputs.push_back(inp);
+//      } else if (auto subMap =
+//                     dyn_cast<polygeist::SubmapOp>(inp.getDefiningOp())) {
+//        auto source_memref = subMap.getMemref();
+//    
+//        //Create a new memref.subview op from the given submap and sizes
+//        Value stride = rewriter.create<arith::ConstantIndexOp>(source_memref.getLoc(), 1);
+//        
+//        //sizesauto blockArg = dyn_cast_or_null<mlir::BlockArgument>(op)) {
+//        // if(auto source_alloca =
+//        // dyn_cast<memref::AllocaOp>(source_memref.getDefiningOp()))
+//        //{
+//        auto map = subMap.getMap();
+//        
+//        ////Create sizes from the submap
+//        auto sizes = subMap.getSizes();
+//
+//        // Create a subview op using lower bound, stride and size
+//        // Convert AffineApplyOp to its result Value and wrap in ValueRange
+//        auto [strides, lowerBounds] = extractStridesAndBounds(map);
+//        SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
+//        for (int64_t offset : lowerBounds) {
+//          offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
+//        }
+//        for (int64_t stride : strides) {
+//          strideValues.push_back(rewriter.getI64IntegerAttr(stride));
+//        }
+//        for (Value size : sizes) {
+//          sizeValues.push_back(size);
+//        }
+//        auto subViewOp = rewriter.create<memref::SubViewOp>(
+//            source_memref.getLoc(),                              // Location
+//            source_memref,                       // Source memref
+//            offsetValues,      // Offsets (array)
+//            sizeValues,                // Sizes (array)
+//            strideValues                // Strides (array)
+//        );
+//        auto subViewType = subViewOp.getType().cast<MemRefType>();
+//        unsigned rank = subViewType.getRank();
+//        auto identityMap = AffineMap::getMultiDimIdentityMap(rank, rewriter.getContext());
+//        
+//        listOfNewMaps.push_back(identityMap);
+//        listOfNewInputs.push_back(subViewOp);
+//
+//        //}
+//        // else {
+//        //  assert(false && "Only expect allocaOp as source for submap
+//        //  canonicalization right now"); return failure();
+//        //}
+//      } else {
+//        listOfNewInputs.push_back(inp);
+//      }
+//    }
+//
+//    for (auto out : outputs) {
+//      if (auto blkArg = dyn_cast<BlockArgument>(out)) {
+//        listOfNewOutputs.push_back(out);
+//      } else if (auto subMap =
+//                     dyn_cast<polygeist::SubmapOp>(out.getDefiningOp())) {
+//        auto source_memref = subMap.getMemref();
+//        auto map = subMap.getMap();
+//        
+//        //Create sizes from the submap
+//        auto sizes = subMap.getSizes();
+//
+//        // Create a subview op using lower bound, stride and size
+//        // Convert AffineApplyOp to its result Value and wrap in ValueRange
+//        auto [strides, lowerBounds] = extractStridesAndBounds(map);
+//        
+//        SmallVector<OpFoldResult> offsetValues, sizeValues, strideValues;
+//        for (int64_t offset : lowerBounds) {
+//          offsetValues.push_back(rewriter.getI64IntegerAttr(offset));
+//        }
+//        for (int64_t stride : strides) {
+//          strideValues.push_back(rewriter.getI64IntegerAttr(stride));
+//        }
+//        for (Value size : sizes) {
+//          sizeValues.push_back(size);
+//        }
+//        auto subViewOp = rewriter.create<memref::SubViewOp>(
+//            source_memref.getLoc(),                              // Location
+//            source_memref,                       // Source memref
+//            offsetValues,      // Offsets (array)
+//            sizeValues,                // Sizes (array)
+//            strideValues                // Strides (array)
+//        );
+//        auto subViewType = subViewOp.getType().cast<MemRefType>();
+//        unsigned rank = subViewType.getRank();
+//        auto identityMap = AffineMap::getMultiDimIdentityMap(rank, rewriter.getContext());
+//        listOfNewMaps.push_back(identityMap);
+//        listOfNewOutputs.push_back(subViewOp);
+//      } else {
+//        listOfNewOutputs.push_back(out);
+//      }
+//    }
+//    ArrayRef<AffineMap> maps(listOfNewMaps);
+//    // No submap ops detected
+//    if (maps.size() == 0)
+//      return failure();
+//    // If inverse permutation exists, then we can canonicalize the linalg of
+//    // submap to linalg
+//    // TODO: Fails for:
+//    //  1. Maps with symbols
+//    //  2. Maps which are not resolvable 1 to 1 with memref for all dims
+//    if (inversePermutation(concatAffineMaps(maps))) {
+//      StringAttr empty = StringAttr::get(genericOp.getContext());
+//      auto newGenericOp = rewriter.create<linalg::GenericOp>(
+//          genericOp.getLoc(), TypeRange(), listOfNewInputs, listOfNewOutputs,
+//          listOfNewMaps, genericOp.getIteratorTypesArray(), empty, empty);
+//      rewriter.inlineRegionBefore(genericOp.getRegion(),
+//                                  newGenericOp.getRegion(),
+//                                  newGenericOp.getRegion().end());
+//
+//      // auto &block = newGenericOp.getRegion().front();
+//      // block.addArguments(newGenericOp.getOperandTypes(),
+//      // SmallVector<Location, 4>(newGenericOp.getNumOperands(),
+//      // genericOp.getLoc()));
+//
+//      rewriter.replaceOp(genericOp, newGenericOp.getResults());
+//      return success();
+//    }
+//    // for(iterate over inputs)
+//    //{
+//    //   gather maps
+//    //   gather submaps
+//    //   Gather affine maps from submaps
+//    //   Check over 2 iterations if all the indexes can be solved.
+//    //   Use the same logic as linalg.generic to do this.
+//    //   if success in getting vars
+//    //     replace affine map from submap to linalg.generic
+//    //     replace input memref as direct input to linalg.generic
+//    // }
+//    // assert(false && "inversePermutation doesn't exists for the given linalg
+//    // generic");
+//    return failure();
+//  }
+//};
 
 // struct LinalgOfSubmap : public OpRewritePattern<linalg::GenericOp> {
 //  using OpRewritePattern<linalg::GenericOp>::OpRewritePattern;
@@ -6641,7 +6805,7 @@ void polygeist::SubmapOp::getCanonicalizationPatterns(
     RewritePatternSet &results, MLIRContext *context) {
   // results.insert<LoadSubMap, StoreSubMap, DimSubMap,
   // SubMapOpCanonicalize>(context);
-  results.insert<LoadSubMap, StoreSubMap, DimSubMap, LinalgOfSubmap>(context);
+  results.insert<LoadSubMap, StoreSubMap, DimSubMap, SubmapToSubviewOp>(context);
   // results.insert<LoadSubMap, StoreSubMap, DimSubMap>(context);
 }
 
