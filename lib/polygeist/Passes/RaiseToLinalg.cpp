@@ -1221,6 +1221,86 @@ private:
   }
 };
 
+struct AffineParallelToFor : public OpRewritePattern<AffineParallelOp> {
+  using OpRewritePattern<AffineParallelOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(AffineParallelOp parallelOp,
+                                PatternRewriter &rewriter) const override {
+    
+    // Skip if there are reductions - they need special handling
+    if (!parallelOp.getReductions().empty()) {
+      return failure();
+    }
+    
+    // Skip if there are result types - parallel loops with returns need special handling
+    if (!parallelOp.getResultTypes().empty()) {
+      return failure();
+    }
+    
+    Location loc = parallelOp.getLoc();
+    
+    // Get the bounds and steps
+    auto lowerBounds = parallelOp.getLowerBoundsMap();
+    auto upperBounds = parallelOp.getUpperBoundsMap();
+    auto steps = parallelOp.getSteps();
+    auto lowerOperands = parallelOp.getLowerBoundsOperands();
+    auto upperOperands = parallelOp.getUpperBoundsOperands();
+    auto ivs = parallelOp.getIVs();
+    
+    // Start building nested for loops from outermost to innermost
+    OpBuilder::InsertionGuard guard(rewriter);
+    rewriter.setInsertionPoint(parallelOp);
+    
+    // Create nested affine.for loops
+    SmallVector<AffineForOp> forOps;
+    SmallVector<Value> newIVs;
+    
+    for (unsigned i = 0; i < ivs.size(); ++i) {
+      // Extract bounds for this dimension
+      auto lbMap = lowerBounds.getSliceMap(i, 1);
+      auto ubMap = upperBounds.getSliceMap(i, 1);
+      int64_t step = steps[i];
+      
+      auto forOp = rewriter.create<AffineForOp>(
+          loc,
+          lowerOperands, lbMap,
+          upperOperands, ubMap,
+          step
+      );
+      
+      forOps.push_back(forOp);
+      newIVs.push_back(forOp.getInductionVar());
+      
+      // Set insertion point for next loop or body
+      rewriter.setInsertionPointToStart(forOp.getBody());
+    }
+    
+    // Move the body content from parallel to innermost for loop
+    Block *parallelBody = parallelOp.getBody();
+    Block *targetBody = forOps.empty() ? nullptr : forOps.back().getBody();
+    
+    if (!targetBody) {
+      return failure();
+    }
+    
+    // Create mapping for induction variables
+    IRMapping mapping;
+    for (auto [parallelIV, newIV] : llvm::zip(ivs, newIVs)) {
+      mapping.map(parallelIV, newIV);
+    }
+    
+    // Clone operations from parallel body to for body (excluding terminator)
+    for (auto &op : parallelBody->without_terminator()) {
+      rewriter.clone(op, mapping);
+    }
+    
+    // Remove the original parallel loop
+    rewriter.eraseOp(parallelOp);
+    
+    return success();
+  }
+};
+
 // namespace {
 // struct RaiseAffineToLinalg
 //     : public AffineRaiseToLinalgBase<RaiseAffineToLinalg> {
@@ -1255,18 +1335,37 @@ struct RaiseAffineToLinalg
 } // namespace
 
 void RaiseAffineToLinalg::runOnOperation() {
-  RewritePatternSet patterns(&getContext());
-  // TODO add the existing canonicalization patterns
-  //  + subview of an affine apply -> subview
-  
-  // Add the fission pattern first (preprocessing step)
-  patterns.insert<AffineParallelFission>(&getContext());
-  
-  // Then add the main raising pattern
-  patterns.insert<AffineForOpRaising>(&getContext());
   GreedyRewriteConfig config;
-  (void)applyPatternsAndFoldGreedily(getOperation(), std::move(patterns),
-                                     config);
+  
+  // Step 1: Apply fission pattern first
+  {
+    RewritePatternSet fissionPatterns(&getContext());
+    fissionPatterns.insert<AffineParallelFission>(&getContext());
+    if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(fissionPatterns), config))) {
+      signalPassFailure();
+      return;
+    }
+  }
+  
+  // Step 2: Apply parallel-to-for conversion
+  {
+    RewritePatternSet parallelToForPatterns(&getContext());
+    parallelToForPatterns.insert<AffineParallelToFor>(&getContext());
+    if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(parallelToForPatterns), config))) {
+      signalPassFailure();
+      return;
+    }
+  }
+  
+  // Step 3: Apply raising pattern
+  {
+    RewritePatternSet raisingPatterns(&getContext());
+    raisingPatterns.insert<AffineForOpRaising>(&getContext());
+    if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(raisingPatterns), config))) {
+      signalPassFailure();
+      return;
+    }
+  }
 }
 
 namespace mlir {
