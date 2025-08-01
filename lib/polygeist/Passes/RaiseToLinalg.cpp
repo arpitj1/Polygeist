@@ -349,6 +349,10 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
     DenseSet<Operation*> processedOps;
     IRMapping mapping;
     auto clonedOp = recursiveCloneWithDominanceCheck(builder, sz, builder.getBlock()->getParent(), mapping, processedOps);
+    if (!clonedOp) {
+      legal = false;
+      return nullptr;
+    }
     operands_without_indices.push_back(clonedOp);
   }
 
