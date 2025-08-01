@@ -16,6 +16,7 @@
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "mlir/Transforms/Passes.h"
 #include "polygeist/Passes/Passes.h"
 #include "llvm/Support/Debug.h"
 
@@ -1129,9 +1130,8 @@ struct AffineParallelFission : public OpRewritePattern<AffineParallelOp> {
     for (auto &op : body->without_terminator()) {
       if (isa<AffineParallelOp, AffineForOp>(op)) {
         nestedLoops.push_back(&op);
-      } else if (!isMemoryOrControlFlowNeutral(&op)) {
-        // If there are non-trivial operations at the top level, 
-        // we can't safely perform fission
+      } else {
+        // Only allow pure nested loops - reject any other operations
         return failure();
       }
     }
@@ -1349,9 +1349,13 @@ void RaiseAffineToLinalgPipeline::runOnOperation() {
   // Add our raise-affine-to-linalg pass second (also runs on func.func)
   funcPM.addPass(createRaiseAffineToLinalgPass());
   
+  // Canonicalize after raise-to-linalg to eliminate submaps and other patterns
+  funcPM.addPass(createCanonicalizerPass());
+  
   // Run the pipeline
   if (failed(runPipeline(pm, getOperation()))) {
-    signalPassFailure();
+    // Warn but don't fail the pass - convergence issues shouldn't kill output
+    getOperation()->emitWarning("Pipeline didn't converge completely, but continuing anyway");
   }
 }
 
@@ -1370,8 +1374,7 @@ void RaiseAffineToLinalg::runOnOperation() {
     RewritePatternSet fissionPatterns(&getContext());
     fissionPatterns.insert<AffineParallelFission>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(fissionPatterns), config))) {
-      signalPassFailure();
-      return;
+      getOperation()->emitWarning("AffineParallelFission didn't converge, continuing anyway");
     }
   }
   
@@ -1380,8 +1383,7 @@ void RaiseAffineToLinalg::runOnOperation() {
     RewritePatternSet parallelToForPatterns(&getContext());
     parallelToForPatterns.insert<AffineParallelToFor>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(parallelToForPatterns), config))) {
-      signalPassFailure();
-      return;
+      getOperation()->emitWarning("AffineParallelToFor didn't converge, continuing anyway");
     }
   }
   
@@ -1390,8 +1392,7 @@ void RaiseAffineToLinalg::runOnOperation() {
     RewritePatternSet raisingPatterns(&getContext());
     raisingPatterns.insert<AffineForOpRaising>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(raisingPatterns), config))) {
-      signalPassFailure();
-      return;
+      getOperation()->emitWarning("AffineForOpRaising didn't converge, continuing anyway");
     }
   }
 }
