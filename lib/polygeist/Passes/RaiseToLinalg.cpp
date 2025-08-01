@@ -1113,6 +1113,114 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
   }
 };
 
+struct AffineParallelFission : public OpRewritePattern<AffineParallelOp> {
+  using OpRewritePattern<AffineParallelOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(AffineParallelOp parallelOp,
+                                PatternRewriter &rewriter) const override {
+
+    auto module = parallelOp->getParentOfType<ModuleOp>();
+    // Collect all top-level nested loops (affine.parallel or affine.for)
+    SmallVector<Operation*> nestedLoops;
+    Block *body = parallelOp.getBody();
+    
+    for (auto &op : body->without_terminator()) {
+      if (isa<AffineParallelOp, AffineForOp>(op)) {
+        nestedLoops.push_back(&op);
+      } else if (!isMemoryOrControlFlowNeutral(&op)) {
+        // If there are non-trivial operations at the top level, 
+        // we can't safely perform fission
+        return failure();
+      }
+    }
+    
+    // Need at least 2 nested loops to perform fission
+    if (nestedLoops.size() < 2) {
+      return failure();
+    }
+    
+    // Convert reductions ArrayAttr to ArrayRef<AtomicRMWKind>
+    SmallVector<arith::AtomicRMWKind> reductionKinds;
+    for (auto attr : parallelOp.getReductions()) {
+      auto enumAttr = cast<arith::AtomicRMWKindAttr>(attr);
+      reductionKinds.push_back(enumAttr.getValue());
+    }
+    
+    // Convert steps to ArrayRef<int64_t>
+    SmallVector<int64_t> stepValues;
+    for (auto step : parallelOp.getSteps()) {
+      stepValues.push_back(step);
+    }
+    
+    for (Operation *nestedLoop : nestedLoops) {
+      
+      // Create new parallel loops for each nested loop
+      rewriter.setInsertionPoint(parallelOp);
+    
+      // Create a new outer parallel loop with same bounds
+      auto newParallelOp = rewriter.create<AffineParallelOp>(
+          parallelOp.getLoc(),
+          parallelOp.getResultTypes(),
+          reductionKinds,
+          SmallVector<AffineMap>{parallelOp.getLowerBoundsMap()},
+          parallelOp.getLowerBoundsOperands(),
+          SmallVector<AffineMap>{parallelOp.getUpperBoundsMap()},
+          parallelOp.getUpperBoundsOperands(),
+          stepValues
+      );
+      
+      // Move the nested loop into the new outer loop
+      Block *newBody = newParallelOp.getBody();
+      // Remove the existing terminator
+      rewriter.eraseOp(newBody->getTerminator());
+      
+      // Set insertion point to the new body before cloning
+      rewriter.setInsertionPointToEnd(newBody);
+      
+      // Clone the nested loop into the new body
+      IRMapping mapping;
+      // Map the induction variables (use getIVs() instead of getInductionVars())
+      for (auto [oldIV, newIV] : llvm::zip(parallelOp.getIVs(),
+                                           newParallelOp.getIVs())) {
+        mapping.map(oldIV, newIV);
+      }
+      
+      // Clone the operation (it will be automatically inserted at the current insertion point)
+      rewriter.clone(*nestedLoop, mapping);
+      
+      // Ensure insertion point is at the end of the outer parallel loop's body
+      rewriter.setInsertionPointToEnd(newBody);
+      
+      // Add the terminator back
+      rewriter.create<AffineYieldOp>(parallelOp.getLoc());
+    }
+    
+    // Remove the original parallel loop
+    rewriter.eraseOp(parallelOp);
+    
+    return success();
+  }
+
+private:
+  // Helper to check if an operation has no side effects that would 
+  // prevent loop fission
+  bool isMemoryOrControlFlowNeutral(Operation *op) const {
+    // Allow constants, arithmetic, and other side-effect-free ops
+    if (isa<arith::ConstantOp>(op)) return true;
+    if (op->hasTrait<OpTrait::ConstantLike>()) return true;
+    
+    // Check if it's a pure operation (no memory effects)
+    if (auto effectInterface = dyn_cast<MemoryEffectOpInterface>(op)) {
+      SmallVector<MemoryEffects::EffectInstance> effects;
+      effectInterface.getEffects(effects);
+      return effects.empty();
+    }
+    
+    // Conservative: if we can't prove it's safe, assume it's not
+    return false;
+  }
+};
+
 // namespace {
 // struct RaiseAffineToLinalg
 //     : public AffineRaiseToLinalgBase<RaiseAffineToLinalg> {
@@ -1150,6 +1258,11 @@ void RaiseAffineToLinalg::runOnOperation() {
   RewritePatternSet patterns(&getContext());
   // TODO add the existing canonicalization patterns
   //  + subview of an affine apply -> subview
+  
+  // Add the fission pattern first (preprocessing step)
+  patterns.insert<AffineParallelFission>(&getContext());
+  
+  // Then add the main raising pattern
   patterns.insert<AffineForOpRaising>(&getContext());
   GreedyRewriteConfig config;
   (void)applyPatternsAndFoldGreedily(getOperation(), std::move(patterns),
