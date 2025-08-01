@@ -535,11 +535,17 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
       // auto emptyTensor =
       // rewriter.create<tensor::EmptyOp>(allocaOp.getLoc(),allocaOp.getType().getShape(),
       // allocaOp.getType().getElementType());
+      auto sortedUsers = getSortedUsers(memVal);
+
+      // If the first user is already a to_tensor op, don't try to debufferize
+      if (!sortedUsers.empty() && isa<bufferization::ToTensorOp>(sortedUsers[0])) {
+        return failure();
+      }
+      
       auto toTensorOp = rewriter.create<bufferization::ToTensorOp>(
           memVal.getLoc(), tensorType, memVal);
       Value currentTensor = toTensorOp;
 
-      auto sortedUsers = getSortedUsers(memVal);
 
       //Other algorithm:
       // 1. Walk over all ops
@@ -635,12 +641,22 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
           expandedUserList.insert(expandedUserList.begin() + userIdx, newGenericOp);
           userIdx++;
           expandedUserList.erase(expandedUserList.begin() + userIdx);
+
         }
         else if (auto subviewOp = dyn_cast<memref::SubViewOp>(user)) {
-          rewriter.setInsertionPointAfter(subviewOp);
-          auto newSubviewOp = rewriter.create<memref::SubViewOp>(
-              subviewOp.getLoc(), subviewOp.getType(), subviewOp.getSource(), subviewOp.getOffsets(), subviewOp.getSizes(), subviewOp.getStrides());
-          rewriter.replaceOp(subviewOp, newSubviewOp.getResult());
+          if (subviewOp.getSource() == memVal) {
+            // Convert memref.subview to tensor.extract_slice
+            rewriter.setInsertionPointAfter(subviewOp);
+            auto extractSliceOp = rewriter.create<tensor::ExtractSliceOp>(
+                subviewOp.getLoc(), 
+                currentTensor,  // Use the tensor version
+                subviewOp.getOffsets(), 
+                subviewOp.getSizes(), 
+                subviewOp.getStrides());
+            
+            // This creates a new tensor that can be used by subsequent operations
+            // Need to handle this tensor in the debufferization chain
+          }
         }
       }
       
@@ -662,17 +678,21 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
       //  rewriter.setInsertionPointAfter(parentOp);
       //}
       //if(currentTensor != prevTensor) {
-      rewriter.setInsertionPointAfter(currentTensor.getDefiningOp());
-      auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
-          memVal.getLoc(), memrefType, currentTensor);
-      rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
+      
+      // Only insert to_memref and copy if currentTensor was actually transformed
+      if (currentTensor != toTensorOp) {
+        rewriter.setInsertionPointAfter(currentTensor.getDefiningOp());
+        auto toMemrefOp = rewriter.create<bufferization::ToMemrefOp>(
+            memVal.getLoc(), memrefType, currentTensor);
+        rewriter.create<memref::CopyOp>(memVal.getLoc(), toMemrefOp, memVal);
+      }
       //}
       // opsToDelete.push_back(allocaOp.getOperation());
       return success();
     };
 
     
-    bool changed;
+    bool anySuccess = false;
     //Fix instead of walk, just get the list of allocaOp users, so that you can easily delete ops inside
     SmallVector<memref::AllocaOp> listOfAllocaOps;
     SmallVector<memref::AllocOp> listOfAllocOps;
@@ -686,18 +706,18 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
     });
     
     for (auto alloca : listOfAllocaOps) {
-      handleMemref(alloca);
+      anySuccess |= succeeded(handleMemref(alloca));
     }
     
     for (auto alloc : listOfAllocOps) {
-      handleMemref(alloc);
+      anySuccess |= succeeded(handleMemref(alloc));
     }
 
     for(auto arg: funcOp.getArguments()){
-      handleMemref(arg);
+      anySuccess |= succeeded(handleMemref(arg));
     }
     
-    passResult = success();
+    passResult = anySuccess ? success() : failure();
     //for (Operation *op : opsToDelete) {
     //  op->erase();
     //}
