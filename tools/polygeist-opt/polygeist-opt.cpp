@@ -15,6 +15,7 @@
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Async/IR/Async.h"
+#include "mlir/Dialect/Bufferization/IR/Bufferization.h"
 #include "mlir/Dialect/DLTI/DLTI.h"
 #include "mlir/Dialect/Func/Extensions/InlinerExtension.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
@@ -63,6 +64,7 @@ int main(int argc, char **argv) {
   registry.insert<mlir::math::MathDialect>();
   registry.insert<mlir::cf::ControlFlowDialect>();
   registry.insert<mlir::linalg::LinalgDialect>();
+  registry.insert<mlir::bufferization::BufferizationDialect>();
   registry.insert<mlir::polygeist::PolygeistDialect>();
   registry.insert<mlir::polygeist::kernel::KernelDialect>();
   registry.insert<DLTIDialect>();

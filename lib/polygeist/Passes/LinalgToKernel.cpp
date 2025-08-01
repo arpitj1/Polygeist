@@ -7,6 +7,7 @@
 
 #include "PassDetails.h"
 
+#include "mlir/Dialect/Bufferization/IR/Bufferization.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/Tensor/IR/Tensor.h"
 #include "mlir/IR/PatternMatch.h"
@@ -14,6 +15,9 @@
 #include "mlir/Parser/Parser.h"
 #include "mlir/Support/FileUtilities.h"
 #include "llvm/ADT/TypeSwitch.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "polygeist/Kernel/KernelDialect.h"
@@ -22,6 +26,7 @@
 
 #include <stack>
 #include <set>
+#include <functional>
 
 using namespace mlir;
 using namespace mlir::linalg;
@@ -30,36 +35,214 @@ using namespace mlir::polygeist::kernel;
 
 namespace {
 
-// Helper function to check if two regions are structurally equivalent
-bool areRegionsEquivalent(Region &first, Region &second) {
-  // Compare number of blocks
-  if (first.getBlocks().size() != second.getBlocks().size())
-    return false;
+// Structure to represent an operation node in the dependency graph
+struct OpNode {
+  Operation *op;
+  StringRef opName;
+  SmallVector<Type> operandTypes;
+  SmallVector<Type> resultTypes;
+  SmallVector<OpNode*> dependencies;  // Operations this depends on
+  SmallVector<OpNode*> dependents;    // Operations that depend on this
+  
+  OpNode(Operation *operation) : op(operation) {
+    if (operation) {
+      // Regular operation node
+      opName = operation->getName().getStringRef();
+      for (Value operand : operation->getOperands()) {
+        operandTypes.push_back(operand.getType());
+      }
+      for (Value result : operation->getResults()) {
+        resultTypes.push_back(result.getType());
+      }
+    } else {
+      // Special node for block arguments - will be set later
+      opName = "block_arg";
+    }
+  }
+  
+  // Check if two nodes are structurally equivalent (same operation type and types)
+  bool isEquivalentTo(const OpNode &other) const {
+    return opName == other.opName && 
+           operandTypes == other.operandTypes && 
+           resultTypes == other.resultTypes;
+  }
+};
 
-  // Compare corresponding blocks
+// Structure to represent a dependency graph for a region
+struct DependencyGraph {
+  SmallVector<std::unique_ptr<OpNode>> nodes;
+  DenseMap<Operation*, OpNode*> opToNode;
+  SmallVector<OpNode*> blockArgNodes;  // Special nodes for block arguments
+  
+  void buildFromRegion(Region &region) {
+    // Process each block in the region
+    for (Block &block : region.getBlocks()) {
+      
+      // Create pseudo-nodes for block arguments
+      for (BlockArgument arg : block.getArguments()) {
+        // Block arguments are represented as special nodes
+        auto argNode = std::make_unique<OpNode>(nullptr);
+        argNode->resultTypes.push_back(arg.getType());
+        blockArgNodes.push_back(argNode.get());
+        
+        // Map the block argument value to this node for dependency tracking
+        // We'll use a separate map for this
+        nodes.push_back(std::move(argNode));
+      }
+      
+      // Create nodes for each operation
+      for (Operation &op : block.getOperations()) {
+        auto node = std::make_unique<OpNode>(&op);
+        OpNode *nodePtr = node.get();
+        opToNode[&op] = nodePtr;
+        nodes.push_back(std::move(node));
+      }
+      
+      // Build dependency edges
+      for (Operation &op : block.getOperations()) {
+        OpNode *currentNode = opToNode[&op];
+        
+        // For each operand, find what it depends on
+        for (Value operand : op.getOperands()) {
+          if (auto blockArg = dyn_cast<BlockArgument>(operand)) {
+            // Depends on a block argument
+            size_t argIndex = blockArg.getArgNumber();
+            if (argIndex < blockArgNodes.size()) {
+              OpNode *argNode = blockArgNodes[argIndex];
+              currentNode->dependencies.push_back(argNode);
+              argNode->dependents.push_back(currentNode);
+            }
+          } else if (Operation *definingOp = operand.getDefiningOp()) {
+            // Depends on another operation
+            if (opToNode.count(definingOp)) {
+              OpNode *depNode = opToNode[definingOp];
+              currentNode->dependencies.push_back(depNode);
+              depNode->dependents.push_back(currentNode);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Get nodes in topological order (dependencies first)
+  SmallVector<OpNode*> getTopologicalOrder() const {
+    SmallVector<OpNode*> result;
+    DenseSet<OpNode*> visited;
+    
+    std::function<void(OpNode*)> dfs = [&](OpNode* node) {
+      if (visited.contains(node)) return;
+      visited.insert(node);
+      
+      // Visit all dependencies first
+      for (OpNode* dep : node->dependencies) {
+        dfs(dep);
+      }
+      
+      result.push_back(node);
+    };
+    
+    // Start DFS from all nodes
+    for (const auto &node : nodes) {
+      dfs(node.get());
+    }
+    
+    return result;
+  }
+};
+
+// Enhanced region equivalence check using dependency graphs
+bool areRegionsEquivalent(Region &first, Region &second) {
+  // Fast early checks before expensive graph construction
+  
+  // Check number of blocks
+  if (first.getBlocks().size() != second.getBlocks().size()) {
+    return false;
+  }
+  
+  // Check each block's basic properties
   for (auto blockPair : llvm::zip(first.getBlocks(), second.getBlocks())) {
     Block &firstBlock = std::get<0>(blockPair);
     Block &secondBlock = std::get<1>(blockPair);
-
-    // Compare number of arguments
-    if (firstBlock.getNumArguments() != secondBlock.getNumArguments())
+    
+    // Check number of arguments
+    if (firstBlock.getNumArguments() != secondBlock.getNumArguments()) {
       return false;
-
-    // Compare argument types
-    for (auto argPair : llvm::zip(firstBlock.getArguments(), 
-                                  secondBlock.getArguments())) {
-      if (std::get<0>(argPair).getType() != std::get<1>(argPair).getType())
-        return false;
     }
-
-    // Compare operations (simplified - real implementation would be more complex)
-    if (firstBlock.getOperations().size() != secondBlock.getOperations().size())
+    
+    // Check argument types
+    for (auto argPair : llvm::zip(firstBlock.getArguments(), secondBlock.getArguments())) {
+      if (std::get<0>(argPair).getType() != std::get<1>(argPair).getType()) {
+        return false;
+      }
+    }
+    
+    // Check number of operations
+    if (firstBlock.getOperations().size() != secondBlock.getOperations().size()) {
       return false;
-
-    // For a full implementation, you'd need more sophisticated operation comparison
-    // based on operands, attributes, and result types
+    }
   }
-
+  
+  // If basic checks pass, proceed with detailed graph-based analysis
+  // Build dependency graphs for both regions
+  DependencyGraph firstGraph, secondGraph;
+  firstGraph.buildFromRegion(first);
+  secondGraph.buildFromRegion(second);
+  
+  // Quick structural checks
+  if (firstGraph.nodes.size() != secondGraph.nodes.size()) {
+    return false;
+  }
+  
+  if (firstGraph.blockArgNodes.size() != secondGraph.blockArgNodes.size()) {
+    return false;
+  }
+  
+  // Get topological orderings
+  auto firstOrder = firstGraph.getTopologicalOrder();
+  auto secondOrder = secondGraph.getTopologicalOrder();
+  
+  if (firstOrder.size() != secondOrder.size()) {
+    return false;
+  }
+  
+  // Compare nodes in topological order
+  DenseMap<OpNode*, OpNode*> nodeMapping;
+  
+  for (size_t i = 0; i < firstOrder.size(); ++i) {
+    OpNode *firstNode = firstOrder[i];
+    OpNode *secondNode = secondOrder[i];
+    
+    // Check if the nodes are structurally equivalent
+    if (!firstNode->isEquivalentTo(*secondNode)) {
+      return false;
+    }
+    
+    // Check if dependency structure matches
+    if (firstNode->dependencies.size() != secondNode->dependencies.size()) {
+      return false;
+    }
+    
+    // Verify that dependencies map correctly
+    for (size_t j = 0; j < firstNode->dependencies.size(); ++j) {
+      OpNode *firstDep = firstNode->dependencies[j];
+      OpNode *secondDep = secondNode->dependencies[j];
+      
+      // Check if we've established a mapping for these dependencies
+      auto it = nodeMapping.find(firstDep);
+      if (it != nodeMapping.end()) {
+        if (it->second != secondDep) {
+          return false; // Inconsistent mapping
+        }
+      } else {
+        nodeMapping[firstDep] = secondDep;
+      }
+    }
+    
+    // Establish mapping for current nodes
+    nodeMapping[firstNode] = secondNode;
+  }
+  
   return true;
 }
 
