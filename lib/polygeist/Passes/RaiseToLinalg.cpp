@@ -1,6 +1,7 @@
 #include "PassDetails.h"
 
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
+#include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
@@ -12,6 +13,7 @@
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Operation.h"
+#include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "polygeist/Passes/Passes.h"
@@ -1328,6 +1330,32 @@ struct AffineParallelToFor : public OpRewritePattern<AffineParallelOp> {
 // } // namespace
 
 namespace {
+struct RaiseAffineToLinalgPipeline
+    : public AffineRaiseToLinalgPipelineBase<RaiseAffineToLinalgPipeline> {
+  void runOnOperation() override;
+};
+} // namespace
+
+void RaiseAffineToLinalgPipeline::runOnOperation() {
+  // Create a nested pass manager to run the pipeline on functions
+  OpPassManager pm(getOperation()->getName());
+  
+  // Create a nested pass manager for function operations
+  OpPassManager &funcPM = pm.nest<func::FuncOp>();
+  
+  // Add affine-parallelize pass first (runs on func.func)
+  funcPM.addPass(mlir::affine::createAffineParallelizePass());
+  
+  // Add our raise-affine-to-linalg pass second (also runs on func.func)
+  funcPM.addPass(createRaiseAffineToLinalgPass());
+  
+  // Run the pipeline
+  if (failed(runPipeline(pm, getOperation()))) {
+    signalPassFailure();
+  }
+}
+
+namespace {
 struct RaiseAffineToLinalg
     : public AffineRaiseToLinalgBase<RaiseAffineToLinalg> {
   void runOnOperation() override;
@@ -1372,6 +1400,10 @@ namespace mlir {
 namespace polygeist {
 std::unique_ptr<Pass> createRaiseAffineToLinalgPass() {
   return std::make_unique<RaiseAffineToLinalg>();
+}
+
+std::unique_ptr<Pass> createRaiseAffineToLinalgPipelinePass() {
+  return std::make_unique<RaiseAffineToLinalgPipeline>();
 }
 } // namespace polygeist
 } // namespace mlir

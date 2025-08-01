@@ -181,6 +181,16 @@ def AffineRaiseToLinalg : Pass<"raise-affine-to-linalg"> {
   ];
 }
 
+def AffineRaiseToLinalgPipeline : Pass<"raise-affine-to-linalg-pipeline"> {
+  let summary = "Pipeline: affine-parallelize followed by raise-affine-to-linalg";
+  let constructor = "mlir::polygeist::createRaiseAffineToLinalgPipelinePass()";
+  let dependentDialects = [
+    "affine::AffineDialect",
+    "linalg::LinalgDialect",
+    "polygeist::PolygeistDialect",
+  ];
+}
+
 def SCFCanonicalizeFor : Pass<"canonicalize-scf-for"> {
   let summary = "Run some additional canonicalization for scf::for";
   let constructor = "mlir::polygeist::createCanonicalizeForPass()";
