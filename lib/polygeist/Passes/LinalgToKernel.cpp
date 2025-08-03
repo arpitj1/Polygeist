@@ -605,19 +605,67 @@ public:
     
     llvm::errs() << "DEBUG: Successfully mapped all kernel arguments, creating kernel.launch\n";
     
-    // Get result types from the generic operation
-    TypeRange resultTypes = genericOp.getResultTypes();
+    // Get kernel function signature types for casting
+    auto kernelFuncType = matchedDefnOp.getFunctionType();
+    auto kernelInputTypes = kernelFuncType.getInputs();
+    auto kernelResultTypes = kernelFuncType.getResults();
     
-    // Create the kernel.launch operation
+    // Cast operands to match kernel signature types if needed
+    SmallVector<Value> castedOperands;
+    for (size_t i = 0; i < operands.size(); ++i) {
+      Value operand = operands[i];
+      Type expectedType = (i < kernelInputTypes.size()) ? kernelInputTypes[i] : operand.getType();
+      
+      if (operand.getType() != expectedType) {
+        // Insert tensor.cast for type conversion
+        if (isa<RankedTensorType>(operand.getType()) && isa<RankedTensorType>(expectedType)) {
+          llvm::errs() << "DEBUG: Casting operand " << i << " from " << operand.getType() 
+                       << " to " << expectedType << "\n";
+          auto castOp = rewriter.create<tensor::CastOp>(loc, expectedType, operand);
+          castedOperands.push_back(castOp.getResult());
+        } else {
+          // For non-tensor types, use the operand as-is
+          castedOperands.push_back(operand);
+        }
+      } else {
+        castedOperands.push_back(operand);
+      }
+    }
+    
+    // Get result types from the generic operation
+    TypeRange originalResultTypes = genericOp.getResultTypes();
+    
+    // Create the kernel.launch operation with casted operands and kernel result types
     auto launchOp = rewriter.create<kernel::LaunchOp>(
         loc, 
-        resultTypes,
+        kernelResultTypes,  // Use kernel result types for the launch op
         opName,
-        operands
+        castedOperands      // Use casted operands
     );
     
-    // Replace the generic operation with the launch operation
-    rewriter.replaceOp(genericOp, launchOp.getResults());
+    // Cast results back to original types if needed
+    SmallVector<Value> finalResults;
+    for (size_t i = 0; i < launchOp.getResults().size(); ++i) {
+      Value result = launchOp.getResult(i);
+      Type originalType = (i < originalResultTypes.size()) ? originalResultTypes[i] : result.getType();
+      
+      if (result.getType() != originalType) {
+        // Insert tensor.cast to convert back to original type
+        if (isa<RankedTensorType>(result.getType()) && isa<RankedTensorType>(originalType)) {
+          llvm::errs() << "DEBUG: Casting result " << i << " from " << result.getType() 
+                       << " to " << originalType << "\n";
+          auto castOp = rewriter.create<tensor::CastOp>(loc, originalType, result);
+          finalResults.push_back(castOp.getResult());
+        } else {
+          finalResults.push_back(result);
+        }
+      } else {
+        finalResults.push_back(result);
+      }
+    }
+    
+    // Replace the generic operation with the final results
+    rewriter.replaceOp(genericOp, finalResults);
     
     return success();
   }
