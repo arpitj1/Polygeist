@@ -20,6 +20,7 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
+#include "llvm/Support/Debug.h"
 #include "polygeist/Kernel/KernelDialect.h"
 #include "polygeist/Kernel/KernelOps.h"
 #include "polygeist/Passes/Passes.h"
@@ -27,6 +28,8 @@
 #include <stack>
 #include <set>
 #include <functional>
+
+#define DEBUG_TYPE "linalg-to-kernel"
 
 using namespace mlir;
 using namespace mlir::linalg;
@@ -291,84 +294,52 @@ Value findCorrespondingValue(BlockArgument kernelArg,
                             const DenseMap<Operation*, Operation*> &operationMapping,
                             GenericOp genericOp) {
   
-  llvm::errs() << "DEBUG: Finding corresponding value for kernel arg #" << kernelArg.getArgNumber() 
-               << " with type " << kernelArg.getType() << "\n";
+  LLVM_DEBUG(llvm::dbgs() << "Finding corresponding value for kernel arg #" << kernelArg.getArgNumber() 
+                          << " with type " << kernelArg.getType() << "\n");
   
   // First, check if this kernel argument is used as an operand to the linalg.generic itself
-  // This handles block arguments that become ins/outs operands
+  // This handles tensor arguments that become ins/outs operands
   for (Operation *kernelUser : kernelArg.getUsers()) {
-    llvm::errs() << "DEBUG: Kernel arg used by: " << *kernelUser << "\n";
+    LLVM_DEBUG(llvm::dbgs() << "Kernel arg used by: " << *kernelUser << "\n");
     
     // Check if the user is a linalg.generic operation
     if (auto kernelGeneric = dyn_cast<GenericOp>(kernelUser)) {
-      llvm::errs() << "DEBUG: Kernel arg is used by linalg.generic as operand\n";
+      LLVM_DEBUG(llvm::dbgs() << "Kernel arg is used by linalg.generic as operand\n");
       
       // Find which operand position kernelArg occupies in the kernel's linalg.generic
       size_t operandIndex = 0;
       for (Value operand : kernelGeneric->getOperands()) {
         if (operand == kernelArg) {
-          llvm::errs() << "DEBUG: Kernel arg is at operand index " << operandIndex 
-                       << " of kernel linalg.generic\n";
+          LLVM_DEBUG(llvm::dbgs() << "Kernel arg is at operand index " << operandIndex 
+                                  << " of kernel linalg.generic\n");
           
           // The corresponding operand in the actual linalg.generic should be at the same position
           if (operandIndex < genericOp->getNumOperands()) {
             Value actualOperand = genericOp->getOperand(operandIndex);
-            llvm::errs() << "DEBUG: Found corresponding actual operand: " << actualOperand << "\n";
+            LLVM_DEBUG(llvm::dbgs() << "Found corresponding actual operand: " << actualOperand << "\n");
             return actualOperand;
           } else {
-            llvm::errs() << "DEBUG: ERROR - operand index out of bounds in actual generic\n";
+            LLVM_DEBUG(llvm::dbgs() << "ERROR - operand index out of bounds in actual generic\n");
           }
           break;
         }
         operandIndex++;
       }
-    } else {
-      // This is the original logic for operations inside the region
-      // Find the corresponding operation in actual IR using reverse mapping
-      auto it = std::find_if(operationMapping.begin(), operationMapping.end(),
-                            [kernelUser](const auto& pair) {
-                              return pair.second == kernelUser;
-                            });
       
-      if (it != operationMapping.end()) {
-        Operation *actualUser = it->first;  // The actual IR operation
-        llvm::errs() << "DEBUG: Found corresponding actual operation: " << *actualUser << "\n";
-        
-        // Find which operand position kernelArg occupies in kernelUser
-        size_t operandIndex = 0;
-        for (Value operand : kernelUser->getOperands()) {
-          if (operand == kernelArg) {
-            break;
-          }
-          operandIndex++;
-        }
-        
-        llvm::errs() << "DEBUG: Kernel arg is at operand index " << operandIndex << "\n";
-        
-        // Ensure we don't go out of bounds
-        if (operandIndex < actualUser->getNumOperands()) {
-          // Get the corresponding operand from actual IR
-          Value actualOperand = actualUser->getOperand(operandIndex);
-          llvm::errs() << "DEBUG: Found corresponding actual operand: " << actualOperand << "\n";
-          return actualOperand;
-        } else {
-          llvm::errs() << "DEBUG: ERROR - operand index out of bounds\n";
-        }
-      } else {
-        llvm::errs() << "DEBUG: Could not find corresponding operation in operationMapping\n";
-      }
+      // If we found a linalg.generic usage, we're done with this user
+      break;
     }
   }
   
   // If we reach here, this might be a scalar argument used inside the region
   // For scalar arguments like %arg3, %arg4, use operation mapping to trace usage
-  llvm::errs() << "DEBUG: Checking if kernel arg is a scalar used inside region\n";
+  LLVM_DEBUG(llvm::dbgs() << "Checking if kernel arg is a scalar used inside region\n");
   
   for (Operation *kernelUser : kernelArg.getUsers()) {
     // Skip if this is the linalg.generic itself (already handled above)
     if (isa<GenericOp>(kernelUser)) continue;
     
-    llvm::errs() << "DEBUG: Kernel arg used by operation: " << *kernelUser << "\n";
+    LLVM_DEBUG(llvm::dbgs() << "Kernel arg used by operation: " << *kernelUser << "\n");
     
     // Find the corresponding operation in actual IR using the fixed mapping
     // Note: operationMapping is actualOp -> kernelOp, so we need to reverse-search
@@ -378,49 +349,49 @@ Value findCorrespondingValue(BlockArgument kernelArg,
                            });
     if (it != operationMapping.end()) {
       Operation *actualUser = it->first;  // The actual IR operation
-      llvm::errs() << "DEBUG: Found corresponding actual operation: " << *actualUser << "\n";
+      LLVM_DEBUG(llvm::dbgs() << "Found corresponding actual operation: " << *actualUser << "\n");
       
       // Find which operand position kernelArg occupies in kernelUser
       size_t operandIndex = 0;
       for (Value operand : kernelUser->getOperands()) {
         if (operand == kernelArg) {
-          llvm::errs() << "DEBUG: Kernel arg is at operand index " << operandIndex << "\n";
+          LLVM_DEBUG(llvm::dbgs() << "Kernel arg is at operand index " << operandIndex << "\n");
           
           // Get the corresponding operand from actual IR
           if (operandIndex < actualUser->getNumOperands()) {
             Value actualOperand = actualUser->getOperand(operandIndex);
-            llvm::errs() << "DEBUG: Found corresponding actual operand: " << actualOperand << "\n";
+            LLVM_DEBUG(llvm::dbgs() << "Found corresponding actual operand: " << actualOperand << "\n");
             return actualOperand;
           } else {
-            llvm::errs() << "DEBUG: ERROR - operand index out of bounds\n";
+            LLVM_DEBUG(llvm::dbgs() << "ERROR - operand index out of bounds\n");
           }
           break;
         }
         operandIndex++;
       }
     } else {
-      llvm::errs() << "DEBUG: Could not find corresponding operation in operationMapping\n";
+      LLVM_DEBUG(llvm::dbgs() << "Could not find corresponding operation in operationMapping\n");
     }
   }
   
   // Fallback: if operation mapping fails, try type matching as last resort
-  llvm::errs() << "DEBUG: Fallback to type matching for function arguments\n";
+  LLVM_DEBUG(llvm::dbgs() << "Fallback to type matching for function arguments\n");
   
   auto func = genericOp->getParentOfType<func::FuncOp>();
   if (func) {
-    llvm::errs() << "DEBUG: Found parent function with " << func.getNumArguments() << " arguments\n";
+    LLVM_DEBUG(llvm::dbgs() << "Found parent function with " << func.getNumArguments() << " arguments\n");
     
     // Look for function arguments with matching type
     for (auto funcArg : func.getArguments()) {
       if (funcArg.getType() == kernelArg.getType()) {
-        llvm::errs() << "DEBUG: Found function argument with matching type: " << funcArg << "\n";
+        LLVM_DEBUG(llvm::dbgs() << "Found function argument with matching type: " << funcArg << "\n");
         // TODO: This is still not ideal - should be improved with better analysis
         return funcArg;
       }
     }
   }
   
-  llvm::errs() << "DEBUG: ERROR - Could not find corresponding value for kernel arg\n";
+  LLVM_DEBUG(llvm::dbgs() << "ERROR - Could not find corresponding value for kernel arg\n");
   return nullptr;
 }
 
@@ -463,7 +434,7 @@ FailureOr<KernelMatchResult> matchGenericWithDefn(
   for (auto defnOp : defnOps) {
     
     StringRef opName = defnOp.getSymName();
-    llvm::errs() << "DEBUG: Checking kernel defn: " << opName << "\n";
+    LLVM_DEBUG(llvm::dbgs() << "Checking kernel defn: " << opName << "\n");
     
     // Check for linalg.generic in the defn's body
     GenericOp candidateOp;
@@ -473,15 +444,15 @@ FailureOr<KernelMatchResult> matchGenericWithDefn(
     });
 
     if(!candidateOp) {
-      llvm::errs() << "DEBUG: No linalg.generic found in defn " << opName << "\n";
+      LLVM_DEBUG(llvm::dbgs() << "No linalg.generic found in defn " << opName << "\n");
       continue;
     }
     
-    llvm::errs() << "DEBUG: Found linalg.generic in defn " << opName << "\n";
-    llvm::errs() << "DEBUG: Candidate numInputs=" << candidateOp.getNumDpsInputs() 
-                 << ", target numInputs=" << numInputs << "\n";
-    llvm::errs() << "DEBUG: Candidate numOutputs=" << candidateOp.getNumDpsInits() 
-                 << ", target numOutputs=" << numOutputs << "\n";
+    LLVM_DEBUG(llvm::dbgs() << "Found linalg.generic in defn " << opName << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "Candidate numInputs=" << candidateOp.getNumDpsInputs() 
+                            << ", target numInputs=" << numInputs << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "Candidate numOutputs=" << candidateOp.getNumDpsInits() 
+                            << ", target numOutputs=" << numOutputs << "\n");
     
     // Check if this linalg.generic matches our target
     DenseMap<OpNode*, OpNode*> nodeMapping;
@@ -491,21 +462,21 @@ FailureOr<KernelMatchResult> matchGenericWithDefn(
         areIndexingMapsEquivalent(candidateOp.getIndexingMapsAttr(), indexingMaps) &&
         areIteratorTypesEquivalent(candidateOp.getIteratorTypesAttr(), iteratorTypes) &&
         areRegionsEquivalent(genericOp.getRegion(), candidateOp.getRegion(), nodeMapping, operationMapping)) {
-      llvm::errs() << "DEBUG: MATCH FOUND for defn " << opName << "\n";
+      LLVM_DEBUG(llvm::dbgs() << "MATCH FOUND for defn " << opName << "\n");
       foundMatch = true;
       matchedOpName = opName;
-      matchedOperationMapping = operationMapping; // Store the mapping
+      matchedOperationMapping = operationMapping; // Store the operation mapping
       matchedDefnOp = defnOp; // Store the matched defnOp
     } else {
-      llvm::errs() << "DEBUG: No match for defn " << opName << "\n";
-      llvm::errs() << "DEBUG: Input/output check: " 
-                   << (candidateOp.getNumDpsInputs() == numInputs) << "\n";
-      llvm::errs() << "DEBUG: Maps check: " 
-                   << areIndexingMapsEquivalent(candidateOp.getIndexingMapsAttr(), indexingMaps) << "\n";
-      llvm::errs() << "DEBUG: Iterator types check: " 
-                   << areIteratorTypesEquivalent(candidateOp.getIteratorTypesAttr(), iteratorTypes) << "\n";
-      llvm::errs() << "DEBUG: Regions check: " 
-                   << areRegionsEquivalent(genericOp.getRegion(), candidateOp.getRegion(), nodeMapping, operationMapping) << "\n";
+      LLVM_DEBUG(llvm::dbgs() << "No match for defn " << opName << "\n");
+      LLVM_DEBUG(llvm::dbgs() << "Input/output check: " 
+                              << (candidateOp.getNumDpsInputs() == numInputs) << "\n");
+      LLVM_DEBUG(llvm::dbgs() << "Maps check: " 
+                              << areIndexingMapsEquivalent(candidateOp.getIndexingMapsAttr(), indexingMaps) << "\n");
+      LLVM_DEBUG(llvm::dbgs() << "Iterator types check: " 
+                              << areIteratorTypesEquivalent(candidateOp.getIteratorTypesAttr(), iteratorTypes) << "\n");
+      LLVM_DEBUG(llvm::dbgs() << "Regions check: " 
+                              << areRegionsEquivalent(genericOp.getRegion(), candidateOp.getRegion(), nodeMapping, operationMapping) << "\n");
     }
     
     if (foundMatch) {
@@ -526,14 +497,14 @@ public:
   LogicalResult matchAndRewrite(GenericOp genericOp,
                                 PatternRewriter &rewriter) const override {
     
-    llvm::errs() << "DEBUG: matchAndRewrite called for genericOp:\n";
-    llvm::errs() << genericOp << "\n";
+    LLVM_DEBUG(llvm::dbgs() << "matchAndRewrite called for genericOp:\n");
+    LLVM_DEBUG(llvm::dbgs() << genericOp << "\n");
     
     auto module = genericOp->getParentOfType<ModuleOp>();
     //Check if the parent of the generic op is a kernel.defn
     if (auto parentOp = genericOp->getParentOp()) {
       if (isa<kernel::DefnOp>(parentOp)) {
-        llvm::errs() << "DEBUG: Skipping genericOp inside kernel.defn\n";
+        LLVM_DEBUG(llvm::dbgs() << "Skipping genericOp inside kernel.defn\n");
         return failure();
       }
     }
@@ -541,12 +512,12 @@ public:
     // Try to match with a defn in the collection
     auto matchResult = matchGenericWithDefn(genericOp, collectionOp);
     if (failed(matchResult)) {
-      llvm::errs() << "DEBUG: No match found in collection\n";
+      LLVM_DEBUG(llvm::dbgs() << "No match found in collection\n");
       return failure();
     }
     
     StringRef opName = matchResult->kernelName;
-    llvm::errs() << "DEBUG: Match found with kernel: " << opName << "\n";
+    LLVM_DEBUG(llvm::dbgs() << "Match found with kernel: " << opName << "\n");
     
     // Find the matched kernel.defn operation
     kernel::DefnOp matchedDefnOp = matchResult->matchedDefnOp;
@@ -591,19 +562,19 @@ public:
     
     // Use unified approach: map ALL kernel arguments to their corresponding actual values
     SmallVector<Value> operands;
-    llvm::errs() << "DEBUG: Starting to map " << kernelArgs.size() << " kernel arguments\n";
+    LLVM_DEBUG(llvm::dbgs() << "Starting to map " << kernelArgs.size() << " kernel arguments\n");
     
     for (BlockArgument kernelArg : kernelArgs) {
       Value actualValue = findCorrespondingValue(kernelArg, operationMapping, genericOp);
       if (!actualValue) {
-        llvm::errs() << "DEBUG: Failed to find corresponding value for kernel arg #" 
-                     << kernelArg.getArgNumber() << " - returning failure\n";
+        LLVM_DEBUG(llvm::dbgs() << "Failed to find corresponding value for kernel arg #" 
+                     << kernelArg.getArgNumber() << " - returning failure\n");
         return failure(); // Could not find corresponding value
       }
       operands.push_back(actualValue);
     }
     
-    llvm::errs() << "DEBUG: Successfully mapped all kernel arguments, creating kernel.launch\n";
+    LLVM_DEBUG(llvm::dbgs() << "Successfully mapped all kernel arguments, creating kernel.launch\n");
     
     // Get kernel function signature types for casting
     auto kernelFuncType = matchedDefnOp.getFunctionType();
@@ -619,8 +590,8 @@ public:
       if (operand.getType() != expectedType) {
         // Insert tensor.cast for type conversion
         if (isa<RankedTensorType>(operand.getType()) && isa<RankedTensorType>(expectedType)) {
-          llvm::errs() << "DEBUG: Casting operand " << i << " from " << operand.getType() 
-                       << " to " << expectedType << "\n";
+          LLVM_DEBUG(llvm::dbgs() << "Casting operand " << i << " from " << operand.getType() 
+                       << " to " << expectedType << "\n");
           auto castOp = rewriter.create<tensor::CastOp>(loc, expectedType, operand);
           castedOperands.push_back(castOp.getResult());
         } else {
@@ -652,8 +623,8 @@ public:
       if (result.getType() != originalType) {
         // Insert tensor.cast to convert back to original type
         if (isa<RankedTensorType>(result.getType()) && isa<RankedTensorType>(originalType)) {
-          llvm::errs() << "DEBUG: Casting result " << i << " from " << result.getType() 
-                       << " to " << originalType << "\n";
+          LLVM_DEBUG(llvm::dbgs() << "Casting result " << i << " from " << result.getType() 
+                       << " to " << originalType << "\n");
           auto castOp = rewriter.create<tensor::CastOp>(loc, originalType, result);
           finalResults.push_back(castOp.getResult());
         } else {
@@ -729,7 +700,7 @@ struct LinalgToKernelPass : public LinalgToKernelBase<LinalgToKernelPass> {
       // Find the kernel.defn_collection in the external module
       externalModule->walk([&](kernel::DefnCollectionOp op) {
         collectionOp = op;
-        llvm::errs() << "DEBUG: Found kernel.defn_collection in external module\n";
+        LLVM_DEBUG(llvm::dbgs() << "Found kernel.defn_collection in external module\n");
         return WalkResult::interrupt();
       });
       
