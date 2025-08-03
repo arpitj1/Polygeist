@@ -48,6 +48,64 @@ module {
       kernel.yield %result : tensor<?x?xf32>
     }
 
+    // Alpha-scaled GEMM accumulation (matches the second operation in the user's pattern)
+    kernel.defn @alpha_gemm_accumulate(%A: tensor<?x?xf64>, %B: tensor<?x?xf64>, %C: tensor<?x?xf64>, %alpha: f64) -> tensor<?x?xf64> {
+      // Matrix multiplication with alpha scaling: C += alpha * A * B
+      %result = linalg.generic {
+        indexing_maps = [
+          affine_map<(d0, d1, d2) -> (d0, d2)>,
+          affine_map<(d0, d1, d2) -> (d2, d1)>,
+          affine_map<(d0, d1, d2) -> (d0, d1)>
+        ],
+        iterator_types = ["parallel", "reduction", "parallel"]
+      } ins(%A, %B : tensor<?x?xf64>, tensor<?x?xf64>) 
+        outs(%C : tensor<?x?xf64>) {
+        ^bb0(%in: f64, %in_0: f64, %out: f64):
+          %6 = arith.mulf %alpha, %in : f64
+          %7 = arith.mulf %6, %in_0 : f64
+          %8 = arith.addf %out, %7 : f64
+          linalg.yield %8 : f64
+      } -> tensor<?x?xf64>
+      kernel.yield %result : tensor<?x?xf64>
+    }
+
+    // Element-wise beta scaling (matches the first operation in the user's pattern)
+    kernel.defn @beta_scale(%C: tensor<?x?xf64>, %beta: f64) -> tensor<?x?xf64> {
+      // Element-wise scaling: C = beta * C
+      %result = linalg.generic {
+        indexing_maps = [
+          affine_map<(d0, d1) -> (d1, d0)>
+        ],
+        iterator_types = ["parallel", "parallel"]
+      } outs(%C : tensor<?x?xf64>) {
+        ^bb0(%out: f64):
+          %6 = arith.mulf %out, %beta : f64
+          linalg.yield %6 : f64
+      } -> tensor<?x?xf64>
+      kernel.yield %result : tensor<?x?xf64>
+    }
+
+    // Matrix multiplication with alpha scaling (second operation standalone)
+    kernel.defn @gemm_alpha_only(%A: tensor<?x?xf64>, %B: tensor<?x?xf64>, %C: tensor<?x?xf64>, %alpha: f64) -> tensor<?x?xf64> {
+      // Matrix multiplication: C += alpha * A * B 
+      %result = linalg.generic {
+        indexing_maps = [
+          affine_map<(d0, d1, d2) -> (d2, d1)>,
+          affine_map<(d0, d1, d2) -> (d1, d0)>,
+          affine_map<(d0, d1, d2) -> (d2, d0)>
+        ],
+        iterator_types = ["parallel", "reduction", "parallel"]
+      } ins(%A, %B : tensor<?x?xf64>, tensor<?x?xf64>) 
+        outs(%C : tensor<?x?xf64>) {
+        ^bb0(%in: f64, %in_0: f64, %out: f64):
+          %6 = arith.mulf %alpha, %in : f64
+          %7 = arith.mulf %6, %in_0 : f64
+          %8 = arith.addf %out, %7 : f64
+          linalg.yield %8 : f64
+      } -> tensor<?x?xf64>
+      kernel.yield %result : tensor<?x?xf64>
+    }
+
     // Sum of absolute values operation (ASUM)
     kernel.defn @asum_linalg(%X: tensor<?xf32>, %init: tensor<f32>) -> tensor<f32> {
       // Sum of absolute values: result = sum_i |x_i|

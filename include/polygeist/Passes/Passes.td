@@ -303,6 +303,7 @@ def LinalgToKernel : Pass<"linalg-to-kernel", "mlir::ModuleOp"> {
     "polygeist::kernel::KernelDialect",
     "tensor::TensorDialect",
     "arith::ArithDialect",
+    "bufferization::BufferizationDialect",
   ];
   let options = [
     Option<"kernelLibraryPath", "kernel-library-path", "std::string", 
