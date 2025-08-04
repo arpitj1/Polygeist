@@ -170,6 +170,26 @@ module {
       kernel.yield %result : tensor<i32>
     }
 
+    // General Matrix-Vector Multiply (GEMV)
+    kernel.defn @gemv_simple(%A: tensor<?x?xf64>, %x: tensor<?xf64>, %y: tensor<?xf64>) -> tensor<?xf64> {
+      // Simple matrix-vector multiplication: y += A * x
+      %result = linalg.generic {
+        indexing_maps = [
+          affine_map<(d0, d1) -> (d1, d0)>,  // Matrix A[d0, d1]
+          affine_map<(d0, d1) -> (d0)>,      // Vector x[d1]
+          affine_map<(d0, d1) -> (d1)>       // Vector y[d0]
+        ],
+        iterator_types = ["parallel", "reduction"]
+      } ins(%A, %x : tensor<?x?xf64>, tensor<?xf64>) 
+        outs(%y : tensor<?xf64>) {
+        ^bb0(%a: f64, %x_val: f64, %y_val: f64):
+          %product = arith.mulf %a, %x_val : f64
+          %result = arith.addf %y_val, %product : f64
+          linalg.yield %result : f64
+      } -> tensor<?xf64>
+      kernel.yield %result : tensor<?xf64>
+    }
+
     // Index of minimum absolute value operation definition with linalg.generic representation
     kernel.defn @iamin_linalg(%X: tensor<?xf32>, %init: tensor<i32>) -> tensor<i32> {
       // Implementation using linalg.generic
