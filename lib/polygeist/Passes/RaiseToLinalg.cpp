@@ -220,7 +220,13 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
                           int firstNDims, ValueRange oldmap_operands,
                           Value origmemref, bool &check_reduction) {
 
+  LLVM_DEBUG(llvm::dbgs() << "\n=== remap_in_affine_dim ===\n");
+  LLVM_DEBUG(llvm::dbgs() << "  oldmap: " << oldmap << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "  firstNDims: " << firstNDims << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "  check_reduction (input): " << check_reduction << "\n");
+
   int lower_bound_val = getConstantFromAffineApply(lower_bound).value_or(0);
+  LLVM_DEBUG(llvm::dbgs() << "  lower_bound_val: " << lower_bound_val << "\n");
 
   assert(oldmap_operands.size() ==
          oldmap.getNumSymbols() + oldmap.getNumDims());
@@ -276,6 +282,9 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
   else
     check_reduction = false;
 
+  LLVM_DEBUG(llvm::dbgs() << "  dimidx: " << dimidx << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "  check_reduction (output): " << check_reduction << "\n");
+
   SmallVector<AffineExpr> dimReplacements;
   size_t validSims = 0;
   size_t validDims = 0;
@@ -330,6 +339,9 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
   auto map2 = oldmap.replaceDimsAndSymbols(dimReplacements, symReplacements,
                                            firstNDims + 1/*Number of dims in new map*/,
                                            operands_without_indices.size() /*Number of symbols in new map*/);
+  
+  LLVM_DEBUG(llvm::dbgs() << "  new map (map2): " << map2 << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "  validDims: " << validDims << ", validSims: " << validSims << "\n");
 
   SmallVector<Value> idx_sizes;
   for (size_t i = 0; i < firstNDims; i++) {
@@ -413,8 +425,13 @@ Value remap_in_affine_dim(bool &legal, OpBuilder &builder, AffineMap oldmap,
 
   //Value subview = subViewOp.getResult();
 
-  return builder.create<polygeist::SubmapOp>(
+  auto result = builder.create<polygeist::SubmapOp>(
       memref_val.getLoc(), ty, memref_val, operands_without_indices, map2);
+  
+  LLVM_DEBUG(llvm::dbgs() << "  Created SubmapOp with type: " << ty << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "=== remap_in_affine_dim END ===\n\n");
+  
+  return result;
 }
 
 // store A[...]
@@ -512,19 +529,28 @@ LogicalResult getLinalgArgMap(Operation *loop, Value &input, AffineMap &lgMap,
                               SmallVector<Value> &lgOperands) {
   OpBuilder builder(loop->getContext());
 
+  LLVM_DEBUG(llvm::dbgs() << "\n=== getLinalgArgMap ===\n");
+  LLVM_DEBUG(llvm::dbgs() << "  Initial lgMap: " << lgMap << "\n");
+
   while (Operation *defOp = input.getDefiningOp()) {
 
     assert(lgOperands.size() == lgMap.getNumSymbols() + lgMap.getNumDims());
     // If the input is defined outside of the loop, we are finished.
-    if (!loop->isAncestor(defOp))
+    if (!loop->isAncestor(defOp)) {
+      LLVM_DEBUG(llvm::dbgs() << "  Input defined outside loop, breaking\n");
       break;
+    }
 
     if (auto SM = dyn_cast<polygeist::SubmapOp>(defOp)) {
       auto submap = SM.getMap();
 
+      LLVM_DEBUG(llvm::dbgs() << "  Found SubmapOp with map: " << submap << "\n");
+
       // TODO: Do we achieve anything with this compose?
       // As lgMap in our case is 1 to 1 identity map
       auto composeMap = submap.compose(lgMap);
+      
+      LLVM_DEBUG(llvm::dbgs() << "  Composed map: " << composeMap << "\n");
 
       SmallVector<Value> operands0;
 
@@ -660,6 +686,10 @@ LogicalResult getLinalgArgMap(Operation *loop, Value &input, AffineMap &lgMap,
     // return failure();
   }
   assert(lgOperands.size() == lgMap.getNumSymbols() + lgMap.getNumDims());
+  
+  LLVM_DEBUG(llvm::dbgs() << "  Final lgMap: " << lgMap << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "=== getLinalgArgMap END ===\n\n");
+  
   return success();
 }
 
@@ -669,11 +699,17 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
   LogicalResult matchAndRewrite(affine::AffineForOp loop,
                                 PatternRewriter &rewriter) const final {
 
+    LLVM_DEBUG(llvm::dbgs() << "\n========================================\n");
+    LLVM_DEBUG(llvm::dbgs() << "=== AffineForOpRaising::matchAndRewrite ===\n");
+    LLVM_DEBUG(llvm::dbgs() << "========================================\n");
+    LLVM_DEBUG(llvm::dbgs() << "Processing loop:\n" << loop << "\n\n");
+
     auto module = loop->getParentOfType<ModuleOp>();
 
     // Don't handle accumulations in registers for the moment, we can have
     // a separate pattern move them into memref's
     if (loop.getNumResults() != 0) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Loop has results\n\n");
       return failure();
     }
 
@@ -726,8 +762,15 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
       return WalkResult::interrupt();
     });
 
-    if (result.wasInterrupted())
+    if (result.wasInterrupted()) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Walk was interrupted (invalid operations found)\n\n");
       return failure();
+    }
+
+    LLVM_DEBUG(llvm::dbgs() << "Pattern recognition complete:\n");
+    LLVM_DEBUG(llvm::dbgs() << "  Loads: " << loads.size() << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "  Stores: " << stores.size() << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "  LinalgGenerics: " << linalgGenerics.size() << "\n\n");
 
     DominanceInfo DI(loop);
 
@@ -777,20 +820,29 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
     // our remapper currently assumes 0 start to bound.
     if (!loop.hasConstantLowerBound() /*|| loop.getConstantLowerBound() != 0*/) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Loop doesn't have constant lower bound\n\n");
       return failure();
     }
 
     // compute this correctly later.
     auto ubMap = loop.getUpperBoundMap();
     auto ubOperands = loop.getUpperBoundOperands();
-    if (!ubMap || ubMap.getNumResults() != 1)
+    if (!ubMap || ubMap.getNumResults() != 1) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Invalid upper bound map\n\n");
       return failure();
+    }
 
     // Retrieve the lower bound
     auto lbMap = loop.getLowerBoundMap();
     auto lbOperands = loop.getLowerBoundOperands();
-    if (!lbMap || lbMap.getNumResults() != 1)
+    if (!lbMap || lbMap.getNumResults() != 1) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Invalid lower bound map\n\n");
       return failure();
+    }
+
+    LLVM_DEBUG(llvm::dbgs() << "Loop bounds:\n");
+    LLVM_DEBUG(llvm::dbgs() << "  lbMap: " << lbMap << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "  ubMap: " << ubMap << "\n");
 
     //auto ub = loop.getSingleUpperBound();
     //if (!ub)
@@ -830,7 +882,11 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     // loop.getConstantUpperBound());//rewriter.create<arith::SubIOp>(loop.getLoc(),
     // *ub, *lb);
 
+    LLVM_DEBUG(llvm::dbgs() << "\n--- Processing Linalg Generics ---\n");
+    
     for (auto &&[conds, lg] : linalgGenerics) {
+
+      LLVM_DEBUG(llvm::dbgs() << "Processing linalg.generic:\n" << lg << "\n");
 
       // This captures the indexing map attribute from the linalg.generic being
       // processed
@@ -838,10 +894,13 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
       int idx = 0;
       // Iterate over input arguments
+      LLVM_DEBUG(llvm::dbgs() << "  Processing " << lg.getInputs().size() << " inputs\n");
       for (const Value input : lg.getInputs()) {
         // Is this needed?
-        if (conds.size() != 0)
+        if (conds.size() != 0) {
+          LLVM_DEBUG(llvm::dbgs() << "  REJECTED: Input has conditions\n");
           return failure();
+        }
 
         // TODO: Implement this
         // lgMap comes from offset of memref.subview,
@@ -850,6 +909,8 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         const AffineMap lgMap0 =
             cast<AffineMapAttr>(indexingMapsAttr[idx]).getAffineMap();
         AffineMap lgMap = lgMap0;
+        
+        LLVM_DEBUG(llvm::dbgs() << "  Input " << idx << " indexing map: " << lgMap << "\n");
         SmallVector<Value> lgOperands;
         for (int i = 0; i < lgMap.getNumDims(); i++) {
           lgOperands.push_back(nullptr);
@@ -891,11 +952,16 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         // size_t firstNDims = lgMap.getResults().size();
         size_t firstNDims = lgMap.getNumDims();
         check_reduction = false;
+        
+        LLVM_DEBUG(llvm::dbgs() << "  Calling remap_in_affine_dim for input " << idx << "\n");
+        
         auto newMemref = remap_in_affine_dim(
             legal, rewriter, lgMap, lgMemref, loop.getInductionVar(), loopSize, lbValue,
             firstNDims, ValueRange(lgOperands), input, check_reduction);
-        if (!legal)
+        if (!legal) {
+          LLVM_DEBUG(llvm::dbgs() << "  REJECTED: remap_in_affine_dim returned illegal for input\n");
           return failure();
+        }
 
         auto newAffineMap = rewriter.getMultiDimIdentityMap(firstNDims + 1);
 
@@ -906,6 +972,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
       }
 
       // Iterate over output arguments
+      LLVM_DEBUG(llvm::dbgs() << "  Processing " << lg.getOutputs().size() << " outputs\n");
       for (const Value output : lg.getOutputs()) {
         // Is this needed?
         if (conds.size() != 0)
@@ -930,11 +997,16 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
         size_t firstNDims = lgMap.getNumDims();
         check_reduction = true;
+        
+        LLVM_DEBUG(llvm::dbgs() << "  Calling remap_in_affine_dim for output " << (idx - lg.getInputs().size()) << "\n");
+        
         auto newMemref = remap_in_affine_dim(
             legal, rewriter, lgMap, lgMemref, loop.getInductionVar(), loopSize, lbValue,
             firstNDims, ValueRange(lgOperands), output, check_reduction);
-        if (!legal)
+        if (!legal) {
+          LLVM_DEBUG(llvm::dbgs() << "  REJECTED: remap_in_affine_dim returned illegal for output\n");
           return failure();
+        }
 
         auto newAffineMap = rewriter.getMultiDimIdentityMap(firstNDims + 1);
         // TODO: need to merge previous indexing maps and new affine maps
@@ -944,10 +1016,16 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     }
 
     // current spec is going to be indexed off of the loop var in isolation
+    LLVM_DEBUG(llvm::dbgs() << "\n--- Processing Loads ---\n");
+    
     for (auto &&[conds, load] : loads) {
+      LLVM_DEBUG(llvm::dbgs() << "Processing load: " << load << "\n");
+      
       // Only support unconditional loads for the moment
-      if (conds.size() != 0)
+      if (conds.size() != 0) {
+        LLVM_DEBUG(llvm::dbgs() << "  REJECTED: Load has conditions\n");
         return failure();
+      }
 
       if (stores_map.find(load) != stores_map.end()) {
         // We have a store that represents this load.
@@ -976,10 +1054,16 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     // SmallVector<Value> outputs;
     //  Store we may need to reindex into a splat potentially later, but for now
     //  we'll be lazy
+    LLVM_DEBUG(llvm::dbgs() << "\n--- Processing Stores ---\n");
+    
     for (auto &&[conds, store] : stores) {
+      LLVM_DEBUG(llvm::dbgs() << "Processing store: " << store << "\n");
+      
       // Only support unconditional loads for the moment
-      if (conds.size() != 0)
+      if (conds.size() != 0) {
+        LLVM_DEBUG(llvm::dbgs() << "  REJECTED: Store has conditions\n");
         return failure();
+      }
 
       bool legal = true;
 
@@ -1004,11 +1088,13 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     // TODO presently  if linalg generic exists, assert there are no load/stores
     if ((linalgGenerics.size() > 0) &&
         ((loads.size() != 0) || (stores.size() != 0))) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Linalg generic exists with loads/stores\n\n");
       return failure();
     }
 
     // TODO assert only zero or one linalg generic exists
     if (!(linalgGenerics.size() == 1 || linalgGenerics.size() == 0)) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: More than one linalg generic\n\n");
       // assert(false);
       return failure();
     }
@@ -1029,10 +1115,19 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     iteratorTypes.push_back(check_reduction ? utils::IteratorType::reduction
                                             : utils::IteratorType::parallel);
 
+    LLVM_DEBUG(llvm::dbgs() << "\n--- Creating linalg.generic ---\n");
+    LLVM_DEBUG(llvm::dbgs() << "Iterator type for this loop: " 
+               << (check_reduction ? "reduction" : "parallel") << "\n");
+
     if (linalgGenerics.size() == 1) {
+      LLVM_DEBUG(llvm::dbgs() << "Extending iterator types from nested linalg.generic\n");
       for (auto attr : linalgGenerics[0].second.getIteratorTypesArray())
         iteratorTypes.push_back(attr);
     }
+
+    LLVM_DEBUG(llvm::dbgs() << "Total iterator types: " << iteratorTypes.size() << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "Total inputs: " << inputs.size() << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "Total outputs: " << outputs.size() << "\n");
 
     StringAttr empty = StringAttr::get(loop.getContext());
     auto genericOp = rewriter.create<mlir::linalg::GenericOp>(
@@ -1115,6 +1210,10 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
     auto func = loop->getParentOfType<func::FuncOp>();
     rewriter.eraseOp(loop);
+    
+    LLVM_DEBUG(llvm::dbgs() << "\n=== AffineForOpRaising SUCCESS ===\n");
+    LLVM_DEBUG(llvm::dbgs() << "========================================\n\n");
+    
     // return success!
     return success();
   }
@@ -1125,6 +1224,9 @@ struct AffineParallelFission : public OpRewritePattern<AffineParallelOp> {
 
   LogicalResult matchAndRewrite(AffineParallelOp parallelOp,
                                 PatternRewriter &rewriter) const override {
+
+    LLVM_DEBUG(llvm::dbgs() << "\n=== AffineParallelFission ===\n");
+    LLVM_DEBUG(llvm::dbgs() << "Processing affine.parallel:\n" << parallelOp << "\n");
 
     auto module = parallelOp->getParentOfType<ModuleOp>();
     // Collect all top-level nested loops (affine.parallel or affine.for)
@@ -1142,8 +1244,12 @@ struct AffineParallelFission : public OpRewritePattern<AffineParallelOp> {
     
     // Need at least 2 nested loops to perform fission
     if (nestedLoops.size() < 2) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Less than 2 nested loops (found " 
+                 << nestedLoops.size() << ")\n\n");
       return failure();
     }
+
+    LLVM_DEBUG(llvm::dbgs() << "Found " << nestedLoops.size() << " nested loops to fission\n");
     
     // Convert reductions ArrayAttr to ArrayRef<AtomicRMWKind>
     SmallVector<arith::AtomicRMWKind> reductionKinds;
@@ -1233,15 +1339,23 @@ struct AffineParallelToFor : public OpRewritePattern<AffineParallelOp> {
   LogicalResult matchAndRewrite(AffineParallelOp parallelOp,
                                 PatternRewriter &rewriter) const override {
     
+    LLVM_DEBUG(llvm::dbgs() << "\n=== AffineParallelToFor ===\n");
+    LLVM_DEBUG(llvm::dbgs() << "Processing affine.parallel:\n" << parallelOp << "\n");
+    
     // Skip if there are reductions - they need special handling
     if (!parallelOp.getReductions().empty()) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Has reductions\n\n");
       return failure();
     }
     
     // Skip if there are result types - parallel loops with returns need special handling
     if (!parallelOp.getResultTypes().empty()) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Has result types\n\n");
       return failure();
     }
+
+    LLVM_DEBUG(llvm::dbgs() << "Converting parallel loop with " 
+               << parallelOp.getIVs().size() << " induction variables\n");
     
     Location loc = parallelOp.getLoc();
     
@@ -1303,6 +1417,8 @@ struct AffineParallelToFor : public OpRewritePattern<AffineParallelOp> {
     // Remove the original parallel loop
     rewriter.eraseOp(parallelOp);
     
+    LLVM_DEBUG(llvm::dbgs() << "=== AffineParallelToFor SUCCESS ===\n\n");
+    
     return success();
   }
 };
@@ -1341,6 +1457,10 @@ struct RaiseAffineToLinalgPipeline
 } // namespace
 
 void RaiseAffineToLinalgPipeline::runOnOperation() {
+  LLVM_DEBUG(llvm::dbgs() << "\n****************************************\n");
+  LLVM_DEBUG(llvm::dbgs() << "*** RaiseAffineToLinalgPipeline START ***\n");
+  LLVM_DEBUG(llvm::dbgs() << "****************************************\n\n");
+
   // Create a nested pass manager to run the pipeline on functions
   OpPassManager pm(getOperation()->getName());
   
@@ -1357,10 +1477,16 @@ void RaiseAffineToLinalgPipeline::runOnOperation() {
   funcPM.addPass(createCanonicalizerPass());
   
   // Run the pipeline
+  LLVM_DEBUG(llvm::dbgs() << "Running pipeline...\n");
   if (failed(runPipeline(pm, getOperation()))) {
     // Warn but don't fail the pass - convergence issues shouldn't kill output
+    LLVM_DEBUG(llvm::dbgs() << "WARNING: Pipeline didn't converge completely\n");
     getOperation()->emitWarning("Pipeline didn't converge completely, but continuing anyway");
   }
+
+  LLVM_DEBUG(llvm::dbgs() << "\n****************************************\n");
+  LLVM_DEBUG(llvm::dbgs() << "*** RaiseAffineToLinalgPipeline END ***\n");
+  LLVM_DEBUG(llvm::dbgs() << "****************************************\n\n");
 }
 
 namespace {
@@ -1371,34 +1497,51 @@ struct RaiseAffineToLinalg
 } // namespace
 
 void RaiseAffineToLinalg::runOnOperation() {
+  LLVM_DEBUG(llvm::dbgs() << "\n****************************************\n");
+  LLVM_DEBUG(llvm::dbgs() << "*** RaiseAffineToLinalg START ***\n");
+  LLVM_DEBUG(llvm::dbgs() << "****************************************\n\n");
+
   GreedyRewriteConfig config;
   
   // Step 1: Apply fission pattern first
   {
+    LLVM_DEBUG(llvm::dbgs() << "### Step 1: Applying AffineParallelFission ###\n");
     RewritePatternSet fissionPatterns(&getContext());
     fissionPatterns.insert<AffineParallelFission>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(fissionPatterns), config))) {
+      LLVM_DEBUG(llvm::dbgs() << "WARNING: AffineParallelFission didn't converge\n");
       getOperation()->emitWarning("AffineParallelFission didn't converge, continuing anyway");
     }
+    LLVM_DEBUG(llvm::dbgs() << "### Step 1 Complete ###\n\n");
   }
   
   // Step 2: Apply parallel-to-for conversion
   {
+    LLVM_DEBUG(llvm::dbgs() << "### Step 2: Applying AffineParallelToFor ###\n");
     RewritePatternSet parallelToForPatterns(&getContext());
     parallelToForPatterns.insert<AffineParallelToFor>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(parallelToForPatterns), config))) {
+      LLVM_DEBUG(llvm::dbgs() << "WARNING: AffineParallelToFor didn't converge\n");
       getOperation()->emitWarning("AffineParallelToFor didn't converge, continuing anyway");
     }
+    LLVM_DEBUG(llvm::dbgs() << "### Step 2 Complete ###\n\n");
   }
   
   // Step 3: Apply raising pattern
   {
+    LLVM_DEBUG(llvm::dbgs() << "### Step 3: Applying AffineForOpRaising ###\n");
     RewritePatternSet raisingPatterns(&getContext());
     raisingPatterns.insert<AffineForOpRaising>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(raisingPatterns), config))) {
+      LLVM_DEBUG(llvm::dbgs() << "WARNING: AffineForOpRaising didn't converge\n");
       getOperation()->emitWarning("AffineForOpRaising didn't converge, continuing anyway");
     }
+    LLVM_DEBUG(llvm::dbgs() << "### Step 3 Complete ###\n\n");
   }
+
+  LLVM_DEBUG(llvm::dbgs() << "****************************************\n");
+  LLVM_DEBUG(llvm::dbgs() << "*** RaiseAffineToLinalg END ***\n");
+  LLVM_DEBUG(llvm::dbgs() << "****************************************\n\n");
 }
 
 namespace mlir {

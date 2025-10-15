@@ -4,6 +4,17 @@
 include "mlir/Pass/PassBase.td"
 include "mlir/Rewrite/PassUtil.td"
 
+def SelectFunc : Pass<"select-func"> {
+  let summary = "Run a pass pipeline on selected functions by name";
+  let constructor = "mlir::polygeist::createSelectFuncPass()";
+  let options = [
+    Option<"pipeline", "pipeline", "std::string", /*default=*/"\"\"",
+           "The pass pipeline to run on filtered functions">,
+    ListOption<"funcNames", "func-name", "std::string",
+               "Function names to process (if empty, process all)">
+  ];
+}
+
 def AffineCFG : Pass<"affine-cfg"> {
   let summary = "Replace scf.if and similar with affine.if";
   let constructor = "mlir::polygeist::replaceAffineCFGPass()";
