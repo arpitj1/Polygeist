@@ -268,8 +268,11 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
     LLVM_DEBUG(llvm::dbgs() << "  Traversing use chain to find store...\n");
     
     // Check if yield is an addition (required for distributivity transformations)
-    auto yieldedAddOp = dyn_cast_or_null<arith::AddFOp>(lastOp.getDefiningOp());
-    bool yieldIsAddition = (yieldedAddOp != nullptr);
+    // Support both float (addf) and integer (addi) addition
+    Operation *yieldedAddOp = lastOp.getDefiningOp();
+    bool yieldIsAddition = yieldedAddOp && 
+                           (isa<arith::AddFOp>(yieldedAddOp) || 
+                            isa<arith::AddIOp>(yieldedAddOp));
     LLVM_DEBUG(llvm::dbgs() << "  Yielded operation is addition: " << (yieldIsAddition ? "YES" : "NO") << "\n");
     
     int traverseLimit = 10; // Prevent infinite loops
@@ -285,15 +288,18 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
       }
       
       // Check if this is a multiply that can distribute over addition
-      if (auto mulOp = dyn_cast<arith::MulFOp>(user)) {
+      // Support both float (mulf) and integer (muli) multiplication
+      if (isa<arith::MulFOp>(user) || isa<arith::MulIOp>(user)) {
         if (!yieldIsAddition) {
           LLVM_DEBUG(llvm::dbgs() << "    ✗ Cannot pull multiply: yield is not addition\n");
           return failure();
         }
         
+        auto mulOp = user;
+        
         // Check that one operand is the loop result and the other is loop-invariant
-        Value lhs = mulOp.getLhs();
-        Value rhs = mulOp.getRhs();
+        Value lhs = mulOp->getOperand(0);
+        Value rhs = mulOp->getOperand(1);
         Value invariantOp;
         
         if (lhs == currentValue && isLoopInvariant(rhs, forOp)) {
@@ -307,19 +313,24 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
         
         LLVM_DEBUG(llvm::dbgs() << "    ✓ Can pull multiply into loop (distributivity)\n");
         opsChain.push_back({mulOp, invariantOp});
-        currentValue = mulOp.getResult();
+        currentValue = mulOp->getResult(0);
         continue;
       }
       
       // Check if this is an addition with a loop-invariant load
-      if (auto addOp = dyn_cast<arith::AddFOp>(user)) {
+      // Check if this is an addition with a loop-invariant load
+      // Support both float (addf) and integer (addi) addition
+      if (isa<arith::AddFOp>(user) || isa<arith::AddIOp>(user)) {
+        auto addOp = user;
         if (!yieldIsAddition) {
           LLVM_DEBUG(llvm::dbgs() << "    ✗ Cannot merge addition: yield is not addition\n");
           return failure();
         }
         
         // Get the other operand (not the loop result)
-        Value otherOperand = (addOp.getLhs() == currentValue) ? addOp.getRhs() : addOp.getLhs();
+        Value lhs = addOp->getOperand(0);
+        Value rhs = addOp->getOperand(1);
+        Value otherOperand = (lhs == currentValue) ? rhs : lhs;
         
         // Check if it's a loop-invariant load
         if (auto loadOp = dyn_cast<affine::AffineLoadOp>(otherOperand.getDefiningOp())) {
@@ -335,7 +346,7 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
             LLVM_DEBUG(llvm::dbgs() << "    ✓ Found loop-invariant load, will merge into init\n");
             initLoad = loadOp;
             opsChain.push_back({addOp, otherOperand});
-            currentValue = addOp.getResult();
+            currentValue = addOp->getResult(0);
             continue;
           }
         }
@@ -430,8 +441,8 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
     
     // Pull multiply operations into the loop
     for (auto &[op, invariantOp] : opsChain) {
-      if (auto mulOp = dyn_cast<arith::MulFOp>(op)) {
-        LLVM_DEBUG(llvm::dbgs() << "    Pulling multiply into loop: " << *mulOp << "\n");
+      if (isa<arith::MulFOp>(op) || isa<arith::MulIOp>(op)) {
+        LLVM_DEBUG(llvm::dbgs() << "    Pulling multiply into loop: " << *op << "\n");
         
         // We need to insert the multiply before the operation that produces currentAccum
         if (auto defOp = currentAccum.getDefiningOp()) {
@@ -441,11 +452,13 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
         }
         
         // The multiply scales the accumulated value
-        // If currentAccum is the result of an AddFOp, we need to modify it
-        if (auto addOp = currentAccum.getDefiningOp<arith::AddFOp>()) {
+        // If currentAccum is the result of an AddFOp or AddIOp, we need to modify it
+        Operation *addOpDef = currentAccum.getDefiningOp();
+        if (addOpDef && (isa<arith::AddFOp>(addOpDef) || isa<arith::AddIOp>(addOpDef))) {
+          auto addOp = addOpDef;
           // Find which operand is the accumulator vs the value being added
-          Value lhs = addOp.getLhs();
-          Value rhs = addOp.getRhs();
+          Value lhs = addOp->getOperand(0);
+          Value rhs = addOp->getOperand(1);
           
           // Check if either operand references the old iter_arg
           bool lhsIsAccum = false;
@@ -461,19 +474,34 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
           Value valueToScale = rhsIsAccum ? lhs : rhs;
           Value accumValue = rhsIsAccum ? rhs : lhs;
           
-          // Create new multiply
+          // Create new multiply (use same type as original)
           rewriter.setInsertionPoint(addOp);
-          auto newMul = rewriter.create<arith::MulFOp>(loc, invariantOp, valueToScale);
+          Value newMulResult;
+          if (isa<arith::MulFOp>(op)) {
+            auto newMul = rewriter.create<arith::MulFOp>(loc, invariantOp, valueToScale);
+            newMulResult = newMul.getResult();
+            LLVM_DEBUG(llvm::dbgs() << "      Created: " << newMul << "\n");
+          } else {
+            auto newMul = rewriter.create<arith::MulIOp>(loc, invariantOp, valueToScale);
+            newMulResult = newMul.getResult();
+            LLVM_DEBUG(llvm::dbgs() << "      Created: " << newMul << "\n");
+          }
           
-          // Create new addition
-          auto newAdd = rewriter.create<arith::AddFOp>(loc, accumValue, newMul.getResult());
+          // Create new addition (use same type as original)
+          Value newAddResult;
+          if (isa<arith::AddFOp>(addOp)) {
+            auto newAdd = rewriter.create<arith::AddFOp>(loc, accumValue, newMulResult);
+            newAddResult = newAdd.getResult();
+            LLVM_DEBUG(llvm::dbgs() << "      Created: " << newAdd << "\n");
+          } else {
+            auto newAdd = rewriter.create<arith::AddIOp>(loc, accumValue, newMulResult);
+            newAddResult = newAdd.getResult();
+            LLVM_DEBUG(llvm::dbgs() << "      Created: " << newAdd << "\n");
+          }
           
           // Replace the old add
-          rewriter.replaceOp(addOp, newAdd.getResult());
-          currentAccum = newAdd.getResult();
-          
-          LLVM_DEBUG(llvm::dbgs() << "      Created: " << newMul << "\n");
-          LLVM_DEBUG(llvm::dbgs() << "      Created: " << newAdd << "\n");
+          rewriter.replaceOp(addOp, newAddResult);
+          currentAccum = newAddResult;
         }
       }
     }
