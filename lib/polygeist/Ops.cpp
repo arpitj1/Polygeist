@@ -5769,7 +5769,7 @@ struct SubMapOpCanonicalize : public OpRewritePattern<polygeist::SubmapOp> {
     /// %x = ... : memref<4x5xf32>
     //  %y = memref.cast %x : memref<4x5xf32> -> memref<?x?xf32>
     //
-    auto source_memref = op.getMemref();
+    auto source_memref = op.getBase();
     bool isIdentity = op.getMap().isIdentity();
     bool isInputSameDim = llvm::all_of(
         llvm::zip_equal(op.getSizes(),
@@ -5785,7 +5785,7 @@ struct SubMapOpCanonicalize : public OpRewritePattern<polygeist::SubmapOp> {
         });
     if (isIdentity && isInputSameDim) {
       rewriter.replaceOpWithNewOp<memref::CastOp>(op, op.getType(),
-                                                  op.getMemref());
+                                                  op.getBase());
       return success();
     }
     if (auto sapOp = source_memref.getDefiningOp<polygeist::SubmapOp>()) {
@@ -5797,7 +5797,7 @@ struct SubMapOpCanonicalize : public OpRewritePattern<polygeist::SubmapOp> {
       operands.append(op.getSymbols().begin(), op.getSymbols().end());
       operands.append(op.getSizes().begin(), op.getSizes().end());
       rewriter.replaceOpWithNewOp<polygeist::SubmapOp>(
-          op, op.getType(), sapOp.getMemref(), operands, new_map);
+          op, op.getType(), sapOp.getBase(), operands, new_map);
       return success();
     }
     return failure();
@@ -5990,7 +5990,7 @@ static bool canConvertSubmapToSubView(polygeist::SubmapOp submapOp) {
   auto map = submapOp.getMap();
   auto sizes = submapOp.getSizes();
   auto symbols = submapOp.getSymbols();
-  auto source_memref = submapOp.getMemref();
+  auto source_memref = submapOp.getBase();
 
   // 0. Only convert if map has symbols
   if (submapOp.getMap().getNumSymbols() == 0) {
@@ -6111,7 +6111,7 @@ struct SubmapToSubviewOp : public OpRewritePattern<polygeist::SubmapOp> {
     for (Value size : conversionInfo.sizes) {
       sizeValues.push_back(size);
     }
-    rewriter.replaceOpWithNewOp<memref::SubViewOp>(submapOp, submapOp.getType(), submapOp.getMemref(), offsetValues, sizeValues, strideValues);
+    rewriter.replaceOpWithNewOp<memref::SubViewOp>(submapOp, submapOp.getBase(), offsetValues, sizeValues, strideValues);
     return success();
   }
 };
@@ -6535,7 +6535,7 @@ public:
 
     auto submap_map = subMapOp.getMap();
     auto submap_operands = subMapOp.getSymbols();
-    auto source_memref = subMapOp.getMemref();
+    auto source_memref = subMapOp.getBase();
 
     auto load_map = op.getAffineMap();
     auto load_operands = op.getMapOperands();
@@ -6567,7 +6567,7 @@ public:
 
     auto submap_map = subMapOp.getMap();
     auto submap_operands = subMapOp.getSymbols();
-    auto source_memref = subMapOp.getMemref();
+    auto source_memref = subMapOp.getBase();
 
     auto load_map = op.getAffineMap();
     auto load_operands = op.getMapOperands();
@@ -6703,5 +6703,22 @@ void polygeist::SubmapOp::getCanonicalizationPatterns(
   results.insert<LoadSubMap, StoreSubMap, DimSubMap, SubmapToSubviewOp, LinalgGenericEliminateSubmaps/*,
   EnhancedSubmapToSubviewOp*/>(context);
   // results.insert<LoadSubMap, StoreSubMap, DimSubMap>(context);
+}
+
+//===----------------------------------------------------------------------===//
+// SubmapInverseOp
+//===----------------------------------------------------------------------===//
+
+OpFoldResult mlir::polygeist::SubmapInverseOp::fold(
+    mlir::polygeist::SubmapInverseOp::FoldAdaptor adaptor) {
+  // TODO: Add folding logic for SubmapInverseOp
+  // For now, just return nullptr (no folding)
+  return nullptr;
+}
+
+void polygeist::SubmapInverseOp::getCanonicalizationPatterns(
+    RewritePatternSet &results, MLIRContext *context) {
+  // TODO: Add canonicalization patterns for SubmapInverseOp
+  // For now, leave empty
 }
 

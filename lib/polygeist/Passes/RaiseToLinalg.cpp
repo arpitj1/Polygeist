@@ -568,7 +568,7 @@ LogicalResult getLinalgArgMap(Operation *loop, Value &input, AffineMap &lgMap,
 
       lgMap = composeMap;
       lgOperands = operands0;
-      input = SM.getMemref();
+      input = SM.getBase();
       assert(lgOperands.size() == lgMap.getNumSymbols() + lgMap.getNumDims());
       continue;
     }
@@ -1474,7 +1474,7 @@ void RaiseAffineToLinalgPipeline::runOnOperation() {
   funcPM.addPass(createRaiseAffineToLinalgPass());
   
   // Canonicalize after raise-to-linalg to eliminate submaps and other patterns
-  funcPM.addPass(createCanonicalizerPass());
+  //funcPM.addPass(createCanonicalizerPass());
   
   // Run the pipeline
   LLVM_DEBUG(llvm::dbgs() << "Running pipeline...\n");
