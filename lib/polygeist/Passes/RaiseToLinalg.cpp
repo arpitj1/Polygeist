@@ -693,6 +693,35 @@ LogicalResult getLinalgArgMap(Operation *loop, Value &input, AffineMap &lgMap,
   return success();
 }
 
+// Group A — triangular-bound support helpers.
+// Returns true iff every operand of `operands` is an SSA value defined strictly
+// outside of `loop` (i.e., loop-invariant w.r.t. `loop`). This is the safety
+// criterion for using an outer-scope-derived bound as an in-body mask.
+static bool allOperandsAreLoopInvariantWrt(ValueRange operands,
+                                           affine::AffineForOp loop) {
+  for (Value v : operands) {
+    if (Operation *defOp = v.getDefiningOp()) {
+      if (loop->isAncestor(defOp)) return false;
+    } else if (auto blockArg = dyn_cast<BlockArgument>(v)) {
+      Operation *parent = blockArg.getOwner()->getParentOp();
+      if (!parent) return false;
+      if (parent == loop.getOperation()) return false;
+      if (loop->isAncestor(parent)) return false;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Bound-mask info captured at loop acceptance time and consumed at body-build
+// time to emit a `linalg.index + affine.apply + cmpi + select` guard.
+struct BoundMaskInfo {
+  bool needed = false;
+  AffineMap origMap;
+  SmallVector<Value> origOperands;
+};
+
 struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
   using OpRewritePattern<affine::AffineForOp>::OpRewritePattern;
 
@@ -818,26 +847,42 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     //     return failure();
     // }
 
-    // our remapper currently assumes 0 start to bound.
-    if (!loop.hasConstantLowerBound() /*|| loop.getConstantLowerBound() != 0*/) {
-      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Loop doesn't have constant lower bound\n\n");
-      return failure();
-    }
+    // Group A — triangular-bound support.
+    // Accept non-constant lower bounds (e.g. `for k = i+1 to m`) provided
+    // the lb is a single affine expression over operands that are loop-
+    // invariant w.r.t. the loop being raised. Capture the original lb so
+    // we can emit a mask in the body. Substitute lb = 0 for the rest of
+    // the pass.
+    BoundMaskInfo lbMaskInfo;
 
-    // compute this correctly later.
-    auto ubMap = loop.getUpperBoundMap();
-    auto ubOperands = loop.getUpperBoundOperands();
+    AffineMap ubMap = loop.getUpperBoundMap();
+    SmallVector<Value> ubOperands(loop.getUpperBoundOperands());
     if (!ubMap || ubMap.getNumResults() != 1) {
       LLVM_DEBUG(llvm::dbgs() << "REJECTED: Invalid upper bound map\n\n");
       return failure();
     }
 
-    // Retrieve the lower bound
-    auto lbMap = loop.getLowerBoundMap();
-    auto lbOperands = loop.getLowerBoundOperands();
+    AffineMap lbMap = loop.getLowerBoundMap();
+    SmallVector<Value> lbOperands(loop.getLowerBoundOperands());
     if (!lbMap || lbMap.getNumResults() != 1) {
       LLVM_DEBUG(llvm::dbgs() << "REJECTED: Invalid lower bound map\n\n");
       return failure();
+    }
+
+    if (!loop.hasConstantLowerBound()) {
+      if (!allOperandsAreLoopInvariantWrt(lbOperands, loop)) {
+        LLVM_DEBUG(llvm::dbgs() << "REJECTED: lb operands are not loop-invariant w.r.t. this loop\n\n");
+        return failure();
+      }
+      lbMaskInfo.needed = true;
+      lbMaskInfo.origMap = lbMap;
+      lbMaskInfo.origOperands.assign(lbOperands.begin(), lbOperands.end());
+      // Substitute lb = 0 for the iteration-domain construction below.
+      lbMap = AffineMap::get(/*dimCount=*/0, /*symCount=*/0,
+                              rewriter.getAffineConstantExpr(0),
+                              rewriter.getContext());
+      lbOperands.clear();
+      LLVM_DEBUG(llvm::dbgs() << "Captured non-constant lb for mask emission\n");
     }
 
     LLVM_DEBUG(llvm::dbgs() << "Loop bounds:\n");
@@ -1206,14 +1251,45 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
 
     rewriter.eraseOp(blk->getTerminator());
     rewriter.setInsertionPointToEnd(blk);
+
+    // Group A — emit in-body mask when the loop had a non-constant lb
+    // (and later: ub). Gate each store-derived yield by `linalg.index >=
+    // origLb(captures)`; fall back to the corresponding output block
+    // arg when inactive.
+    if (lbMaskInfo.needed) {
+      Value idx = rewriter.create<linalg::IndexOp>(loop.getLoc(),
+                                                   /*dim=*/0);
+      Value lbVal = rewriter.create<affine::AffineApplyOp>(
+          loop.getLoc(), lbMaskInfo.origMap, lbMaskInfo.origOperands);
+      Value active = rewriter.create<arith::CmpIOp>(
+          loop.getLoc(), arith::CmpIPredicate::sge, idx, lbVal);
+
+      // The last `stores.size()` entries of `toreturn` correspond to the
+      // store-derived yields; the last `stores.size()` block args of `blk`
+      // are the output operand block-args (representing the existing
+      // accumulator/output value at this iteration).
+      unsigned nArgs = blk->getNumArguments();
+      unsigned nStores = stores.size();
+      if (nStores > 0 && nArgs >= nStores && toreturn.size() >= nStores) {
+        unsigned firstStoreArg = nArgs - nStores;
+        unsigned firstStoreYield = toreturn.size() - nStores;
+        for (unsigned i = 0; i < nStores; ++i) {
+          Value oldAcc = blk->getArgument(firstStoreArg + i);
+          Value gated = rewriter.create<arith::SelectOp>(
+              loop.getLoc(), active, toreturn[firstStoreYield + i], oldAcc);
+          toreturn[firstStoreYield + i] = gated;
+        }
+      }
+    }
+
     rewriter.create<linalg::YieldOp>(loop.getLoc(), toreturn);
 
     auto func = loop->getParentOfType<func::FuncOp>();
     rewriter.eraseOp(loop);
-    
+
     LLVM_DEBUG(llvm::dbgs() << "\n=== AffineForOpRaising SUCCESS ===\n");
     LLVM_DEBUG(llvm::dbgs() << "========================================\n\n");
-    
+
     // return success!
     return success();
   }
