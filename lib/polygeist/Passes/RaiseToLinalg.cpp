@@ -693,6 +693,114 @@ LogicalResult getLinalgArgMap(Operation *loop, Value &input, AffineMap &lgMap,
   return success();
 }
 
+//===----------------------------------------------------------------------===//
+// Group C — distribute an affine.for whose body has multiple "chunks"
+//           (each linalg.generic and each nested affine.for is a chunk).
+//
+// Match precondition: the loop was promoted from an affine.parallel (so it
+// carries `polygeist.was_parallel`). That gives us the safety: iterations are
+// independent, so it's legal to run all of chunk-1 across iterations, then all
+// of chunk-2, etc. — instead of all chunks per iteration.
+//
+// After this rewrite each new sibling loop has a homogeneous body that
+// AffineForOpRaising can handle.
+//===----------------------------------------------------------------------===//
+
+struct DistributeAffineForOnLinalgGeneric
+    : public OpRewritePattern<affine::AffineForOp> {
+  using OpRewritePattern<affine::AffineForOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(affine::AffineForOp forOp,
+                                PatternRewriter &rewriter) const final {
+    // Only distribute loops we know are parallel (i.e. were affine.parallel
+    // before AffineParallelToFor demoted them).
+    if (!forOp->hasAttr("polygeist.was_parallel")) return failure();
+    // Can't distribute loops with iter_args.
+    if (forOp.getNumResults() != 0) return failure();
+
+    Block *body = forOp.getBody();
+    if (body->empty()) return failure();
+
+    // Identify chunks: each linalg.generic or nested affine.for is a chunk
+    // boundary; everything before the boundary (since the last) plus that op
+    // forms one chunk. Trailing ops form a final chunk.
+    SmallVector<SmallVector<Operation *, 4>> chunks;
+    SmallVector<Operation *, 4> currentChunk;
+    for (Operation &op : *body) {
+      if (isa<affine::AffineYieldOp>(op)) continue;
+      currentChunk.push_back(&op);
+      if (isa<linalg::GenericOp>(op) || isa<affine::AffineForOp>(op)) {
+        chunks.push_back(std::move(currentChunk));
+        currentChunk.clear();
+      }
+    }
+    if (!currentChunk.empty())
+      chunks.push_back(std::move(currentChunk));
+
+    if (chunks.size() <= 1) return failure();
+
+    // Cross-chunk SSA reference check: every operand of an op in chunk C must
+    // be (a) defined outside the loop, (b) the loop's IV, or (c) defined by an
+    // earlier op in the same chunk. If anything else, we can't legally split.
+    Value iv = forOp.getInductionVar();
+    for (auto &chunk : chunks) {
+      DenseSet<Operation *> inChunk;
+      for (Operation *op : chunk) inChunk.insert(op);
+      for (Operation *op : chunk) {
+        for (Value operand : op->getOperands()) {
+          if (operand == iv) continue;
+          Operation *defOp = operand.getDefiningOp();
+          if (!defOp) {
+            // Block argument from outside the loop; assume safe.
+            if (auto blockArg = dyn_cast<BlockArgument>(operand)) {
+              if (blockArg.getOwner() == body) {
+                LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: unexpected block arg from body\n");
+                return failure();
+              }
+            }
+            continue;
+          }
+          // If defined outside the loop's region, fine.
+          if (!forOp->isAncestor(defOp)) continue;
+          // Otherwise must be defined in the same chunk.
+          if (!inChunk.count(defOp)) {
+            LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: cross-chunk SSA reference\n");
+            return failure();
+          }
+        }
+      }
+    }
+
+    LLVM_DEBUG(llvm::dbgs() << "Distributing affine.for into " << chunks.size()
+                            << " sibling loops\n");
+
+    // For each chunk, clone the affine.for with just that chunk's ops.
+    rewriter.setInsertionPoint(forOp);
+    for (auto &chunk : chunks) {
+      auto newFor = rewriter.create<affine::AffineForOp>(
+          forOp.getLoc(),
+          forOp.getLowerBoundOperands(), forOp.getLowerBoundMap(),
+          forOp.getUpperBoundOperands(), forOp.getUpperBoundMap(),
+          forOp.getStep());
+      newFor->setAttr("polygeist.was_parallel", rewriter.getUnitAttr());
+
+      Block *newBody = newFor.getBody();
+      // newBody already has a default affine.yield from the builder.
+      OpBuilder::InsertionGuard g(rewriter);
+      rewriter.setInsertionPointToStart(newBody);
+
+      IRMapping mapping;
+      mapping.map(iv, newFor.getInductionVar());
+      for (Operation *op : chunk)
+        rewriter.clone(*op, mapping);
+      // Leave the builder-inserted affine.yield alone (it terminates the body).
+    }
+
+    rewriter.eraseOp(forOp);
+    return success();
+  }
+};
+
 // Group A — triangular-bound support helpers.
 // Returns true iff every operand of `operands` is an SSA value defined strictly
 // outside of `loop` (i.e., loop-invariant w.r.t. `loop`). This is the safety
@@ -1463,7 +1571,10 @@ struct AffineParallelToFor : public OpRewritePattern<AffineParallelOp> {
           upperOperands, ubMap,
           step
       );
-      
+      // Mark this loop as known-parallel (came from affine.parallel). Group C
+      // loop-distribution uses this as a precondition for safe fission.
+      forOp->setAttr("polygeist.was_parallel", rewriter.getUnitAttr());
+
       forOps.push_back(forOp);
       newIVs.push_back(forOp.getInductionVar());
       
@@ -1603,14 +1714,17 @@ void RaiseAffineToLinalg::runOnOperation() {
     LLVM_DEBUG(llvm::dbgs() << "### Step 2 Complete ###\n\n");
   }
   
-  // Step 3: Apply raising pattern
+  // Step 3: Apply distribution then raising patterns. Distribute runs at
+  // higher benefit so loops whose bodies have mixed chunks (Group C/D)
+  // get split into sibling homogeneous-body loops before being raised.
   {
-    LLVM_DEBUG(llvm::dbgs() << "### Step 3: Applying AffineForOpRaising ###\n");
+    LLVM_DEBUG(llvm::dbgs() << "### Step 3: Applying Distribute + AffineForOpRaising ###\n");
     RewritePatternSet raisingPatterns(&getContext());
-    raisingPatterns.insert<AffineForOpRaising>(&getContext());
+    raisingPatterns.add<DistributeAffineForOnLinalgGeneric>(&getContext(), /*benefit=*/2);
+    raisingPatterns.add<AffineForOpRaising>(&getContext(), /*benefit=*/1);
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(raisingPatterns), config))) {
-      LLVM_DEBUG(llvm::dbgs() << "WARNING: AffineForOpRaising didn't converge\n");
-      getOperation()->emitWarning("AffineForOpRaising didn't converge, continuing anyway");
+      LLVM_DEBUG(llvm::dbgs() << "WARNING: Distribute+Raising didn't converge\n");
+      getOperation()->emitWarning("Distribute+Raising didn't converge, continuing anyway");
     }
     LLVM_DEBUG(llvm::dbgs() << "### Step 3 Complete ###\n\n");
   }
