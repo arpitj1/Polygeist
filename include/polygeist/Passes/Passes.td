@@ -179,7 +179,13 @@ def LinalgDebufferize : Pass<"linalg-debufferize"> {
     "affine::AffineDialect",
     "linalg::LinalgDialect",
     "bufferization::BufferizationDialect",
+    "memref::MemRefDialect",
+    "tensor::TensorDialect",
     "polygeist::PolygeistDialect",
+  ];
+  let options = [
+    Option<"useRecursive", "use-recursive", "bool", /*default=*/"false",
+           "Use the region-recursive (v2) debufferization implementation">
   ];
 }
 

@@ -134,7 +134,7 @@ void setRegionTensor(Region* region, Value tensor,
 void recordBranchResult(Operation* user, Value newTensor, 
                         llvm::DenseMap<scf::IfOp, PendingIfInfo>& pendingIfs,
                         Region* rootRegion) {
-  LLVM_DEBUG(llvm::dbgs() << "      recordBranchResult called for user: " << *user << "\n");
+  LLVM_DEBUG(llvm::dbgs() << "      recordBranchResult called for user: " << user->getName() << " at " << user->getLoc() << "\n");
   LLVM_DEBUG(llvm::dbgs() << "        newTensor: " << newTensor << "\n");
   
   // For each containing if, record the tensor in the appropriate branch
@@ -147,16 +147,14 @@ void recordBranchResult(Operation* user, Value newTensor,
       PendingIfInfo& info = it->second;
       if (isInIfThenBranch(user, ifOp)) {
         LLVM_DEBUG(llvm::dbgs() << "        Recording THEN result for if at " << ifOp.getLoc() << "\n");
-        LLVM_DEBUG(llvm::dbgs() << "          Old thenResult: " << info.thenResult << "\n");
         info.thenResult = newTensor;
         info.thenProcessed = true;
-        LLVM_DEBUG(llvm::dbgs() << "          New thenResult: " << info.thenResult << "\n");
+        LLVM_DEBUG(llvm::dbgs() << "          Set thenResult, thenProcessed=true\n");
       } else if (isInIfElseBranch(user, ifOp)) {
         LLVM_DEBUG(llvm::dbgs() << "        Recording ELSE result for if at " << ifOp.getLoc() << "\n");
-        LLVM_DEBUG(llvm::dbgs() << "          Old elseResult: " << info.elseResult << "\n");
         info.elseResult = newTensor;
         info.elseProcessed = true;
-        LLVM_DEBUG(llvm::dbgs() << "          New elseResult: " << info.elseResult << "\n");
+        LLVM_DEBUG(llvm::dbgs() << "          Set elseResult, elseProcessed=true\n");
       } else {
         LLVM_DEBUG(llvm::dbgs() << "        WARNING: User not in THEN or ELSE branch of if at " << ifOp.getLoc() << "!\n");
       }
@@ -478,7 +476,7 @@ void propagateValueThroughRegion(Value &currentValue, SmallVector<Region*> regio
   });
   
   for (Region* region : regions) {
-    LLVM_DEBUG(llvm::dbgs() << "      Processing region in: " << *region->getParentOp() << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "      Processing region in: " << region->getParentOp()->getName() << " at " << region->getParentOp()->getLoc() << "\n");
       Block& block = region->front();
       (void)block; // Silence unused warning
       Operation *parentOp = region->getParentOp();
@@ -518,16 +516,14 @@ void propagateValueThroughRegion(Value &currentValue, SmallVector<Region*> regio
           PendingIfInfo& info = pendingIt->second;
           entryTensor = info.entryTensor;
           
-          LLVM_DEBUG(llvm::dbgs() << "      PendingIfInfo state:\n");
-          LLVM_DEBUG(llvm::dbgs() << "        entryTensor: " << info.entryTensor << "\n");
-          LLVM_DEBUG(llvm::dbgs() << "        thenResult: " << info.thenResult << " (processed=" << info.thenProcessed << ")\n");
-          LLVM_DEBUG(llvm::dbgs() << "        elseResult: " << info.elseResult << " (processed=" << info.elseProcessed << ")\n");
+          LLVM_DEBUG(llvm::dbgs() << "      PendingIfInfo state: thenProcessed=" << info.thenProcessed 
+                                    << ", elseProcessed=" << info.elseProcessed << "\n");
           
           // Use recorded values: if a branch was processed, use its result; otherwise use entry tensor
           thenValue = info.thenProcessed ? info.thenResult : entryTensor;
           elseValue = info.elseProcessed ? info.elseResult : entryTensor;
           
-          LLVM_DEBUG(llvm::dbgs() << "      Final values - THEN: " << thenValue << ", ELSE: " << elseValue << "\n");
+          LLVM_DEBUG(llvm::dbgs() << "      Using recorded values for THEN and ELSE branches\n");
         } else {
           // First time seeing this if - no users processed yet, use entry tensor for both
           thenValue = entryTensor;
@@ -543,15 +539,12 @@ void propagateValueThroughRegion(Value &currentValue, SmallVector<Region*> regio
           info.elseProcessed = false;
           pendingIfs[prevIf] = info;
           
-          LLVM_DEBUG(llvm::dbgs() << "      First time seeing if, using entry tensor for both: " << entryTensor << "\n");
+          LLVM_DEBUG(llvm::dbgs() << "      First time seeing if, using entry tensor for both branches\n");
         }
         
         initTensor = entryTensor;
         
-        LLVM_DEBUG(llvm::dbgs() << "      Building new if with yields:\n");
-        LLVM_DEBUG(llvm::dbgs() << "        THEN will yield: " << thenValue << "\n");
-        LLVM_DEBUG(llvm::dbgs() << "        ELSE will yield: " << elseValue << "\n");
-        LLVM_DEBUG(llvm::dbgs() << "        Entry tensor: " << entryTensor << "\n");
+        LLVM_DEBUG(llvm::dbgs() << "      Building new if with yields for THEN and ELSE branches\n");
         
         auto prevResults = prevIf.getResults();
         SmallVector<Type> newResultTypes;
@@ -620,8 +613,7 @@ void propagateValueThroughRegion(Value &currentValue, SmallVector<Region*> regio
         opResultMap[newIf] = std::make_tuple(newIf->getResult(newIf->getNumResults() - 1), initTensor);
         currentValue = newIf->getResult(newIf->getNumResults() - 1); 
         
-        LLVM_DEBUG(llvm::dbgs() << "      Created new if with result: " << currentValue << "\n");
-        LLVM_DEBUG(llvm::dbgs() << "      New if: " << *newIf << "\n");
+        LLVM_DEBUG(llvm::dbgs() << "      Created new if at " << newIf->getLoc() << " with " << newIf->getNumResults() << " results\n");
         
         // FIX: Update outer ifs to use this if's result instead of raw inner tensor values
         // This is critical for nested ifs - outer ifs should yield the inner if's RESULT,
@@ -632,20 +624,14 @@ void propagateValueThroughRegion(Value &currentValue, SmallVector<Region*> regio
           // Check if newIf is nested inside outerIfOp
           if (outerIfOp.getThenRegion().isAncestor(newIf->getParentRegion())) {
             // newIf is in outer's THEN branch - outer should yield newIf's result
-            LLVM_DEBUG(llvm::dbgs() << "      Updating outer if's THEN result to use inner if result\n");
-            LLVM_DEBUG(llvm::dbgs() << "        Outer if at: " << outerIfOp.getLoc() << "\n");
-            // Note: Don't print old thenResult - it might be a deleted Value
+            LLVM_DEBUG(llvm::dbgs() << "      Updating outer if at " << outerIfOp.getLoc() << " THEN result\n");
             outerInfo.thenResult = currentValue;
             outerInfo.thenProcessed = true;
-            LLVM_DEBUG(llvm::dbgs() << "        New thenResult: " << outerInfo.thenResult << "\n");
           } else if (outerIfOp.getElseRegion().isAncestor(newIf->getParentRegion())) {
             // newIf is in outer's ELSE branch - outer should yield newIf's result
-            LLVM_DEBUG(llvm::dbgs() << "      Updating outer if's ELSE result to use inner if result\n");
-            LLVM_DEBUG(llvm::dbgs() << "        Outer if at: " << outerIfOp.getLoc() << "\n");
-            // Note: Don't print old elseResult - it might be a deleted Value
+            LLVM_DEBUG(llvm::dbgs() << "      Updating outer if at " << outerIfOp.getLoc() << " ELSE result\n");
             outerInfo.elseResult = currentValue;
             outerInfo.elseProcessed = true;
-            LLVM_DEBUG(llvm::dbgs() << "        New elseResult: " << outerInfo.elseResult << "\n");
           }
         }
         
@@ -752,7 +738,7 @@ bool areAllUsersSupportedForDebufferization(Value memVal) {
       }
       continue;
     }
-    LLVM_DEBUG(llvm::dbgs() << "  Unsupported user: " << *user << "\n");
+    LLVM_DEBUG(llvm::dbgs() << "  Unsupported user: " << user->getName() << " at " << user->getLoc() << "\n");
     return false;
   }
   return true;
@@ -899,7 +885,7 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
       Operation* lastUser = nullptr;
       
       for (auto user : sortedUsers) {
-        LLVM_DEBUG(llvm::dbgs() << "\n  [User " << userIdx << "] Processing: " << *user << "\n");
+        LLVM_DEBUG(llvm::dbgs() << "\n  [User " << userIdx << "] Processing: " << user->getName() << " at " << user->getLoc() << "\n");
         
         // Check if we're entering a new region
         Region* userRegion = user->getParentRegion();
@@ -918,6 +904,7 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
             }
             
             // Check which ifs we're leaving (in old but not in new)
+            // Process innermost first (oldContainingIfs is already innermost-first)
             for (auto oldIf : oldContainingIfs) {
               if (!newIfsSet.contains(oldIf)) {
                 // We're exiting this if! Update its parent region
@@ -928,7 +915,6 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
                 Region* oldElseRegion = &oldIf.getElseRegion();
                 
                 // Get the tensor value from the branch we're leaving
-                Value exitTensor = currentTensor;
                 auto thenIt = regionTensorTree.find(oldThenRegion);
                 auto elseIt = regionTensorTree.find(oldElseRegion);
                 
@@ -938,7 +924,7 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
                   if (pendingIt != pendingIfs.end()) {
                     pendingIt->second.thenResult = thenIt->second.tensor;
                     pendingIt->second.thenProcessed = true;
-                    LLVM_DEBUG(llvm::dbgs() << "      Updated THEN result on exit: " << thenIt->second.tensor << "\n");
+                    LLVM_DEBUG(llvm::dbgs() << "      Updated THEN result on exit\n");
                   }
                 } else if (elseIt != regionTensorTree.end() && elseIt->second.valid) {
                   // We were in ELSE branch - update pendingIfs  
@@ -946,22 +932,51 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
                   if (pendingIt != pendingIfs.end()) {
                     pendingIt->second.elseResult = elseIt->second.tensor;
                     pendingIt->second.elseProcessed = true;
-                    LLVM_DEBUG(llvm::dbgs() << "      Updated ELSE result on exit: " << elseIt->second.tensor << "\n");
+                    LLVM_DEBUG(llvm::dbgs() << "      Updated ELSE result on exit\n");
                   }
                 }
                 
-                // Update parent region's tensor to reflect we processed this if
-                // For now, use the exit tensor value from the branch we left
+                // MERGE PHASE 2 INTO PHASE 1: If exiting a function-body-level if,
+                // rebuild it immediately so sibling ifs get the correct entry tensor
                 Region* parentRegion = oldIf->getParentRegion();
-                auto pendingIt = pendingIfs.find(oldIf);
-                if (pendingIt != pendingIfs.end()) {
-                  // Use the appropriate branch result
-                  if (thenIt != regionTensorTree.end() && thenIt->second.valid) {
-                    regionTensorTree[parentRegion] = RegionTensorState{thenIt->second.tensor, true};
-                  } else if (elseIt != regionTensorTree.end() && elseIt->second.valid) {
-                    regionTensorTree[parentRegion] = RegionTensorState{elseIt->second.tensor, true};
+                if (parentRegion == &funcOp.getBody()) {
+                  LLVM_DEBUG(llvm::dbgs() << "      Function-body if - rebuilding immediately\n");
+                  
+                  auto pendingIt = pendingIfs.find(oldIf);
+                  if (pendingIt != pendingIfs.end()) {
+                    // Build regions list containing just the parent region
+                    SmallVector<Region*> exitRegions;
+                    exitRegions.push_back(parentRegion);
+                    
+                    // Get entry tensor for this if
+                    Value entryTensor = pendingIt->second.entryTensor;
+                    
+                    // Rebuild the if with yields
+                    propagateValueThroughRegion(entryTensor, exitRegions, expandedUserList, opResultMap, rewriter, pendingIfs);
+                    
+                    // Find the rebuilt if and update currentTensor
+                    for (auto& op : funcOp.getBody().front()) {
+                      if (auto newIf = dyn_cast<scf::IfOp>(&op)) {
+                        if (newIf.getNumResults() > 0 && newIf.getLoc() == oldIf.getLoc()) {
+                          currentTensor = newIf.getResult(newIf.getNumResults() - 1);
+                          regionTensorTree[parentRegion] = RegionTensorState{currentTensor, true};
+                          LLVM_DEBUG(llvm::dbgs() << "      Updated currentTensor from rebuilt if result\n");
+                          break;
+                        }
+                      }
+                    }
                   }
-                  LLVM_DEBUG(llvm::dbgs() << "      Updated parent region tensor on exit\n");
+                } else {
+                  // For nested ifs, just update the parent region tensor
+                  auto pendingIt = pendingIfs.find(oldIf);
+                  if (pendingIt != pendingIfs.end()) {
+                    if (thenIt != regionTensorTree.end() && thenIt->second.valid) {
+                      regionTensorTree[parentRegion] = RegionTensorState{thenIt->second.tensor, true};
+                    } else if (elseIt != regionTensorTree.end() && elseIt->second.valid) {
+                      regionTensorTree[parentRegion] = RegionTensorState{elseIt->second.tensor, true};
+                    }
+                    LLVM_DEBUG(llvm::dbgs() << "      Updated parent region tensor on exit\n");
+                  }
                 }
               }
             }
@@ -1448,6 +1463,696 @@ struct LinalgDebufferization : public OpRewritePattern<func::FuncOp> {
   }
 };
 
+//===----------------------------------------------------------------------===//
+// V2: Region-recursive debufferization
+//===----------------------------------------------------------------------===//
+//
+// Design (see notes/polygeist_raise_to_linalg/linalg_debufferize_stress_survey.md):
+// Per-root walk over the IR. A single SSA `currentTensor` flows through the
+// recursion. Region-bearing ops (scf.for so far) are rebuilt with extra
+// iter_args / yields when their body modifies the root, and the walk recurses
+// inside. No flat user list; no per-region tensor tree; no pendingIfs.
+//
+// Stage 1: linear function-body scope.
+// Stage 2: + scf.for (this commit).
+// Future: scf.if, scf.while, affine.for, full submap-inverse chain.
+
+namespace v2 {
+
+// Does `v` transitively come from `root` via a chain of polygeist.submap ops?
+static bool tracesToRoot(Value v, Value root) {
+  while (true) {
+    if (v == root) return true;
+    if (auto sm = v.getDefiningOp<polygeist::SubmapOp>()) {
+      v = sm.getViewSource();
+      continue;
+    }
+    return false;
+  }
+}
+
+// True if `op`'s ancestor chain up to a func::FuncOp consists only of
+// region-bearing ops we know how to rebuild.
+// Stage 5: scf.for + scf.if + affine.for + scf.while.
+static bool ancestorsAreHandled(Operation *op) {
+  Operation *parent = op->getParentOp();
+  while (parent && !isa<func::FuncOp>(parent)) {
+    if (!isa<scf::ForOp, scf::IfOp, affine::AffineForOp, scf::WhileOp>(parent))
+      return false;
+    parent = parent->getParentOp();
+  }
+  return true;
+}
+
+// Precondition: can we safely debufferize `root` end-to-end?
+// All transitive memory users (through polygeist.submap) must be
+// load/store/linalg.generic, each under only handled region-bearing
+// ancestors. There must also be at least one such memory op (otherwise
+// there's no work to do and re-firing the pattern would loop forever).
+static bool canHandle(Value root) {
+  SmallPtrSet<Operation *, 16> visited;
+  SmallVector<Value, 4> worklist;
+  worklist.push_back(root);
+  bool hasMemoryOp = false;
+  while (!worklist.empty()) {
+    Value v = worklist.pop_back_val();
+    for (Operation *user : v.getUsers()) {
+      if (!visited.insert(user).second) continue;
+      if (isa<memref::DeallocOp, bufferization::ToTensorOp,
+              bufferization::ToMemrefOp, memref::CopyOp>(user))
+        continue;
+      if (isa<memref::LoadOp, memref::StoreOp,
+              affine::AffineLoadOp, affine::AffineStoreOp,
+              linalg::GenericOp>(user)) {
+        if (!ancestorsAreHandled(user)) return false;
+        hasMemoryOp = true;
+        continue;
+      }
+      if (auto submap = dyn_cast<polygeist::SubmapOp>(user)) {
+        worklist.push_back(submap.getResult());
+        continue;
+      }
+      return false;
+    }
+  }
+  return hasMemoryOp;
+}
+
+// Does anything inside `r` *write* to `root` (via store/affine.store/
+// linalg.generic with root in outs)?
+static bool regionWritesRoot(Region &r, Value root) {
+  bool writes = false;
+  r.walk([&](Operation *op) {
+    if (writes) return WalkResult::interrupt();
+    if (auto store = dyn_cast<memref::StoreOp>(op)) {
+      if (tracesToRoot(store.getMemRef(), root)) writes = true;
+    } else if (auto astore = dyn_cast<affine::AffineStoreOp>(op)) {
+      if (tracesToRoot(astore.getMemRef(), root)) writes = true;
+    } else if (auto generic = dyn_cast<linalg::GenericOp>(op)) {
+      for (Value o : generic.getOutputs())
+        if (o.getType().isa<MemRefType>() && tracesToRoot(o, root)) {
+          writes = true;
+          break;
+        }
+    }
+    return writes ? WalkResult::interrupt() : WalkResult::advance();
+  });
+  return writes;
+}
+
+// Rebuild a submap chain on the tensor side, starting from `baseTensor`.
+static Value buildTensorSubmapChain(Value baseTensor,
+                                    const SubmapChainInfo &chain,
+                                    PatternRewriter &rewriter) {
+  Value t = baseTensor;
+  for (auto submap : chain.submaps) {
+    auto resMemref = submap.getResult().getType().cast<MemRefType>();
+    auto resTensor = RankedTensorType::get(resMemref.getShape(),
+                                           resMemref.getElementType());
+    auto newSubmap = rewriter.create<polygeist::SubmapOp>(
+        submap.getLoc(), resTensor, t,
+        SmallVector<Value>(submap.getIndicesAndSizes()),
+        submap.getMap());
+    t = newSubmap.getResult();
+  }
+  return t;
+}
+
+// Scatter `sliceTensor` (at the leaf-view shape) all the way back into
+// `baseTensor` (the root). For a chain [sm0, sm1, sm2]:
+//   base[i] tensors:  bases[0]=baseTensor  (root)
+//                     bases[1]=submap(bases[0], sm0)
+//                     bases[2]=submap(bases[1], sm1)
+//                     -- (the leaf view at depth 3 is sliceTensor's shape;
+//                         we don't need a bases[3])
+// Then unwind innermost-first:
+//   bases[2]' = submapInverse(bases[2], sliceTensor, sm2.ops, sm2.map)
+//   bases[1]' = submapInverse(bases[1], bases[2]',   sm1.ops, sm1.map)
+//   bases[0]' = submapInverse(bases[0], bases[1]',   sm0.ops, sm0.map)
+// Return bases[0]'.
+static Value applySubmapInverseChain(Value baseTensor, Value sliceTensor,
+                                     const SubmapChainInfo &chain,
+                                     Location loc,
+                                     PatternRewriter &rewriter) {
+  if (chain.isEmpty()) return sliceTensor;
+
+  // Build intermediate bases by applying chain forward, skipping the leaf
+  // (whose "base output" is sliceTensor's domain).
+  SmallVector<Value> bases;
+  bases.push_back(baseTensor);
+  for (size_t i = 0; i + 1 < chain.submaps.size(); ++i) {
+    auto sm = chain.submaps[i];
+    auto resMemref = sm.getResult().getType().cast<MemRefType>();
+    auto resTensor = RankedTensorType::get(resMemref.getShape(),
+                                           resMemref.getElementType());
+    auto fwd = rewriter.create<polygeist::SubmapOp>(
+        sm.getLoc(), resTensor, bases.back(),
+        SmallVector<Value>(sm.getIndicesAndSizes()), sm.getMap());
+    bases.push_back(fwd.getResult());
+  }
+
+  // Unwind: leaf first.
+  Value current = sliceTensor;
+  for (int i = static_cast<int>(chain.submaps.size()) - 1; i >= 0; --i) {
+    auto sm = chain.submaps[i];
+    Value base = bases[i];
+    auto inv = rewriter.create<polygeist::SubmapInverseOp>(
+        sm.getLoc(), base.getType(), base, current,
+        SmallVector<Value>(sm.getIndicesAndSizes()), sm.getMap());
+    current = inv.getResult();
+  }
+  return current;
+}
+
+// Forward declarations
+struct WalkCtx;
+static void walkBlock(WalkCtx &ctx, Block &block);
+static void handleScfFor(WalkCtx &ctx, scf::ForOp forOp);
+static void handleScfIf(WalkCtx &ctx, scf::IfOp ifOp);
+static void handleAffineFor(WalkCtx &ctx, affine::AffineForOp forOp);
+static void handleScfWhile(WalkCtx &ctx, scf::WhileOp whileOp);
+static void rewriteLinalgGenericForRoot(WalkCtx &ctx, linalg::GenericOp generic);
+
+// Per-root walk context. `didRewrite` flips true as soon as we mutate the IR
+// (rewriting a load, store, or generic). It distinguishes the "we did
+// something" case from the "current tensor reverted to entry" case, which
+// matters for multi-root linalg.generics where we rewrite inputs but the
+// output tensor flow stays unchanged.
+struct WalkCtx {
+  Value root;
+  Value currentTensor;
+  PatternRewriter *rewriter;
+  bool didRewrite = false;
+};
+
+static void rewriteLinalgGenericForRoot(WalkCtx &ctx, linalg::GenericOp generic) {
+  Value root = ctx.root;
+  PatternRewriter &rewriter = *ctx.rewriter;
+  rewriter.setInsertionPoint(generic);
+  SmallVector<Value> newInputs, newOutputs;
+  SmallVector<Type> resultTypes;
+  int outRootIdx = -1;
+  SubmapChainInfo outRootChain;
+
+  auto routeOperand = [&](Value v) -> std::pair<Value, std::optional<SubmapChainInfo>> {
+    if (v == root) return {ctx.currentTensor, SubmapChainInfo{root, {}}};
+    if (!v.getType().isa<MemRefType>()) return {v, std::nullopt};
+    SubmapChainInfo chain = traceSubmapChainToRoot(v);
+    if (chain.rootMemref != root) return {v, std::nullopt};
+    if (chain.isEmpty()) return {ctx.currentTensor, chain};
+    return {buildTensorSubmapChain(ctx.currentTensor, chain, rewriter), chain};
+  };
+
+  for (Value in : generic.getInputs()) {
+    auto [nv, _] = routeOperand(in);
+    newInputs.push_back(nv);
+  }
+  int idx = 0;
+  for (Value out : generic.getOutputs()) {
+    auto [nv, chainOpt] = routeOperand(out);
+    newOutputs.push_back(nv);
+    resultTypes.push_back(nv.getType());
+    if (chainOpt.has_value()) {
+      outRootIdx = idx;
+      outRootChain = *chainOpt;
+    }
+    ++idx;
+  }
+
+  rewriter.setInsertionPointAfter(generic);
+  StringAttr empty = StringAttr::get(generic.getContext());
+  auto newGeneric = rewriter.create<linalg::GenericOp>(
+      generic.getLoc(), ArrayRef<Type>(resultTypes), newInputs, newOutputs,
+      generic.getIndexingMaps(), generic.getIteratorTypes(), empty, empty);
+  rewriter.cloneRegionBefore(generic.getRegion(), newGeneric.getRegion(),
+                             newGeneric.getRegion().end());
+
+  if (outRootIdx >= 0) {
+    Value resultSlice = newGeneric.getResult(outRootIdx);
+    if (outRootChain.isEmpty()) {
+      ctx.currentTensor = resultSlice;
+    } else {
+      ctx.currentTensor = applySubmapInverseChain(
+          ctx.currentTensor, resultSlice, outRootChain, generic.getLoc(), rewriter);
+    }
+  }
+
+  for (auto [oldR, newR] : llvm::zip(generic.getResults(), newGeneric.getResults()))
+    oldR.replaceAllUsesWith(newR);
+  rewriter.eraseOp(generic);
+}
+
+static void handleScfFor(WalkCtx &ctx, scf::ForOp forOp) {
+  PatternRewriter &rewriter = *ctx.rewriter;
+
+  // Body only READS root → walk inline; currentTensor unchanged outside.
+  // We still recurse to rewrite reads/sub-ops; the outer-scope tensor
+  // dominates the body and is the right SSA value for them.
+  if (!regionWritesRoot(forOp.getRegion(), ctx.root)) {
+    Value saved = ctx.currentTensor;
+    walkBlock(ctx, forOp.getRegion().front());
+    ctx.currentTensor = saved;
+    return;
+  }
+
+  // Body WRITES root → rebuild scf.for with one extra iter_arg carrying
+  // the tensor for this root.
+  rewriter.setInsertionPoint(forOp);
+  SmallVector<Value> newInits(forOp.getInitArgs());
+  newInits.push_back(ctx.currentTensor);
+
+  auto newFor = rewriter.create<scf::ForOp>(
+      forOp.getLoc(), forOp.getLowerBound(), forOp.getUpperBound(),
+      forOp.getStep(), newInits);
+
+  Block *oldBody = forOp.getBody();
+  Block *newBody = newFor.getBody();
+
+  // The newly-built scf.for body has a default terminator that the builder
+  // inserted. Remove it so mergeBlocks can append the old body cleanly.
+  if (!newBody->empty()) {
+    Operation *term = newBody->getTerminator();
+    rewriter.eraseOp(term);
+  }
+  // Map oldBody's [IV, iter_args...] block-args onto newBody's first N+1
+  // arguments (everything except the trailing new tensor iter_arg).
+  rewriter.mergeBlocks(oldBody, newBody, newBody->getArguments().drop_back());
+
+  // Now walk the new body with currentTensor = the appended tensor iter_arg.
+  Value entryTensor = newBody->getArguments().back();
+  ctx.currentTensor = entryTensor;
+  walkBlock(ctx, *newBody);
+
+  // Append the inner-final tensor to the yield's operand list.
+  auto yield = cast<scf::YieldOp>(newBody->getTerminator());
+  SmallVector<Value> newYields(yield.getOperands());
+  newYields.push_back(ctx.currentTensor);
+  rewriter.setInsertionPoint(yield);
+  rewriter.replaceOpWithNewOp<scf::YieldOp>(yield, newYields);
+
+  // Rewire users of the old for's results to the new for's matching results.
+  for (auto [oldR, newR] :
+       llvm::zip(forOp.getResults(), newFor.getResults().drop_back()))
+    oldR.replaceAllUsesWith(newR);
+  rewriter.eraseOp(forOp);
+
+  // The outer continuation should now see the new for's last result.
+  ctx.currentTensor = newFor.getResults().back();
+  ctx.didRewrite = true;
+}
+
+static void handleScfIf(WalkCtx &ctx, scf::IfOp ifOp) {
+  PatternRewriter &rewriter = *ctx.rewriter;
+
+  bool thenWrites = regionWritesRoot(ifOp.getThenRegion(), ctx.root);
+  bool elseWrites = !ifOp.getElseRegion().empty() &&
+                    regionWritesRoot(ifOp.getElseRegion(), ctx.root);
+
+  // Neither branch writes → walk inline for reads only; currentTensor
+  // unchanged because the outer-scope tensor dominates both branch bodies.
+  if (!thenWrites && !elseWrites) {
+    Value saved = ctx.currentTensor;
+    if (!ifOp.getThenRegion().empty())
+      walkBlock(ctx, ifOp.getThenRegion().front());
+    ctx.currentTensor = saved;
+    if (!ifOp.getElseRegion().empty())
+      walkBlock(ctx, ifOp.getElseRegion().front());
+    ctx.currentTensor = saved;
+    return;
+  }
+
+  // Rebuild scf.if with one extra tensor result for the root.
+  Value entryTensor = ctx.currentTensor;
+  SmallVector<Type> newResultTypes(ifOp.getResultTypes().begin(),
+                                   ifOp.getResultTypes().end());
+  newResultTypes.push_back(entryTensor.getType());
+
+  rewriter.setInsertionPoint(ifOp);
+  auto newIf = rewriter.create<scf::IfOp>(
+      ifOp.getLoc(), newResultTypes, ifOp.getCondition(),
+      /*withElseRegion=*/true);
+
+  // THEN branch: splice old's contents into new's then block, then walk.
+  Block *oldThen = &ifOp.getThenRegion().front();
+  Block *newThen = &newIf.getThenRegion().front();
+  if (!newThen->empty()) rewriter.eraseOp(newThen->getTerminator());
+  rewriter.mergeBlocks(oldThen, newThen, /*argValues=*/{});
+
+  ctx.currentTensor = entryTensor;
+  walkBlock(ctx, *newThen);
+  Value thenFinal = ctx.currentTensor;
+
+  {
+    auto thenYield = cast<scf::YieldOp>(newThen->getTerminator());
+    SmallVector<Value> thenYields(thenYield.getOperands());
+    thenYields.push_back(thenFinal);
+    rewriter.setInsertionPoint(thenYield);
+    rewriter.replaceOpWithNewOp<scf::YieldOp>(thenYield, thenYields);
+  }
+
+  // ELSE branch: either splice old's contents or synthesize "yield entry".
+  Block *newElse = &newIf.getElseRegion().front();
+  if (!ifOp.getElseRegion().empty()) {
+    Block *oldElse = &ifOp.getElseRegion().front();
+    if (!newElse->empty()) rewriter.eraseOp(newElse->getTerminator());
+    rewriter.mergeBlocks(oldElse, newElse, /*argValues=*/{});
+
+    ctx.currentTensor = entryTensor;
+    walkBlock(ctx, *newElse);
+    Value elseFinal = ctx.currentTensor;
+
+    auto elseYield = cast<scf::YieldOp>(newElse->getTerminator());
+    SmallVector<Value> elseYields(elseYield.getOperands());
+    elseYields.push_back(elseFinal);
+    rewriter.setInsertionPoint(elseYield);
+    rewriter.replaceOpWithNewOp<scf::YieldOp>(elseYield, elseYields);
+  } else {
+    // Original had no else. Synthesize: yield the entry tensor unchanged.
+    // newElse is non-empty: it contains a default empty yield op the
+    // builder inserted. Replace it with one that yields entryTensor.
+    SmallVector<Value> elseYields{entryTensor};
+    if (!newElse->empty()) {
+      auto elseYield = cast<scf::YieldOp>(newElse->getTerminator());
+      rewriter.setInsertionPoint(elseYield);
+      rewriter.replaceOpWithNewOp<scf::YieldOp>(elseYield, elseYields);
+    } else {
+      rewriter.setInsertionPointToEnd(newElse);
+      rewriter.create<scf::YieldOp>(ifOp.getLoc(), elseYields);
+    }
+  }
+
+  // Rewire old if's pre-existing results to the new if's matching ones.
+  for (auto [oldR, newR] :
+       llvm::zip(ifOp.getResults(), newIf.getResults().drop_back()))
+    oldR.replaceAllUsesWith(newR);
+  rewriter.eraseOp(ifOp);
+
+  ctx.currentTensor = newIf.getResults().back();
+  ctx.didRewrite = true;
+}
+
+static void handleAffineFor(WalkCtx &ctx, affine::AffineForOp forOp) {
+  PatternRewriter &rewriter = *ctx.rewriter;
+
+  if (!regionWritesRoot(forOp.getRegion(), ctx.root)) {
+    Value saved = ctx.currentTensor;
+    walkBlock(ctx, forOp.getRegion().front());
+    ctx.currentTensor = saved;
+    return;
+  }
+
+  rewriter.setInsertionPoint(forOp);
+  SmallVector<Value> newInits(forOp.getInits());
+  newInits.push_back(ctx.currentTensor);
+
+  auto newFor = rewriter.create<affine::AffineForOp>(
+      forOp.getLoc(), forOp.getLowerBoundOperands(), forOp.getLowerBoundMap(),
+      forOp.getUpperBoundOperands(), forOp.getUpperBoundMap(),
+      forOp.getStep(), newInits);
+
+  Block *oldBody = forOp.getBody();
+  Block *newBody = newFor.getBody();
+
+  if (!newBody->empty()) {
+    Operation *term = newBody->getTerminator();
+    rewriter.eraseOp(term);
+  }
+  rewriter.mergeBlocks(oldBody, newBody, newBody->getArguments().drop_back());
+
+  Value entryTensor = newBody->getArguments().back();
+  ctx.currentTensor = entryTensor;
+  walkBlock(ctx, *newBody);
+
+  auto yield = cast<affine::AffineYieldOp>(newBody->getTerminator());
+  SmallVector<Value> newYields(yield.getOperands());
+  newYields.push_back(ctx.currentTensor);
+  rewriter.setInsertionPoint(yield);
+  rewriter.replaceOpWithNewOp<affine::AffineYieldOp>(yield, newYields);
+
+  for (auto [oldR, newR] :
+       llvm::zip(forOp.getResults(), newFor.getResults().drop_back()))
+    oldR.replaceAllUsesWith(newR);
+  rewriter.eraseOp(forOp);
+
+  ctx.currentTensor = newFor.getResults().back();
+  ctx.didRewrite = true;
+}
+
+static void handleScfWhile(WalkCtx &ctx, scf::WhileOp whileOp) {
+  PatternRewriter &rewriter = *ctx.rewriter;
+
+  bool beforeWrites = regionWritesRoot(whileOp.getBefore(), ctx.root);
+  bool afterWrites = regionWritesRoot(whileOp.getAfter(), ctx.root);
+
+  // Neither region writes → walk inline (just for reads).
+  if (!beforeWrites && !afterWrites) {
+    Value saved = ctx.currentTensor;
+    if (!whileOp.getBefore().empty())
+      walkBlock(ctx, whileOp.getBefore().front());
+    ctx.currentTensor = saved;
+    if (!whileOp.getAfter().empty())
+      walkBlock(ctx, whileOp.getAfter().front());
+    ctx.currentTensor = saved;
+    return;
+  }
+
+  // Rebuild scf.while with one extra tensor iter_arg threaded through both
+  // regions:
+  //   - extra `before` block arg     (init = currentTensor)
+  //   - extra scf.condition operand  (latest tensor in before)
+  //   - extra `after` block arg      (carried from condition)
+  //   - extra scf.yield operand      (latest tensor in after — feeds next iter)
+  //   - extra scf.while result       (final tensor after loop exits)
+  Value entryTensor = ctx.currentTensor;
+  Type tensorType = entryTensor.getType();
+
+  SmallVector<Value> newOperands(whileOp.getOperands());
+  newOperands.push_back(entryTensor);
+
+  SmallVector<Type> newResultTypes(whileOp.getResultTypes().begin(),
+                                   whileOp.getResultTypes().end());
+  newResultTypes.push_back(tensorType);
+
+  rewriter.setInsertionPoint(whileOp);
+  auto newWhile =
+      rewriter.create<scf::WhileOp>(whileOp.getLoc(), newResultTypes,
+                                    newOperands);
+
+  // Build the before block manually (with the extra tensor arg appended).
+  SmallVector<Type> beforeArgTypes(
+      whileOp.getBefore().front().getArgumentTypes());
+  beforeArgTypes.push_back(tensorType);
+  SmallVector<Location> beforeArgLocs(beforeArgTypes.size(), whileOp.getLoc());
+  Block *newBefore =
+      rewriter.createBlock(&newWhile.getBefore(), {}, beforeArgTypes,
+                           beforeArgLocs);
+
+  Block *oldBefore = &whileOp.getBefore().front();
+  rewriter.mergeBlocks(oldBefore, newBefore, newBefore->getArguments().drop_back());
+
+  ctx.currentTensor = newBefore->getArguments().back();
+  walkBlock(ctx, *newBefore);
+  Value beforeFinal = ctx.currentTensor;
+
+  // Replace scf.condition with one that carries the tensor too.
+  auto cond = cast<scf::ConditionOp>(newBefore->getTerminator());
+  SmallVector<Value> newCondArgs(cond.getArgs());
+  newCondArgs.push_back(beforeFinal);
+  rewriter.setInsertionPoint(cond);
+  rewriter.replaceOpWithNewOp<scf::ConditionOp>(cond, cond.getCondition(),
+                                                newCondArgs);
+
+  // Build the after block manually too.
+  SmallVector<Type> afterArgTypes(
+      whileOp.getAfter().front().getArgumentTypes());
+  afterArgTypes.push_back(tensorType);
+  SmallVector<Location> afterArgLocs(afterArgTypes.size(), whileOp.getLoc());
+  Block *newAfter =
+      rewriter.createBlock(&newWhile.getAfter(), {}, afterArgTypes,
+                           afterArgLocs);
+
+  Block *oldAfter = &whileOp.getAfter().front();
+  rewriter.mergeBlocks(oldAfter, newAfter, newAfter->getArguments().drop_back());
+
+  ctx.currentTensor = newAfter->getArguments().back();
+  walkBlock(ctx, *newAfter);
+  Value afterFinal = ctx.currentTensor;
+
+  // Replace scf.yield with one that yields the tensor too.
+  auto yield = cast<scf::YieldOp>(newAfter->getTerminator());
+  SmallVector<Value> newYields(yield.getOperands());
+  newYields.push_back(afterFinal);
+  rewriter.setInsertionPoint(yield);
+  rewriter.replaceOpWithNewOp<scf::YieldOp>(yield, newYields);
+
+  for (auto [oldR, newR] :
+       llvm::zip(whileOp.getResults(), newWhile.getResults().drop_back()))
+    oldR.replaceAllUsesWith(newR);
+  rewriter.eraseOp(whileOp);
+
+  ctx.currentTensor = newWhile.getResults().back();
+  ctx.didRewrite = true;
+}
+
+static void walkBlock(WalkCtx &ctx, Block &block) {
+  for (auto it = block.begin(), end = block.end(); it != end;) {
+    Operation &op = *it++;
+
+    if (auto load = dyn_cast<memref::LoadOp>(&op)) {
+      if (load.getMemRef() == ctx.root) {
+        ctx.rewriter->setInsertionPoint(load);
+        auto extract = ctx.rewriter->create<tensor::ExtractOp>(
+            load.getLoc(), ctx.currentTensor, load.getIndices());
+        load.getResult().replaceAllUsesWith(extract.getResult());
+        ctx.rewriter->eraseOp(load);
+        ctx.didRewrite = true;
+      }
+    } else if (auto store = dyn_cast<memref::StoreOp>(&op)) {
+      if (store.getMemRef() == ctx.root) {
+        ctx.rewriter->setInsertionPoint(store);
+        auto insert = ctx.rewriter->create<tensor::InsertOp>(
+            store.getLoc(), store.getValueToStore(), ctx.currentTensor,
+            store.getIndices());
+        ctx.currentTensor = insert.getResult();
+        ctx.rewriter->eraseOp(store);
+        ctx.didRewrite = true;
+      }
+    } else if (auto aload = dyn_cast<affine::AffineLoadOp>(&op)) {
+      if (aload.getMemRef() == ctx.root) {
+        ctx.rewriter->setInsertionPoint(aload);
+        AffineMap map = aload.getAffineMap();
+        SmallVector<Value> mapOperands(aload.getMapOperands());
+        SmallVector<Value> idx;
+        for (unsigned i = 0; i < map.getNumResults(); ++i) {
+          auto apply = ctx.rewriter->create<affine::AffineApplyOp>(
+              aload.getLoc(), map.getSubMap({i}), mapOperands);
+          idx.push_back(apply.getResult());
+        }
+        auto extract = ctx.rewriter->create<tensor::ExtractOp>(
+            aload.getLoc(), ctx.currentTensor, idx);
+        aload.getResult().replaceAllUsesWith(extract.getResult());
+        ctx.rewriter->eraseOp(aload);
+        ctx.didRewrite = true;
+      }
+    } else if (auto astore = dyn_cast<affine::AffineStoreOp>(&op)) {
+      if (astore.getMemRef() == ctx.root) {
+        ctx.rewriter->setInsertionPoint(astore);
+        AffineMap map = astore.getAffineMap();
+        SmallVector<Value> mapOperands(astore.getMapOperands());
+        SmallVector<Value> idx;
+        for (unsigned i = 0; i < map.getNumResults(); ++i) {
+          auto apply = ctx.rewriter->create<affine::AffineApplyOp>(
+              astore.getLoc(), map.getSubMap({i}), mapOperands);
+          idx.push_back(apply.getResult());
+        }
+        auto insert = ctx.rewriter->create<tensor::InsertOp>(
+            astore.getLoc(), astore.getValueToStore(), ctx.currentTensor, idx);
+        ctx.currentTensor = insert.getResult();
+        ctx.rewriter->eraseOp(astore);
+        ctx.didRewrite = true;
+      }
+    } else if (auto generic = dyn_cast<linalg::GenericOp>(&op)) {
+      // Rewrite only if this generic touches our root via in/out operands.
+      bool touches = false;
+      for (Value v : generic.getInputs()) {
+        if (v.getType().isa<MemRefType>() &&
+            traceSubmapChainToRoot(v).rootMemref == ctx.root) {
+          touches = true;
+          break;
+        }
+      }
+      if (!touches) {
+        for (Value v : generic.getOutputs()) {
+          if (v.getType().isa<MemRefType>() &&
+              traceSubmapChainToRoot(v).rootMemref == ctx.root) {
+            touches = true;
+            break;
+          }
+        }
+      }
+      if (touches) {
+        rewriteLinalgGenericForRoot(ctx, generic);
+        ctx.didRewrite = true;
+      }
+    } else if (isa<polygeist::SubmapOp>(&op)) {
+      // NOOP — re-emitted at linalg.generic time.
+    } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
+      handleScfFor(ctx, forOp);
+    } else if (auto ifOp = dyn_cast<scf::IfOp>(&op)) {
+      handleScfIf(ctx, ifOp);
+    } else if (auto affFor = dyn_cast<affine::AffineForOp>(&op)) {
+      handleAffineFor(ctx, affFor);
+    } else if (auto whileOp = dyn_cast<scf::WhileOp>(&op)) {
+      handleScfWhile(ctx, whileOp);
+    }
+    // Anything else: leave alone. canHandle has ensured no unsupported
+    // op touches our root.
+  }
+}
+
+static LogicalResult handleRoot(Value root, Block *body,
+                                PatternRewriter &rewriter) {
+  auto memrefType = root.getType().dyn_cast<MemRefType>();
+  if (!memrefType) return failure();
+  if (!canHandle(root)) return failure();
+
+  rewriter.setInsertionPointAfterValue(root);
+  auto tensorType = RankedTensorType::get(memrefType.getShape(),
+                                          memrefType.getElementType());
+  auto initT = rewriter.create<bufferization::ToTensorOp>(
+      root.getLoc(), tensorType, root);
+  Value initTensor = initT.getResult();
+
+  WalkCtx ctx{root, initTensor, &rewriter};
+  walkBlock(ctx, *body);
+
+  if (!ctx.didRewrite) {
+    // Nothing actually changed. Undo the speculative to_tensor — but only
+    // if it has no uses (e.g. an input-only rewrite of a generic would
+    // have wired tensor submaps to it, in which case didRewrite is true).
+    if (initT.getResult().use_empty()) rewriter.eraseOp(initT);
+    return failure();
+  }
+
+  // Write back if the current tensor diverged from the entry tensor.
+  // If only reads (loads) or input-only generic rewrites happened, the
+  // outer memref hasn't been logically modified — no copy needed.
+  if (ctx.currentTensor != initTensor) {
+    rewriter.setInsertionPointAfterValue(ctx.currentTensor);
+    auto toMemref = rewriter.create<bufferization::ToMemrefOp>(
+        root.getLoc(), memrefType, ctx.currentTensor);
+    rewriter.create<memref::CopyOp>(root.getLoc(), toMemref, root);
+  }
+  return success();
+}
+
+} // namespace v2
+
+struct LinalgDebufferizationRecursive : public OpRewritePattern<func::FuncOp> {
+  using OpRewritePattern<func::FuncOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(func::FuncOp funcOp,
+                                PatternRewriter &rewriter) const final {
+    if (funcOp.isExternal() || funcOp.empty()) return failure();
+    // Multi-block CFG isn't supported yet; future stages will follow cf.br.
+    if (!llvm::hasSingleElement(funcOp.getBody())) return failure();
+    Block *body = &funcOp.getBody().front();
+    bool anyChanged = false;
+
+    SmallVector<Value> roots;
+    funcOp.walk([&](memref::AllocaOp op) { roots.push_back(op.getResult()); });
+    funcOp.walk([&](memref::AllocOp op) { roots.push_back(op.getResult()); });
+    for (auto arg : funcOp.getArguments())
+      if (arg.getType().isa<MemRefType>()) roots.push_back(arg);
+
+    for (Value root : roots) {
+      if (succeeded(v2::handleRoot(root, body, rewriter)))
+        anyChanged = true;
+    }
+    return anyChanged ? success() : failure();
+  }
+};
+
 namespace {
 struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
   void runOnOperation() override;
@@ -1457,7 +2162,11 @@ struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
 void LinalgDebufferize::runOnOperation() {
   auto module = getOperation()->getParentOfType<ModuleOp>();
   RewritePatternSet patterns(&getContext());
-  patterns.insert<LinalgDebufferization>(&getContext());
+  if (useRecursive) {
+    patterns.insert<LinalgDebufferizationRecursive>(&getContext());
+  } else {
+    patterns.insert<LinalgDebufferization>(&getContext());
+  }
   patterns.insert<debufferizationAllocaRemoval>(&getContext());
   GreedyRewriteConfig config;
   (void)applyPatternsAndFoldGreedily(getOperation(), std::move(patterns),
