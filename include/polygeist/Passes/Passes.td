@@ -184,8 +184,9 @@ def LinalgDebufferize : Pass<"linalg-debufferize"> {
     "polygeist::PolygeistDialect",
   ];
   let options = [
-    Option<"useRecursive", "use-recursive", "bool", /*default=*/"false",
-           "Use the region-recursive (v2) debufferization implementation">
+    Option<"useRecursive", "use-recursive", "bool", /*default=*/"true",
+           "Use the region-recursive (v2) debufferization implementation. "
+           "Set to false to fall back to the legacy v1 pattern.">
   ];
 }
 
