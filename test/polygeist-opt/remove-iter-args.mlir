@@ -157,12 +157,21 @@ func.func @test_gemm_inner_loop(
 
 // -----
 
-// Test case 6: Multiply after multiply reduction (should NOT transform)
-// This requires different algebraic properties (not addition)
+// Test case 6: Multiply-reduction with a post-loop scale.
+// Distributivity does NOT apply (yield isn't addition), so the fast path bails.
+// The alloca fallback handles it: one slot for the product accumulator, the
+// post-loop scale runs after the final load.
 // CHECK-LABEL: func.func @test_multiply_after_multiply
-// CHECK: iter_args
-// CHECK: arith.mulf %{{.*}}, %{{.*}} : f64
-// CHECK: affine.yield
+// CHECK-NOT: iter_args
+// CHECK: %[[SLOT:.*]] = memref.alloca() : memref<f64>
+// CHECK: affine.store %{{.*}}, %[[SLOT]][] : memref<f64>
+// CHECK: affine.for
+// CHECK: %[[ACC:.*]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK: arith.mulf %[[ACC]], %{{.*}} : f64
+// CHECK: affine.store %{{.*}}, %[[SLOT]][] : memref<f64>
+// CHECK: }
+// CHECK: %[[FIN:.*]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK: arith.mulf %{{.*}}, %[[FIN]] : f64
 func.func @test_multiply_after_multiply(%A: memref<?xf64>, %n: index, %alpha: f64) {
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
@@ -182,12 +191,18 @@ func.func @test_multiply_after_multiply(%A: memref<?xf64>, %n: index, %alpha: f6
 
 // -----
 
-// Test case 7: Multiple uses of result (should NOT transform)
+// Test case 7: Multiple uses of the loop result.
+// The fast path's hasOneUse() guard rejects this. The alloca fallback handles
+// it by RAUWing the old result with a single post-loop load that both stores
+// then consume.
 // CHECK-LABEL: func.func @test_multiple_uses
-// CHECK: iter_args
-// CHECK: affine.yield
-// CHECK: affine.store %{{.*}}, %{{.*}}[] : memref<f64>
-// CHECK: affine.store %{{.*}}, %{{.*}}[] : memref<f64>
+// CHECK-NOT: iter_args
+// CHECK: %[[SLOT:.*]] = memref.alloca() : memref<f64>
+// CHECK: affine.for
+// CHECK: }
+// CHECK: %[[FIN:.*]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK: affine.store %[[FIN]], %{{.*}}[] : memref<f64>
+// CHECK: affine.store %[[FIN]], %{{.*}}[] : memref<f64>
 func.func @test_multiple_uses(%A: memref<?xf64>, %n: index) {
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
@@ -484,7 +499,217 @@ func.func @test_scf_integer_gemm(%A: memref<?xi32>, %C: memref<i32>, %n: index, 
   %old_c = memref.load %C[] : memref<i32>
   %new_c = arith.addi %old_c, %scaled : i32
   memref.store %new_c, %C[] : memref<i32>
-  
+
   return
+}
+
+// -----
+
+// ============================================================================
+// SURVEY-DERIVED CASES (alloca fallback)
+// ============================================================================
+
+// Survey r01: scalar reduction returned directly. Alloca path; final load
+// becomes the return value.
+// CHECK-LABEL: func.func @ddot
+// CHECK:         %[[CST:.+]] = arith.constant 0.000000e+00 : f64
+// CHECK:         %[[SLOT:.+]] = memref.alloca() : memref<f64>
+// CHECK:         affine.store %[[CST]], %[[SLOT]][] : memref<f64>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK:           %[[ACC:.+]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK:           %[[NEW:.+]] = arith.addf %[[ACC]], {{.*}} : f64
+// CHECK:           affine.store %[[NEW]], %[[SLOT]][] : memref<f64>
+// CHECK:         }
+// CHECK:         %[[RES:.+]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK:         return %[[RES]] : f64
+func.func @ddot(%n: index, %x: memref<?xf64>, %y: memref<?xf64>) -> f64 {
+  %cst = arith.constant 0.000000e+00 : f64
+  %s = affine.for %i = 0 to %n iter_args(%acc = %cst) -> (f64) {
+    %a = affine.load %x[%i] : memref<?xf64>
+    %b = affine.load %y[%i] : memref<?xf64>
+    %p = arith.mulf %a, %b : f64
+    %new = arith.addf %acc, %p : f64
+    affine.yield %new : f64
+  }
+  return %s : f64
+}
+
+// -----
+
+// Survey r02: pure unary op (math.sqrt) sits between loop result and return.
+// Alloca path: sqrt consumes the post-loop load.
+// CHECK-LABEL: func.func @dnrm2
+// CHECK:         %[[SLOT:.+]] = memref.alloca() : memref<f64>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK:         }
+// CHECK:         %[[FIN:.+]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK:         %[[SQ:.+]] = math.sqrt %[[FIN]] : f64
+// CHECK:         return %[[SQ]] : f64
+func.func @dnrm2(%n: index, %x: memref<?xf64>) -> f64 {
+  %cst = arith.constant 0.000000e+00 : f64
+  %s = affine.for %i = 0 to %n iter_args(%acc = %cst) -> (f64) {
+    %a = affine.load %x[%i] : memref<?xf64>
+    %p = arith.mulf %a, %a : f64
+    %new = arith.addf %acc, %p : f64
+    affine.yield %new : f64
+  }
+  %r = math.sqrt %s : f64
+  return %r : f64
+}
+
+// -----
+
+// Survey r06: loop result passed to a call. Alloca path; call argument is
+// the post-loop load.
+// CHECK-LABEL: func.func @log_sum
+// CHECK:         %[[SLOT:.+]] = memref.alloca() : memref<f64>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK:         }
+// CHECK:         %[[FIN:.+]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK:         call @sink(%[[FIN]]) : (f64) -> ()
+// CHECK:         return
+func.func @log_sum(%n: index, %x: memref<?xf64>) {
+  %cst = arith.constant 0.000000e+00 : f64
+  %s = affine.for %i = 0 to %n iter_args(%acc = %cst) -> (f64) {
+    %a = affine.load %x[%i] : memref<?xf64>
+    %new = arith.addf %acc, %a : f64
+    affine.yield %new : f64
+  }
+  func.call @sink(%s) : (f64) -> ()
+  return
+}
+func.func private @sink(f64)
+
+// -----
+
+// Survey r08: multi-iter_arg loop. The existing fast path bails (multi-iter
+// guard); the alloca fallback creates one slot per iter_arg.
+// CHECK-LABEL: func.func @two_reductions
+// CHECK-DAG:     %[[S0:.+]] = memref.alloca() : memref<f64>
+// CHECK-DAG:     %[[S1:.+]] = memref.alloca() : memref<f64>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK-DAG:       affine.load %[[S0]][] : memref<f64>
+// CHECK-DAG:       affine.load %[[S1]][] : memref<f64>
+// CHECK-DAG:       affine.store %{{.*}}, %[[S0]][] : memref<f64>
+// CHECK-DAG:       affine.store %{{.*}}, %[[S1]][] : memref<f64>
+// CHECK:         }
+// CHECK-DAG:     affine.load %[[S0]][] : memref<f64>
+// CHECK-DAG:     affine.load %[[S1]][] : memref<f64>
+// CHECK:         return
+func.func @two_reductions(%n: index, %x: memref<?xf64>,
+                          %m: memref<?xf64>, %q: memref<?xf64>) {
+  %cst = arith.constant 0.000000e+00 : f64
+  %r:2 = affine.for %i = 0 to %n
+        iter_args(%s = %cst, %ss = %cst) -> (f64, f64) {
+    %a = affine.load %x[%i] : memref<?xf64>
+    %ns = arith.addf %s, %a : f64
+    %sq = arith.mulf %a, %a : f64
+    %nss = arith.addf %ss, %sq : f64
+    affine.yield %ns, %nss : f64, f64
+  }
+  affine.store %r#0, %m[0] : memref<?xf64>
+  affine.store %r#1, %q[0] : memref<?xf64>
+  return
+}
+
+// -----
+
+// Survey r11: product reduction (mulf accumulator). Alloca path is operator-
+// agnostic — the body is cloned verbatim.
+// CHECK-LABEL: func.func @prod
+// CHECK:         %[[ONE:.+]] = arith.constant 1.000000e+00 : f64
+// CHECK:         %[[SLOT:.+]] = memref.alloca() : memref<f64>
+// CHECK:         affine.store %[[ONE]], %[[SLOT]][] : memref<f64>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK:           %[[ACC:.+]] = affine.load %[[SLOT]][] : memref<f64>
+// CHECK:           arith.mulf %[[ACC]], {{.*}} : f64
+// CHECK:           affine.store %{{.*}}, %[[SLOT]][] : memref<f64>
+// CHECK:         }
+// CHECK:         affine.load %[[SLOT]][] : memref<f64>
+// CHECK:         return
+func.func @prod(%n: index, %x: memref<?xf64>) -> f64 {
+  %one = arith.constant 1.000000e+00 : f64
+  %p = affine.for %i = 0 to %n iter_args(%acc = %one) -> (f64) {
+    %a = affine.load %x[%i] : memref<?xf64>
+    %new = arith.mulf %acc, %a : f64
+    affine.yield %new : f64
+  }
+  return %p : f64
+}
+
+// -----
+
+// Survey r14: integer-typed iter_arg, post-loop result cast to index and used
+// as an affine.for upper bound. RAUW propagates through the cast naturally.
+// CHECK-LABEL: func.func @hist
+// CHECK:         %[[SLOT:.+]] = memref.alloca() : memref<i32>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK:         }
+// CHECK:         %[[FIN:.+]] = affine.load %[[SLOT]][] : memref<i32>
+// CHECK:         %[[FINI:.+]] = arith.index_cast %[[FIN]] : i32 to index
+// CHECK:         affine.for {{.*}} = 0 to %[[FINI]]
+func.func @hist(%n: index, %x: memref<?xf64>) {
+  %c0 = arith.constant 0 : i32
+  %c1 = arith.constant 1 : i32
+  %cst = arith.constant 0.000000e+00 : f64
+  %count = affine.for %i = 0 to %n iter_args(%c = %c0) -> (i32) {
+    %a = affine.load %x[%i] : memref<?xf64>
+    %p = arith.cmpf ogt, %a, %cst : f64
+    %nc = scf.if %p -> (i32) {
+      %inc = arith.addi %c, %c1 : i32
+      scf.yield %inc : i32
+    } else {
+      scf.yield %c : i32
+    }
+    affine.yield %nc : i32
+  }
+  %ci = arith.index_cast %count : i32 to index
+  affine.for %j = 0 to %ci {
+    %ji = arith.index_cast %j : index to i32
+    func.call @use_int(%ji) : (i32) -> ()
+  }
+  return
+}
+func.func private @use_int(i32)
+
+// -----
+
+// Nested reductions (survey r15): inner iter_arg's result feeds the outer
+// iter_arg's body. Both loops should be rewritten — inner first by the
+// greedy driver, then outer.
+// CHECK-LABEL: func.func @dist
+// CHECK:         %[[OUT:.+]] = memref.alloca() : memref<f64>
+// CHECK:         affine.for {{.*}} {
+// CHECK-NOT:       iter_args
+// CHECK:           %[[IN:.+]] = memref.alloca() : memref<f64>
+// CHECK:           affine.for {{.*}} {
+// CHECK-NOT:         iter_args
+// CHECK:             affine.load %[[IN]][] : memref<f64>
+// CHECK:             affine.store %{{.*}}, %[[IN]][] : memref<f64>
+// CHECK:           }
+// CHECK:           affine.load %[[IN]][] : memref<f64>
+// CHECK:           affine.store %{{.*}}, %[[OUT]][] : memref<f64>
+// CHECK:         }
+// CHECK:         %[[RES:.+]] = affine.load %[[OUT]][] : memref<f64>
+// CHECK:         return %[[RES]] : f64
+func.func @dist(%m: index, %n: index, %A: memref<?xf64>) -> f64 {
+  %cst = arith.constant 0.000000e+00 : f64
+  %total = affine.for %i = 0 to %m iter_args(%t = %cst) -> (f64) {
+    %row = affine.for %j = 0 to %n iter_args(%r = %cst) -> (f64) {
+      %v = affine.load %A[%i * symbol(%n) + %j] : memref<?xf64>
+      %nr = arith.addf %r, %v : f64
+      affine.yield %nr : f64
+    }
+    %sq = arith.mulf %row, %row : f64
+    %nt = arith.addf %t, %sq : f64
+    affine.yield %nt : f64
+  }
+  return %total : f64
 }
 

@@ -269,12 +269,20 @@ struct RemoveSCFIterArgs : public OpRewritePattern<scf::ForOp> {
     
     unsigned numIterArgs = forOp.getNumRegionIterArgs();
     LLVM_DEBUG(llvm::dbgs() << "Number of iter_args: " << numIterArgs << "\n");
-    
+
     if (numIterArgs == 0) {
       LLVM_DEBUG(llvm::dbgs() << "REJECTED: No iter_args to remove\n");
       return failure();
     }
-    
+
+    // This pattern's single-iter_arg incremental rewrite produces an
+    // ill-formed terminator when the new loop still has iter_args left.
+    // Defer multi-iter_arg loops to the alloca fallback.
+    if (numIterArgs > 1) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: numIterArgs > 1 — defer to alloca fallback\n");
+      return failure();
+    }
+
     // For now, process only the last iter_arg (like Affine version)
     LLVM_DEBUG(llvm::dbgs() << "Processing last iter_arg (index " << (numIterArgs - 1) << ")\n");
     
@@ -465,12 +473,20 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
     
     unsigned numIterArgs = forOp.getNumRegionIterArgs();
     LLVM_DEBUG(llvm::dbgs() << "Number of iter_args: " << numIterArgs << "\n");
-    
+
     if (numIterArgs == 0) {
       LLVM_DEBUG(llvm::dbgs() << "REJECTED: No iter_args to remove\n");
       return failure();
     }
-   
+
+    // This pattern's single-iter_arg incremental rewrite produces an
+    // ill-formed terminator when the new loop still has iter_args left.
+    // Defer multi-iter_arg loops to the alloca fallback.
+    if (numIterArgs > 1) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: numIterArgs > 1 — defer to alloca fallback\n");
+      return failure();
+    }
+
     LLVM_DEBUG(llvm::dbgs() << "Processing last iter_arg (index " << (numIterArgs - 1) << ")\n");
     
     auto loc = forOp->getLoc();
@@ -628,6 +644,114 @@ struct RemoveAffineIterArgs : public OpRewritePattern<affine::AffineForOp> {
   }
 };
 
+// ============================================================================
+// Universal alloca-based materialization (consumer-blind fallback)
+// ============================================================================
+//
+// This pattern unconditionally converts every iter_arg of an affine.for into a
+// 0-D memref slot:
+//
+//   %slot_i = memref.alloca() : memref<T_i>
+//   affine.store %init_i, %slot_i[]
+//   affine.for %iv = lb to ub {                 // no iter_args
+//     %acc_i = affine.load %slot_i[]            // replaces the iter_arg
+//     ... body, with iter_arg_i -> %acc_i ...
+//     affine.store %yielded_i, %slot_i[]        // replaces yield operand i
+//   }
+//   %final_i = affine.load %slot_i[]
+//   // RAUW old loop result #i -> %final_i  (handles return / call / store /
+//   //                                       cmp / loop bound / multi-use ...)
+//
+// Registered at lower benefit than RemoveAffineIterArgs, so the existing
+// store-fusion fast path is tried first; this pattern catches everything else.
+
+struct MaterializeAffineIterArgsViaAlloca
+    : public OpRewritePattern<affine::AffineForOp> {
+  using OpRewritePattern<affine::AffineForOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(affine::AffineForOp forOp,
+                                PatternRewriter &rewriter) const override {
+    LLVM_DEBUG(llvm::dbgs() << "\n=== MaterializeAffineIterArgsViaAlloca ===\n");
+    LLVM_DEBUG(llvm::dbgs() << "Processing affine.for:\n" << forOp << "\n");
+
+    unsigned numIterArgs = forOp.getNumRegionIterArgs();
+    if (numIterArgs == 0) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: No iter_args\n");
+      return failure();
+    }
+    if (!forOp.getRegion().hasOneBlock()) {
+      LLVM_DEBUG(llvm::dbgs() << "REJECTED: Loop body has != 1 block\n");
+      return failure();
+    }
+
+    auto loc = forOp.getLoc();
+    auto yieldOp = cast<affine::AffineYieldOp>(forOp.getBody()->getTerminator());
+
+    // Step 1 & 2: alloca + init store for each iter_arg, before the loop.
+    rewriter.setInsertionPoint(forOp);
+    SmallVector<Value> slots;
+    slots.reserve(numIterArgs);
+    for (unsigned i = 0; i < numIterArgs; ++i) {
+      Type t = forOp.getRegionIterArgs()[i].getType();
+      auto slot = rewriter.create<memref::AllocaOp>(
+          loc, MemRefType::get({}, t));
+      slots.push_back(slot.getResult());
+      rewriter.create<affine::AffineStoreOp>(
+          loc, forOp.getInits()[i], slot.getResult(), ValueRange{});
+    }
+
+    // Step 3: new affine.for with the same bounds but no iter_args.
+    auto newForOp = rewriter.create<affine::AffineForOp>(
+        loc, forOp.getLowerBoundOperands(), forOp.getLowerBoundMap(),
+        forOp.getUpperBoundOperands(), forOp.getUpperBoundMap(),
+        forOp.getStep(), /*iterArgs=*/ValueRange{});
+
+    Block *newBody = newForOp.getBody();
+    Block *oldBody = forOp.getBody();
+
+    IRMapping mapper;
+    mapper.map(forOp.getInductionVar(), newForOp.getInductionVar());
+
+    // Step 4a: at the top of the new body, load each slot and map the
+    // corresponding old iter_arg block-arg onto the loaded SSA value.
+    rewriter.setInsertionPointToStart(newBody);
+    for (unsigned i = 0; i < numIterArgs; ++i) {
+      auto load = rewriter.create<affine::AffineLoadOp>(
+          loc, slots[i], ValueRange{});
+      mapper.map(forOp.getRegionIterArgs()[i], load.getResult());
+    }
+
+    // Step 4b: clone every body op (the IRMapping rewires iter_arg uses
+    // to the loaded values). The auto-inserted affine.yield in newBody
+    // stays at the end; we insert before it.
+    for (Operation &op : oldBody->without_terminator()) {
+      rewriter.clone(op, mapper);
+    }
+
+    // Step 4c: store the (mapped) yielded values back to their slots,
+    // just before the new loop's terminator.
+    rewriter.setInsertionPoint(newBody->getTerminator());
+    for (unsigned i = 0; i < numIterArgs; ++i) {
+      Value mappedYielded = mapper.lookupOrDefault(yieldOp.getOperand(i));
+      rewriter.create<affine::AffineStoreOp>(
+          loc, mappedYielded, slots[i], ValueRange{});
+    }
+
+    // Step 5: after the loop, load each slot and RAUW the corresponding
+    // old loop result.
+    rewriter.setInsertionPointAfter(newForOp);
+    for (unsigned i = 0; i < numIterArgs; ++i) {
+      auto finalLoad = rewriter.create<affine::AffineLoadOp>(
+          loc, slots[i], ValueRange{});
+      rewriter.replaceAllUsesWith(forOp.getResult(i), finalLoad.getResult());
+    }
+
+    rewriter.eraseOp(forOp);
+    LLVM_DEBUG(llvm::dbgs() << "=== MaterializeAffineIterArgsViaAlloca SUCCESS ===\n\n");
+    return success();
+  }
+};
+
 namespace {
 struct RemoveIterArgs : public RemoveIterArgsBase<RemoveIterArgs> {
 
@@ -636,15 +760,18 @@ struct RemoveIterArgs : public RemoveIterArgsBase<RemoveIterArgs> {
     LLVM_DEBUG(llvm::dbgs() << "===================================================\n");
     LLVM_DEBUG(llvm::dbgs() << "=== STARTING RemoveIterArgs PASS ===\n");
     LLVM_DEBUG(llvm::dbgs() << "===================================================\n");
-    
+
     GreedyRewriteConfig config;
     MLIRContext *context = &getContext();
     RewritePatternSet patterns(context);
     ConversionTarget target(*context);
-    patterns.insert<RemoveSCFIterArgs>(patterns.getContext());
-    patterns.insert<RemoveAffineIterArgs>(patterns.getContext());
+    // Fast-path patterns (store-fusion): higher benefit, tried first.
+    patterns.add<RemoveSCFIterArgs>(context, /*benefit=*/2);
+    patterns.add<RemoveAffineIterArgs>(context, /*benefit=*/2);
+    // Universal fallback (alloca materialization): lower benefit.
+    patterns.add<MaterializeAffineIterArgsViaAlloca>(context, /*benefit=*/1);
 
-    LLVM_DEBUG(llvm::dbgs() << "Registered patterns: RemoveSCFIterArgs, RemoveAffineIterArgs\n");
+    LLVM_DEBUG(llvm::dbgs() << "Registered patterns: RemoveSCFIterArgs, RemoveAffineIterArgs, MaterializeAffineIterArgsViaAlloca\n");
     LLVM_DEBUG(llvm::dbgs() << "Applying patterns greedily...\n\n");
 
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(patterns),

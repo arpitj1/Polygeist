@@ -168,6 +168,7 @@ def RemoveIterArgs : Pass<"remove-iter-args"> {
   let dependentDialects = [
     "affine::AffineDialect",
     "scf::SCFDialect",
+    "memref::MemRefDialect",
   ];
 }
 
