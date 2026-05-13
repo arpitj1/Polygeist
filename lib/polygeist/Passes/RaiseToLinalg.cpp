@@ -721,54 +721,62 @@ struct DistributeAffineForOnLinalgGeneric
     Block *body = forOp.getBody();
     if (body->empty()) return failure();
 
-    // Identify chunks: each linalg.generic or nested affine.for is a chunk
-    // boundary; everything before the boundary (since the last) plus that op
-    // forms one chunk. Trailing ops form a final chunk.
-    SmallVector<SmallVector<Operation *, 4>> chunks;
-    SmallVector<Operation *, 4> currentChunk;
+    // Anchor-based chunking: each side-effecting op (linalg.generic,
+    // affine.store, memref.store, nested affine.for) is an anchor. Its
+    // chunk is itself plus the SSA def-use closure of its operands within
+    // the body. Chunks must be disjoint (no shared deps); body order
+    // determines emit order.
+
+    // Step 1: collect anchors (in body order).
+    SmallVector<Operation *> anchors;
     for (Operation &op : *body) {
       if (isa<affine::AffineYieldOp>(op)) continue;
-      currentChunk.push_back(&op);
-      if (isa<linalg::GenericOp>(op) || isa<affine::AffineForOp>(op)) {
-        chunks.push_back(std::move(currentChunk));
-        currentChunk.clear();
-      }
+      if (isa<linalg::GenericOp, affine::AffineStoreOp, memref::StoreOp,
+              affine::AffineForOp>(op))
+        anchors.push_back(&op);
     }
-    if (!currentChunk.empty())
-      chunks.push_back(std::move(currentChunk));
+    if (anchors.size() <= 1) return failure();
 
-    if (chunks.size() <= 1) return failure();
-
-    // Cross-chunk SSA reference check: every operand of an op in chunk C must
-    // be (a) defined outside the loop, (b) the loop's IV, or (c) defined by an
-    // earlier op in the same chunk. If anything else, we can't legally split.
+    // Step 2: compute each anchor's SSA dep closure within the body. If two
+    // anchors share a body-local dependency, we can't cleanly split — fail.
+    DenseMap<Operation *, unsigned> opToChunk;
     Value iv = forOp.getInductionVar();
-    for (auto &chunk : chunks) {
-      DenseSet<Operation *> inChunk;
-      for (Operation *op : chunk) inChunk.insert(op);
-      for (Operation *op : chunk) {
+    for (unsigned i = 0; i < anchors.size(); ++i) {
+      SmallVector<Operation *> work;
+      work.push_back(anchors[i]);
+      while (!work.empty()) {
+        Operation *op = work.pop_back_val();
+        auto it = opToChunk.find(op);
+        if (it != opToChunk.end()) {
+          if (it->second != i) {
+            LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: shared dependency between chunks\n");
+            return failure();
+          }
+          continue;
+        }
+        opToChunk[op] = i;
         for (Value operand : op->getOperands()) {
           if (operand == iv) continue;
           Operation *defOp = operand.getDefiningOp();
-          if (!defOp) {
-            // Block argument from outside the loop; assume safe.
-            if (auto blockArg = dyn_cast<BlockArgument>(operand)) {
-              if (blockArg.getOwner() == body) {
-                LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: unexpected block arg from body\n");
-                return failure();
-              }
-            }
-            continue;
-          }
-          // If defined outside the loop's region, fine.
-          if (!forOp->isAncestor(defOp)) continue;
-          // Otherwise must be defined in the same chunk.
-          if (!inChunk.count(defOp)) {
-            LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: cross-chunk SSA reference\n");
-            return failure();
-          }
+          if (!defOp) continue;             // block arg / outer-scope
+          if (defOp->getBlock() != body) continue;  // outside this body
+          work.push_back(defOp);
         }
       }
+    }
+
+    // Step 3: collect chunks by chunkIdx, preserving body order.
+    SmallVector<SmallVector<Operation *, 4>> chunks(anchors.size());
+    for (Operation &op : *body) {
+      if (isa<affine::AffineYieldOp>(op)) continue;
+      auto it = opToChunk.find(&op);
+      if (it == opToChunk.end()) {
+        // Op not reachable from any anchor — pure, dead, or feeds an unknown
+        // sink. Conservatively bail rather than drop it.
+        LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: op not in any chunk's closure\n");
+        return failure();
+      }
+      chunks[it->second].push_back(&op);
     }
 
     LLVM_DEBUG(llvm::dbgs() << "Distributing affine.for into " << chunks.size()
