@@ -172,6 +172,18 @@ def RemoveIterArgs : Pass<"remove-iter-args"> {
   ];
 }
 
+def LowerPolygeistSubmap : Pass<"lower-polygeist-submap"> {
+  let summary = "Lower polygeist.submap and polygeist.submapInverse to standard MLIR";
+  let constructor = "mlir::polygeist::createLowerPolygeistSubmapPass()";
+  let dependentDialects = [
+    "arith::ArithDialect",
+    "linalg::LinalgDialect",
+    "memref::MemRefDialect",
+    "tensor::TensorDialect",
+    "polygeist::PolygeistDialect",
+  ];
+}
+
 def LinalgDebufferize : Pass<"linalg-debufferize"> {
   let summary = "Raise affine to linalg";
   let constructor = "mlir::polygeist::createLinalgDebufferizePass()";
