@@ -1006,6 +1006,236 @@ struct DistributeAffineForOnLinalgGeneric
   }
 };
 
+//===----------------------------------------------------------------------===//
+// PrivatizeScratchAllocaForLoop
+//
+// Looks for a 0-D scalar `memref.alloca` (defined in the enclosing function,
+// outside the loop) that is used as per-iteration scratch by the loop body —
+// i.e., every iteration starts by overwriting the scalar before reading it,
+// and nothing outside the loop reads it after the loop. Expands the alloca
+// to `memref<? x T>` with one slot per loop iteration and rewrites every
+// in-loop use to address `new_alloca[iv]` instead of `alloca[]`.
+//
+// After this rewrite, all accesses to the scratch are bound to the outer
+// IV at root-dim 0, which is exactly what the dep-check in
+// DistributeAffineForOnLinalgGeneric needs to fire on the loop.
+//
+// Constraints (kept tight for v1):
+//  - Loop has constant lb 0 (so `iv` can be used as a direct index).
+//  - Loop has no iter_args.
+//  - Alloca type is `memref<T>` (0-D scalar).
+//  - The first use of the alloca inside the loop body is a write.
+//  - The alloca has no uses after the loop.
+//===----------------------------------------------------------------------===//
+
+namespace {
+// Does this op write to `alloca` without first reading from it?
+static bool isInitWriteForScalarAlloca(Operation *op, Value alloca) {
+  if (auto store = dyn_cast<affine::AffineStoreOp>(op))
+    return store.getMemref() == alloca;
+  if (auto store = dyn_cast<memref::StoreOp>(op))
+    return store.getMemref() == alloca;
+  return false;
+}
+
+// Find the first use of `alloca` in body order; return null if none.
+static Operation *firstUseInBody(Value alloca, Block *body) {
+  for (Operation &op : *body)
+    for (Value v : op.getOperands())
+      if (v == alloca) return &op;
+  return nullptr;
+}
+
+// Returns true iff `user` is executed strictly before `loopOp` in the program
+// flow, accounting for the possibility that they live in different (but
+// nested) blocks.
+static bool isBeforeLoopInProgramOrder(Operation *user, Operation *loopOp) {
+  DenseMap<Block *, Operation *> loopBlockToAncestor;
+  for (Operation *l = loopOp; l; l = l->getParentOp())
+    loopBlockToAncestor[l->getBlock()] = l;
+  for (Operation *u = user; u; u = u->getParentOp()) {
+    auto it = loopBlockToAncestor.find(u->getBlock());
+    if (it == loopBlockToAncestor.end()) continue;
+    if (u == it->second) return false; // same op — neither before nor after
+    return u->isBeforeInBlock(it->second);
+  }
+  return false;
+}
+
+// Verify the alloca is unused past `loopOp`.
+static bool noUsesAfterLoop(Value alloca, Operation *loopOp) {
+  for (Operation *user : alloca.getUsers()) {
+    if (loopOp->isAncestor(user)) continue; // inside the loop — fine
+    if (isBeforeLoopInProgramOrder(user, loopOp)) continue; // before — fine
+    return false;
+  }
+  return true;
+}
+} // anonymous namespace
+
+struct PrivatizeScratchAllocaForLoop
+    : public OpRewritePattern<affine::AffineForOp> {
+  using OpRewritePattern<affine::AffineForOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(affine::AffineForOp forOp,
+                                PatternRewriter &rewriter) const final {
+    if (forOp.getNumResults() != 0) return failure();
+    if (!forOp.hasConstantLowerBound() || forOp.getConstantLowerBound() != 0)
+      return failure();
+
+    // We need the loop's iteration count as an SSA Value to size the new
+    // alloca. For constant ub, materialize a constant; otherwise emit an
+    // affine.apply at the loop's site.
+    Block *body = forOp.getBody();
+    Value iv = forOp.getInductionVar();
+
+    // Find candidate allocas: any operand inside the body whose defining op
+    // is a `memref.alloca` outside the loop with 0-D scalar type.
+    SmallVector<memref::AllocaOp> candidates;
+    DenseSet<Operation *> seen;
+    body->walk([&](Operation *op) {
+      for (Value v : op->getOperands()) {
+        auto allocaOp = v.getDefiningOp<memref::AllocaOp>();
+        if (!allocaOp) continue;
+        if (forOp->isAncestor(allocaOp)) continue; // inside this loop already
+        if (!seen.insert(allocaOp).second) continue;
+        auto mrt = dyn_cast<MemRefType>(allocaOp.getType());
+        if (!mrt || mrt.getRank() != 0) continue;
+        if (allocaOp->getNumOperands() != 0) continue; // dynamic-shape alloca: skip
+        candidates.push_back(allocaOp);
+      }
+    });
+    if (candidates.empty()) return failure();
+
+    // Filter candidates: first in-body use is a write, all in-loop users are
+    // among the rewriteable set, no uses after loop, and the alloca lives
+    // in some ancestor block of `forOp` so we can place the sized
+    // replacement at the same scope (and have AffineForOpRaising later
+    // lift enclosing loops without dominance issues).
+    SmallVector<memref::AllocaOp> good;
+    for (memref::AllocaOp a : candidates) {
+      Operation *firstUse = firstUseInBody(a, body);
+      if (!firstUse) continue;
+      if (!isInitWriteForScalarAlloca(firstUse, a)) continue;
+      if (!noUsesAfterLoop(a, forOp)) continue;
+      bool allHandled = true;
+      for (Operation *user : a->getUsers()) {
+        if (!forOp->isAncestor(user)) continue;
+        if (!isa<affine::AffineLoadOp, affine::AffineStoreOp, memref::LoadOp,
+                 memref::StoreOp, polygeist::SubmapOp>(user)) {
+          allHandled = false;
+          break;
+        }
+      }
+      if (!allHandled) continue;
+      good.push_back(a);
+    }
+    if (good.empty()) return failure();
+
+    AffineMap idxMap = AffineMap::get(/*dimCount=*/1, /*symCount=*/0,
+                                      rewriter.getAffineDimExpr(0),
+                                      rewriter.getContext());
+
+    for (memref::AllocaOp oldAlloca : good) {
+      // Find the ancestor of `forOp` that lives in the same block as
+      // `oldAlloca`. That's where we want to insert: same block as the old
+      // alloca, just before the outermost enclosing loop. This keeps the
+      // new alloca at the scratch's original scope so AffineForOpRaising
+      // can later lift the enclosing loops without hitting dominance
+      // failures on the size operand.
+      Block *allocaBlock = oldAlloca->getBlock();
+      Operation *insertionAnchor = forOp.getOperation();
+      while (insertionAnchor && insertionAnchor->getBlock() != allocaBlock)
+        insertionAnchor = insertionAnchor->getParentOp();
+      if (!insertionAnchor) continue; // shouldn't happen given precondition
+      rewriter.setInsertionPoint(insertionAnchor);
+      AffineMap ubMap = forOp.getUpperBoundMap();
+      Value tripCount;
+      if (forOp.hasConstantUpperBound()) {
+        tripCount = rewriter.create<arith::ConstantIndexOp>(
+            forOp.getLoc(), forOp.getConstantUpperBound());
+      } else {
+        tripCount = rewriter.create<affine::AffineApplyOp>(
+            forOp.getLoc(), ubMap,
+            SmallVector<Value>(forOp.getUpperBoundOperands()));
+      }
+      MemRefType oldTy = cast<MemRefType>(oldAlloca.getType());
+      auto newTy = MemRefType::get({ShapedType::kDynamic}, oldTy.getElementType());
+      auto newAlloca = rewriter.create<memref::AllocaOp>(oldAlloca.getLoc(),
+                                                         newTy, tripCount);
+
+      // Rewrite every in-loop use of oldAlloca.
+      SmallVector<Operation *> users(oldAlloca->getUsers().begin(),
+                                     oldAlloca->getUsers().end());
+      for (Operation *user : users) {
+        if (!forOp->isAncestor(user)) continue;
+        OpBuilder::InsertionGuard g(rewriter);
+        rewriter.setInsertionPoint(user);
+        if (auto load = dyn_cast<affine::AffineLoadOp>(user)) {
+          auto newLoad = rewriter.create<affine::AffineLoadOp>(
+              load.getLoc(), newAlloca, idxMap, ValueRange{iv});
+          rewriter.replaceOp(load, newLoad.getResult());
+        } else if (auto store = dyn_cast<affine::AffineStoreOp>(user)) {
+          rewriter.create<affine::AffineStoreOp>(
+              store.getLoc(), store.getValue(), newAlloca, idxMap,
+              ValueRange{iv});
+          rewriter.eraseOp(store);
+        } else if (auto load = dyn_cast<memref::LoadOp>(user)) {
+          auto newLoad = rewriter.create<memref::LoadOp>(
+              load.getLoc(), newAlloca, ValueRange{iv});
+          rewriter.replaceOp(load, newLoad.getResult());
+        } else if (auto store = dyn_cast<memref::StoreOp>(user)) {
+          rewriter.create<memref::StoreOp>(store.getLoc(), store.getValue(),
+                                            newAlloca, ValueRange{iv});
+          rewriter.eraseOp(store);
+        } else if (auto submap = dyn_cast<polygeist::SubmapOp>(user)) {
+          // Original submap: takes 0-D scalar base + (viewSize) operands +
+          // 0 symbols. Rewrite to take 1-D base + (iv, viewSize) operands +
+          // 1 extra symbol (s_iv) that selects new_alloca[iv]. The result
+          // expression for the inner-most root-dim becomes s_iv; the view
+          // shape (and hence later linalg semantics) is unchanged.
+          AffineMap oldMap = submap.getMap();
+          unsigned numDims = oldMap.getNumDims();
+          unsigned numSyms = oldMap.getNumSymbols();
+          // New map has numDims dims, numSyms+1 symbols. s_iv is symbol
+          // position numSyms. Result is a single expression: s_iv (the
+          // address into new_alloca). Note: the old map's results were
+          // 0-rank (no result expressions, since old base was 0-D). The new
+          // base is 1-D, so the new map has exactly one result.
+          AffineExpr sIv = rewriter.getAffineSymbolExpr(numSyms);
+          AffineMap newMap = AffineMap::get(numDims, numSyms + 1, {sIv},
+                                            rewriter.getContext());
+          // SubmapOp builder takes (loc, resultType, base, indices_and_sizes,
+          // map) — indices_and_sizes is [syms..., sizes...]. Append iv as a
+          // new trailing symbol so it pairs with the new s_iv we added.
+          SmallVector<Value> indicesAndSizes;
+          for (Value s : submap.getSymbols()) indicesAndSizes.push_back(s);
+          indicesAndSizes.push_back(iv);
+          for (Value sz : submap.getSizes()) indicesAndSizes.push_back(sz);
+          auto newSubmap = rewriter.create<polygeist::SubmapOp>(
+              submap.getLoc(), submap.getType(), newAlloca, indicesAndSizes,
+              newMap);
+          rewriter.replaceOp(submap, newSubmap.getResult());
+        } else {
+          // Unhandled user. Bail entire pattern by deleting the new alloca
+          // and returning failure.
+          // (Other uses we've already rewritten above will still be live;
+          // the simplest recovery is to refuse the rewrite up front. Since
+          // we're inside a greedy driver, returning failure here without a
+          // clean rollback would leave inconsistent IR. So instead, we
+          // checked-cast above and bail before any rewrite for unknown
+          // users.)
+          // — but for safety: we already early-bailed in the precondition
+          // pass below. Reaching this should be impossible.
+          llvm_unreachable("unhandled alloca user in privatization");
+        }
+      }
+    }
+
+    return success();
+  }
+};
+
 // Shift every `linalg.index` op nested in `region` by `shift`. Used when an
 // outer loop is being raised and prepends `shift` new iterator dims to an
 // inner linalg's iteration space: each existing `linalg.index N` becomes
@@ -1991,6 +2221,7 @@ void RaiseAffineToLinalg::runOnOperation() {
   {
     LLVM_DEBUG(llvm::dbgs() << "### Step 3: Applying Distribute + AffineForOpRaising ###\n");
     RewritePatternSet raisingPatterns(&getContext());
+    raisingPatterns.add<PrivatizeScratchAllocaForLoop>(&getContext(), /*benefit=*/3);
     raisingPatterns.add<DistributeAffineForOnLinalgGeneric>(&getContext(), /*benefit=*/2);
     raisingPatterns.add<AffineForOpRaising>(&getContext(), /*benefit=*/1);
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(raisingPatterns), config))) {

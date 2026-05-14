@@ -420,7 +420,7 @@ struct debufferizationAllocaRemoval : public OpRewritePattern<memref::AllocaOp> 
 
     auto emptyTensor =
     rewriter.create<tensor::EmptyOp>(allocaOp.getLoc(),allocaOp.getType().getShape(),
-    allocaOp.getType().getElementType());
+    allocaOp.getType().getElementType(), allocaOp.getDynamicSizes());
 
     rewriter.replaceAllUsesWith(toTensorOp.getResult(), emptyTensor.getResult());
 
