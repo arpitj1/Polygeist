@@ -697,14 +697,202 @@ LogicalResult getLinalgArgMap(Operation *loop, Value &input, AffineMap &lgMap,
 // Group C — distribute an affine.for whose body has multiple "chunks"
 //           (each linalg.generic and each nested affine.for is a chunk).
 //
-// Match precondition: the loop was promoted from an affine.parallel (so it
-// carries `polygeist.was_parallel`). That gives us the safety: iterations are
-// independent, so it's legal to run all of chunk-1 across iterations, then all
-// of chunk-2, etc. — instead of all chunks per iteration.
+// Match precondition: either
+//   (a) the loop was promoted from an affine.parallel (so it carries
+//       `polygeist.was_parallel`) — iterations are independent, so it's legal
+//       to run all of chunk-1 across iterations, then all of chunk-2, etc.; or
+//   (b) the loop is sequential but cross-chunk fission is provably safe: every
+//       root memref shared across multiple chunks (with at least one writer)
+//       is indexed by the outer IV in the same composed dim across all of
+//       those chunks. The check below builds an AccessInfo per
+//       affine.load/store, memref.load/store, and linalg.generic operand (via
+//       the polygeist.submap chain) and verifies the iv-binding consistency.
 //
 // After this rewrite each new sibling loop has a homogeneous body that
 // AffineForOpRaising can handle.
 //===----------------------------------------------------------------------===//
+
+namespace {
+struct AccessInfo {
+  Value rootMemref;
+  // Root-dim positions that are bound to the outer IV via identity (same SSA
+  // value as the outer IV appears as the dim operand / submap symbol that
+  // feeds this root-dim).
+  SmallVector<unsigned, 4> ivBoundRootDims;
+  bool isWrite;
+};
+
+// For a memref value reached by an access (the direct memref of an affine
+// load/store, or the linalg.generic operand which is typically a submap),
+// follow at most one polygeist.submap layer to the root, and compute which
+// root-dim positions are bound to `outerIV` via identity (a single dim/symbol
+// expression that names `outerIV`). Returns std::nullopt if the structure is
+// too complex to analyze conservatively (chained submaps, non-trivial
+// expressions involving the IV, etc.) — caller must treat that as unsafe.
+static std::optional<AccessInfo> analyzeAccessThroughSubmap(
+    Value memref, AffineMap accessMap, ValueRange accessOperands, bool isWrite,
+    Value outerIV) {
+  AccessInfo info;
+  info.isWrite = isWrite;
+
+  if (auto submap = memref.getDefiningOp<polygeist::SubmapOp>()) {
+    // Chained submaps require full composition; bail conservatively for now.
+    if (submap.getBase().getDefiningOp<polygeist::SubmapOp>())
+      return std::nullopt;
+    info.rootMemref = submap.getBase();
+    AffineMap m = submap.getMap();
+    ValueRange syms = submap.getSymbols();
+    // Each result of `m` is one root-dim. If it names symbol s and syms[s] is
+    // the outer IV, mark this root-dim as iv-bound.
+    for (unsigned d = 0, e = m.getNumResults(); d < e; ++d) {
+      AffineExpr expr = m.getResult(d);
+      if (auto sym = expr.dyn_cast<AffineSymbolExpr>()) {
+        unsigned sIdx = sym.getPosition();
+        if (sIdx < syms.size() && syms[sIdx] == outerIV)
+          info.ivBoundRootDims.push_back(d);
+      }
+      // Any non-trivial expression involving outerIV: if expr references a
+      // symbol whose binding is outerIV but isn't a pure SymbolExpr, treat as
+      // unanalyzable.
+      else {
+        bool referencesIv = false;
+        expr.walk([&](AffineExpr sub) {
+          if (auto s = sub.dyn_cast<AffineSymbolExpr>()) {
+            unsigned sIdx = s.getPosition();
+            if (sIdx < syms.size() && syms[sIdx] == outerIV)
+              referencesIv = true;
+          }
+        });
+        if (referencesIv) return std::nullopt;
+      }
+    }
+    return info;
+  }
+
+  // Direct memref access via affine map.
+  if (!accessMap) return std::nullopt;
+  info.rootMemref = memref;
+  for (unsigned d = 0, e = accessMap.getNumResults(); d < e; ++d) {
+    AffineExpr expr = accessMap.getResult(d);
+    if (auto dim = expr.dyn_cast<AffineDimExpr>()) {
+      unsigned dIdx = dim.getPosition();
+      if (dIdx < accessOperands.size() && accessOperands[dIdx] == outerIV)
+        info.ivBoundRootDims.push_back(d);
+    } else {
+      bool referencesIv = false;
+      expr.walk([&](AffineExpr sub) {
+        if (auto dimSub = sub.dyn_cast<AffineDimExpr>()) {
+          unsigned dIdx = dimSub.getPosition();
+          if (dIdx < accessOperands.size() && accessOperands[dIdx] == outerIV)
+            referencesIv = true;
+        }
+      });
+      if (referencesIv) return std::nullopt;
+    }
+  }
+  return info;
+}
+
+// Walk a chunk's ops (transitively, into nested regions) and collect
+// AccessInfo for every memref access op. Returns false if any access is
+// unanalyzable (caller must bail).
+static bool collectChunkAccesses(ArrayRef<Operation *> chunk, Value outerIV,
+                                 SmallVectorImpl<AccessInfo> &out) {
+  bool unanalyzable = false;
+  auto visit = [&](Operation *op) {
+    if (auto load = dyn_cast<affine::AffineLoadOp>(op)) {
+      auto info = analyzeAccessThroughSubmap(
+          load.getMemref(), load.getAffineMap(),
+          ValueRange(load.getMapOperands()), /*isWrite=*/false, outerIV);
+      if (!info) { unanalyzable = true; return WalkResult::interrupt(); }
+      out.push_back(*info);
+    } else if (auto store = dyn_cast<affine::AffineStoreOp>(op)) {
+      auto info = analyzeAccessThroughSubmap(
+          store.getMemref(), store.getAffineMap(),
+          ValueRange(store.getMapOperands()), /*isWrite=*/true, outerIV);
+      if (!info) { unanalyzable = true; return WalkResult::interrupt(); }
+      out.push_back(*info);
+    } else if (auto load = dyn_cast<memref::LoadOp>(op)) {
+      AccessInfo info;
+      info.rootMemref = load.getMemref();
+      info.isWrite = false;
+      for (unsigned d = 0, e = load.getIndices().size(); d < e; ++d)
+        if (load.getIndices()[d] == outerIV)
+          info.ivBoundRootDims.push_back(d);
+      out.push_back(info);
+    } else if (auto store = dyn_cast<memref::StoreOp>(op)) {
+      AccessInfo info;
+      info.rootMemref = store.getMemref();
+      info.isWrite = true;
+      for (unsigned d = 0, e = store.getIndices().size(); d < e; ++d)
+        if (store.getIndices()[d] == outerIV)
+          info.ivBoundRootDims.push_back(d);
+      out.push_back(info);
+    } else if (auto generic = dyn_cast<linalg::GenericOp>(op)) {
+      for (Value input : generic.getInputs()) {
+        auto info = analyzeAccessThroughSubmap(input, AffineMap(), ValueRange(),
+                                               /*isWrite=*/false, outerIV);
+        if (!info) { unanalyzable = true; return WalkResult::interrupt(); }
+        out.push_back(*info);
+      }
+      for (Value output : generic.getOutputs()) {
+        auto info = analyzeAccessThroughSubmap(output, AffineMap(), ValueRange(),
+                                               /*isWrite=*/true, outerIV);
+        if (!info) { unanalyzable = true; return WalkResult::interrupt(); }
+        out.push_back(*info);
+      }
+    }
+    // SubmapOp setup and read-none arith are not accesses themselves.
+    return WalkResult::advance();
+  };
+  for (Operation *op : chunk) {
+    op->walk(visit);
+    if (unanalyzable) return false;
+  }
+  return true;
+}
+
+// For each shared root memref across chunks with at least one writer, every
+// access from any chunk that touches it must (a) bind the outer IV to at
+// least one root-dim, and (b) bind it to the same dim-set across chunks.
+// Otherwise distributing reorders cross-iteration accesses to address-overlapping
+// cells.
+static bool
+chunksDistributionSafe(ArrayRef<SmallVector<Operation *, 4>> chunks,
+                       Value outerIV) {
+  SmallVector<SmallVector<AccessInfo>, 4> perChunk(chunks.size());
+  for (unsigned i = 0; i < chunks.size(); ++i) {
+    if (!collectChunkAccesses(chunks[i], outerIV, perChunk[i])) {
+      LLVM_DEBUG(llvm::dbgs()
+                 << "Distribute REJECTED: unanalyzable access in chunk " << i
+                 << "\n");
+      return false;
+    }
+  }
+  for (unsigned p = 0; p < chunks.size(); ++p) {
+    for (unsigned q = p + 1; q < chunks.size(); ++q) {
+      for (const AccessInfo &accP : perChunk[p]) {
+        for (const AccessInfo &accQ : perChunk[q]) {
+          if (accP.rootMemref != accQ.rootMemref) continue;
+          if (!accP.isWrite && !accQ.isWrite) continue;
+          if (accP.ivBoundRootDims.empty() || accQ.ivBoundRootDims.empty()) {
+            LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: shared memref "
+                                       "access not bound to outer IV\n");
+            return false;
+          }
+          if (accP.ivBoundRootDims != accQ.ivBoundRootDims) {
+            LLVM_DEBUG(llvm::dbgs() << "Distribute REJECTED: shared memref "
+                                       "binds outer IV to different root-dims "
+                                       "across chunks\n");
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+} // end anonymous namespace
 
 struct DistributeAffineForOnLinalgGeneric
     : public OpRewritePattern<affine::AffineForOp> {
@@ -712,9 +900,7 @@ struct DistributeAffineForOnLinalgGeneric
 
   LogicalResult matchAndRewrite(affine::AffineForOp forOp,
                                 PatternRewriter &rewriter) const final {
-    // Only distribute loops we know are parallel (i.e. were affine.parallel
-    // before AffineParallelToFor demoted them).
-    if (!forOp->hasAttr("polygeist.was_parallel")) return failure();
+    bool isParallel = forOp->hasAttr("polygeist.was_parallel");
     // Can't distribute loops with iter_args.
     if (forOp.getNumResults() != 0) return failure();
 
@@ -779,8 +965,15 @@ struct DistributeAffineForOnLinalgGeneric
       chunks[it->second].push_back(&op);
     }
 
+    // Safety gate: parallel-loop fast path, otherwise cross-chunk dep check.
+    if (!isParallel && !chunksDistributionSafe(chunks, iv)) {
+      return failure();
+    }
+
     LLVM_DEBUG(llvm::dbgs() << "Distributing affine.for into " << chunks.size()
-                            << " sibling loops\n");
+                            << " sibling loops"
+                            << (isParallel ? " (was_parallel)" : " (dep-check)")
+                            << "\n");
 
     // For each chunk, clone the affine.for with just that chunk's ops.
     rewriter.setInsertionPoint(forOp);
@@ -790,7 +983,11 @@ struct DistributeAffineForOnLinalgGeneric
           forOp.getLowerBoundOperands(), forOp.getLowerBoundMap(),
           forOp.getUpperBoundOperands(), forOp.getUpperBoundMap(),
           forOp.getStep());
-      newFor->setAttr("polygeist.was_parallel", rewriter.getUnitAttr());
+      // Only carry the parallel mark forward when the input had it. The
+      // dep-check fallback path operates on sequential loops; the sibling
+      // loops it produces are equally sequential.
+      if (isParallel)
+        newFor->setAttr("polygeist.was_parallel", rewriter.getUnitAttr());
 
       Block *newBody = newFor.getBody();
       // newBody already has a default affine.yield from the builder.
