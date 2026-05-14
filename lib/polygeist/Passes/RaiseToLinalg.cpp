@@ -809,6 +809,17 @@ struct DistributeAffineForOnLinalgGeneric
   }
 };
 
+// Shift every `linalg.index` op nested in `region` by `shift`. Used when an
+// outer loop is being raised and prepends `shift` new iterator dims to an
+// inner linalg's iteration space: each existing `linalg.index N` becomes
+// `linalg.index N + shift`.
+static void shiftLinalgIndexDims(Region &region, unsigned shift) {
+  if (shift == 0) return;
+  region.walk([&](linalg::IndexOp idxOp) {
+    idxOp.setDim(idxOp.getDim() + shift);
+  });
+}
+
 // Group A — triangular-bound support helpers.
 // Returns true iff every operand of `operands` is an SSA value defined strictly
 // outside of `loop` (i.e., loop-invariant w.r.t. `loop`). This is the safety
@@ -964,12 +975,7 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     // }
 
     // Group A — triangular-bound support.
-    // Accept non-constant lower bounds (e.g. `for k = i+1 to m`) provided
-    // the lb is a single affine expression over operands that are loop-
-    // invariant w.r.t. the loop being raised. Capture the original lb so
-    // we can emit a mask in the body. Substitute lb = 0 for the rest of
-    // the pass.
-    BoundMaskInfo lbMaskInfo;
+    BoundMaskInfo lbMaskInfo, ubMaskInfo;
 
     AffineMap ubMap = loop.getUpperBoundMap();
     SmallVector<Value> ubOperands(loop.getUpperBoundOperands());
@@ -985,6 +991,8 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
       return failure();
     }
 
+    // Non-constant lower bound (e.g. `for k = i+1 to m`): substitute lb = 0
+    // for iteration sizing and emit an in-body mask `index >= origLb(captures)`.
     if (!loop.hasConstantLowerBound()) {
       if (!allOperandsAreLoopInvariantWrt(lbOperands, loop)) {
         LLVM_DEBUG(llvm::dbgs() << "REJECTED: lb operands are not loop-invariant w.r.t. this loop\n\n");
@@ -993,12 +1001,53 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
       lbMaskInfo.needed = true;
       lbMaskInfo.origMap = lbMap;
       lbMaskInfo.origOperands.assign(lbOperands.begin(), lbOperands.end());
-      // Substitute lb = 0 for the iteration-domain construction below.
       lbMap = AffineMap::get(/*dimCount=*/0, /*symCount=*/0,
                               rewriter.getAffineConstantExpr(0),
                               rewriter.getContext());
       lbOperands.clear();
       LLVM_DEBUG(llvm::dbgs() << "Captured non-constant lb for mask emission\n");
+    }
+
+    // Non-constant upper bound (e.g. `for j = 0 to i+1`): if any of the ub
+    // operands is an IV of an enclosing affine.for, replace it with that
+    // outer loop's (ub - 1) so the resulting size becomes outer-scope-
+    // dominating. This is necessary for the outer loop to later wrap this
+    // inner linalg.generic. Emit a body mask `index < origUb(captures)` so
+    // the iterations we'd otherwise execute past the original ub are gated.
+    if (!loop.hasConstantUpperBound() &&
+        allOperandsAreLoopInvariantWrt(ubOperands, loop)) {
+      // Check whether any operand is an IV of an enclosing affine.for.
+      bool anyOuterIv = false;
+      SmallVector<Value> maxUbOperands;
+      maxUbOperands.reserve(ubOperands.size());
+      for (Value op : ubOperands) {
+        if (auto blockArg = dyn_cast<BlockArgument>(op)) {
+          Operation *parentOp = blockArg.getOwner()->getParentOp();
+          if (auto outerFor = dyn_cast<affine::AffineForOp>(parentOp)) {
+            // Build (outerFor.ub - 1) at the same site this loop currently is.
+            OpBuilder::InsertionGuard g(rewriter);
+            rewriter.setInsertionPoint(loop);
+            Value outerUb = rewriter.create<affine::AffineApplyOp>(
+                loop.getLoc(), outerFor.getUpperBoundMap(),
+                SmallVector<Value>(outerFor.getUpperBoundOperands()));
+            Value c1 = rewriter.create<arith::ConstantIndexOp>(loop.getLoc(), 1);
+            Value outerUbMinus1 = rewriter.create<arith::SubIOp>(
+                loop.getLoc(), outerUb, c1);
+            maxUbOperands.push_back(outerUbMinus1);
+            anyOuterIv = true;
+            continue;
+          }
+        }
+        maxUbOperands.push_back(op);
+      }
+      if (anyOuterIv) {
+        ubMaskInfo.needed = true;
+        ubMaskInfo.origMap = ubMap;
+        ubMaskInfo.origOperands.assign(ubOperands.begin(), ubOperands.end());
+        // Use max-substituted operands for iteration-domain sizing.
+        ubOperands = std::move(maxUbOperands);
+        LLVM_DEBUG(llvm::dbgs() << "Captured non-constant ub for mask emission (max-substituted)\n");
+      }
     }
 
     LLVM_DEBUG(llvm::dbgs() << "Loop bounds:\n");
@@ -1351,7 +1400,13 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
         map.map(arg, arg2);
       }
       for (auto &op : genBlock.without_terminator()) {
-        rewriter.clone(op, map);
+        Operation *cloned = rewriter.clone(op, map);
+        // The outer loop being raised prepends one new iter dim (index 0).
+        // Shift any cloned linalg.index dim numbers by 1 so they keep
+        // referring to the inner iter they referenced before extension.
+        if (auto idxOp = dyn_cast<linalg::IndexOp>(cloned)) {
+          idxOp.setDim(idxOp.getDim() + 1);
+        }
       }
       for (auto op : term->getOperands()) {
         toreturn.push_back(map.lookupOrDefault(op));
@@ -1368,17 +1423,28 @@ struct AffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
     rewriter.eraseOp(blk->getTerminator());
     rewriter.setInsertionPointToEnd(blk);
 
-    // Group A — emit in-body mask when the loop had a non-constant lb
-    // (and later: ub). Gate each store-derived yield by `linalg.index >=
-    // origLb(captures)`; fall back to the corresponding output block
-    // arg when inactive.
-    if (lbMaskInfo.needed) {
-      Value idx = rewriter.create<linalg::IndexOp>(loop.getLoc(),
-                                                   /*dim=*/0);
-      Value lbVal = rewriter.create<affine::AffineApplyOp>(
-          loop.getLoc(), lbMaskInfo.origMap, lbMaskInfo.origOperands);
-      Value active = rewriter.create<arith::CmpIOp>(
-          loop.getLoc(), arith::CmpIPredicate::sge, idx, lbVal);
+    // Group A — emit in-body mask when the loop had a non-constant lb and/or
+    // ub. Gate each store-derived yield by the combined condition; fall back
+    // to the corresponding output block arg when inactive.
+    if (lbMaskInfo.needed || ubMaskInfo.needed) {
+      Value idx = rewriter.create<linalg::IndexOp>(loop.getLoc(), /*dim=*/0);
+      Value active;
+      if (lbMaskInfo.needed) {
+        Value lbVal = rewriter.create<affine::AffineApplyOp>(
+            loop.getLoc(), lbMaskInfo.origMap, lbMaskInfo.origOperands);
+        Value lbOk = rewriter.create<arith::CmpIOp>(
+            loop.getLoc(), arith::CmpIPredicate::sge, idx, lbVal);
+        active = lbOk;
+      }
+      if (ubMaskInfo.needed) {
+        Value ubVal = rewriter.create<affine::AffineApplyOp>(
+            loop.getLoc(), ubMaskInfo.origMap, ubMaskInfo.origOperands);
+        Value ubOk = rewriter.create<arith::CmpIOp>(
+            loop.getLoc(), arith::CmpIPredicate::slt, idx, ubVal);
+        active = active
+                     ? rewriter.create<arith::AndIOp>(loop.getLoc(), active, ubOk).getResult()
+                     : ubOk;
+      }
 
       // The last `stores.size()` entries of `toreturn` correspond to the
       // store-derived yields; the last `stores.size()` block args of `blk`
