@@ -1,73 +1,81 @@
 # PolyBench end-to-end correctness — current status
 
-Last run: 2026-05-14. Pipeline = `cgeist` → `polygeist-opt --remove-iter-args --affine-parallelize --raise-affine-to-linalg-pipeline --lower-polygeist-submap [--linalg-debufferize]` → `mlir-opt` (standard MLIR lowering) → `mlir-translate` → `clang` → run + diff against pure-`clang` reference. Dataset: `MINI_DATASET`.
+Last run: 2026-05-14. Pipeline = `cgeist` → `polygeist-opt --remove-iter-args --affine-parallelize --raise-affine-to-linalg-pipeline --lower-polygeist-submap [--linalg-debufferize]` → `mlir-opt` (standard MLIR lowering, with `--expand-strided-metadata`, `--lower-affine`, `--empty-tensor-to-alloc-tensor` on the debuf path) → `mlir-translate` → `clang` → run + diff against pure-`clang` reference. Dataset: `MINI_DATASET`.
 
-## Raise-only path (15 / 17 PASS)
+## Lowering smoke test (lower-polygeist-submap → mlir-opt to LLVM dialect)
 
-| Kernel | Result | Notes |
-|---|---|---|
-| gemm | PASS | bit-exact |
-| syr2k | PASS | |
-| syrk | PASS | |
-| gesummv | PASS | |
-| gemver | PASS | |
-| bicg | PASS | |
-| atax | PASS | |
-| mvt | PASS | |
-| 2mm | PASS | |
-| 3mm | PASS | |
-| jacobi-1d | PASS | |
-| jacobi-2d | PASS | |
-| floyd-warshall | PASS | |
-| deriche | PASS | requires `--convert-math-to-llvm` |
-| nussinov | PASS | |
-| heat-3d | **FAIL_DIFF** | numerical bug — stencil compose loses something |
-| correlation | **FAIL_DIFF** | numerical bug — likely similar shape issue |
+**26 / 30 kernels lower clean.** Up from 17 / 30 before broadcast support.
 
-## Raise + debuferize path (12 / 17 PASS)
+Remaining 4:
+- `adi` (10 ops): stencil shape rejected by Compose's iter-dim-coverage check (all operands drop the reduction dim).
+- `seidel-2d` (9 ops): same.
+- `durbin` (2 ops): reverse-index access `-d0 + s0 - 1`. Needs negative-stride subview support.
+- `ludcmp` (1 op): similar to durbin.
 
-Same kernels as above, plus `--linalg-debufferize` in the polygeist-opt pipeline.
+## Raise-only e2e (25 / 26 PASS)
 
-| Kernel | Result | Notes |
-|---|---|---|
-| gemm, syr2k, syrk, gesummv, gemver, bicg, atax, mvt, 2mm, 3mm, floyd-warshall, nussinov | PASS | |
-| jacobi-1d | bufferize-back FAIL | `affine.for` with tensor iter_args isn't handled by `one-shot-bufferize` |
-| jacobi-2d | bufferize-back FAIL | same |
-| heat-3d | bufferize-back FAIL | same |
-| deriche | bufferize-back FAIL | same / related |
-| correlation | bufferize-back FAIL | same / related |
+| Kernel | Result |
+|---|---|
+| gemm, syr2k, syrk, gesummv, gemver, symm, trmm | PASS |
+| bicg, atax, mvt, 2mm, 3mm, doitgen | PASS |
+| cholesky, gramschmidt, lu, trisolv | PASS |
+| heat-3d, jacobi-1d, jacobi-2d, fdtd-2d | PASS |
+| floyd-warshall, deriche, nussinov, covariance | PASS |
+| **correlation** | **FAIL_DIFF** — raise-side bug (diagonal accumulation; the kernel sets `corr[i][i]=1.0` only once but our lowered linalg.generic accumulates the dot product over the diagonal too, producing `corr[i][i]=2.0`). Independent of the lowering pass — needs a fix in the raise pass to mask the diagonal. |
+
+## Raise + debufferize e2e (24 / 26 PASS)
+
+Same 24 pass through debuferize as well.
+
+Two fail:
+- `correlation` — same diagonal bug as raise-only.
+- `covariance` — new debuf-path failure: `LinalgDebufferize` produces a `linalg.generic` with mixed tensor/memref operands. Probably interaction with the new broadcast lowering. Needs separate investigation.
+
+## What changed today
+
+1. **Broadcast-shape lowering in `ComposeSubmapIntoLinalgGeneric`.** Extended the
+   per-base-dim decomposition to handle pure `SymbolExpr` and pure `ConstantExpr`
+   results — these become rank-reducing offsets in the emitted `memref.subview`.
+   The consumer linalg.generic's indexing_map for that operand drops the
+   corresponding view-dim(s). Unlocks covariance, durbin, cholesky, gramschmidt,
+   lu, ludcmp, trisolv, symm, doitgen, trmm in the smoke test.
+
+2. **Subview-for-offsets instead of compose-into-linalg.** When ANY operand
+   of a linalg has a non-zero offset (shifted stencil access, fixed-index
+   capture), emit a `memref.subview` for that operand AND for all other
+   operands so iter-dim bounds stay consistent. Composes only the
+   permutation part of the original submap map into the linalg's
+   indexing_map. Fixes heat-3d numerical bug.
+
+3. **`--expand-strided-metadata`** before standard lowering. Required to
+   handle the strided memref results from `memref.subview` in the
+   final-to-llvm stage.
+
+4. **`--lower-affine` + `--empty-tensor-to-alloc-tensor`** before
+   `--one-shot-bufferize` on the debuf path. Lifts `affine.for` with
+   tensor iter_args to `scf.for` (which one-shot-bufferize handles) and
+   converts `tensor.empty` from privatization to `bufferization.alloc_tensor`.
 
 ## Running
 
 - Single kernel: `scripts/correctness/run_kernel_e2e.sh <kernel_dir> <short_name> [--debuf]`
-- All 17: `scripts/correctness/run_all_e2e.sh [--debuf]`
-- Smoke-only (no run, just lower-to-LLVM-dialect): `scripts/correctness/lower_smoke_test.sh`
+- All 26: `scripts/correctness/run_all_e2e.sh [--debuf]`
+- Smoke-only: `scripts/correctness/lower_smoke_test.sh`
 
-The per-kernel wrapper is generated automatically from the C source by
-`scripts/correctness/gen_wrapper.py`.
+## Known remaining bugs / next investigations
 
-## Known issues / next investigations
+1. *correlation FAIL_DIFF*: raise pass accumulates dot product over the
+   diagonal (which the C source sets to 1.0 explicitly and skips in its
+   off-diagonal computation). Needs a mask in the produced linalg.generic.
+   *Diagonal = 2.0 instead of 1.0.*
 
-1. *heat-3d FAIL_DIFF (numerical)*: the stencil composition produces an
-   IR that compiles and runs but gives different values from the C
-   reference. The C reference happens to preserve initial values for
-   the linear-in-(i+j+k) field (Laplacian = 0), while our lowered
-   version produces non-trivial values. The bug is likely in either
-   the raise pass's handling of shifted stencil submaps, or in my
-   `ComposeSubmapIntoLinalgGeneric` composing `d+const` shifts in a way
-   that doesn't agree with what `convert-linalg-to-loops` expects.
+2. *covariance debuf-path FAIL*: debuferize produces a linalg.generic with
+   mixed tensor and memref operands.
 
-2. *correlation FAIL_DIFF (numerical)*: similar — has shifted/sliced
-   submaps that lower but produce wrong numerics. Needs the same
-   investigation.
+3. *adi / seidel-2d lowering*: Compose's iter-dim-coverage check
+   correctly rejects (all operands drop the reduction dim). Real fix
+   needs raise to encode the iter-dim bound explicitly (or a different
+   representation).
 
-3. *5 kernels fail debuferize-path bufferize-back*: `affine.for` with
-   tensor iter_args (produced by the debuferize pass) isn't lowered
-   correctly by `one-shot-bufferize`. Either need to convert these
-   `affine.for` to `scf.for` (which one-shot-bufferize handles) before
-   bufferize, or extend the bufferize-back step.
-
-4. *13 / 30 PolyBench kernels still don't lower at all* (broadcasts,
-   stencil rejections, chained submaps — see
-   `notes/polygeist_raise_to_linalg/` and `raise_correctness_testing.md`
-   memory). Each adds another set of e2e candidates once handled.
+4. *durbin / ludcmp lowering*: reverse-indexed access (`-d0 + s0 - 1`).
+   Needs negative-stride subview support in the lowering.
