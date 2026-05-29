@@ -62,6 +62,56 @@ Two fail:
 - All 26: `scripts/correctness/run_all_e2e.sh [--debuf]`
 - Smoke-only: `scripts/correctness/lower_smoke_test.sh`
 
+## Jetson warmed raised runtime vs PolyBenchGPU CUDA
+
+Run date: 2026-05-28. Device: Jetson Orin. Datatype: double. Dimensions:
+`N/NI/NJ/NK/NL/NM=512`.
+
+Method: 50 in-process iterations, discard first 10 warmups, then report a 10%
+trimmed mean over the remaining 40 samples. Raised path uses
+`POLYGEIST_RT_TIMING=1` runtime-shim device timings summed per benchmark
+iteration. PolyBenchGPU path uses CUDA events around the handwritten kernel
+sequence. This avoids counting cuBLAS first-use cold-start as steady-state
+runtime.
+
+| Kernel | Raised rt-gpu ms | PolyBenchGPU CUDA ms | Result |
+|---|---:|---:|---|
+| gemm | 3.809 | 7.697 | raised 2.02x faster |
+| 2mm | 7.640 | 11.200 | raised 1.47x faster |
+| 3mm | 11.451 | 10.501 | PolyBenchGPU 1.09x faster |
+| gesummv | 0.069 | 0.341 | raised 4.93x faster |
+| gemver | 0.188 | 0.313 | raised 1.66x faster |
+
+Previous cold outer-harness comparison, kept for context only:
+
+| Kernel | Raised outer s | Raised rt-gpu s | PolyBenchGPU CUDA s |
+|---|---:|---:|---:|
+| gemm | 0.103025 | 0.033008 | 0.008401 |
+| 2mm | 0.112321 | 0.036679 | 0.034213 |
+| 3mm | 0.117875 | 0.040612 | 0.038889 |
+| gesummv | 0.097759 | 0.032294 | 0.019568 |
+| gemver | 0.100270 | 0.032451 | 0.031399 |
+
+## Darknet im2col + GEMM fused path
+
+Run date: 2026-05-29. Device: Jetson Orin. Fixture:
+`third_party/cnn-extracted/darknet_im2col_gemm.c`, `MINI_DATASET`
+(`IC=3`, `OC=4`, `H=W=8`, `K=3`, `stride=1`, `pad=1`).
+
+Progress saved:
+- Raise pipeline lifts the guarded im2col workspace fill and the following
+  `i,k,j` GEMM.
+- Kernel matcher recognizes the 3-step composition
+  `zero(output) + guarded im2col(workspace) + SGEMM(output)` and emits one
+  `kernel.launch @cudnnConvolutionFwd_im2col_gemm`.
+- ABI lowering maps that launch to
+  `polygeist_cudnn_conv2d_im2col_gemm_f32`, avoiding materialized im2col.
+- Host CPU shim matches the original C reference exactly.
+- Jetson run exits 0. Output compare: 256 printed values, max absolute diff
+  `0.0001`, no values above `1.1e-3`.
+- First-call Jetson timing from the fused path:
+  `POLYGEIST_RT_TIMING op=cudnnConv2d_im2col_gemm m=4 n=64 k=27 host_ms=26.356336 device_ms=15.357408`.
+
 ## Known remaining bugs / next investigations
 
 1. *correlation FAIL_DIFF*: raise pass accumulates dot product over the
