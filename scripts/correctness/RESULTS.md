@@ -112,6 +112,55 @@ Progress saved:
 - First-call Jetson timing from the fused path:
   `POLYGEIST_RT_TIMING op=cudnnConv2d_im2col_gemm m=4 n=64 k=27 host_ms=26.356336 device_ms=15.357408`.
 
+## llama2.c RMSNorm and softmax lowering
+
+Run date: 2026-05-29. Device: Jetson Orin. Fixtures:
+`third_party/cnn-extracted/llama2_rmsnorm.c` and
+`third_party/cnn-extracted/llama2_softmax.c`, `N=128`.
+
+Progress saved:
+- Matcher emits `kernel.launch @rmsnorm_f32(%x, %weight, %out)` for the
+  two-stage llama2 RMSNorm pattern.
+- Matcher emits `kernel.launch @cudnnSoftmaxForward(%x)` for the three-stage
+  max / exp+sum / divide softmax pattern.
+- ABI lowering maps RMSNorm to `polygeist_rmsnorm_f32` and softmax to
+  `polygeist_cudnn_softmax_forward_f32`.
+- Host CPU-stub correctness is byte-exact for both fixtures versus plain
+  `gcc -O2` reference output.
+- Jetson RMSNorm exits 0 through cuDNN backend graph
+  `CUDNN_RMS_NORM` / `CUDNN_NORM_FWD_INFERENCE` and is byte-exact versus the
+  aarch64 reference. Timing:
+  `POLYGEIST_RT_TIMING op=cudnnRmsNormForward m=1 n=128 k=0 host_ms=180.841512 device_ms=8.238944`.
+- Jetson softmax exits 0 using `cudnnSoftmaxForward`. Output compare:
+  128 values, max absolute diff `1.0e-8`, no values above `1.0e-6`.
+  Timing: `POLYGEIST_RT_TIMING op=cudnnSoftmaxForward m=1 n=128 k=0 host_ms=121.393178 device_ms=120.336578`.
+- Caveat: the installed target has cuDNN's C backend graph API rather than the
+  C++ `cudnn_frontend` wrapper headers, so the runtime builds the graph with
+  `cudnnBackend*` descriptors directly. The graph path currently uses real
+  CUDA device allocations/copies; mapped host pointers hit
+  `CUDNN_STATUS_BAD_PARAM_MISALIGNED_POINTER` at execution time.
+
+## llama2 tiny forward tensor path
+
+Run date: 2026-05-30. Fixture:
+`third_party/cnn-extracted/llama2_tiny_forward.c`, `N=16`, `H=16`.
+
+Progress saved:
+- Debufferized tensor path now matches RMSNorm as
+  `kernel.launch @rmsnorm_f32_tensor`, zero-init as `@memset_zero_1D_f32`,
+  and GEMV as `@cublasSgemv`.
+- ABI lowering emits three runtime calls:
+  `polygeist_rmsnorm_f32`, `polygeist_cublas_memset_zero_1d_f32`, and
+  `polygeist_cublas_sgemv`.
+- Host CPU-stub output is byte-exact versus the native C reference.
+- Jetson output matches native within `2.0e-08` max absolute difference.
+  Runtime timing confirmed RMSNorm + SGEMV dispatch:
+  `POLYGEIST_RT_TIMING op=host_rmsnorm_f32 ...` and
+  `POLYGEIST_RT_TIMING op=cublasSgemv m=16 n=16 ...`.
+- Caveat: the whole-forward softmax tail remains residual tensor code in this
+  fixture because the max phase is still an `affine.for` + `scf.if`, not the
+  clean 3-step softmax linalg pattern.
+
 ## Known remaining bugs / next investigations
 
 1. *correlation FAIL_DIFF*: raise pass accumulates dot product over the
