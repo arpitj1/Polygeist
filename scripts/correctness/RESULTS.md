@@ -161,6 +161,26 @@ Progress saved:
   fixture because the max phase is still an `affine.for` + `scf.if`, not the
   clean 3-step softmax linalg pattern.
 
+## llama2 larger forward tensor path
+
+Run date: 2026-05-31. Fixture:
+`third_party/cnn-extracted/llama2_forward_bench.c`, default `N=1024`, `H=4096`;
+Jetson run used `REPEAT=5` in one process.
+
+Progress saved:
+- The default tensor path matches all four intended launches:
+  `@rmsnorm_f32_tensor`, `@memset_zero_1D_f32`, `@cublasSgemv`, and
+  `@cudnnSoftmaxForward_tensor`.
+- Host CPU-stub output is byte-exact versus native C for the printed sample
+  and checksum.
+- Jetson output matches native with max absolute diff `2.56e-06` over the
+  printed 32 values plus softmax checksum.
+- Unlike the tiny `N=16` fixture, RMSNorm uses the cuDNN backend graph at
+  `N=1024` instead of falling back to the host path.
+- Warm Jetson device timings after first-use setup:
+  `cudnnRmsNormForward` ~`0.09-0.10 ms`, `cublasSgemv` ~`0.53-0.55 ms`,
+  `cudnnSoftmaxForward` ~`0.028-0.030 ms`.
+
 ## Known remaining bugs / next investigations
 
 1. *correlation FAIL_DIFF*: raise pass accumulates dot product over the
