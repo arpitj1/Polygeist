@@ -294,6 +294,93 @@ lm_head_projection            2      0.0246       0.0251     0.0156      0.0163
 - Approximate `token_embedding + one layer + final_rmsnorm + lm_head` total:
   host median `0.9548 ms`, device median `0.6623 ms`.
 
+Extended Llama exact ggml comparison, 2026-06-01:
+- Added ggml helper: `scripts/correctness/llama_extended_ggml_bench.cpp`.
+- It mirrors `third_party/cnn-extracted/llama2_extended_forward_bench.c`:
+  same f32 initialization, token `7`, position `16`, split Q/K RoPE,
+  KV-cache update/read, attention softmax, FFN, final RMSNorm, and lm-head.
+- This is an exact comparison for the full extended fixture, not for a real
+  quantized GGUF/TinyLlama model.
+- Native C printed logits/checksum:
+  `0.55907595, 1.64667618, 1.63461435, -1.32392168, -3.59120536,
+  1.10384059, 1.95925152, 0.28402749, 3.77530479`.
+- ggml CUDA cold one-iteration log:
+  `/tmp/llama_extended_ggml_cuda_exact.local.log`.
+- ggml CUDA warmed log:
+  `/tmp/llama_extended_ggml_cuda_warm.local.log`.
+- ggml CUDA output max absolute diff vs native printed values:
+  `8.46e-06`.
+- ggml CUDA cold one-iteration host time: `72.725 ms`.
+- ggml CUDA warm per-token/iteration host median: `0.098 ms`
+  (`5` warmup iterations, `30` measured iterations).
+- Existing raised fixture first iteration from
+  `/tmp/llama2_extended_jetson_20260531_214105/timing.tsv`:
+  host sum `269.634 ms`, device sum `101.091 ms`.
+- Warm raised fixture from the same run remains host median `0.719 ms`,
+  device median `0.447 ms` after discarding the first 5 iterations.
+- Warm host-visible comparison for the exact fixture:
+  raised `0.719 ms` vs ggml CUDA `0.098 ms`, so raised is about `7.3x`
+  slower on this tiny one-token fixture.
+
+Llama 2 7B-size one-layer comparison, 2026-06-01:
+- Same `extended_forward` fixture and same f32 math, but built with
+  `MODEL_DIM=4096`, `FFN_DIM=11008`, `VOCAB=32000`, `SEQ_LEN=2048`,
+  `NUM_HEADS=32`.
+- This is *one token through one transformer layer plus final RMSNorm/lm_head*,
+  not the full 32-layer Llama 2 model and not a quantized GGUF path.
+- Raised build:
+  `scripts/correctness/polygeist_build.sh --target=jetson
+  --function=kernel_llama2_extended_forward
+  third_party/cnn-extracted/llama2_extended_forward_bench.c
+  -DMODEL_DIM=4096 -DFFN_DIM=11008 -DVOCAB=32000 -DSEQ_LEN=2048
+  -DNUM_HEADS=32 -DREPEAT=8 -DPRINT_ELEMS=4`.
+- Raised log/artifacts:
+  `/tmp/llama2_7b_one_layer_20260531_232838/timing.tsv` and
+  `/tmp/llama2_7b_one_layer_20260531_232838/out.txt`.
+- Raised warm timing after discarding the first 2 of 8 repeats:
+  host median `13.480 ms`, device median `12.273 ms`.
+- Raised cold first iteration:
+  host `447.317 ms`, device `111.999 ms` (first-use CUDA/cuDNN/cuBLAS setup).
+- ggml helper built with the same dimensions and run as
+  `./llama_extended_ggml_bench_7b --warmup 2 --iters 6`.
+- ggml log: `/tmp/llama2_7b_one_layer_20260531_232838/ggml.log`.
+- ggml CUDA warm host median: `9.638 ms`.
+- Warm host-visible comparison at 7B-size one-layer:
+  raised `13.480 ms` vs ggml CUDA `9.638 ms`, so ggml is about `1.40x`
+  faster. The gap is much smaller than the toy-size fixture because real
+  GEMV work dominates fixed launch/setup overhead.
+- Printed correctness check:
+  first four logits match raised vs ggml to printed precision
+  (`-66.40298462`, `12.98781776`, `34.77934265`, `55.23807144`).
+  The checksum differs by about `0.002` over `32000` logits.
+- Largest raised warm device-time contributors after discarding the first two
+  repeats:
+  `cudaCopy_f32` cache materialization for `8388608` floats: `3.809 ms`;
+  `lm_head` SGEMV (`32000x4096`): `3.163 ms`;
+  FFN down/up/gate SGEMVs: about `1.09-1.13 ms` each.
+
+Stencil Conv2D sweep, 2026-06-01:
+- Fixture source: `third_party/cnn-extracted/stencil_conv2d_3x3.c`.
+- Bake path: `PYTHON=/usr/bin/python3 scripts/correctness/bake_stencil_conv2d_mlir.sh`.
+- Lowering target: `cudnnConvolution2D_9tap` through the runtime cuDNN
+  3x3 convolution shim. Jetson timing used `REPEAT=20` and discards the first
+  5 iterations.
+- All eight 3x3 stencil forms raised and matched. The `box5x5` fixture raises
+  to linalg but is intentionally unmatched because the current matcher only has
+  the 3x3/9-tap template.
+
+```
+kernel              launch host_med_ms host_mean_ms dev_med_ms dev_mean_ms checksum
+box3x3                  1      0.4255       0.4264     0.0059      0.0059 -0.41999996
+gaussian3x3             1      0.4182       0.4203     0.0059      0.0059 -0.42000079
+sobel_x3x3              1      0.4247       0.4267     0.0059      0.0060 -5.88010693
+sobel_y3x3              1      0.4227       0.4224     0.0059      0.0059  4.11986542
+laplacian4_3x3          1      0.1663       0.1671     0.0417      0.0420  0.00000403
+laplacian8_3x3          1      0.1572       0.1604     0.0366      0.0383 -0.00000316
+sharpen3x3              1      0.1601       0.1618     0.0392      0.0410 -0.42001334
+emboss3x3               1      0.1625       0.1632     0.0399      0.0416 -1.74002242
+```
+
 ## Known remaining bugs / next investigations
 
 1. *correlation FAIL_DIFF*: raise pass accumulates dot product over the
