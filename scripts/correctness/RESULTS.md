@@ -362,12 +362,34 @@ Llama 2 7B-size one-layer comparison, 2026-06-01:
 Stencil Conv2D sweep, 2026-06-01:
 - Fixture source: `third_party/cnn-extracted/stencil_conv2d_3x3.c`.
 - Bake path: `PYTHON=/usr/bin/python3 scripts/correctness/bake_stencil_conv2d_mlir.sh`.
-- Lowering target: `cudnnConvolution2D_9tap` through the runtime cuDNN
-  3x3 convolution shim. Jetson timing used `REPEAT=20` and discards the first
-  5 iterations.
-- All eight 3x3 stencil forms raised and matched. The `box5x5` fixture raises
-  to linalg but is intentionally unmatched because the current matcher only has
-  the 3x3/9-tap template.
+- Lowering targets: `cudnnConvolution2D_9tap` for 3x3 stencils and
+  `cudnnConvolution2D_25tap` for the 5x5 box filter. Jetson 3x3 timing used
+  `REPEAT=20` and discards the first 5 iterations.
+- All eight 3x3 stencil forms raised and matched. The `box5x5` fixture now
+  also raises and matches to one `cudnnConvolution2D_25tap_f32` launch.
+- 5x5 validation:
+  host exact-output diff vs native C passed for all `64x64` output elements;
+  checksum `-0.02520496`; Jetson aarch64 binary cross-build succeeded at
+  `/tmp/stencil_5x5_jetson_20260601_133108/box5x5`. Device execution was not
+  rerun in this session because the usual Jetson SSH aliases were unreachable.
+- Expanded 5x5 validation:
+  added Gaussian, Sobel X/Y, Laplacian, sharpen, and emboss 5x5 fixtures.
+  All seven 5x5 fixtures raise to one loop-free linalg.generic and match one
+  `cudnnConvolution2D_25tap_f32` launch. Host checksum comparison against
+  native C passed for each. Jetson aarch64 cross-build passed for each into
+  `/tmp/stencil_5x5_jetson_suite_20260601_140627`; silicon execution is still
+  blocked by SSH access to the Jetson.
+
+```
+kernel           match                    host checksum
+box5x5           cudnnConvolution2D_25tap -0.02520496
+gaussian5x5      cudnnConvolution2D_25tap -0.48238885
+sobel_x5x5       cudnnConvolution2D_25tap 225.14816284
+sobel_y5x5       cudnnConvolution2D_25tap 12.86839104
+laplacian5x5     cudnnConvolution2D_25tap -17.16963387
+sharpen5x5       cudnnConvolution2D_25tap -2.78251743
+emboss5x5        cudnnConvolution2D_25tap 18.00988960
+```
 
 ```
 kernel              launch host_med_ms host_mean_ms dev_med_ms dev_mean_ms checksum
