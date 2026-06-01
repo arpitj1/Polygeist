@@ -181,6 +181,119 @@ Progress saved:
   `cudnnRmsNormForward` ~`0.09-0.10 ms`, `cublasSgemv` ~`0.53-0.55 ms`,
   `cudnnSoftmaxForward` ~`0.028-0.030 ms`.
 
+## llama.cpp suffix comparison
+
+Run date: 2026-05-31. Device: Jetson Orin. Goal: apples-to-apples comparison
+against the part of llama.cpp/ggml that corresponds to the C suffix we can
+raise today.
+
+Workload compared:
+`RMSNorm + scale + output projection GEMV -> logits`
+with `N=2048`, `H=32000`, 5 warmup iterations, 30 measured iterations.
+This is not a full `llama-bench` comparison. `llama-bench` measures whole
+`llama_decode` to logits, while our C fixture only covers the final suffix.
+Sampling softmax is also outside the `llama_decode` path, so the clean
+comparison stops at logits rather than probabilities.
+
+Artifacts:
+- ggml helper: `scripts/correctness/llama_suffix_ggml_bench.cpp`.
+- ggml Jetson log:
+  `/tmp/llama_suffix_ggml_logits_n2048_h32000.log`.
+- raised C Jetson log:
+  `/tmp/llama2_forward_bench_raised_n2048_h32000.log`.
+
+Measured warm numbers:
+- ggml/llama.cpp CUDA logits suffix: median `1.494 ms`, trimmed mean
+  `1.494 ms`.
+- Raised pipeline logits suffix, device-only: median `2.135 ms`, trimmed mean
+  `2.134 ms`.
+- Raised pipeline logits suffix, host-visible: median `186.1 ms`, trimmed mean
+  `186.1 ms`.
+- Device-only ratio: raised pipeline is about `1.43x` slower than ggml for
+  this suffix.
+
+Correctness sanity:
+- ggml logits sample:
+  `0.06607100, 0.33554888, -0.36427033, 0.09345388`.
+- Native C logits for the same initialization match to expected FP32
+  tolerance.
+- Full raised softmax checksum for the fixture is approximately `1.000001`.
+
+Slowness diagnosis:
+- Host-visible time is dominated by RMSNorm setup. `cudnnRmsNormForward`
+  warm host median is `184.0 ms`, while its device median is only `0.093 ms`.
+  The runtime currently rebuilds cuDNN backend descriptors, engine config,
+  execution plan, variant pack, device allocations, input copies, output copy,
+  and descriptor cleanup on every call.
+- Device time is mostly the output projection. Raised `cublasSgemv` warm
+  device median is `2.038 ms`, which is already slower than ggml's entire
+  RMSNorm+projection logits suffix at `1.494 ms`.
+- ggml benefits from graph scheduling/CUDA graph reuse and a matvec-oriented
+  layout/kernel path. Our lowering emits separate runtime calls
+  (`RMSNorm`, zero-fill, SGEMV) and synchronizes each shim for timing/current
+  ABI behavior.
+
+Next runtime fixes, in priority order:
+1. Cache cuDNN RMSNorm descriptors/plans/buffers, or replace RMSNorm with a
+   simple custom fused CUDA kernel for the Llama vector case.
+2. Replace decode-style output `cublasSgemv` with a row-major custom matvec
+   kernel or a cuBLASLt matmul path tuned for `H x N` by `N`.
+3. Drop explicit logits zero-fill when GEMV uses `beta=0`.
+4. Avoid per-shim synchronization; run the suffix asynchronously on one stream
+   or capture it as a graph.
+
+RMSNorm cache update, 2026-06-01:
+- Runtime change: `polygeist_rmsnorm_f32` now caches cuDNN backend descriptors,
+  execution plan, variant pack, workspace, and device buffers by `N` instead of
+  rebuilding them on every call.
+- Rebuilt and reran the same `N=2048`, `H=32000`, `REPEAT=35` Jetson fixture.
+  Cached log: `/tmp/llama2_forward_bench_cached_rms_n2048_h32000.log`.
+- First call still pays cuDNN plan creation (`cudnnRmsNormForward` host
+  `214.7 ms`), but warm calls reuse the plan.
+- Warm RMSNorm host median dropped from `184.0 ms` to `0.052 ms`.
+- Warm raised logits suffix host median dropped from `186.1 ms` to `1.652 ms`.
+- Warm raised logits suffix device median in this rerun was `1.614 ms`.
+- With the cached path, the remaining gap to ggml's `1.494 ms` logits suffix
+  is primarily the output projection path (`cublasSgemv` median `1.588 ms` in
+  this rerun) plus separate shim overhead, not cuDNN RMSNorm plan setup.
+
+Standalone Llama op sweep, 2026-06-01:
+- Fixture source: `third_party/cnn-extracted/llama_forward_ops.c`.
+- Timing harness: `third_party/cnn-extracted/llama_forward_ops_harness.c`.
+- Build path: `scripts/correctness/polygeist_build.sh --target=jetson`
+  with one raised function per binary.
+- Run setup: Jetson Orin, `REPEAT=50`, discard first 5 iterations, report warm
+  median/mean. Shapes are `MODEL_DIM=64`, `FFN_DIM=128`, `SEQ_LEN=32`,
+  `VOCAB=256`.
+- All 17 matched standalone ops ran successfully. The interleaved RoPE and
+  branchy mask variants still do not raise; the split/branchless variants do.
+
+```
+op                       launch host_med_ms host_mean_ms dev_med_ms dev_mean_ms
+token_embedding               1      0.0319       0.0322     0.0243      0.0245
+attention_rmsnorm             1      0.0652       0.0657     0.0471      0.0461
+qkv_projection                6      0.0687       0.0686     0.0446      0.0445
+rope_split                    4      0.1486       0.1494     0.0969      0.0973
+kv_cache_rw                   4      0.1244       0.1252     0.0908      0.0925
+attention_scores              2      0.0215       0.0221     0.0135      0.0141
+attention_mask_select         1      0.0422       0.0422     0.0275      0.0275
+attention_softmax             2      0.0552       0.0534     0.0384      0.0363
+attention_output              2      0.0208       0.0210     0.0128      0.0131
+output_projection             2      0.0252       0.0257     0.0157      0.0164
+residual_add                  1      0.0440       0.0393     0.0361      0.0308
+ffn_rmsnorm                   1      0.0652       0.0644     0.0465      0.0445
+gate_up_projection            4      0.0445       0.0451     0.0286      0.0286
+swiglu                        1      0.0376       0.0376     0.0248      0.0248
+down_projection               2      0.0252       0.0259     0.0156      0.0161
+final_rmsnorm                 1      0.0662       0.0654     0.0475      0.0455
+lm_head_projection            2      0.0246       0.0251     0.0156      0.0163
+```
+
+- Approximate standalone-composed one-layer total: host median `0.8322 ms`,
+  device median `0.5750 ms`.
+- Approximate `token_embedding + one layer + final_rmsnorm + lm_head` total:
+  host median `0.9548 ms`, device median `0.6623 ms`.
+
 ## Known remaining bugs / next investigations
 
 1. *correlation FAIL_DIFF*: raise pass accumulates dot product over the
