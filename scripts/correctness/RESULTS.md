@@ -362,42 +362,41 @@ Llama 2 7B-size one-layer comparison, 2026-06-01:
 Stencil Conv2D sweep, 2026-06-01:
 - Fixture source: `third_party/cnn-extracted/stencil_conv2d_3x3.c`.
 - Bake path: `PYTHON=/usr/bin/python3 scripts/correctness/bake_stencil_conv2d_mlir.sh`.
-- Lowering targets: `cudnnConvolution2D_9tap` for 3x3 stencils,
-  `cudnnConvolution2D_25tap` for 5x5 stencils, and the generalized
-  packed-weight `cudnnConvolution2D_ntap` path for wider odd-square stencils.
+- Default lowering target after debufferization: generalized packed-weight
+  `cudnnConvolution2D_ntap_tensor` for all odd-square 2D stencil convs
+  currently in this fixture set (`3x3`, `5x5`, `7x7`). Legacy memref
+  `9tap`/`25tap` entries remain available for explicit no-debufferize runs.
   Jetson timing used `REPEAT=20` and discards the first 5 iterations.
-- All eight 3x3 stencil forms raised and matched. The `box5x5` fixture now
-  also raises and matches to one `cudnnConvolution2D_25tap_f32` launch.
-- 5x5 validation:
-  host exact-output diff vs native C passed for all `64x64` output elements;
-  checksum `-0.02520496`; Jetson aarch64 binary cross-build succeeded at
-  `/tmp/stencil_5x5_jetson_20260601_133108/box5x5`.
-- Expanded 5x5 validation:
-  added Gaussian, Sobel X/Y, Laplacian, sharpen, and emboss 5x5 fixtures.
-  All seven 5x5 fixtures raise to one loop-free linalg.generic and match one
-  `cudnnConvolution2D_25tap_f32` launch. Host checksum comparison against
-  native C passed for each. Jetson aarch64 cross-build passed for each into
-  `/tmp/stencil_5x5_jetson_suite_20260601_140627`.
+- Current tensor validation:
+  all eight 3x3 forms, all seven 5x5 forms, and the `box7x7` proof fixture
+  raise to one loop-free tensor-form linalg.generic and match one
+  `cudnnConvolution2D_ntap_tensor` launch.
+- Historical 5x5 validation:
+  the earlier memref `25tap` route passed host exact-output comparison and
+  Jetson cross-build for the seven 5x5 fixtures. Those artifacts remain useful
+  for no-debufferize testing, but the default bake summary now reports the
+  tensor ntap route from `_debuf.mlir`.
 - Jetson execution path:
   this VM -> `arjaiswal@10.176.207.72` -> `nvidia@192.168.55.1`
   using `sshpass -p nvidia`. Full timing log:
   `/tmp/stencil_5x5_jetson_suite_20260601_1700_full.log`.
-- Generalized ntap validation:
-  added `box7x7`, which raises to one loop-free linalg.generic, matches one
-  `cudnnConvolution2D_ntap_f32` launch, packs `W[49]`, and lowers through the
-  fixed `(A, C, W, K)` runtime ABI. Host checksum comparison against native C
-  passed for the `64x64` fixture. Jetson run used the same two-hop path above.
+- Tensor ntap validation:
+  all 16 stencil Conv2D fixtures now match from `_debuf.mlir` to one
+  `cudnnConvolution2D_ntap_tensor` launch. `box7x7` packs `W[49]` and lowers
+  through the fixed `(A, C, W, K)` runtime ABI. Host checksum comparison
+  against native C passed for `3x3`, `5x5`, and `7x7` spot checks. Jetson
+  tensor-path run used the same two-hop path above.
 
 ```
 kernel           match                    host checksum
-box5x5           cudnnConvolution2D_25tap -0.02520496
-gaussian5x5      cudnnConvolution2D_25tap -0.48238885
-sobel_x5x5       cudnnConvolution2D_25tap 225.14816284
-sobel_y5x5       cudnnConvolution2D_25tap 12.86839104
-laplacian5x5     cudnnConvolution2D_25tap -17.16963387
-sharpen5x5       cudnnConvolution2D_25tap -2.78251743
-emboss5x5        cudnnConvolution2D_25tap 18.00988960
-box7x7           cudnnConvolution2D_ntap   0.03551064
+box5x5           cudnnConvolution2D_ntap_tensor -0.02520496
+gaussian5x5      cudnnConvolution2D_ntap_tensor -0.48238885
+sobel_x5x5       cudnnConvolution2D_ntap_tensor 225.14816284
+sobel_y5x5       cudnnConvolution2D_ntap_tensor 12.86839104
+laplacian5x5     cudnnConvolution2D_ntap_tensor -17.16963387
+sharpen5x5       cudnnConvolution2D_ntap_tensor -2.78251743
+emboss5x5        cudnnConvolution2D_ntap_tensor 18.00988960
+box7x7           cudnnConvolution2D_ntap_tensor  0.03551064
 ```
 
 ```
@@ -417,7 +416,7 @@ sobel_y5x5              1      0.1564       0.1578     0.0369      0.0384  12.86
 laplacian5x5            1      0.1703       0.1766     0.0416      0.0425 -17.16963387
 sharpen5x5              1      0.1594       0.1592     0.0399      0.0393 -2.78251743
 emboss5x5               1      0.1620       0.1620     0.0403      0.0400  18.00988960
-box7x7                  1      0.4297       0.4344     0.0107      0.0107   0.03551028
+box7x7                  1      0.4332       0.4315     0.0109      0.0109   0.03551028
 ```
 
 ## Known remaining bugs / next investigations
