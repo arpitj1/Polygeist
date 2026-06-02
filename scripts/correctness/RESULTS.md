@@ -363,22 +363,24 @@ Stencil Conv2D sweep, 2026-06-01:
 - Fixture source: `third_party/cnn-extracted/stencil_conv2d_3x3.c`.
 - Bake path: `PYTHON=/usr/bin/python3 scripts/correctness/bake_stencil_conv2d_mlir.sh`.
 - Lowering targets: `cudnnConvolution2D_9tap` for 3x3 stencils and
-  `cudnnConvolution2D_25tap` for the 5x5 box filter. Jetson 3x3 timing used
+  `cudnnConvolution2D_25tap` for 5x5 stencils. Jetson timing used
   `REPEAT=20` and discards the first 5 iterations.
 - All eight 3x3 stencil forms raised and matched. The `box5x5` fixture now
   also raises and matches to one `cudnnConvolution2D_25tap_f32` launch.
 - 5x5 validation:
   host exact-output diff vs native C passed for all `64x64` output elements;
   checksum `-0.02520496`; Jetson aarch64 binary cross-build succeeded at
-  `/tmp/stencil_5x5_jetson_20260601_133108/box5x5`. Device execution was not
-  rerun in this session because the usual Jetson SSH aliases were unreachable.
+  `/tmp/stencil_5x5_jetson_20260601_133108/box5x5`.
 - Expanded 5x5 validation:
   added Gaussian, Sobel X/Y, Laplacian, sharpen, and emboss 5x5 fixtures.
   All seven 5x5 fixtures raise to one loop-free linalg.generic and match one
   `cudnnConvolution2D_25tap_f32` launch. Host checksum comparison against
   native C passed for each. Jetson aarch64 cross-build passed for each into
-  `/tmp/stencil_5x5_jetson_suite_20260601_140627`; silicon execution is still
-  blocked by SSH access to the Jetson.
+  `/tmp/stencil_5x5_jetson_suite_20260601_140627`.
+- Jetson execution path:
+  this VM -> `arjaiswal@10.176.207.72` -> `nvidia@192.168.55.1`
+  using `sshpass -p nvidia`. Full timing log:
+  `/tmp/stencil_5x5_jetson_suite_20260601_1700_full.log`.
 
 ```
 kernel           match                    host checksum
@@ -401,6 +403,13 @@ laplacian4_3x3          1      0.1663       0.1671     0.0417      0.0420  0.000
 laplacian8_3x3          1      0.1572       0.1604     0.0366      0.0383 -0.00000316
 sharpen3x3              1      0.1601       0.1618     0.0392      0.0410 -0.42001334
 emboss3x3               1      0.1625       0.1632     0.0399      0.0416 -1.74002242
+box5x5                  1      0.4168       0.4208     0.0082      0.0084 -0.02519889
+gaussian5x5             1      0.1603       0.1618     0.0399      0.0408 -0.48238647
+sobel_x5x5              1      0.1552       0.1575     0.0400      0.0397 225.14791870
+sobel_y5x5              1      0.1564       0.1578     0.0369      0.0384  12.86828041
+laplacian5x5            1      0.1703       0.1766     0.0416      0.0425 -17.16963387
+sharpen5x5              1      0.1594       0.1592     0.0399      0.0393 -2.78251743
+emboss5x5               1      0.1620       0.1620     0.0403      0.0400  18.00988960
 ```
 
 ## Known remaining bugs / next investigations
