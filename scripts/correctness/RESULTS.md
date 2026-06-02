@@ -362,9 +362,10 @@ Llama 2 7B-size one-layer comparison, 2026-06-01:
 Stencil Conv2D sweep, 2026-06-01:
 - Fixture source: `third_party/cnn-extracted/stencil_conv2d_3x3.c`.
 - Bake path: `PYTHON=/usr/bin/python3 scripts/correctness/bake_stencil_conv2d_mlir.sh`.
-- Lowering targets: `cudnnConvolution2D_9tap` for 3x3 stencils and
-  `cudnnConvolution2D_25tap` for 5x5 stencils. Jetson timing used
-  `REPEAT=20` and discards the first 5 iterations.
+- Lowering targets: `cudnnConvolution2D_9tap` for 3x3 stencils,
+  `cudnnConvolution2D_25tap` for 5x5 stencils, and the generalized
+  packed-weight `cudnnConvolution2D_ntap` path for wider odd-square stencils.
+  Jetson timing used `REPEAT=20` and discards the first 5 iterations.
 - All eight 3x3 stencil forms raised and matched. The `box5x5` fixture now
   also raises and matches to one `cudnnConvolution2D_25tap_f32` launch.
 - 5x5 validation:
@@ -381,6 +382,11 @@ Stencil Conv2D sweep, 2026-06-01:
   this VM -> `arjaiswal@10.176.207.72` -> `nvidia@192.168.55.1`
   using `sshpass -p nvidia`. Full timing log:
   `/tmp/stencil_5x5_jetson_suite_20260601_1700_full.log`.
+- Generalized ntap validation:
+  added `box7x7`, which raises to one loop-free linalg.generic, matches one
+  `cudnnConvolution2D_ntap_f32` launch, packs `W[49]`, and lowers through the
+  fixed `(A, C, W, K)` runtime ABI. Host checksum comparison against native C
+  passed for the `64x64` fixture. Jetson run used the same two-hop path above.
 
 ```
 kernel           match                    host checksum
@@ -391,6 +397,7 @@ sobel_y5x5       cudnnConvolution2D_25tap 12.86839104
 laplacian5x5     cudnnConvolution2D_25tap -17.16963387
 sharpen5x5       cudnnConvolution2D_25tap -2.78251743
 emboss5x5        cudnnConvolution2D_25tap 18.00988960
+box7x7           cudnnConvolution2D_ntap   0.03551064
 ```
 
 ```
@@ -410,6 +417,7 @@ sobel_y5x5              1      0.1564       0.1578     0.0369      0.0384  12.86
 laplacian5x5            1      0.1703       0.1766     0.0416      0.0425 -17.16963387
 sharpen5x5              1      0.1594       0.1592     0.0399      0.0393 -2.78251743
 emboss5x5               1      0.1620       0.1620     0.0403      0.0400  18.00988960
+box7x7                  1      0.4297       0.4344     0.0107      0.0107   0.03551028
 ```
 
 ## Known remaining bugs / next investigations
