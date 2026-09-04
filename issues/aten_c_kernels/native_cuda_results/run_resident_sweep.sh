@@ -24,7 +24,7 @@ for k in $built; do
   if [ "${SKIP_DONE:-1}" = "1" ] && grep -q "^$k," "$DONE_CSV" 2>/dev/null; then
     echo "[sweep] ($i/$n) $k: already measured, skip"; continue
   fi
-  ST_TRACKER_JETSON_HOST=192.168.58.1 POLYGEIST_SILICON_PROFILE=pva-general \
+  ST_TRACKER_JETSON_HOST=192.168.57.1 POLYGEIST_SILICON_PROFILE=pva-general \
     POLYGEIST_JETSON_LD_LIBRARY_PATH="/home/nvidia/polygeist_cuda_libs:/usr/local/cuda/lib64:/usr/local/cuda/targets/aarch64-linux/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:/home/nvidia/venv/lib/python3.12/site-packages/nvidia/cudnn/lib" \
     POLYGEIST_JETSON_RUNS=3 timeout 200 scripts/correctness/run_jetson.sh \
     --exe "$OUT/$k/$k" "res_$k" > "$OUT/$k.run.log" 2>&1
