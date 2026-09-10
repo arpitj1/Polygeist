@@ -1,0 +1,55 @@
+{
+  "fixture_count": 23,
+  "git_head": "2cb29dafdeda1866dce860e3bda35b5314c9fd96",
+  "host": "arpitj-dev",
+  "load_average_at_campaign_start": [
+    14.052734375,
+    14.10546875,
+    14.22607421875
+  ],
+  "logical_cpu_count": 24,
+  "manifest": "issues/equality_saturation_eval/llama_whole_compile_egglog_20260910/manifest.json",
+  "manifest_sha256": "36aaddfe4ce5a9319e91d45a2a764a97e65fbaa5b92beaf3bdf20ec74e69c574",
+  "matcher_ast_node_ceiling": 32,
+  "matcher_iteration_limit": 8,
+  "modes": [
+    "egglog"
+  ],
+  "per_candidate_wall_timeout_seconds": null,
+  "platform": "Linux-5.15.0-151-generic-x86_64-with-glibc2.35",
+  "repetitions_per_mode": 5,
+  "runner_sha256": "aca8439183276a2d144647aeaf972c235f40f493aedc27596a5a67b2159ee493",
+  "schema": 1,
+  "scope": "C source through linked AArch64 executable",
+  "semantic_fallback_disabled": true,
+  "sequential": true,
+  "suite": "llama",
+  "target": "Jetson AArch64 cross-compile on x86 host; executable not run",
+  "timeout_seconds_per_build": 900,
+  "tools": {
+    "build_script": {
+      "path": "/home/arjaiswal/Polygeist-polybench-compile-study/scripts/correctness/polygeist_build.sh",
+      "sha256": "e1f2f3dd199aa5d7db026f3dfacc911352e20dde5d961e3596c0457bab20ffb5"
+    },
+    "cgeist": {
+      "path": "/home/arjaiswal/Polygeist/build/bin/cgeist",
+      "sha256": "1c585c2e7c02616079e792c9771a95030259120ce479eae6b85c43ccd7c39e25"
+    },
+    "clang": {
+      "path": "/home/arjaiswal/Polygeist/llvm-project/build/bin/clang",
+      "sha256": "edc952a05b52ea0d5844b4d5e86df31a6372bdb99ae7e6b9f9f43a6bdd7ccd9e"
+    },
+    "mlir_opt": {
+      "path": "/home/arjaiswal/Polygeist/llvm-project/build/bin/mlir-opt",
+      "sha256": "5d324a26e89d7ecc611991b85ef5cc94c2b2c5be1ea19f44ca99c64b841d3574"
+    },
+    "mlir_translate": {
+      "path": "/home/arjaiswal/Polygeist/llvm-project/build/bin/mlir-translate",
+      "sha256": "e9829fb2190eaa5af19f2c9176916e786c58a4480f1439c7770078cb6ddf69a6"
+    },
+    "polygeist_opt": {
+      "path": "/home/arjaiswal/Polygeist/build/bin/polygeist-opt",
+      "sha256": "f3f37dfd8744a0aa910609ce89a7cfc60b41d839c96e0acb2c07504dce57d680"
+    }
+  }
+}

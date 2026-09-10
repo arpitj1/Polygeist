@@ -1,0 +1,19 @@
+{
+  "attempted_builds": 115,
+  "failed_builds": 30,
+  "failed_fixtures": 6,
+  "fixture_count": 23,
+  "fully_successful_fixtures": 17,
+  "mode": "egglog",
+  "partially_successful_fixtures": 0,
+  "repetitions_per_fixture": 5,
+  "schema": 1,
+  "successful_builds": 85,
+  "successful_matcher_median_ms": 338.30948919057846,
+  "successful_peak_rss_median_kib": 157800.0,
+  "successful_wall_median_seconds": 7.71,
+  "successful_wall_q1_seconds": 7.54,
+  "successful_wall_q3_seconds": 7.87,
+  "suite": "Llama",
+  "timeout_builds": 0
+}

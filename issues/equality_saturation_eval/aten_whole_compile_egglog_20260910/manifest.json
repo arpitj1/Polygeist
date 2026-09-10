@@ -1,0 +1,2992 @@
+[
+  {
+    "kernel": "aten_abs",
+    "source": "issues/aten_c_kernels/aten_abs.c",
+    "sha256": "8d30cbf392c3fa1712493857d1f02d6963982a225f192f5685d474431d2a4192"
+  },
+  {
+    "kernel": "aten_acos",
+    "source": "issues/aten_c_kernels/aten_acos.c",
+    "sha256": "2637ae06ce13baf4915193568e0dce93a73035fefa59d624341b48f8b04237a1"
+  },
+  {
+    "kernel": "aten_acosh",
+    "source": "issues/aten_c_kernels/aten_acosh.c",
+    "sha256": "f0c05c5ec3b89b85e355aa927e2b5937ed7a651edbc57b57d1afc984d1ac3550"
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool2d",
+    "source": "issues/aten_c_kernels/aten_adaptive_avg_pool2d.c",
+    "sha256": "7bcbb2c295b024c1c1f47373423e2b3753f2226d64bf90b2e71ea131a12fc3c5"
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_avg_pool2d_backward_cpu.c",
+    "sha256": "1df513377b2ea18f6ceddad54f386894527401b76a181c0685fa748a4b82e5ac"
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool2d_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_avg_pool2d_cpu.c",
+    "sha256": "19d122eb8a6e8f8ee6217ecc2501096ee4b2c3e0017e3a8b4520f91f0fc4bd21"
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool3d",
+    "source": "issues/aten_c_kernels/aten_adaptive_avg_pool3d.c",
+    "sha256": "715c9a3fc0c5cb214aead945fdf88e56faea940353368535278b6afc3579f8b2"
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_avg_pool3d_backward_cpu.c",
+    "sha256": "fab4214d128c6dfe68987b60cd6d9d0e680d2ef9ad14882ef042e8552a55f9ab"
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool3d_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_avg_pool3d_cpu.c",
+    "sha256": "f0a530c0a34065aa571e68fb7770d6c4acbdab97dcc701ecf7aba15043e04639"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool1d_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool1d_cpu.c",
+    "sha256": "aeb61b44a8a9789528d3e672e871a73af10eca645a1d3a2a7e309ae28dfe9a5b"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool2d_backward_cpu.c",
+    "sha256": "aa55668b4398cd6630038b88f01e798a655db64cf652f6c61718ae40b1f0f6f8"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool2d_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool2d_cpu.c",
+    "sha256": "761b36e4c6be659e5e248984fbd4ffe5fe269f6dfdc65f847db9ec1301985b9f"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool3d_backward_cpu.c",
+    "sha256": "3f34166c3c56b67088896b229a57a99652f444adf74956b37ce24fd4678f2917"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool3d_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool3d_cpu.c",
+    "sha256": "5232799d48959871d9be1467dd57720565abd1b1d88c82258c2a6941fc009c60"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool3d_legacy_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool3d_legacy_backward_cpu.c",
+    "sha256": "979812d22e54bb452d7d412173e3563498d1e2cd2b009051165ca3abd3ff5cd9"
+  },
+  {
+    "kernel": "aten_adaptive_max_pool3d_legacy_cpu",
+    "source": "issues/aten_c_kernels/aten_adaptive_max_pool3d_legacy_cpu.c",
+    "sha256": "e622ad26bb6ba58e7ecbb5100adb4ce3722a96598970145e6fb2ac3388943d16"
+  },
+  {
+    "kernel": "aten_add",
+    "source": "issues/aten_c_kernels/aten_add.c",
+    "sha256": "f916bcb1045593a24439b46b7514e6a475d351ee142c619a17c4e20d07e09be7"
+  },
+  {
+    "kernel": "aten_add_clamp",
+    "source": "issues/aten_c_kernels/aten_add_clamp.c",
+    "sha256": "9133a516df91d3c1b44ca38a13eb12d4be997ccfd53166b4159d7069aef0238c"
+  },
+  {
+    "kernel": "aten_addcdiv",
+    "source": "issues/aten_c_kernels/aten_addcdiv.c",
+    "sha256": "4392049c3fb0cb208240f7f2c462ed344c0808d5fc2ff114c4a1eb998fb9a3b6"
+  },
+  {
+    "kernel": "aten_addcmul",
+    "source": "issues/aten_c_kernels/aten_addcmul.c",
+    "sha256": "c54aa0903015b7ecc68c3c32640d66032c8722a221b5f8b5e58221838c9b24c0"
+  },
+  {
+    "kernel": "aten_addmm",
+    "source": "issues/aten_c_kernels/aten_addmm.c",
+    "sha256": "e1b995d81996ed42495e0ef68f00224ea5dcaacf1d82f483d2a29dcfbc790eb1"
+  },
+  {
+    "kernel": "aten_addr_elementwise",
+    "source": "issues/aten_c_kernels/aten_addr_elementwise.c",
+    "sha256": "1708ecaa95e5b0140f8abb95934cccd685ef4d9d0677a64de1a3df5b71697060"
+  },
+  {
+    "kernel": "aten_airy_ai",
+    "source": "issues/aten_c_kernels/aten_airy_ai.c",
+    "sha256": "efb6fcd029aed328e0bdc32522cac796bbd3bfe552cdaf6d9b06bd187355dfe9"
+  },
+  {
+    "kernel": "aten_allany_dims_cpu",
+    "source": "issues/aten_c_kernels/aten_allany_dims_cpu.c",
+    "sha256": "550b9fb6f472d58dc8088fb32cec06cbafed2ca93375f74b4c9d47fdbf0e8b3a"
+  },
+  {
+    "kernel": "aten_aminmax_allreduce_cpu",
+    "source": "issues/aten_c_kernels/aten_aminmax_allreduce_cpu.c",
+    "sha256": "b24822c8ebf5e8a65fa718dbeb2ea70e21907370bf08bf1ef39ea32a7a0d746e"
+  },
+  {
+    "kernel": "aten_aminmax_cpu",
+    "source": "issues/aten_c_kernels/aten_aminmax_cpu.c",
+    "sha256": "460585f3362ec2e5e5b5476d3ff427dd46576850680e63c0bd64563c43b6f32d"
+  },
+  {
+    "kernel": "aten_amp_update_scale_cpu",
+    "source": "issues/aten_c_kernels/aten_amp_update_scale_cpu.c",
+    "sha256": "9edd288d6d4068bed2352d2373a0164c6843a8b21e08e4b11668ea0b9de780b1"
+  },
+  {
+    "kernel": "aten_and_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_and_reduce_cpu.c",
+    "sha256": "b451f0b5adcb639d82ce53bc6b8fac0364c3124ed3e181d11823f9fb55aa2cf3"
+  },
+  {
+    "kernel": "aten_angle_complex_scalarized",
+    "source": "issues/aten_c_kernels/aten_angle_complex_scalarized.c",
+    "sha256": "5f56382f7e4271fb9f145a60283b1a96fe0ff7aedf9ef756763679b367e634ab"
+  },
+  {
+    "kernel": "aten_angle_real",
+    "source": "issues/aten_c_kernels/aten_angle_real.c",
+    "sha256": "8b7d42cc3bc7f1b68fb829fc5151e6cec04dce219f94b7954da9820cee240ac1"
+  },
+  {
+    "kernel": "aten_arange_cpu",
+    "source": "issues/aten_c_kernels/aten_arange_cpu.c",
+    "sha256": "1964f1ebf0ec727b207edb439fe15f6c1c0dd9736c2eb47e1e55121aed6774e9"
+  },
+  {
+    "kernel": "aten_argmax_cpu",
+    "source": "issues/aten_c_kernels/aten_argmax_cpu.c",
+    "sha256": "84559d9192a8c6bcda1349eb6aec4b6029e57a78996330d42f03f628a79c5a60"
+  },
+  {
+    "kernel": "aten_argmin_cpu",
+    "source": "issues/aten_c_kernels/aten_argmin_cpu.c",
+    "sha256": "a07be0a9598837647bf80dbe68ae5848a460c46e92e4b5884b3e5c23cfa51829"
+  },
+  {
+    "kernel": "aten_as_complex_cpu",
+    "source": "issues/aten_c_kernels/aten_as_complex_cpu.c",
+    "sha256": "0106e9eb002e234bc41fd1ad61973a6f257dbeb0207638e7c60210be63d9766c"
+  },
+  {
+    "kernel": "aten_asin",
+    "source": "issues/aten_c_kernels/aten_asin.c",
+    "sha256": "8f8da931437745303ce0b2a802b9eefbd6662adb4ec8a567f76f395714e8ba8b"
+  },
+  {
+    "kernel": "aten_asinh",
+    "source": "issues/aten_c_kernels/aten_asinh.c",
+    "sha256": "fb25772ac9222b82e819706107a35a8a6248e858dd4b0dceed67b7e2fb9dbffe"
+  },
+  {
+    "kernel": "aten_atan",
+    "source": "issues/aten_c_kernels/aten_atan.c",
+    "sha256": "12492c7b56e8d53a160975a39d7202dd68dffceb051bb845ac7d3502fa8f6bba"
+  },
+  {
+    "kernel": "aten_atan2",
+    "source": "issues/aten_c_kernels/aten_atan2.c",
+    "sha256": "2984e6383713e767525b6ffb100e9148915503c6328d033965b1ec9782d1ca71"
+  },
+  {
+    "kernel": "aten_atanh",
+    "source": "issues/aten_c_kernels/aten_atanh.c",
+    "sha256": "2917d7f25747c5401235d0971ffd927cd722251ec5d856b77e8a809b6eeaafb6"
+  },
+  {
+    "kernel": "aten_avg_pool2d",
+    "source": "issues/aten_c_kernels/aten_avg_pool2d.c",
+    "sha256": "0243fcae848eaf6f6f663ebb8d687c0611cc27f61ddd7c5b671512d7d9826785"
+  },
+  {
+    "kernel": "aten_avg_pool2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_avg_pool2d_backward_cpu.c",
+    "sha256": "25c2c9bec5f5bf3d7b0e0b05d7424777f28624fc88bc4b900818618a6728a247"
+  },
+  {
+    "kernel": "aten_avg_pool2d_cpu",
+    "source": "issues/aten_c_kernels/aten_avg_pool2d_cpu.c",
+    "sha256": "88fd947d8cf5aa3a16571cbe774cee1a4ad467563d97d356b7bf045786285602"
+  },
+  {
+    "kernel": "aten_avg_pool3d",
+    "source": "issues/aten_c_kernels/aten_avg_pool3d.c",
+    "sha256": "ac41fdd1882e1eb9e6506009e2eb6cdec9414ebd9ee72c7a358db1a7d0fea92e"
+  },
+  {
+    "kernel": "aten_avg_pool3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_avg_pool3d_backward_cpu.c",
+    "sha256": "2cbfbdd941b1f9c8380277f18d0d909c2b7a10d57109f75802b95cf9daf3505f"
+  },
+  {
+    "kernel": "aten_avg_pool3d_cpu",
+    "source": "issues/aten_c_kernels/aten_avg_pool3d_cpu.c",
+    "sha256": "ef5ca3b14f88c87c040cdf04b2e84867fba588361f858e2a754b6a59e2498c2b"
+  },
+  {
+    "kernel": "aten_batch_norm",
+    "source": "issues/aten_c_kernels/aten_batch_norm.c",
+    "sha256": "f8aa85dab866e2d78affe0957f555babc9e9bf68d3ddd32f6dfec6cb16bfc232"
+  },
+  {
+    "kernel": "aten_batch_norm_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_batch_norm_backward_cpu.c",
+    "sha256": "8b435e6a584efbec2f6fd6e0ce5a2e7b9604c72cd19880b57f8df443f55e95ab"
+  },
+  {
+    "kernel": "aten_batch_norm_backward_template_cpu",
+    "source": "issues/aten_c_kernels/aten_batch_norm_backward_template_cpu.c",
+    "sha256": "7df8e4e695d186b187fb9b8b73596b96dbb6883bd907708d9f6763627dfbfe12"
+  },
+  {
+    "kernel": "aten_batch_norm_collect_stats_cpu",
+    "source": "issues/aten_c_kernels/aten_batch_norm_collect_stats_cpu.c",
+    "sha256": "713099ccdbf531a1e0435214914c24eb2cfee622b32576f06445340a0add7a01"
+  },
+  {
+    "kernel": "aten_batch_norm_cpu_entry",
+    "source": "issues/aten_c_kernels/aten_batch_norm_cpu_entry.c",
+    "sha256": "4bf2cc10cdee0d5913b26adbf4c49c0891ca5d2cf9843a04bef3be05e779c855"
+  },
+  {
+    "kernel": "aten_batch_norm_stats_cpu",
+    "source": "issues/aten_c_kernels/aten_batch_norm_stats_cpu.c",
+    "sha256": "3fcdd6cc01997b721a0bc5c61cdb7624fb7578802b6a8f9a538d80e5ece4afad"
+  },
+  {
+    "kernel": "aten_batch_norm_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_batch_norm_transform_cpu.c",
+    "sha256": "4cb56aff0b1e53f5a33960064a29820496b53543c8a9ea0ff05ef4dbed41bbf6"
+  },
+  {
+    "kernel": "aten_bernoulli_scalar_cpu",
+    "source": "issues/aten_c_kernels/aten_bernoulli_scalar_cpu.c",
+    "sha256": "80c3a134325e134dc413ac6c5f7dded9d562f1ce547e6dbcb4a6fce17800e566"
+  },
+  {
+    "kernel": "aten_bernoulli_tensor_cpu",
+    "source": "issues/aten_c_kernels/aten_bernoulli_tensor_cpu.c",
+    "sha256": "11c886977c8dceae0299f3676f9e940eb49ff67bd870fadce40e93c047b2e48c"
+  },
+  {
+    "kernel": "aten_bessel_j0",
+    "source": "issues/aten_c_kernels/aten_bessel_j0.c",
+    "sha256": "6f13dfc6f443516346d72feac1bbd93c32065d1be4cba26ff286316d16f0a1a8"
+  },
+  {
+    "kernel": "aten_bessel_j1",
+    "source": "issues/aten_c_kernels/aten_bessel_j1.c",
+    "sha256": "b97a8336911d06019aa0bfbeceac04a7dc55cf1e4d321088e877a4e86d08d3b8"
+  },
+  {
+    "kernel": "aten_bessel_y0",
+    "source": "issues/aten_c_kernels/aten_bessel_y0.c",
+    "sha256": "9845d3e420cd704909e797569a80f327ee2e57d69c629937a5b20e52e0309db4"
+  },
+  {
+    "kernel": "aten_bessel_y1",
+    "source": "issues/aten_c_kernels/aten_bessel_y1.c",
+    "sha256": "4a7ba2843d3c8b88faa203910864da76880661a75f8fab38b69bc47b3005e687"
+  },
+  {
+    "kernel": "aten_bf16_dot_cpu",
+    "source": "issues/aten_c_kernels/aten_bf16_dot_cpu.c",
+    "sha256": "d7d685fa590937b0e9fb63637e9d0accb3305fcdf73d44509d1c79f36d639afc"
+  },
+  {
+    "kernel": "aten_bf16_gemv_trans_cpu",
+    "source": "issues/aten_c_kernels/aten_bf16_gemv_trans_cpu.c",
+    "sha256": "acb9260444f50513e4e2299a157c2685ddcac2d240c842e9c2a1ff5fa4b3da5f"
+  },
+  {
+    "kernel": "aten_bilinear_cpu",
+    "source": "issues/aten_c_kernels/aten_bilinear_cpu.c",
+    "sha256": "16b8af828128f027af1a5379eac3c572ad2cb19bc94aa7e39efbb61e2e7e09b0"
+  },
+  {
+    "kernel": "aten_binary_cross_entropy",
+    "source": "issues/aten_c_kernels/aten_binary_cross_entropy.c",
+    "sha256": "57d982483805b17cb891e14854a161c5ce6ff99530050fdbab6f1445880f9092"
+  },
+  {
+    "kernel": "aten_binary_search_strided_rightmost_cpu",
+    "source": "issues/aten_c_kernels/aten_binary_search_strided_rightmost_cpu.c",
+    "sha256": "07eb5c4055a610676d01366dacc2264d1207e0ce34e215a0f38c24c7cdae5529"
+  },
+  {
+    "kernel": "aten_bincount_cpu",
+    "source": "issues/aten_c_kernels/aten_bincount_cpu.c",
+    "sha256": "b5863466d841f632bc33f299e8ae32921d9f0bf34c77a8c13f14c402c4c5d952"
+  },
+  {
+    "kernel": "aten_binomial_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_binomial_transform_cpu.c",
+    "sha256": "bfb87ba2a036198ca588caa206cddbe796ed98011f76663c44530436ca3aef63"
+  },
+  {
+    "kernel": "aten_bitwise_and_i32",
+    "source": "issues/aten_c_kernels/aten_bitwise_and_i32.c",
+    "sha256": "84e6589d42a4295b41411ea745b214a3ce938b28c2f3ff9129f22f0247be9dda"
+  },
+  {
+    "kernel": "aten_bitwise_not_i32",
+    "source": "issues/aten_c_kernels/aten_bitwise_not_i32.c",
+    "sha256": "71433f8eaa0e9996168e91fdb0125ba6b8a4589910c5ffd43182708e468751c8"
+  },
+  {
+    "kernel": "aten_bitwise_or_i32",
+    "source": "issues/aten_c_kernels/aten_bitwise_or_i32.c",
+    "sha256": "9f54a394f631969a07d1dbc17aa4e70bc0f878517f6dc69f5bcc0a7942815c10"
+  },
+  {
+    "kernel": "aten_bitwise_xor_i32",
+    "source": "issues/aten_c_kernels/aten_bitwise_xor_i32.c",
+    "sha256": "79e2d14418042ec3cdfb79644a754b21504f4dfe2dfcd79bc07900386c754086"
+  },
+  {
+    "kernel": "aten_blas_axpy_cpu",
+    "source": "issues/aten_c_kernels/aten_blas_axpy_cpu.c",
+    "sha256": "5a197873d726623873ced93913f838c77432b5837f2dabb34e8960e5602802ba"
+  },
+  {
+    "kernel": "aten_blas_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_blas_copy_cpu.c",
+    "sha256": "fc007a37ec2b3c6f9adc409930bc22dc9cc448ad3b6bdc079690164603fc0e29"
+  },
+  {
+    "kernel": "aten_blas_dot_naive_cpu",
+    "source": "issues/aten_c_kernels/aten_blas_dot_naive_cpu.c",
+    "sha256": "68448d3b864a3bb6d3f5822e1d84d1acb54cbaf517095beb0a4cd5ff310f3337"
+  },
+  {
+    "kernel": "aten_blas_gemv_generic_cpu",
+    "source": "issues/aten_c_kernels/aten_blas_gemv_generic_cpu.c",
+    "sha256": "9c1e324a7d26317e8f44d2f49eaff4c40555363f323710f9d66629bc74797447"
+  },
+  {
+    "kernel": "aten_blas_scale_cpu",
+    "source": "issues/aten_c_kernels/aten_blas_scale_cpu.c",
+    "sha256": "fc90a70b101523401e8d19e34b0c4e7e9b85cd27c5b0b2f1c273ed4eec485503"
+  },
+  {
+    "kernel": "aten_blas_sum_cpu",
+    "source": "issues/aten_c_kernels/aten_blas_sum_cpu.c",
+    "sha256": "e19390414245f7f1f0a3a4afc7562dfffa8bf992ee571b0aa8e27b8826f6480d"
+  },
+  {
+    "kernel": "aten_block_diag_cpu",
+    "source": "issues/aten_c_kernels/aten_block_diag_cpu.c",
+    "sha256": "67b08d64764e7a726707431917b94cec8edfcd4593c5eda2faa39d563eb1ae52"
+  },
+  {
+    "kernel": "aten_bmm",
+    "source": "issues/aten_c_kernels/aten_bmm.c",
+    "sha256": "d4fc0344bd68ec53186b363afa6244d6ed95b626138d9df11d021d6317054050"
+  },
+  {
+    "kernel": "aten_cartesian_prod_cpu",
+    "source": "issues/aten_c_kernels/aten_cartesian_prod_cpu.c",
+    "sha256": "1368d46b5e549dd638f5b81b885a5765a7454d8719fdb121d2dec07c9864e6db"
+  },
+  {
+    "kernel": "aten_cat_serial_cpu",
+    "source": "issues/aten_c_kernels/aten_cat_serial_cpu.c",
+    "sha256": "840aff897b3e707057324284418bf2da12327f73f0a544bae045c523d32c30a6"
+  },
+  {
+    "kernel": "aten_cat_sparse_cpu",
+    "source": "issues/aten_c_kernels/aten_cat_sparse_cpu.c",
+    "sha256": "0733a20c588618c97a3eeeee5505d880aa85c225bc4421e9809bf58039d64b89"
+  },
+  {
+    "kernel": "aten_cauchy_cpu",
+    "source": "issues/aten_c_kernels/aten_cauchy_cpu.c",
+    "sha256": "1e5fb50404ace7efc6bf2ba027834ffe7b86c322a239e4ff59942baff2e1c84f"
+  },
+  {
+    "kernel": "aten_cdist_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_cdist_backward_cpu.c",
+    "sha256": "0d5732bb76427119876a78d6241bfeea61641405c4a4ed600889cecd6c05aa8f"
+  },
+  {
+    "kernel": "aten_cdist_cpu",
+    "source": "issues/aten_c_kernels/aten_cdist_cpu.c",
+    "sha256": "1e51b7a3bf7d3a1aba8b2b08cab1161e6f2bda7c19d959b0f1bad715fdcedbb8"
+  },
+  {
+    "kernel": "aten_ceil",
+    "source": "issues/aten_c_kernels/aten_ceil.c",
+    "sha256": "7aecc6069ad7310c47bc1317eeec7a1b825f7be62ce9311754fb31bad49aff74"
+  },
+  {
+    "kernel": "aten_channel_shuffle",
+    "source": "issues/aten_c_kernels/aten_channel_shuffle.c",
+    "sha256": "088f758a7d60c591a971421baf0091443d9a9453c6c4a994a57b1b716cef9755"
+  },
+  {
+    "kernel": "aten_channel_shuffle_cpu",
+    "source": "issues/aten_c_kernels/aten_channel_shuffle_cpu.c",
+    "sha256": "c0c5fbbd1a64f62ae1b9f9d13df8c7a99e3845f690b5951f73afb3f0eb7eab36"
+  },
+  {
+    "kernel": "aten_chebyshev_polynomial_t",
+    "source": "issues/aten_c_kernels/aten_chebyshev_polynomial_t.c",
+    "sha256": "579c50934f014a64012b8f643f0d812ed491186d5d837ee7b5e5667dc9aed24d"
+  },
+  {
+    "kernel": "aten_chebyshev_polynomial_u",
+    "source": "issues/aten_c_kernels/aten_chebyshev_polynomial_u.c",
+    "sha256": "293f8c5a60c07d50a94fd57d873a45fbd16b7f7024c1e7677802a2a6e5d96d65"
+  },
+  {
+    "kernel": "aten_chebyshev_polynomial_v",
+    "source": "issues/aten_c_kernels/aten_chebyshev_polynomial_v.c",
+    "sha256": "00413edd2b350f96dec1c8e34bc0a4d5cce57ed036744d56207f442aecdc69df"
+  },
+  {
+    "kernel": "aten_chebyshev_polynomial_w",
+    "source": "issues/aten_c_kernels/aten_chebyshev_polynomial_w.c",
+    "sha256": "070b01b4df109e1832729a99a1cbb6ae72defcbb25b33f68d91f92b6093dbadf"
+  },
+  {
+    "kernel": "aten_circular_pad_cpu",
+    "source": "issues/aten_c_kernels/aten_circular_pad_cpu.c",
+    "sha256": "bc1ad7146fb99307f2d5829e888fd0746c8342bbef166581f293011346390bc4"
+  },
+  {
+    "kernel": "aten_clamp",
+    "source": "issues/aten_c_kernels/aten_clamp.c",
+    "sha256": "3e48996b7a919c0e03832750527b9f02d5de9e7bd7b00c11de0d4b5a3fd0003d"
+  },
+  {
+    "kernel": "aten_clamp_cpu",
+    "source": "issues/aten_c_kernels/aten_clamp_cpu.c",
+    "sha256": "2c8d87e11ef547c8f07db85496f76fb4e7b193aab91fc94546db2bb06d35a27a"
+  },
+  {
+    "kernel": "aten_clamp_max_scalar_cpu",
+    "source": "issues/aten_c_kernels/aten_clamp_max_scalar_cpu.c",
+    "sha256": "6a556ccd59c955fff4a4566c797297a465526bf0c01f817eb423da7ca3d6a852"
+  },
+  {
+    "kernel": "aten_clamp_min_scalar_cpu",
+    "source": "issues/aten_c_kernels/aten_clamp_min_scalar_cpu.c",
+    "sha256": "f5ab4dde4fd7d96ef9cdc504df74fc95b779686ac872d40bd05046f795d4932b"
+  },
+  {
+    "kernel": "aten_clamp_scalar_cpu",
+    "source": "issues/aten_c_kernels/aten_clamp_scalar_cpu.c",
+    "sha256": "8b6e0e7adfe772f8c54e1fc09567b9ee062adeea7ac4f6b34a61b2b77d1bc6ac"
+  },
+  {
+    "kernel": "aten_coalesce_sparse_cpu",
+    "source": "issues/aten_c_kernels/aten_coalesce_sparse_cpu.c",
+    "sha256": "bc36b58f6be0ab31720fd5056e1ee8f324b8df82278eab3c95fec710d89aa34e"
+  },
+  {
+    "kernel": "aten_col2im_cpu",
+    "source": "issues/aten_c_kernels/aten_col2im_cpu.c",
+    "sha256": "efe8881e1d4f3ecc9cdc99d423625667a1047d34e24f63da6f8fe5f41f891ed0"
+  },
+  {
+    "kernel": "aten_combinations_cpu",
+    "source": "issues/aten_c_kernels/aten_combinations_cpu.c",
+    "sha256": "d75e13ac3b51282a49014103136deda02c5663354f09408d5f4c5a441a13c7c4"
+  },
+  {
+    "kernel": "aten_complex_scalarized",
+    "source": "issues/aten_c_kernels/aten_complex_scalarized.c",
+    "sha256": "30136eda51fcdb1194352c4b50c0c139085a5f5c92a0d35c1e27db61734ee340"
+  },
+  {
+    "kernel": "aten_compressed_block_convert_cpu",
+    "source": "issues/aten_c_kernels/aten_compressed_block_convert_cpu.c",
+    "sha256": "be7ca88266b6d994682debee3335f6222c2e3d188f2476948a21d92c0214597b"
+  },
+  {
+    "kernel": "aten_conj_complex_scalarized",
+    "source": "issues/aten_c_kernels/aten_conj_complex_scalarized.c",
+    "sha256": "42af791a210508f05f409a5f2908d4fab8f821c5798e9e3a268e82bbb34d3e95"
+  },
+  {
+    "kernel": "aten_constant_pad_nd_cpu",
+    "source": "issues/aten_c_kernels/aten_constant_pad_nd_cpu.c",
+    "sha256": "c396c8f185beb2bb5d9d373dd3e89a0bccd32123d3c650a2921528f1ac5a6813"
+  },
+  {
+    "kernel": "aten_conv1d",
+    "source": "issues/aten_c_kernels/aten_conv1d.c",
+    "sha256": "2d79dced3dcc9edcd81050e1aea8829fa1f12392fa2d257eea85d8899a9733cf"
+  },
+  {
+    "kernel": "aten_conv2d",
+    "source": "issues/aten_c_kernels/aten_conv2d.c",
+    "sha256": "a9bcc5d8353847acd00b1604d3859d7c36bf897170e3b821cb84c2091a9e468c"
+  },
+  {
+    "kernel": "aten_conv2d_columns_cpu",
+    "source": "issues/aten_c_kernels/aten_conv2d_columns_cpu.c",
+    "sha256": "769c673ca319c1601b44a0727be622f098218c26adf2f14ef5897e27dbd0b7c1"
+  },
+  {
+    "kernel": "aten_conv3d",
+    "source": "issues/aten_c_kernels/aten_conv3d.c",
+    "sha256": "51c27ba5f2d83ee059b78b390173d148f953a525dfb7215cb5365585d18ac183"
+  },
+  {
+    "kernel": "aten_conv3d_columns_cpu",
+    "source": "issues/aten_c_kernels/aten_conv3d_columns_cpu.c",
+    "sha256": "b453ffed1cfa39928d1c6fec5ee1093bad9f0e52de685198fde1f3d68dd69c65"
+  },
+  {
+    "kernel": "aten_conv_tbc_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_conv_tbc_backward_cpu.c",
+    "sha256": "c04190bdcb5439a20ede18891f635365275e57926aefada1c88493be829d563e"
+  },
+  {
+    "kernel": "aten_conv_tbc_cpu",
+    "source": "issues/aten_c_kernels/aten_conv_tbc_cpu.c",
+    "sha256": "2f52a292ed8689a46de22bf0e25f03cd87d685df31f5555b35db4de2c7a0244f"
+  },
+  {
+    "kernel": "aten_conv_transpose2d",
+    "source": "issues/aten_c_kernels/aten_conv_transpose2d.c",
+    "sha256": "381360aab63b7264002957582b44173c0b06cd8ec212abb841984d21ccfbb944"
+  },
+  {
+    "kernel": "aten_conv_transpose3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_conv_transpose3d_backward_cpu.c",
+    "sha256": "d616422ce83fab53ff69979fc6dcce4fd2245288c0c11ecb7434644b961c0166"
+  },
+  {
+    "kernel": "aten_conv_transpose3d_cpu",
+    "source": "issues/aten_c_kernels/aten_conv_transpose3d_cpu.c",
+    "sha256": "e004773f43a3f05bc89b1620e79a2dc227541a68722e9495e9873dd6e53476c7"
+  },
+  {
+    "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+    "source": "issues/aten_c_kernels/aten_conv_transpose3d_grad_weight_cpu.c",
+    "sha256": "83018236b1a956e9a412c99ac17f4ea3b54bed73148d814c9e165d28026a3241"
+  },
+  {
+    "kernel": "aten_convert_coo_to_csr_cpu",
+    "source": "issues/aten_c_kernels/aten_convert_coo_to_csr_cpu.c",
+    "sha256": "7b44238873139fa17d0e03340ca4dbe9f7652479b2807c884543f1ecd5a7109f"
+  },
+  {
+    "kernel": "aten_convert_csr_to_coo_cpu",
+    "source": "issues/aten_c_kernels/aten_convert_csr_to_coo_cpu.c",
+    "sha256": "5b933dcf59b6b1d5e3e04f3b83f6e76709edeb845d1d45f1620d3adc65d6f4f6"
+  },
+  {
+    "kernel": "aten_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_copy_cpu.c",
+    "sha256": "4d55abf1bde19677f1ef315d6a77d2c59028b4346f9f2d7a681cb528e8aa1195"
+  },
+  {
+    "kernel": "aten_copy_tensor_array_cpu",
+    "source": "issues/aten_c_kernels/aten_copy_tensor_array_cpu.c",
+    "sha256": "a0cbcddf375dbfc2a45ab452dc365a129c40caefcdb5ebc65386c04cb3f7704f"
+  },
+  {
+    "kernel": "aten_copysign",
+    "source": "issues/aten_c_kernels/aten_copysign.c",
+    "sha256": "b21e064d7e8b29c94baf4e7415b67a0cbceb47eaaa8a2476209830a4cf9c6a8b"
+  },
+  {
+    "kernel": "aten_cos",
+    "source": "issues/aten_c_kernels/aten_cos.c",
+    "sha256": "3bc5d1cbfd27fae1b6721301e7c6c4fdbe582f425bfc84683ebfbd711337fab0"
+  },
+  {
+    "kernel": "aten_cosh",
+    "source": "issues/aten_c_kernels/aten_cosh.c",
+    "sha256": "589132bec14c26c2bd8e02313806028092c2e799e04fbb3aecb229ef1ec647f6"
+  },
+  {
+    "kernel": "aten_count_nonzero_cpu",
+    "source": "issues/aten_c_kernels/aten_count_nonzero_cpu.c",
+    "sha256": "cb95c97e04c0f2f7258ed07df2445f4ec7cad060b004d4b808094427b0a7ef5f"
+  },
+  {
+    "kernel": "aten_count_nonzero_impl_cpu",
+    "source": "issues/aten_c_kernels/aten_count_nonzero_impl_cpu.c",
+    "sha256": "01d4096b2a075d3ff966aa8b424c80178679fc6ed1ca0b9be34986bb1ef8cbe1"
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_batched_cpu",
+    "source": "issues/aten_c_kernels/aten_cpu_blas_gemm_batched_cpu.c",
+    "sha256": "98fbb49f6448641807004a6b8d85c1dbdea83194e76dde2f9e13d823fb478a85"
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_cpu",
+    "source": "issues/aten_c_kernels/aten_cpu_blas_gemm_cpu.c",
+    "sha256": "992005818b60fbc5f44d5596726ab929ec7edac786301906903ea513249204b3"
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_strided_batched_cpu",
+    "source": "issues/aten_c_kernels/aten_cpu_blas_gemm_strided_batched_cpu.c",
+    "sha256": "ecb678184067fe1c621008a260d11f21691a4d7bb24d94aca06f9397b5323180"
+  },
+  {
+    "kernel": "aten_cross",
+    "source": "issues/aten_c_kernels/aten_cross.c",
+    "sha256": "05e8ea7bb11819d225461ff43b314395b5cf97b07c49c035fafb3e7f4fc76a1b"
+  },
+  {
+    "kernel": "aten_cross_cpu_backend",
+    "source": "issues/aten_c_kernels/aten_cross_cpu_backend.c",
+    "sha256": "4c42405280c56d3ed34225926d0c1ed81f40462940836a9907133daba5cc4545"
+  },
+  {
+    "kernel": "aten_ctc_loss_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_ctc_loss_backward_cpu.c",
+    "sha256": "b86a0a7a68d254bd680f7c2421051e96a3792a32aeb2c7307003411e1af12460"
+  },
+  {
+    "kernel": "aten_ctc_loss_cpu",
+    "source": "issues/aten_c_kernels/aten_ctc_loss_cpu.c",
+    "sha256": "29dc82f28fb1f7e1388f3e9a633b4021f0a6080b8674c6e8b2b5fce1c3738a99"
+  },
+  {
+    "kernel": "aten_cummax_cummin_cpu",
+    "source": "issues/aten_c_kernels/aten_cummax_cummin_cpu.c",
+    "sha256": "cdddd562279f3395219e69082d6182b284d933424a88858607ce4e6187e9f388"
+  },
+  {
+    "kernel": "aten_cumprod_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_cumprod_backward_cpu.c",
+    "sha256": "70149e10cd0c8764feb66daee8a0edd93742cf037820cdfbc91eba6e620463eb"
+  },
+  {
+    "kernel": "aten_cumprod_cpu",
+    "source": "issues/aten_c_kernels/aten_cumprod_cpu.c",
+    "sha256": "94ddd95e220654c8b5f1bedfe55d0ba6905ac4162348854386b4f443f6672b15"
+  },
+  {
+    "kernel": "aten_cumsum",
+    "source": "issues/aten_c_kernels/aten_cumsum.c",
+    "sha256": "d083501532dae366b8c7fc0c52cbd471701986d45a2c549a4307724b6109b5f4"
+  },
+  {
+    "kernel": "aten_dense_sparse_add_cpu",
+    "source": "issues/aten_c_kernels/aten_dense_sparse_add_cpu.c",
+    "sha256": "93852a7e5606d4f21b2c9bdf200a317640b0f2ef07059f0db25cbfc00ff23d3e"
+  },
+  {
+    "kernel": "aten_depthwise_conv3x3_cpu",
+    "source": "issues/aten_c_kernels/aten_depthwise_conv3x3_cpu.c",
+    "sha256": "c5bc0d8d6f2a6baa14232fde4c76f60142d7bc27cad826b50266f5dadb6d3fd5"
+  },
+  {
+    "kernel": "aten_diff_cpu",
+    "source": "issues/aten_c_kernels/aten_diff_cpu.c",
+    "sha256": "e81e45894ace5e917a05642239a3b52023eb540b5b829101688493e4a5328fdf"
+  },
+  {
+    "kernel": "aten_digamma",
+    "source": "issues/aten_c_kernels/aten_digamma.c",
+    "sha256": "89047494986e6687fe06410102aa6177febeda4606596b4f3962b634089b1738"
+  },
+  {
+    "kernel": "aten_dilated_convolution_cpu",
+    "source": "issues/aten_c_kernels/aten_dilated_convolution_cpu.c",
+    "sha256": "a8a9b279ff8baccf051570f6c27b1ff706c6ccf830940b70d797f545342f2034"
+  },
+  {
+    "kernel": "aten_dirichlet_grad_cpu",
+    "source": "issues/aten_c_kernels/aten_dirichlet_grad_cpu.c",
+    "sha256": "b52ac29385b6a77375e4d009d74beb96b615b7446ec79880ed383924886f65a6"
+  },
+  {
+    "kernel": "aten_dirichlet_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_dirichlet_transform_cpu.c",
+    "sha256": "085f2555e941b310b5f5ec0212514539aba1f94d514a1d32431b694028935bf5"
+  },
+  {
+    "kernel": "aten_div",
+    "source": "issues/aten_c_kernels/aten_div.c",
+    "sha256": "18468acb9660285c23353e15c352a34c67664431c3db4accfca804a7a4c612d9"
+  },
+  {
+    "kernel": "aten_div_floor",
+    "source": "issues/aten_c_kernels/aten_div_floor.c",
+    "sha256": "97e63b6644af1bb8c4d1fe551c13248c8c20fa9f178b485fa12bde95d255e7d0"
+  },
+  {
+    "kernel": "aten_div_trunc",
+    "source": "issues/aten_c_kernels/aten_div_trunc.c",
+    "sha256": "675a7d10de38e3592ce9d15276d06b647d6f26f015f4470b3423d0595a5f6bc4"
+  },
+  {
+    "kernel": "aten_dot",
+    "source": "issues/aten_c_kernels/aten_dot.c",
+    "sha256": "d97e019c03198385a2786d0244be1dab306af0df0cca868fc4a4a4543cdc23f0"
+  },
+  {
+    "kernel": "aten_dropout_feature_noise_cpu",
+    "source": "issues/aten_c_kernels/aten_dropout_feature_noise_cpu.c",
+    "sha256": "a2d1a0fd1f93c81fbc67ce81fb468aaea55e2b3664a89ee258c35eab8b400db3"
+  },
+  {
+    "kernel": "aten_dyn_quant_matmul_4bit_cpu",
+    "source": "issues/aten_c_kernels/aten_dyn_quant_matmul_4bit_cpu.c",
+    "sha256": "45e0319d62bddc1f333fe020aaadc96548513935b58d5fab9f43a3e8b4d4db23"
+  },
+  {
+    "kernel": "aten_dyn_quant_pack_4bit_weight_cpu",
+    "source": "issues/aten_c_kernels/aten_dyn_quant_pack_4bit_weight_cpu.c",
+    "sha256": "5feceb6043e178d15966c608659467717f9dcf0d20aa05023335a4f7278f5a68"
+  },
+  {
+    "kernel": "aten_eig_complex_vectors_cpu",
+    "source": "issues/aten_c_kernels/aten_eig_complex_vectors_cpu.c",
+    "sha256": "4ac056f247ce3f730db40403a43cf0f67efc1a8b2d915c26fadc7f9fedb5ea81"
+  },
+  {
+    "kernel": "aten_elu",
+    "source": "issues/aten_c_kernels/aten_elu.c",
+    "sha256": "33426fead0d065357d0cf0a01e30f3d301c123721da7c942f8121fe9a536265f"
+  },
+  {
+    "kernel": "aten_elu_backward",
+    "source": "issues/aten_c_kernels/aten_elu_backward.c",
+    "sha256": "53d0b58eedd3cba61d9ed16966e72756590f06994d07f359daa17565fcc2468c"
+  },
+  {
+    "kernel": "aten_embedding",
+    "source": "issues/aten_c_kernels/aten_embedding.c",
+    "sha256": "d4a3d2de56d38d0a37eb50b690fccf2e6c8dd39ac0c0584b5790bdfb29f7fb6e"
+  },
+  {
+    "kernel": "aten_embedding_bag_backward_max_cpu",
+    "source": "issues/aten_c_kernels/aten_embedding_bag_backward_max_cpu.c",
+    "sha256": "4492dedae3135bf881060fff2474ccb838ab9b7ea1fa4a4179e1fe4ecbd892a7"
+  },
+  {
+    "kernel": "aten_embedding_bag_backward_sum_cpu",
+    "source": "issues/aten_c_kernels/aten_embedding_bag_backward_sum_cpu.c",
+    "sha256": "8beaaaa1532fdfe9ea18195845032402a15742bc9b879aa0372fdf5dfa104867"
+  },
+  {
+    "kernel": "aten_embedding_bag_counts_cpu",
+    "source": "issues/aten_c_kernels/aten_embedding_bag_counts_cpu.c",
+    "sha256": "f69ffe12ea95bdeaf070758ececab171a02e5d55798c66f248682f698f095b69"
+  },
+  {
+    "kernel": "aten_embedding_bag_counts_uniq_cpu",
+    "source": "issues/aten_c_kernels/aten_embedding_bag_counts_uniq_cpu.c",
+    "sha256": "44ac479c4d0e8bda3325c4bd6ca864c70742c6bf14aaf7f49703bd3ea08cbd3d"
+  },
+  {
+    "kernel": "aten_embedding_bag_max_cpu",
+    "source": "issues/aten_c_kernels/aten_embedding_bag_max_cpu.c",
+    "sha256": "31bf2f16bb929484faa5c62cd31dc15a8da29937a42bac18188c5dba88e17122"
+  },
+  {
+    "kernel": "aten_embedding_bag_per_sample_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_embedding_bag_per_sample_backward_cpu.c",
+    "sha256": "fee47e343f9a4f8cf4b2c00eb95fcc83128c75a3d97ccc6a5ec0cc98f8431a01"
+  },
+  {
+    "kernel": "aten_entr",
+    "source": "issues/aten_c_kernels/aten_entr.c",
+    "sha256": "c8dbac4666e684fc06918038bb38a1ecc65f85312964b60cc24cc9fb4522a694"
+  },
+  {
+    "kernel": "aten_eq",
+    "source": "issues/aten_c_kernels/aten_eq.c",
+    "sha256": "b5fcb7856db7ddc5b8e632ae6028966d546237682aa67b04e36b421693b9b0b2"
+  },
+  {
+    "kernel": "aten_equal_cpu",
+    "source": "issues/aten_c_kernels/aten_equal_cpu.c",
+    "sha256": "5b708d1191b030d0dba4ed13781cc8c7cc0079c462ce9e06ff6258f0a5f82eb7"
+  },
+  {
+    "kernel": "aten_erf",
+    "source": "issues/aten_c_kernels/aten_erf.c",
+    "sha256": "d81038c730ba0360d831638b62d1b39eb9e9351a5e44e88ed0775b2cf6cb16c5"
+  },
+  {
+    "kernel": "aten_erfc",
+    "source": "issues/aten_c_kernels/aten_erfc.c",
+    "sha256": "0d6f15cebd08caee6cc984fdd5e7789d057769b764eb922d07ff0593d1d0e40d"
+  },
+  {
+    "kernel": "aten_erfcx",
+    "source": "issues/aten_c_kernels/aten_erfcx.c",
+    "sha256": "12d39f3c6fe1e43b19d4839e1b9f02bc06d0a97915fc40fb234f58b52ba34a2b"
+  },
+  {
+    "kernel": "aten_erfinv",
+    "source": "issues/aten_c_kernels/aten_erfinv.c",
+    "sha256": "83008b04226385b936ee9b2626ba1124ddebed293626775c27993076ed8b6477"
+  },
+  {
+    "kernel": "aten_exp",
+    "source": "issues/aten_c_kernels/aten_exp.c",
+    "sha256": "1191680af2f9a2ce8a32b573fd0eb985a4ea379277108db5797946bb797d9e8b"
+  },
+  {
+    "kernel": "aten_exp2",
+    "source": "issues/aten_c_kernels/aten_exp2.c",
+    "sha256": "772de61a72406e8cae85e455e05932e3662991f38d1f6f5a5919c87997f86e97"
+  },
+  {
+    "kernel": "aten_expm1",
+    "source": "issues/aten_c_kernels/aten_expm1.c",
+    "sha256": "95c735d5a91c624821bf9857e262e493c4eb8baa5d71f8b70a9627f617cf8ab9"
+  },
+  {
+    "kernel": "aten_exponential_cpu",
+    "source": "issues/aten_c_kernels/aten_exponential_cpu.c",
+    "sha256": "8d809ffd0cdc34b7bf524ab22ae5f8667a36cefcbfc1fd6cab0c609ad0b847bb"
+  },
+  {
+    "kernel": "aten_eye_cpu",
+    "source": "issues/aten_c_kernels/aten_eye_cpu.c",
+    "sha256": "7804936c4c5c64aac31ebd24793f27b9d65ace045d8a50d775c7a70446c41544"
+  },
+  {
+    "kernel": "aten_fast_cat_dim0_cpu",
+    "source": "issues/aten_c_kernels/aten_fast_cat_dim0_cpu.c",
+    "sha256": "a4a9b160525fbb548824526af0bfe6b5c77b7f4c95108f37e83e01243edb33b0"
+  },
+  {
+    "kernel": "aten_fft_conjugate_symmetry_cpu",
+    "source": "issues/aten_c_kernels/aten_fft_conjugate_symmetry_cpu.c",
+    "sha256": "7443572ec5f0bda5a2794aacfada048b72bd6d9e358e2832a8cf86a02cb487a3"
+  },
+  {
+    "kernel": "aten_fftshift_cpu",
+    "source": "issues/aten_c_kernels/aten_fftshift_cpu.c",
+    "sha256": "db31951b50a9f0bd1d56518460b1cdff2b57c396b35f892e34d33cec41873828"
+  },
+  {
+    "kernel": "aten_fill",
+    "source": "issues/aten_c_kernels/aten_fill.c",
+    "sha256": "275481c1ba430b0c0c610a92f133e99147153382861db08ebfd1c50d2a0eb424"
+  },
+  {
+    "kernel": "aten_fill_diagonal_cpu",
+    "source": "issues/aten_c_kernels/aten_fill_diagonal_cpu.c",
+    "sha256": "c0ed7610bf11bc85b5b324f4c62bd5aea822bd13bc4f857078144a84d2f2c717"
+  },
+  {
+    "kernel": "aten_flash_attention_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_flash_attention_backward_cpu.c",
+    "sha256": "81716fded42f4daca4a857f551836217da4e2878d8724820bc67594b9cf11b76"
+  },
+  {
+    "kernel": "aten_flash_attention_cpu",
+    "source": "issues/aten_c_kernels/aten_flash_attention_cpu.c",
+    "sha256": "b9414311b9f6556a9120c14146eaf0875b9f2c5984683744bb9d18009c89aa53"
+  },
+  {
+    "kernel": "aten_flatten_indices_launch_cpu",
+    "source": "issues/aten_c_kernels/aten_flatten_indices_launch_cpu.c",
+    "sha256": "ba2672a6445875d75ae81c9757c53a8ad1304b6c2563dda0c64da09d95024eeb"
+  },
+  {
+    "kernel": "aten_flatten_nd_linear_cpu",
+    "source": "issues/aten_c_kernels/aten_flatten_nd_linear_cpu.c",
+    "sha256": "4fb557bd5a8ef7deb64938d5a903883830121ffeee9157c4a13e682d07e79f5d"
+  },
+  {
+    "kernel": "aten_flip_cpu",
+    "source": "issues/aten_c_kernels/aten_flip_cpu.c",
+    "sha256": "f93ca68c00f91739e15f6a05929b45714072fdbc8440e7cb890dc52771cc399e"
+  },
+  {
+    "kernel": "aten_flip_tensor_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_flip_tensor_transform_cpu.c",
+    "sha256": "42619a58b1446a34dbd9db3f21577ec2692552c7676fdbc866190d7bf40c52a5"
+  },
+  {
+    "kernel": "aten_floor",
+    "source": "issues/aten_c_kernels/aten_floor.c",
+    "sha256": "9bfcde3f82311b0e0f59b398a812d6b205ec07ac405d7dd8e0920b1af91c6a52"
+  },
+  {
+    "kernel": "aten_fmax",
+    "source": "issues/aten_c_kernels/aten_fmax.c",
+    "sha256": "51fdf73673ebfe192f924de6e19298a72980f8528e1fb2a9c31dd3982bde0cd3"
+  },
+  {
+    "kernel": "aten_fmin",
+    "source": "issues/aten_c_kernels/aten_fmin.c",
+    "sha256": "3b3dbc54b8d5f45476d21912f4ae3e5c0a94e58f0c5aaac4e8e116ca3b867e83"
+  },
+  {
+    "kernel": "aten_fmod",
+    "source": "issues/aten_c_kernels/aten_fmod.c",
+    "sha256": "b326efae15a9cc8020f92baf52816b750f98a0e8b0a6b9c9e6331525502fd492"
+  },
+  {
+    "kernel": "aten_fp16_dot_cpu",
+    "source": "issues/aten_c_kernels/aten_fp16_dot_cpu.c",
+    "sha256": "55b5577c46528a32acb1c18b44bc1d4b8737a1df342e0c694e21ac257a6fe9f3"
+  },
+  {
+    "kernel": "aten_fp16_gemv_f16arith_cpu",
+    "source": "issues/aten_c_kernels/aten_fp16_gemv_f16arith_cpu.c",
+    "sha256": "245c95167b3fa59a6067041173acbb914d3dd63ba583e299db05d47becb48941"
+  },
+  {
+    "kernel": "aten_fp16_gemv_f32arith_cpu",
+    "source": "issues/aten_c_kernels/aten_fp16_gemv_f32arith_cpu.c",
+    "sha256": "4b8a669fe78404771af441b22902fc5dadf293729bbf83c98696891e863f075c"
+  },
+  {
+    "kernel": "aten_fp16_gemv_notrans_cpu",
+    "source": "issues/aten_c_kernels/aten_fp16_gemv_notrans_cpu.c",
+    "sha256": "3475b2a0640f2c223084574a7835d86e64a9a549f1983a806624b66ec63112d8"
+  },
+  {
+    "kernel": "aten_fp16_gemv_trans_cpu",
+    "source": "issues/aten_c_kernels/aten_fp16_gemv_trans_cpu.c",
+    "sha256": "cc516ab2476050fc94c0274c744019e6b08be10bbb0ced03d649b4174c5660f5"
+  },
+  {
+    "kernel": "aten_frac",
+    "source": "issues/aten_c_kernels/aten_frac.c",
+    "sha256": "a824423a1bd1cb3e4f92d9084ddbc84fb9d46911c543c08c72dadbff7ba16cba"
+  },
+  {
+    "kernel": "aten_fractional_max_pool2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_fractional_max_pool2d_backward_cpu.c",
+    "sha256": "1dec58e805d473d2aad927f1fbe0cb11947a8b6502d54c2edec3c1baa95e9005"
+  },
+  {
+    "kernel": "aten_fractional_max_pool2d_cpu",
+    "source": "issues/aten_c_kernels/aten_fractional_max_pool2d_cpu.c",
+    "sha256": "339808149a223a34043c490ce03d7ef8d2c7234ef568ac4e351a53afac8eeca8"
+  },
+  {
+    "kernel": "aten_fractional_max_pool3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_fractional_max_pool3d_backward_cpu.c",
+    "sha256": "0b75b9ae9c62ced993fa645bdc1dbd6348414033e4adfa2e71a76425fb94d82a"
+  },
+  {
+    "kernel": "aten_fractional_max_pool3d_cpu",
+    "source": "issues/aten_c_kernels/aten_fractional_max_pool3d_cpu.c",
+    "sha256": "4b51c0c79c8cdadad67fec746cae7131907baf9bc53b577fb66e5178369ecc5a"
+  },
+  {
+    "kernel": "aten_fused_adagrad_cpu",
+    "source": "issues/aten_c_kernels/aten_fused_adagrad_cpu.c",
+    "sha256": "53ed7722bf0b07b331e613d9530aa31cfe6fb601f63697ebee71320dc6537c25"
+  },
+  {
+    "kernel": "aten_fused_adam_cpu",
+    "source": "issues/aten_c_kernels/aten_fused_adam_cpu.c",
+    "sha256": "0acf0dbbc6911c9cf0ae683aa2019e94c5bd2568c958adf05dfa6e819005554f"
+  },
+  {
+    "kernel": "aten_fused_sgd_cpu",
+    "source": "issues/aten_c_kernels/aten_fused_sgd_cpu.c",
+    "sha256": "20810b2668a8bdb596898319740b436f85e03bc06c13e3ba0eb56bd19da03289"
+  },
+  {
+    "kernel": "aten_gamma_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_gamma_transform_cpu.c",
+    "sha256": "5ee55d947d4db516fc1fd086bd1833c1142fec1d3fecd434ed2ed1dec8a39e50"
+  },
+  {
+    "kernel": "aten_gather_cpu",
+    "source": "issues/aten_c_kernels/aten_gather_cpu.c",
+    "sha256": "adb952fa19a1ce552415f20a17449d272362970d2d508099618c4af5dfbb6b32"
+  },
+  {
+    "kernel": "aten_gather_expanded_index_cpu",
+    "source": "issues/aten_c_kernels/aten_gather_expanded_index_cpu.c",
+    "sha256": "d1716aa2fa130cbcd969c857e6af6b763a1a9f29d338b8f07f4cb829182a5d7c"
+  },
+  {
+    "kernel": "aten_gcd_i32",
+    "source": "issues/aten_c_kernels/aten_gcd_i32.c",
+    "sha256": "5b072a30a17b38c07bd6bf3c44f078a2ba009149988c49848eaea391f7d3a7d4"
+  },
+  {
+    "kernel": "aten_ge",
+    "source": "issues/aten_c_kernels/aten_ge.c",
+    "sha256": "b5ed9547926ba186a48b5283e00d062b46911f4e8a82229048a47192fc2bf635"
+  },
+  {
+    "kernel": "aten_gelu",
+    "source": "issues/aten_c_kernels/aten_gelu.c",
+    "sha256": "efa27e1ce1884517585db46c6369fd84f625b54880c46ae9de7701ff54377d23"
+  },
+  {
+    "kernel": "aten_gelu_backward_cpu_exact",
+    "source": "issues/aten_c_kernels/aten_gelu_backward_cpu_exact.c",
+    "sha256": "bcf04116109985837c9dc650b6050114ceccb070dc91b800fd6d2a348806d896"
+  },
+  {
+    "kernel": "aten_gelu_backward_cpu_tanh",
+    "source": "issues/aten_c_kernels/aten_gelu_backward_cpu_tanh.c",
+    "sha256": "177e80d4c709c88f48c12585399e19b117647e81326f14f13d5c4a672219ab77"
+  },
+  {
+    "kernel": "aten_gelu_cpu_exact",
+    "source": "issues/aten_c_kernels/aten_gelu_cpu_exact.c",
+    "sha256": "9539cc79481e7688b468bf8b4e2c84263610592b4d240af64c4a357f8c592ce0"
+  },
+  {
+    "kernel": "aten_gelu_cpu_tanh",
+    "source": "issues/aten_c_kernels/aten_gelu_cpu_tanh.c",
+    "sha256": "969c060e8e11bd1adfbdfa4bb018af6939266b324b98e711d270da4c353f0c3a"
+  },
+  {
+    "kernel": "aten_gemm_notrans_cpu",
+    "source": "issues/aten_c_kernels/aten_gemm_notrans_cpu.c",
+    "sha256": "d3436be61b01bbe20a879aaf6b15b9e60bf0cceef813f9d0d828a7a6c866b59c"
+  },
+  {
+    "kernel": "aten_gemm_transa_cpu",
+    "source": "issues/aten_c_kernels/aten_gemm_transa_cpu.c",
+    "sha256": "a5d2ce3f734131f897ed653bcd0ba2d20726fd8d87fb324f6a636e380221044d"
+  },
+  {
+    "kernel": "aten_gemm_transab_cpu",
+    "source": "issues/aten_c_kernels/aten_gemm_transab_cpu.c",
+    "sha256": "57e1219425a4ef0abb27e12c6fbdacd1df6dc053c54d980af1b7750e5a299192"
+  },
+  {
+    "kernel": "aten_gemm_transb_cpu",
+    "source": "issues/aten_c_kernels/aten_gemm_transb_cpu.c",
+    "sha256": "36ca6917007119816b33984abe3fc3629c94f5a3c9c0b93175dd68b36222e013"
+  },
+  {
+    "kernel": "aten_geometric_cpu",
+    "source": "issues/aten_c_kernels/aten_geometric_cpu.c",
+    "sha256": "bc096e09149013f5afb1dd72424ab5836bbcaca5db0e5cd39bf2b61b662274f0"
+  },
+  {
+    "kernel": "aten_glu",
+    "source": "issues/aten_c_kernels/aten_glu.c",
+    "sha256": "e0b4a42fc715dca50e418c8971e8a9be0b6162a3bd33639c24087877e75c7255"
+  },
+  {
+    "kernel": "aten_glu_backward",
+    "source": "issues/aten_c_kernels/aten_glu_backward.c",
+    "sha256": "ecdb1a46febf0877992007cd0d56522e9774d650b9ecc004205ba7e3f107cb7b"
+  },
+  {
+    "kernel": "aten_glu_jvp",
+    "source": "issues/aten_c_kernels/aten_glu_jvp.c",
+    "sha256": "bae0b860b3e74c345526caac2c463f8860bc93625b215b7bdfbf1af5bb9c01bb"
+  },
+  {
+    "kernel": "aten_gradient_cpu",
+    "source": "issues/aten_c_kernels/aten_gradient_cpu.c",
+    "sha256": "27556028863b019f97bc683fec345ae56f024b87eeaf82e0a4b49e7f23a9cb8a"
+  },
+  {
+    "kernel": "aten_gradient_float_cpu",
+    "source": "issues/aten_c_kernels/aten_gradient_float_cpu.c",
+    "sha256": "c3ae8a3a550feadce15e4b0e44d0c051b99f9fcbe78ac93fa63c2041914ffccc"
+  },
+  {
+    "kernel": "aten_grid_sampler_2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_grid_sampler_2d_backward_cpu.c",
+    "sha256": "e67c3403c659419c0ef2539f6ede50106f4884d5e40a87bf645ab015c1cb12ca"
+  },
+  {
+    "kernel": "aten_grid_sampler_2d_cpu",
+    "source": "issues/aten_c_kernels/aten_grid_sampler_2d_cpu.c",
+    "sha256": "7a60a2341cfc3935bf1fd9c92a6eca52d7d759c34752aafb753fce3f1e4da65f"
+  },
+  {
+    "kernel": "aten_grid_sampler_2d_fallback_cpu",
+    "source": "issues/aten_c_kernels/aten_grid_sampler_2d_fallback_cpu.c",
+    "sha256": "fd78608ab2c6b5b4353480119b3eae164ea197687a104989bf4fe53715b2899a"
+  },
+  {
+    "kernel": "aten_grid_sampler_2d_quantized_cpu",
+    "source": "issues/aten_c_kernels/aten_grid_sampler_2d_quantized_cpu.c",
+    "sha256": "4255e7b48d9091f33d44813e148809d09621e8db93eb1ba2255b1f74b68fc448"
+  },
+  {
+    "kernel": "aten_grid_sampler_3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_grid_sampler_3d_backward_cpu.c",
+    "sha256": "5303f67d004b0d9b6502cb06823d30eb6e627a16e91ae19b8aa02d2a761114c4"
+  },
+  {
+    "kernel": "aten_grid_sampler_3d_cpu",
+    "source": "issues/aten_c_kernels/aten_grid_sampler_3d_cpu.c",
+    "sha256": "4a779481806ac6b00770b067920b81dfae23017e9548f837901d86ef97b84fba"
+  },
+  {
+    "kernel": "aten_group_norm_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_group_norm_backward_cpu.c",
+    "sha256": "9f2949458aac665ea7e3faeb398b4eca55bc77a6fe534828bbf3012647221087"
+  },
+  {
+    "kernel": "aten_group_norm_cpu",
+    "source": "issues/aten_c_kernels/aten_group_norm_cpu.c",
+    "sha256": "ef95efadb00499e2d034f58ba452a76962d16f45828f98a36d7806499959b563"
+  },
+  {
+    "kernel": "aten_gt",
+    "source": "issues/aten_c_kernels/aten_gt.c",
+    "sha256": "6be6daafa827d25f44f01596563e37d3bd121e0b280cebcf95f2b0fd31154300"
+  },
+  {
+    "kernel": "aten_hardshrink",
+    "source": "issues/aten_c_kernels/aten_hardshrink.c",
+    "sha256": "a3f8a4c69a922bb3a7c90c7dc9a01e2079ab8c4045a3d0b0579d7e5f9b88473c"
+  },
+  {
+    "kernel": "aten_hardsigmoid",
+    "source": "issues/aten_c_kernels/aten_hardsigmoid.c",
+    "sha256": "4611357e8492f6cfcf50577a22797ed904875ec9edb591c88e6533e560dcd233"
+  },
+  {
+    "kernel": "aten_hardsigmoid_backward",
+    "source": "issues/aten_c_kernels/aten_hardsigmoid_backward.c",
+    "sha256": "67d89561a94febbadc9d2cad1ac8ae8fb50dcba54d971ca29b5f082458da1e2a"
+  },
+  {
+    "kernel": "aten_hardswish",
+    "source": "issues/aten_c_kernels/aten_hardswish.c",
+    "sha256": "e3d2778d7a238fcc1807b77bf8d2a80d98a3a94fb156de0320a6459645293419"
+  },
+  {
+    "kernel": "aten_hardswish_backward",
+    "source": "issues/aten_c_kernels/aten_hardswish_backward.c",
+    "sha256": "e69aeae2bde4a235498e21f3cc812eec0c1264e4aaf9f9b68f3bb3c93a92993a"
+  },
+  {
+    "kernel": "aten_hardtanh",
+    "source": "issues/aten_c_kernels/aten_hardtanh.c",
+    "sha256": "64beaff5652e4884dac3261ee9b9174417480b50bb69089e129f162777233271"
+  },
+  {
+    "kernel": "aten_hardtanh_backward",
+    "source": "issues/aten_c_kernels/aten_hardtanh_backward.c",
+    "sha256": "86f471dfbd7011d7f83d0141a58421e354fb74fe56c1e66a90b2c244c8d8c726"
+  },
+  {
+    "kernel": "aten_heaviside",
+    "source": "issues/aten_c_kernels/aten_heaviside.c",
+    "sha256": "ff14af2e53e79c135dfc5a00b610607e6b88db6aab1119ca43877bb124fbeec6"
+  },
+  {
+    "kernel": "aten_hermite_polynomial_h",
+    "source": "issues/aten_c_kernels/aten_hermite_polynomial_h.c",
+    "sha256": "711f40385762221b0dbbb747b7708306e69db346fd213b0886d2b2270abd54bd"
+  },
+  {
+    "kernel": "aten_hermite_polynomial_he",
+    "source": "issues/aten_c_kernels/aten_hermite_polynomial_he.c",
+    "sha256": "7c796c5c358a2a6496a8b301acdd9c3b05778a0440dd3b7590f8a27e09719ab0"
+  },
+  {
+    "kernel": "aten_histogram_select_outer_bin_edges_cpu",
+    "source": "issues/aten_c_kernels/aten_histogram_select_outer_bin_edges_cpu.c",
+    "sha256": "1dfea25d6ed4692ee1fca16cbefaa249bd83ffa5470ef6930b93a8877d9d6eb8"
+  },
+  {
+    "kernel": "aten_histogramdd_cpu",
+    "source": "issues/aten_c_kernels/aten_histogramdd_cpu.c",
+    "sha256": "d78ac32bbc2d8bd2ac5d3dd248f412c358695c81caf3fbf1847dcaa4fcc3f301"
+  },
+  {
+    "kernel": "aten_histogramdd_linear_cpu",
+    "source": "issues/aten_c_kernels/aten_histogramdd_linear_cpu.c",
+    "sha256": "f3a7a172fead6983828da03639450e44b7415eade44656713df80cab043089c9"
+  },
+  {
+    "kernel": "aten_host_softmax_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_host_softmax_backward_cpu.c",
+    "sha256": "ff1a3b60a0ad690e8ef76767a7e3e1214282bfcb7ed276712ed880b1afc37324"
+  },
+  {
+    "kernel": "aten_host_softmax_cpu",
+    "source": "issues/aten_c_kernels/aten_host_softmax_cpu.c",
+    "sha256": "8a34966ef4902b602d34aa4b2fe448b963f3081c73c3d4823523c2120c21edb3"
+  },
+  {
+    "kernel": "aten_hspmm_cpu",
+    "source": "issues/aten_c_kernels/aten_hspmm_cpu.c",
+    "sha256": "084e16e0ab3d22484b00a03cb6970d99b6fcbb89989394ac86e1f933b285ac78"
+  },
+  {
+    "kernel": "aten_huber_backward",
+    "source": "issues/aten_c_kernels/aten_huber_backward.c",
+    "sha256": "b264ff0f38f419abdfe348bfa97587bf8c2803e7f62ec99cc5c48bf1617454be"
+  },
+  {
+    "kernel": "aten_huber_elementwise",
+    "source": "issues/aten_c_kernels/aten_huber_elementwise.c",
+    "sha256": "427d993c21ebc054a2a1c504864cc4faf67702a97d9c7949b14dda594a86ca5e"
+  },
+  {
+    "kernel": "aten_hypot",
+    "source": "issues/aten_c_kernels/aten_hypot.c",
+    "sha256": "ebe432c91207b3ac297feaf1f3143c82a54a33ab0557d3f80285271bd5c4ad09"
+  },
+  {
+    "kernel": "aten_i0",
+    "source": "issues/aten_c_kernels/aten_i0.c",
+    "sha256": "38bae11d78461ea7965e7a4896f15b49df55ca586cbf55de68ce8981cefc3795"
+  },
+  {
+    "kernel": "aten_i0e",
+    "source": "issues/aten_c_kernels/aten_i0e.c",
+    "sha256": "7a3aa1571baa883bbe38ceea9197ec4ab7ff8e2c59487fe89c9c83f8ff9f582f"
+  },
+  {
+    "kernel": "aten_i1",
+    "source": "issues/aten_c_kernels/aten_i1.c",
+    "sha256": "8e72d454955ce7fea69a450c7dd3e336c5276351decc507f48eaa7f53eb3fbbc"
+  },
+  {
+    "kernel": "aten_i1e",
+    "source": "issues/aten_c_kernels/aten_i1e.c",
+    "sha256": "8bccf6a2510540828a4c52b4cd98d4bc40d7d3bc01604bd0b885cce7acaece31"
+  },
+  {
+    "kernel": "aten_ifftshift_cpu",
+    "source": "issues/aten_c_kernels/aten_ifftshift_cpu.c",
+    "sha256": "93758d2423d7313b094eb42cb7f19790c6a1753a8c2c5b4138d7fcf63575b6fb"
+  },
+  {
+    "kernel": "aten_igamma",
+    "source": "issues/aten_c_kernels/aten_igamma.c",
+    "sha256": "2e263eaf558dfec0e8b77f07d552e97c0324ba3e54243cf02c00ddebcc8943ba"
+  },
+  {
+    "kernel": "aten_igammac",
+    "source": "issues/aten_c_kernels/aten_igammac.c",
+    "sha256": "5caaeac7cd2633f2f0c4bfebb3cc2619068f13e277241807a042b604236e4eb5"
+  },
+  {
+    "kernel": "aten_im2col",
+    "source": "issues/aten_c_kernels/aten_im2col.c",
+    "sha256": "8e95724d6a388499fb233155148e921f01f1c54a782256ff011cd926ac77f628"
+  },
+  {
+    "kernel": "aten_index_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_index_copy_cpu.c",
+    "sha256": "ea4fda46e0852fe4be71b55be5454e5e85e592bdedd740a7a21d912605f804bc"
+  },
+  {
+    "kernel": "aten_index_cpu",
+    "source": "issues/aten_c_kernels/aten_index_cpu.c",
+    "sha256": "b3ed04d0dfe3fa971eafb6e38755daf2b00bc8f2693474c8119354a10b2d4f59"
+  },
+  {
+    "kernel": "aten_index_fill_cpu",
+    "source": "issues/aten_c_kernels/aten_index_fill_cpu.c",
+    "sha256": "25b115680a98761836ac1f7d6b37ef76eecf7716779c6e8111ccdc4eef117ec2"
+  },
+  {
+    "kernel": "aten_index_put_cpu",
+    "source": "issues/aten_c_kernels/aten_index_put_cpu.c",
+    "sha256": "884ef79fc0423e79ad9cf87d630739279eaa6fa3f9bab758f14c035964616a5f"
+  },
+  {
+    "kernel": "aten_index_put_impl_cpu",
+    "source": "issues/aten_c_kernels/aten_index_put_impl_cpu.c",
+    "sha256": "3cc9e870591769a09bd8fda323825284c25b3ff9b8cafb81dec21679f6d6e132"
+  },
+  {
+    "kernel": "aten_index_reduce_impl_cpu",
+    "source": "issues/aten_c_kernels/aten_index_reduce_impl_cpu.c",
+    "sha256": "53f6eda13737514688675d9a72934e5b826e3f679af479d9619ede05fdf79cbb"
+  },
+  {
+    "kernel": "aten_index_select_dim1_cpu",
+    "source": "issues/aten_c_kernels/aten_index_select_dim1_cpu.c",
+    "sha256": "04926299f498131259faa1e72c3b5844f0af1de9305e40d9cf5d840866e60868"
+  },
+  {
+    "kernel": "aten_index_select_out_cpu",
+    "source": "issues/aten_c_kernels/aten_index_select_out_cpu.c",
+    "sha256": "e7cefea6d905823bbc3c9d927576ac65eb290b00f484cb616009c7c7d16a0910"
+  },
+  {
+    "kernel": "aten_index_select_sparse_cpu",
+    "source": "issues/aten_c_kernels/aten_index_select_sparse_cpu.c",
+    "sha256": "ef1d336130f95145c7b400c7124fa4b83925e09e03709d3eb27718ffae6c5c4e"
+  },
+  {
+    "kernel": "aten_int4pack_mm_cpu",
+    "source": "issues/aten_c_kernels/aten_int4pack_mm_cpu.c",
+    "sha256": "552d826549f6ae87b985798354b05b7b324348087b7ecc397f53f1d15c12984f"
+  },
+  {
+    "kernel": "aten_int8pack_mm_cpu",
+    "source": "issues/aten_c_kernels/aten_int8pack_mm_cpu.c",
+    "sha256": "4a484d23fca297832686d89325e5228f6cb4280f35740582de782050b53dc85e"
+  },
+  {
+    "kernel": "aten_int_mm_out_cpu",
+    "source": "issues/aten_c_kernels/aten_int_mm_out_cpu.c",
+    "sha256": "9aed346705bf4b656ca5fd854b50c2c7507a7d355707698847a71aafbadb0d9c"
+  },
+  {
+    "kernel": "aten_isin_default_cpu",
+    "source": "issues/aten_c_kernels/aten_isin_default_cpu.c",
+    "sha256": "857569caf25b8ea0589124f1327d8ab59ae0da0a27a6f8c5cee261c9b20f82a2"
+  },
+  {
+    "kernel": "aten_isneginf",
+    "source": "issues/aten_c_kernels/aten_isneginf.c",
+    "sha256": "b209a40a8f25dacb110c91c201d7396d58f5753e6539b0062784f3943ff01f1a"
+  },
+  {
+    "kernel": "aten_isposinf",
+    "source": "issues/aten_c_kernels/aten_isposinf.c",
+    "sha256": "6da181311568c618e390ee9fe006237e86b3efd3407472e63ef5f5861109dc46"
+  },
+  {
+    "kernel": "aten_jagged_to_padded_cpu",
+    "source": "issues/aten_c_kernels/aten_jagged_to_padded_cpu.c",
+    "sha256": "27b8aff601ddb7a0f4ec0b7266b87661d636525d1ae49731623af67ec3724fe0"
+  },
+  {
+    "kernel": "aten_joint_scaling_cpu",
+    "source": "issues/aten_c_kernels/aten_joint_scaling_cpu.c",
+    "sha256": "8f61c8b20f16084c937720935ffef09d2cb7a7835a54551480904c3855d96bc4"
+  },
+  {
+    "kernel": "aten_kaiser_window",
+    "source": "issues/aten_c_kernels/aten_kaiser_window.c",
+    "sha256": "5e2caa0fc9a3eeef5dc1e30ee76b43654d909f1660b72d62b9e3c80264f95518"
+  },
+  {
+    "kernel": "aten_kron_impl_cpu",
+    "source": "issues/aten_c_kernels/aten_kron_impl_cpu.c",
+    "sha256": "caeead682ea8e87097e850c650fb11fb6c7995601804333f2f15974d05d42c7d"
+  },
+  {
+    "kernel": "aten_kron_out_cpu",
+    "source": "issues/aten_c_kernels/aten_kron_out_cpu.c",
+    "sha256": "7c7242b0f4947f7ef0ed2de88bcc033f10a7c86ff3ab36f7aa3d5c134de0e7c4"
+  },
+  {
+    "kernel": "aten_kthvalue_cpu",
+    "source": "issues/aten_c_kernels/aten_kthvalue_cpu.c",
+    "sha256": "59b629ee5c3f6324ecc5ae40a76694fe279e2fdf7296f70a6c8e92de1ecfc3ba"
+  },
+  {
+    "kernel": "aten_l1_loss",
+    "source": "issues/aten_c_kernels/aten_l1_loss.c",
+    "sha256": "772b9aaa98b5ff15ed53c41b10fe9101f06d5090e105718dcf56116566c25966"
+  },
+  {
+    "kernel": "aten_laguerre_polynomial_l",
+    "source": "issues/aten_c_kernels/aten_laguerre_polynomial_l.c",
+    "sha256": "b7e04bc4f77ba83aa54b75a8b0c78e04f1afa2cb67e4b458203c39f1697035fa"
+  },
+  {
+    "kernel": "aten_layer_norm",
+    "source": "issues/aten_c_kernels/aten_layer_norm.c",
+    "sha256": "26f5cabc18620f67cb62676768f02f5a11cec3ebe340d35dd513423f7fbf930c"
+  },
+  {
+    "kernel": "aten_layer_norm_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_layer_norm_backward_cpu.c",
+    "sha256": "69cdf83444fdf19775c1de62e1dd37e324da196fa92f39bfaeee65fc6511267c"
+  },
+  {
+    "kernel": "aten_layer_norm_cpu_backend",
+    "source": "issues/aten_c_kernels/aten_layer_norm_cpu_backend.c",
+    "sha256": "bd297b481861e837bfda3abe338b212e6d2ce8f289c2d15a16d5b0e8a19b8125"
+  },
+  {
+    "kernel": "aten_lcm_i32",
+    "source": "issues/aten_c_kernels/aten_lcm_i32.c",
+    "sha256": "355c4a0558d5a1caa97caceaf8dbeb26b488cd1ed7d4f8df428621f5cacb33cc"
+  },
+  {
+    "kernel": "aten_ldexp",
+    "source": "issues/aten_c_kernels/aten_ldexp.c",
+    "sha256": "5a5badf659761429b51cfe4a5cdf1aa267573d61250e2161baf73fe822e01ce3"
+  },
+  {
+    "kernel": "aten_le",
+    "source": "issues/aten_c_kernels/aten_le.c",
+    "sha256": "b0c0a3c73bb230ade60e71e3943d0cbf6e01015c0bca189a73b4caa6bb4ebcfb"
+  },
+  {
+    "kernel": "aten_leaky_relu",
+    "source": "issues/aten_c_kernels/aten_leaky_relu.c",
+    "sha256": "60790e3da4508df6b90c5c03d36488c990c081139f309e3f9e2eb6bf0d4796bc"
+  },
+  {
+    "kernel": "aten_legendre_polynomial_p",
+    "source": "issues/aten_c_kernels/aten_legendre_polynomial_p.c",
+    "sha256": "715503684eea0aabea885ecff6c1ede7e74b6440e961b213e93d58a6b59395ac"
+  },
+  {
+    "kernel": "aten_lerp",
+    "source": "issues/aten_c_kernels/aten_lerp.c",
+    "sha256": "ad9f7d84e825ebde175aa4ee5f8257347a134c971658e086715de6964108282a"
+  },
+  {
+    "kernel": "aten_lerp_scalar",
+    "source": "issues/aten_c_kernels/aten_lerp_scalar.c",
+    "sha256": "1e909fa83a56623f7573d0985168f290f1019c688c4947a32aea027c6fb59362"
+  },
+  {
+    "kernel": "aten_lerp_scalar_cpu",
+    "source": "issues/aten_c_kernels/aten_lerp_scalar_cpu.c",
+    "sha256": "54a62ca5e7eebdc388f2ed7e12b1c06afe0ae764ca6c516762e2ebc543d5a6b8"
+  },
+  {
+    "kernel": "aten_lerp_tensor_cpu",
+    "source": "issues/aten_c_kernels/aten_lerp_tensor_cpu.c",
+    "sha256": "4de70a9e8e345576873dd0b54e43224830df49d5ac6bf0b51466f1de9817b945"
+  },
+  {
+    "kernel": "aten_lgamma",
+    "source": "issues/aten_c_kernels/aten_lgamma.c",
+    "sha256": "76416ae7f4700f1a720eded93dd3be35a5e8cc1491c00827570fa7abaae213de"
+  },
+  {
+    "kernel": "aten_linalg_powsum_cpu",
+    "source": "issues/aten_c_kernels/aten_linalg_powsum_cpu.c",
+    "sha256": "d08f17a0e12fbb490376f672f5578a8db3b0da901a6754ffcf2f6e4cac10fad0"
+  },
+  {
+    "kernel": "aten_linear_combination_cpu",
+    "source": "issues/aten_c_kernels/aten_linear_combination_cpu.c",
+    "sha256": "3e4a960c60d701d0c598ea6ecbc5b68a1f58d6e4714aa7295290ee86cf4b000c"
+  },
+  {
+    "kernel": "aten_linspace",
+    "source": "issues/aten_c_kernels/aten_linspace.c",
+    "sha256": "1371dd2f092bee2eb3830df110d0a2679fce4e4913ca3c6ef52212c72b575a90"
+  },
+  {
+    "kernel": "aten_log",
+    "source": "issues/aten_c_kernels/aten_log.c",
+    "sha256": "63aa21fb88099dd327bb7506d5464d4d33fc2a22dd1e28686988d0bae91e4ace"
+  },
+  {
+    "kernel": "aten_log10",
+    "source": "issues/aten_c_kernels/aten_log10.c",
+    "sha256": "b2bfe9631c8c64c27a556280545ac302cc980d7c8deae5ce614414fb7e4a6d3b"
+  },
+  {
+    "kernel": "aten_log1p",
+    "source": "issues/aten_c_kernels/aten_log1p.c",
+    "sha256": "fb490b5280c92c265107105ec615d8bacffe49695de0bb5330941142ba2f5566"
+  },
+  {
+    "kernel": "aten_log2",
+    "source": "issues/aten_c_kernels/aten_log2.c",
+    "sha256": "f2d4e4b5468f7e3bb8071d524ec63d4b21fe2fdc9953f4717a924e38fcadbdf5"
+  },
+  {
+    "kernel": "aten_log_ndtr",
+    "source": "issues/aten_c_kernels/aten_log_ndtr.c",
+    "sha256": "f1f9b03899a51c8043a945d3c63dbb1a27d3f63c6fdaafea3619a4c52329bc2e"
+  },
+  {
+    "kernel": "aten_log_normal_cpu",
+    "source": "issues/aten_c_kernels/aten_log_normal_cpu.c",
+    "sha256": "f82431c3bfec2f321d8194f22122f265bcd5bc6a8406ddfa4361ca3bc1e4be00"
+  },
+  {
+    "kernel": "aten_log_sigmoid_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_log_sigmoid_backward_cpu.c",
+    "sha256": "d9357a196872d09519ebf03737f0e17f9e5f21ba32b2117ee4f73ce98901df50"
+  },
+  {
+    "kernel": "aten_log_sigmoid_cpu",
+    "source": "issues/aten_c_kernels/aten_log_sigmoid_cpu.c",
+    "sha256": "b3d80e44ce134b25d3345f9c036eb7bbdd9c538a8735467bd89781605f70b9ff"
+  },
+  {
+    "kernel": "aten_logaddexp",
+    "source": "issues/aten_c_kernels/aten_logaddexp.c",
+    "sha256": "4b69504ed428e950b895a185aa3f9a3de3eb8fc6ccd6d8b1f47b03e5c53ae4f1"
+  },
+  {
+    "kernel": "aten_logaddexp2",
+    "source": "issues/aten_c_kernels/aten_logaddexp2.c",
+    "sha256": "76c4b158dd3c7c4a645b57455fb3ef5a8942ded526c6e820697f6153e8ee8bf7"
+  },
+  {
+    "kernel": "aten_logcumsumexp_cpu",
+    "source": "issues/aten_c_kernels/aten_logcumsumexp_cpu.c",
+    "sha256": "9de54828f82c0883a52cd9b11ea71820ee4215d0d3752018dee51fe8d930d7ee"
+  },
+  {
+    "kernel": "aten_logical_and",
+    "source": "issues/aten_c_kernels/aten_logical_and.c",
+    "sha256": "c839eacef53b05893c2aeb7e652c0a4e5e6ab041f35c09aea340398638e16cdd"
+  },
+  {
+    "kernel": "aten_logical_not_f32",
+    "source": "issues/aten_c_kernels/aten_logical_not_f32.c",
+    "sha256": "d7acdb202fd5581c73edbb26b7f1cc38b9e22a2b32cb0a13ce2e8078601d0a2a"
+  },
+  {
+    "kernel": "aten_logical_or",
+    "source": "issues/aten_c_kernels/aten_logical_or.c",
+    "sha256": "d4026b88bee2f0c0ce6796541119df1a6b7518b90af7d6a1a2d0d6c64e545992"
+  },
+  {
+    "kernel": "aten_logical_xor",
+    "source": "issues/aten_c_kernels/aten_logical_xor.c",
+    "sha256": "0ce15c05ad73b61c3e0977d4c5a2ba66638e06e36ce63bcaa25a2385a9e9ccd7"
+  },
+  {
+    "kernel": "aten_logit",
+    "source": "issues/aten_c_kernels/aten_logit.c",
+    "sha256": "73ff7872c01bbb3caf4df562c852455d261014bbc55fbe846466a139cafb3a7e"
+  },
+  {
+    "kernel": "aten_logit_backward",
+    "source": "issues/aten_c_kernels/aten_logit_backward.c",
+    "sha256": "de8890e62754aa10345f630f73cadffa8af01f3be2e177f659a8f19f8e131d98"
+  },
+  {
+    "kernel": "aten_logspace_cpu",
+    "source": "issues/aten_c_kernels/aten_logspace_cpu.c",
+    "sha256": "03f78952c3c3a6fda7c8e031e4fd88b724a311ebe2327758f76bcd9f044350ca"
+  },
+  {
+    "kernel": "aten_lower_bound_cpu",
+    "source": "issues/aten_c_kernels/aten_lower_bound_cpu.c",
+    "sha256": "08e3ff9a32d9ec97fd0691d6727b320c8db3e4c58c314cb564026a4cf8a3a98b"
+  },
+  {
+    "kernel": "aten_lshift_i32",
+    "source": "issues/aten_c_kernels/aten_lshift_i32.c",
+    "sha256": "f0ae5726c705fbd1ed9dd8dd2fabb502c0d8ecace9f2621366697bb9e8b440ae"
+  },
+  {
+    "kernel": "aten_lt",
+    "source": "issues/aten_c_kernels/aten_lt.c",
+    "sha256": "97ac06e46c78f30234ea0d394240fc6765c9455c6890f3ef38ebf1cc36f05fbd"
+  },
+  {
+    "kernel": "aten_masked_fill_cpu",
+    "source": "issues/aten_c_kernels/aten_masked_fill_cpu.c",
+    "sha256": "121c4b2c34dcf6402f3a73d8814104dcf9d94d874cf9334b543ed1652ec08102"
+  },
+  {
+    "kernel": "aten_masked_scale",
+    "source": "issues/aten_c_kernels/aten_masked_scale.c",
+    "sha256": "0fa3e4d2e93d369c62846dd8454e15bc72ebcace693beea205c2d56fa77af2e8"
+  },
+  {
+    "kernel": "aten_masked_scatter_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_masked_scatter_backward_cpu.c",
+    "sha256": "8f9e7892ca4a2afe67af5008a7ae97de1e4f2be9812545b5a3c0de250aa76783"
+  },
+  {
+    "kernel": "aten_masked_scatter_cpu",
+    "source": "issues/aten_c_kernels/aten_masked_scatter_cpu.c",
+    "sha256": "ba10feafc2dab1b5c5bc0f91f674831551e5565278e0db9476ded93a3e5eaa7b"
+  },
+  {
+    "kernel": "aten_masked_select_cpu",
+    "source": "issues/aten_c_kernels/aten_masked_select_cpu.c",
+    "sha256": "e4bbfbeea0d344288cfa77d3ae36967e441a400cb656e499a68feddff3029af8"
+  },
+  {
+    "kernel": "aten_masked_select_serial_cpu",
+    "source": "issues/aten_c_kernels/aten_masked_select_serial_cpu.c",
+    "sha256": "24888245a72d869364d7d7fb3089c59e69998f36041eb7959044c86d629a0920"
+  },
+  {
+    "kernel": "aten_max_all_cpu",
+    "source": "issues/aten_c_kernels/aten_max_all_cpu.c",
+    "sha256": "a58f3f99349d67e2aa218d916013f9494c0f1d0bdab1fd8080588c818f88c734"
+  },
+  {
+    "kernel": "aten_max_pool1d_cpu",
+    "source": "issues/aten_c_kernels/aten_max_pool1d_cpu.c",
+    "sha256": "48e1e683134b935d3ce3f0bfb818faadf24bd6e3e16cb2add593930f0de39e6b"
+  },
+  {
+    "kernel": "aten_max_pool2d",
+    "source": "issues/aten_c_kernels/aten_max_pool2d.c",
+    "sha256": "006016a39f0da8198cabf5440350814b0bf681c369ad16928bb554a6bbe3600e"
+  },
+  {
+    "kernel": "aten_max_pool3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_max_pool3d_backward_cpu.c",
+    "sha256": "7e50b9d3355feb878141f96c3a3439a332b47ffe818f760818e779372f84d428"
+  },
+  {
+    "kernel": "aten_max_pool3d_cpu",
+    "source": "issues/aten_c_kernels/aten_max_pool3d_cpu.c",
+    "sha256": "b90cd22ef7f048bfc0777dfb4126f2c40fe3e3f127fe4da3b032931418283841"
+  },
+  {
+    "kernel": "aten_max_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_max_reduce_cpu.c",
+    "sha256": "25114fc68f66646751804478015ae0c14846b2cb3b224e196908f4123e42ba0f"
+  },
+  {
+    "kernel": "aten_max_unpool2d_cpu",
+    "source": "issues/aten_c_kernels/aten_max_unpool2d_cpu.c",
+    "sha256": "4c4546fa3eb6b7d93fff604ccc004235d3bcc145e508811a2ed7c5881a7df583"
+  },
+  {
+    "kernel": "aten_max_unpool3d_cpu",
+    "source": "issues/aten_c_kernels/aten_max_unpool3d_cpu.c",
+    "sha256": "fbff29ddd4c395728a76a2f142671574789bea8b661c43329bd8eefd24dde3b9"
+  },
+  {
+    "kernel": "aten_max_unpool_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_max_unpool_backward_cpu.c",
+    "sha256": "d8d0269ff0ad1abeecc3660926a7b48005bcca90eca025075bf456946ff08e6f"
+  },
+  {
+    "kernel": "aten_max_values_cpu",
+    "source": "issues/aten_c_kernels/aten_max_values_cpu.c",
+    "sha256": "d800c13da79c0c13004421da10de2d66f9701564baa434a8e39c5dd68a141860"
+  },
+  {
+    "kernel": "aten_maximum",
+    "source": "issues/aten_c_kernels/aten_maximum.c",
+    "sha256": "f677f87ac3997c8e377afd72174693e4dc7e558f27badbc65143256223ceb10c"
+  },
+  {
+    "kernel": "aten_mean",
+    "source": "issues/aten_c_kernels/aten_mean.c",
+    "sha256": "aee0053b8cf376d76d87899980e65665a82bf04338b804e2ab4f65b274362f47"
+  },
+  {
+    "kernel": "aten_median_indices_cpu",
+    "source": "issues/aten_c_kernels/aten_median_indices_cpu.c",
+    "sha256": "c62bf9178a7eabec3c1619581e475266749601cb1db4475ee8cb663dea43b723"
+  },
+  {
+    "kernel": "aten_min_all_cpu",
+    "source": "issues/aten_c_kernels/aten_min_all_cpu.c",
+    "sha256": "6c3a04f5ed490c3e7bcdd58215eace14edfc44eb792b2b6bfd47e4d81653e11b"
+  },
+  {
+    "kernel": "aten_min_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_min_reduce_cpu.c",
+    "sha256": "28c08c7ac9e9e3fc96ed922945b3d194dbb0a3329fa17aa95067b71fb03c3b0a"
+  },
+  {
+    "kernel": "aten_min_values_cpu",
+    "source": "issues/aten_c_kernels/aten_min_values_cpu.c",
+    "sha256": "ebc4921a718016ec394925645b35f495c3ef866238cca0b6d63d7aa4dc480c21"
+  },
+  {
+    "kernel": "aten_minimum",
+    "source": "issues/aten_c_kernels/aten_minimum.c",
+    "sha256": "ccce7e394ce6fb2dc9f99813037c36f55662d3c31f4cc3f9070328e52fe7bd54"
+  },
+  {
+    "kernel": "aten_mish",
+    "source": "issues/aten_c_kernels/aten_mish.c",
+    "sha256": "0b787d5e4e5aa183bfcec2cfcc5039c27cea41e8a8e24c687b838f405fb71d7e"
+  },
+  {
+    "kernel": "aten_mish_backward",
+    "source": "issues/aten_c_kernels/aten_mish_backward.c",
+    "sha256": "6ffacc661abc587ae9c94a9cc744bcad3e1ace3f348526185c80d76e38a196a9"
+  },
+  {
+    "kernel": "aten_mm",
+    "source": "issues/aten_c_kernels/aten_mm.c",
+    "sha256": "53c236e56e5d89cd3a77227c6c1e9427f53fb99d30e892071e21fd1c41421593"
+  },
+  {
+    "kernel": "aten_mode_cpu",
+    "source": "issues/aten_c_kernels/aten_mode_cpu.c",
+    "sha256": "25e391140d9eb2ff13583804963c2e9838ce093d573e6d327da42920a09b8dd8"
+  },
+  {
+    "kernel": "aten_modified_bessel_i0",
+    "source": "issues/aten_c_kernels/aten_modified_bessel_i0.c",
+    "sha256": "2f4a04a228b3ba6ed659b4c3b4edcb22062bfeda0a6ea65e1576056ccc731e41"
+  },
+  {
+    "kernel": "aten_modified_bessel_i1",
+    "source": "issues/aten_c_kernels/aten_modified_bessel_i1.c",
+    "sha256": "0dc7d6631354743bd0b0e8c80c3762c8b160dc55dbb37de85c03c4398a9760da"
+  },
+  {
+    "kernel": "aten_modified_bessel_k0",
+    "source": "issues/aten_c_kernels/aten_modified_bessel_k0.c",
+    "sha256": "be035ceb8499cf6a5fa647fb808a6162a567182212c21c7296ff02504352df98"
+  },
+  {
+    "kernel": "aten_modified_bessel_k1",
+    "source": "issues/aten_c_kernels/aten_modified_bessel_k1.c",
+    "sha256": "9794d91f4a43edee8606fec4927d9dd4bbc8b08129232e1edceec1d33f601f3f"
+  },
+  {
+    "kernel": "aten_mse_backward",
+    "source": "issues/aten_c_kernels/aten_mse_backward.c",
+    "sha256": "b9d8feba6634af74cb1952eff2f3e4adb32ef5c706ce64cc443a7b4f4c3dd945"
+  },
+  {
+    "kernel": "aten_mse_elementwise",
+    "source": "issues/aten_c_kernels/aten_mse_elementwise.c",
+    "sha256": "bfd7b2f9856c981e67f32794448056c33d72e052f8af1ce5bb69daf410bc080c"
+  },
+  {
+    "kernel": "aten_mse_loss",
+    "source": "issues/aten_c_kernels/aten_mse_loss.c",
+    "sha256": "e6ad4561fc713665ad70d7624f61568b615026caf11a68b21251ed9b7a71e132"
+  },
+  {
+    "kernel": "aten_mul",
+    "source": "issues/aten_c_kernels/aten_mul.c",
+    "sha256": "e62611829002ed2f09b69e606c8459ec52489ae1544436472a77b6522d57b89c"
+  },
+  {
+    "kernel": "aten_multi_margin_loss_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_multi_margin_loss_backward_cpu.c",
+    "sha256": "d700e006ffca3a87d4ec971a43fc183f03c33c50a7d4575bbf1898b169178869"
+  },
+  {
+    "kernel": "aten_multi_margin_loss_cpu",
+    "source": "issues/aten_c_kernels/aten_multi_margin_loss_cpu.c",
+    "sha256": "eac4878f1560adedf296eb15674d92d5645ebb612403f6ab6646fc378322a173"
+  },
+  {
+    "kernel": "aten_multilabel_margin_loss_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_multilabel_margin_loss_backward_cpu.c",
+    "sha256": "3395ab921bac89f764086bba3010abcc8d3d9e2507f600f8a0e14fe7a0d09ece"
+  },
+  {
+    "kernel": "aten_multilabel_margin_loss_forward_cpu",
+    "source": "issues/aten_c_kernels/aten_multilabel_margin_loss_forward_cpu.c",
+    "sha256": "9fca0eca79479a89f473c29c8a1edbeb0d917dbc293544efe63cc06720d815f6"
+  },
+  {
+    "kernel": "aten_multinomial_with_replacement_cpu",
+    "source": "issues/aten_c_kernels/aten_multinomial_with_replacement_cpu.c",
+    "sha256": "c8de1e1f27a2b5d63694b5249c0d0725438d80a1dc4486eec14dc3141ec92c7e"
+  },
+  {
+    "kernel": "aten_mv",
+    "source": "issues/aten_c_kernels/aten_mv.c",
+    "sha256": "2aff81984ff8765a18180605ee61913a6271dd6dcbd45017adce2aac3b8b1d9b"
+  },
+  {
+    "kernel": "aten_nan_to_num",
+    "source": "issues/aten_c_kernels/aten_nan_to_num.c",
+    "sha256": "f82193cb71e169f704a9b4710f4fa254ce3147ee6f9ae246cf92587ac171a1e2"
+  },
+  {
+    "kernel": "aten_nansum_cpu",
+    "source": "issues/aten_c_kernels/aten_nansum_cpu.c",
+    "sha256": "23e4c4dde484f3f862d65a3864c39a2615eccbe7fa92bd50dc1af1974c1805e7"
+  },
+  {
+    "kernel": "aten_narrow_copy_dense_cpu",
+    "source": "issues/aten_c_kernels/aten_narrow_copy_dense_cpu.c",
+    "sha256": "d7de636cc808fb2a3e99417350ac6bdb3c0644bb7ffecafe1d71f58483f51ba0"
+  },
+  {
+    "kernel": "aten_ndtri",
+    "source": "issues/aten_c_kernels/aten_ndtri.c",
+    "sha256": "48ae3b5163a386ed04f56c3796953c44b7f27632a6fab35c570389830fe97a01"
+  },
+  {
+    "kernel": "aten_ne",
+    "source": "issues/aten_c_kernels/aten_ne.c",
+    "sha256": "f692ac846ce094ca81b6c3309d659ba76333de04a4aad9e6ce8811f53821069b"
+  },
+  {
+    "kernel": "aten_neg",
+    "source": "issues/aten_c_kernels/aten_neg.c",
+    "sha256": "fa2b841930305cd889d5ee2e008a11a6ef4d0770b60646958c1e518dc9232e6c"
+  },
+  {
+    "kernel": "aten_nested_all_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_all_cpu.c",
+    "sha256": "d1eeacb608e823cdbc62e7120195fa4954371387046649addd0649a0f2893620"
+  },
+  {
+    "kernel": "aten_nested_batch_offsets_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_batch_offsets_cpu.c",
+    "sha256": "712b9db4b012fe08c43f9929b1dbc19f72317791d0ecf35544a12a33a8301591"
+  },
+  {
+    "kernel": "aten_nested_bmm_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_bmm_cpu.c",
+    "sha256": "426f467ec6161bdfe8be0ab88eefe94fe76cbd454c63a179145b138fa3d38a90"
+  },
+  {
+    "kernel": "aten_nested_clone_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_clone_cpu.c",
+    "sha256": "5eb531c89d913520e5412eed8e0992a8474b9ed5a75528099d0da57c2056ae13"
+  },
+  {
+    "kernel": "aten_nested_from_padded_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_from_padded_cpu.c",
+    "sha256": "e6bbc1a46a67a422409bd4960fe750368b6c533fc8733247616867c25f71bcb1"
+  },
+  {
+    "kernel": "aten_nested_matmul_broadcast_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_matmul_broadcast_cpu.c",
+    "sha256": "28761c8a5e2297cc0ac540eb2f7dfbcdafbf0782a8121941789fb9321befa2d2"
+  },
+  {
+    "kernel": "aten_nested_pad_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_pad_cpu.c",
+    "sha256": "2caa6b612af1673cf66c400ad8036a729488b0cad55370a097010aec59ce8369"
+  },
+  {
+    "kernel": "aten_nested_select_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_select_cpu.c",
+    "sha256": "bd79c62aadda1fba0b224a246cfa5d30c839dfd16c9f8d0c0d5a26a89a19ed0a"
+  },
+  {
+    "kernel": "aten_nested_softmax_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_softmax_backward_cpu.c",
+    "sha256": "5264caefca910bd283977353e32be94c6a761eb484b0f63a7581953c3efe984f"
+  },
+  {
+    "kernel": "aten_nested_softmax_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_softmax_cpu.c",
+    "sha256": "0d378c5c5fd6aa5ee897ba406ea4f026f8fc28983bde2562f50bf4ad99e6167d"
+  },
+  {
+    "kernel": "aten_nested_softmax_dropout_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_softmax_dropout_cpu.c",
+    "sha256": "d7e0b88620c18c9d4f523f0157064eb1c0bd224ed4e56599232b2a20d85bf37c"
+  },
+  {
+    "kernel": "aten_nested_squeeze_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_squeeze_cpu.c",
+    "sha256": "54ff4dcbf2862f855e95815d573b24211e0c4a62a64dcf6308e5e4562bdb031f"
+  },
+  {
+    "kernel": "aten_nested_sum_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_sum_backward_cpu.c",
+    "sha256": "a0cc56c677600a3624a308fb4e912dcc2264c311d6a5c4b74387db7c1826eb3c"
+  },
+  {
+    "kernel": "aten_nested_sum_dim_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_sum_dim_cpu.c",
+    "sha256": "5cc944d926fb566ceeae017348e6a3152ba924de26876011e6e6f6f95618c5b1"
+  },
+  {
+    "kernel": "aten_nested_to_mask_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_to_mask_cpu.c",
+    "sha256": "884b1d03c01c206dc5ca2d415cc93e7fc3696e37b028d71d307d5488df888429"
+  },
+  {
+    "kernel": "aten_nested_to_padded_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_to_padded_cpu.c",
+    "sha256": "3146b0fd942d3817703eb431125595b1cf185c126792606aeb5555a03cccf23a"
+  },
+  {
+    "kernel": "aten_nested_where_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_where_cpu.c",
+    "sha256": "f377db11b474d2e8e51d037fe2ee8b748d096f94949f82146028d9cfef2d8ec9"
+  },
+  {
+    "kernel": "aten_nested_where_out_cpu",
+    "source": "issues/aten_c_kernels/aten_nested_where_out_cpu.c",
+    "sha256": "00fb26e8c1077d9672e527219da66295edac18ee064bb01ce6698815e617f358"
+  },
+  {
+    "kernel": "aten_nextafter",
+    "source": "issues/aten_c_kernels/aten_nextafter.c",
+    "sha256": "4eee228630d9c6bbab52ce7aa9ff3098ffd515df99f1fff790befefb17069550"
+  },
+  {
+    "kernel": "aten_nll_loss2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_nll_loss2d_backward_cpu.c",
+    "sha256": "529d032928457f4ece9f1a321e514ca03e1b57af612ad984ce5fdd08444aef84"
+  },
+  {
+    "kernel": "aten_nll_loss2d_forward_cpu",
+    "source": "issues/aten_c_kernels/aten_nll_loss2d_forward_cpu.c",
+    "sha256": "baf7f2e4f5641854e9c1cebb4d86fd2f3d555f1030ab406176707ff6b7fd7613"
+  },
+  {
+    "kernel": "aten_nll_loss_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_nll_loss_backward_cpu.c",
+    "sha256": "a215e2fef6ee42f4feee25d8d35f6f25d7a10d817dfea2a15deeb32a4a8d2bb4"
+  },
+  {
+    "kernel": "aten_nll_loss_forward_cpu",
+    "source": "issues/aten_c_kernels/aten_nll_loss_forward_cpu.c",
+    "sha256": "7c65cbe62c48ba9f153a73d8264a3b0bcf7def929634d92bab5cf08830e37ee7"
+  },
+  {
+    "kernel": "aten_nonzero_out_cpu",
+    "source": "issues/aten_c_kernels/aten_nonzero_out_cpu.c",
+    "sha256": "8006eee8ccf8118d637d1d7c3e64a6433620a9c254ac976f00e27c9bcf7c6cec"
+  },
+  {
+    "kernel": "aten_norm_cpu",
+    "source": "issues/aten_c_kernels/aten_norm_cpu.c",
+    "sha256": "a59fd4c8266b0ce203614f11e884c19508766ae05af7a307c595e812deaac36a"
+  },
+  {
+    "kernel": "aten_normal_cpu",
+    "source": "issues/aten_c_kernels/aten_normal_cpu.c",
+    "sha256": "e4a8dfe1222586cd2da43694bea1461c26953317ea2396d41bfa667b1c481264"
+  },
+  {
+    "kernel": "aten_or_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_or_reduce_cpu.c",
+    "sha256": "e5902450b3f42fb060714711677215ed456103c21864ecb6223c642fd55ea7b1"
+  },
+  {
+    "kernel": "aten_outer",
+    "source": "issues/aten_c_kernels/aten_outer.c",
+    "sha256": "f760e9a94d38d9aeab7c5f326c5f57676435844c5e6e5ab62f8c8a367bc80ec9"
+  },
+  {
+    "kernel": "aten_padded_to_jagged_cpu",
+    "source": "issues/aten_c_kernels/aten_padded_to_jagged_cpu.c",
+    "sha256": "1576de859d15bb59af13debe8b3fb079e49002c44ede469f7e615554e9d655a2"
+  },
+  {
+    "kernel": "aten_pdist_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_pdist_backward_cpu.c",
+    "sha256": "e3bab233ad54048cb84883c15227d5252fe8c8f0b00fa61172f2bc72f9287358"
+  },
+  {
+    "kernel": "aten_pdist_forward_cpu",
+    "source": "issues/aten_c_kernels/aten_pdist_forward_cpu.c",
+    "sha256": "a61a80c8c742cb7d2be3c44aae6cbe0a8eba0c1be39403c54b952563ebc382a6"
+  },
+  {
+    "kernel": "aten_permute_sparse_coo_cpu",
+    "source": "issues/aten_c_kernels/aten_permute_sparse_coo_cpu.c",
+    "sha256": "92767d360e2b1026e5498a35d0c9e47bd681ab7528052a0d549fb0638963a1fd"
+  },
+  {
+    "kernel": "aten_pixel_shuffle",
+    "source": "issues/aten_c_kernels/aten_pixel_shuffle.c",
+    "sha256": "cddfe244b3ee3df3114165a0fc931f4fa47755be975c4f0042740274c67ffe7e"
+  },
+  {
+    "kernel": "aten_pixel_shuffle_cpu_backend",
+    "source": "issues/aten_c_kernels/aten_pixel_shuffle_cpu_backend.c",
+    "sha256": "ebdf6cac6ecff15ffcb897f9fbb0c974f9d2e91b59e565ae5387bdb7e31158fe"
+  },
+  {
+    "kernel": "aten_pixel_unshuffle_cpu_backend",
+    "source": "issues/aten_c_kernels/aten_pixel_unshuffle_cpu_backend.c",
+    "sha256": "ad1da3bb2e0ed24b98e31f7b6a31cfc38966360e9239ef35248072a5bc578826"
+  },
+  {
+    "kernel": "aten_poisson_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_poisson_transform_cpu.c",
+    "sha256": "ea8e3f75ea96ba1d8727791dbfba0781012d7482035f2d907eac511bc30af4d5"
+  },
+  {
+    "kernel": "aten_polar_scalarized",
+    "source": "issues/aten_c_kernels/aten_polar_scalarized.c",
+    "sha256": "bdb3327a48d6e8cc98f7c1e77cd5c5f0d6f37f9b71280391a8d2008a420fe330"
+  },
+  {
+    "kernel": "aten_polygamma",
+    "source": "issues/aten_c_kernels/aten_polygamma.c",
+    "sha256": "6b62926354e28d3e3a14695080b34bf7c73ad980ea0d3167851fd244d1022da3"
+  },
+  {
+    "kernel": "aten_pow",
+    "source": "issues/aten_c_kernels/aten_pow.c",
+    "sha256": "e78d0a093d3c8aa89b9ea64cc1aea62cc6d183686347556546102014c03ff9ee"
+  },
+  {
+    "kernel": "aten_pow_tensor_scalar",
+    "source": "issues/aten_c_kernels/aten_pow_tensor_scalar.c",
+    "sha256": "5ed0de07b09cecc8797e67448d74ac154b75ff88d0a57c2cd6ca78f1ea61a36e"
+  },
+  {
+    "kernel": "aten_powsum_cpu",
+    "source": "issues/aten_c_kernels/aten_powsum_cpu.c",
+    "sha256": "20f5bcd9c01c5b6bb6dc83be3837a7144f36fb08fdb10e4dc0437a117f671bda"
+  },
+  {
+    "kernel": "aten_prod",
+    "source": "issues/aten_c_kernels/aten_prod.c",
+    "sha256": "5d4c9c44ac03b7444905afc5b564aac2fc85e1cf97892d859e97a01fc073758a"
+  },
+  {
+    "kernel": "aten_put_cpu",
+    "source": "issues/aten_c_kernels/aten_put_cpu.c",
+    "sha256": "54d4fed985147a4d2817a8ae8409bf5c849f71609246eb3ecf3b31303e233d4d"
+  },
+  {
+    "kernel": "aten_quant_col_offsets_cpu",
+    "source": "issues/aten_c_kernels/aten_quant_col_offsets_cpu.c",
+    "sha256": "6a02669b8d1589204272136cc05ec4646149b47bcc191be671773fb94e15d7b4"
+  },
+  {
+    "kernel": "aten_quant_saturation_cpu",
+    "source": "issues/aten_c_kernels/aten_quant_saturation_cpu.c",
+    "sha256": "25d4c46d474c0ded0e157f71c7d76b98670bf2edc97d43351d37dde1b1489d43"
+  },
+  {
+    "kernel": "aten_quick_select_cpu",
+    "source": "issues/aten_c_kernels/aten_quick_select_cpu.c",
+    "sha256": "572f652eaa3085ef144f4a4db20ac177eb2eb02cff18c72ad370a68b7a04e89f"
+  },
+  {
+    "kernel": "aten_random_cpu",
+    "source": "issues/aten_c_kernels/aten_random_cpu.c",
+    "sha256": "bb38cc695d212b1f8fe44c1b65769d1f30a3d166fd24ed22e057466101650df5"
+  },
+  {
+    "kernel": "aten_random_from_to_cpu",
+    "source": "issues/aten_c_kernels/aten_random_from_to_cpu.c",
+    "sha256": "32f817f7253d752482820ced450ad1138b8e5891e721cba414e3c6386709da82"
+  },
+  {
+    "kernel": "aten_random_full_64_bits_range_cpu",
+    "source": "issues/aten_c_kernels/aten_random_full_64_bits_range_cpu.c",
+    "sha256": "42eb7c566ba531e664611dad877144892f4fa5ac16b566a0f646cdc0459092ff"
+  },
+  {
+    "kernel": "aten_randperm_cpu",
+    "source": "issues/aten_c_kernels/aten_randperm_cpu.c",
+    "sha256": "b87be88a29800070f88f0a8113e58901d41786129a6e9114b6d327cf4bd7dcd5"
+  },
+  {
+    "kernel": "aten_range_out_cpu",
+    "source": "issues/aten_c_kernels/aten_range_out_cpu.c",
+    "sha256": "39d79f5e0fa0a62ea800fc93599aee017f8badd9ef70f4f7ee78501f6c5bc3d5"
+  },
+  {
+    "kernel": "aten_reciprocal",
+    "source": "issues/aten_c_kernels/aten_reciprocal.c",
+    "sha256": "ee0c99775bdc57ae3319a058fc2601167c78555d251f60fc1292411e647cf289"
+  },
+  {
+    "kernel": "aten_reflect_conj_tri_cpu",
+    "source": "issues/aten_c_kernels/aten_reflect_conj_tri_cpu.c",
+    "sha256": "ecf20fb6076d97a36301e4c628a76bda7e15040e00315bff3c33e5b01a31fda8"
+  },
+  {
+    "kernel": "aten_reflection_pad1d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_reflection_pad1d_backward_cpu.c",
+    "sha256": "eb470ed7a45e0c7a642475087985d288ff49b03a0b3826d68afc75f45d52a844"
+  },
+  {
+    "kernel": "aten_reflection_pad1d_cpu",
+    "source": "issues/aten_c_kernels/aten_reflection_pad1d_cpu.c",
+    "sha256": "05c6f1995486c0abbede3e4b8b4d16457edde863387f176d97bac453042842c2"
+  },
+  {
+    "kernel": "aten_reflection_pad2d",
+    "source": "issues/aten_c_kernels/aten_reflection_pad2d.c",
+    "sha256": "88794b018a92e5e1eb0b601a9de6671f06020a69d9b6219a1ac96a703f69e85c"
+  },
+  {
+    "kernel": "aten_reflection_pad2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_reflection_pad2d_backward_cpu.c",
+    "sha256": "32bc46a8c7a87236d6d63790c128f7185ce53916f971b39d680cd1f16ebbd883"
+  },
+  {
+    "kernel": "aten_reflection_pad2d_cpu",
+    "source": "issues/aten_c_kernels/aten_reflection_pad2d_cpu.c",
+    "sha256": "c1ea9b15aad8703d24a8cb921ac5e2f0e25566391bf9404e0448dcc853e588cc"
+  },
+  {
+    "kernel": "aten_reflection_pad3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_reflection_pad3d_backward_cpu.c",
+    "sha256": "e3647c5e132feda703cf531bf6f9dc8689480291f3be3db7f11c4aba2f873125"
+  },
+  {
+    "kernel": "aten_reflection_pad3d_cpu",
+    "source": "issues/aten_c_kernels/aten_reflection_pad3d_cpu.c",
+    "sha256": "09c03ddbff8aae3a15cb76130397675447fc9c3f91dbe75124596a920cbcce0c"
+  },
+  {
+    "kernel": "aten_relu",
+    "source": "issues/aten_c_kernels/aten_relu.c",
+    "sha256": "cc1cceea9c852c8a7cd1ee80f274969d11c6bdf6a499a02f7a3e59454afae5aa"
+  },
+  {
+    "kernel": "aten_remainder",
+    "source": "issues/aten_c_kernels/aten_remainder.c",
+    "sha256": "7c995fcf095630a1315527fb540cffe5f1dc4cf1b39d0b28dde6d35ea46251fe"
+  },
+  {
+    "kernel": "aten_renorm_scale_factor",
+    "source": "issues/aten_c_kernels/aten_renorm_scale_factor.c",
+    "sha256": "c2abcd39bcd0bce3ff1379813e9cb31294bb930827918fd7be19203a2274931d"
+  },
+  {
+    "kernel": "aten_repeat_compute_cpu",
+    "source": "issues/aten_c_kernels/aten_repeat_compute_cpu.c",
+    "sha256": "61ef88d3a960c44fc4b741c2e17842577fe924931aba3595de7e22a0be00ecd2"
+  },
+  {
+    "kernel": "aten_repeat_tensor_shape_cpu",
+    "source": "issues/aten_c_kernels/aten_repeat_tensor_shape_cpu.c",
+    "sha256": "fa7e45c20faaf50ce93c418606e5f2de36a89a1c6ab6abbb3e5104a4f7e1544f"
+  },
+  {
+    "kernel": "aten_replication_pad1d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_replication_pad1d_backward_cpu.c",
+    "sha256": "01d22ee6570d65dd5b542c27a79440f8573acb5e77ba4069deab82ea34e852c8"
+  },
+  {
+    "kernel": "aten_replication_pad1d_cpu",
+    "source": "issues/aten_c_kernels/aten_replication_pad1d_cpu.c",
+    "sha256": "0cd992a9693e206769dda171c89d222db231913a7824dd1714c2aca0bfdf33e9"
+  },
+  {
+    "kernel": "aten_replication_pad2d",
+    "source": "issues/aten_c_kernels/aten_replication_pad2d.c",
+    "sha256": "915379f3c3fda331de43071661af51052b78cee3bc4622fccce48103697923e3"
+  },
+  {
+    "kernel": "aten_replication_pad2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_replication_pad2d_backward_cpu.c",
+    "sha256": "13fc604bb8517a62470837ad6d5ebded1f004a11d5eb88265c48ec529220355e"
+  },
+  {
+    "kernel": "aten_replication_pad2d_cpu",
+    "source": "issues/aten_c_kernels/aten_replication_pad2d_cpu.c",
+    "sha256": "ad063da31ee8276d048a2ca6bd76a423a514b31fbe5d00b0d4cb1e3f77894cea"
+  },
+  {
+    "kernel": "aten_replication_pad3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_replication_pad3d_backward_cpu.c",
+    "sha256": "bf8d27f0d8584c323ab4385971e8f0cdd8de401c7b8808060af3fe61105e9415"
+  },
+  {
+    "kernel": "aten_replication_pad3d_cpu",
+    "source": "issues/aten_c_kernels/aten_replication_pad3d_cpu.c",
+    "sha256": "111d6623c50091c4aaa01c9c70e4ec893c691c1a4bedbc6f0b79e7e1e083dcec"
+  },
+  {
+    "kernel": "aten_rms_norm",
+    "source": "issues/aten_c_kernels/aten_rms_norm.c",
+    "sha256": "cffbeb1fc49625673676fb36dbf4da83e0565f5baede7476c2c8e42240bbe61d"
+  },
+  {
+    "kernel": "aten_round",
+    "source": "issues/aten_c_kernels/aten_round.c",
+    "sha256": "bda7d0b073c7582f026f60d244a4de493b217f1598084063d88c1625f3af71fb"
+  },
+  {
+    "kernel": "aten_round_decimals",
+    "source": "issues/aten_c_kernels/aten_round_decimals.c",
+    "sha256": "46d8c0b83df0eaf9a0ba2783bc06e60458ee7bbbee4096789d519033128d3edb"
+  },
+  {
+    "kernel": "aten_rowwise_prune_cpu",
+    "source": "issues/aten_c_kernels/aten_rowwise_prune_cpu.c",
+    "sha256": "9cd0eba6e86bd44e4d95074988e1151e270a75fce925e533ac98e38c34fe1f08"
+  },
+  {
+    "kernel": "aten_rshift_i32",
+    "source": "issues/aten_c_kernels/aten_rshift_i32.c",
+    "sha256": "9cae047eadb7bcaa855bcfef9ddbf7f5db9cb6fb71874e84e3e418c41dd2cae6"
+  },
+  {
+    "kernel": "aten_rsqrt",
+    "source": "issues/aten_c_kernels/aten_rsqrt.c",
+    "sha256": "81022bd49370eb02f6eee9f0ea3addffd40cedec48adfc3af1522757719f674d"
+  },
+  {
+    "kernel": "aten_sample_poisson_transform_cpu",
+    "source": "issues/aten_c_kernels/aten_sample_poisson_transform_cpu.c",
+    "sha256": "b70de65b178a29e4c78fa7e46afff45b28d51b3276cf180182b2782f44101d95"
+  },
+  {
+    "kernel": "aten_sampled_addmm_sparse_csr_cpu",
+    "source": "issues/aten_c_kernels/aten_sampled_addmm_sparse_csr_cpu.c",
+    "sha256": "7c015e659f963dcfa9a556b8e133871660ac1890852d21263a9257822726848d"
+  },
+  {
+    "kernel": "aten_scaled_modified_bessel_k0",
+    "source": "issues/aten_c_kernels/aten_scaled_modified_bessel_k0.c",
+    "sha256": "67a949979e0768f9b8c2a01e8b8c60604272b48629489ff319c9c59a029e4404"
+  },
+  {
+    "kernel": "aten_scaled_modified_bessel_k1",
+    "source": "issues/aten_c_kernels/aten_scaled_modified_bessel_k1.c",
+    "sha256": "8113dbe17a9aca39de75063fd40a67a2b9feb79d751ce0a25f8cd747c3cab3ec"
+  },
+  {
+    "kernel": "aten_scatter_add_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_add_cpu.c",
+    "sha256": "529d01c125787c182f11ac05b948951c1a8ff2f53727b908b67cdd769edb0589"
+  },
+  {
+    "kernel": "aten_scatter_add_expanded_index_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_add_expanded_index_cpu.c",
+    "sha256": "5a539cd9e2e9b215bd2aa053d5c2fe82226b3641e34a2433288c1b4790e68f3e"
+  },
+  {
+    "kernel": "aten_scatter_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_cpu.c",
+    "sha256": "55af4d090ea21458d900cc38f2026a8412f15b2069f6c5e2c8283b510d01b428"
+  },
+  {
+    "kernel": "aten_scatter_fill_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_fill_cpu.c",
+    "sha256": "603332b09154512b0b912614fc4505d102ebf6d20cb660da5b6a254e53ca145f"
+  },
+  {
+    "kernel": "aten_scatter_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_reduce_cpu.c",
+    "sha256": "f5d660fc0458f9288fadaa275ae486c0c1d5cd17cc5517699d5452395c644508"
+  },
+  {
+    "kernel": "aten_scatter_reduce_expanded_index_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_reduce_expanded_index_cpu.c",
+    "sha256": "064cd8d54170d822f37e55375763b3fa3b4a2fd520d459cf8585a097bb3ed31c"
+  },
+  {
+    "kernel": "aten_scatter_reduce_two_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_reduce_two_cpu.c",
+    "sha256": "43391102f801fb07b6b05a4850e57a539faf4267275a0095a600bf49cc09d81f"
+  },
+  {
+    "kernel": "aten_scatter_scalar_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_scatter_scalar_reduce_cpu.c",
+    "sha256": "7ef5b3354124299852fd7cd2ea134e202ed7db92b284e3693f93dee862e1406d"
+  },
+  {
+    "kernel": "aten_searchsorted_cpu",
+    "source": "issues/aten_c_kernels/aten_searchsorted_cpu.c",
+    "sha256": "bf7564caaab368583ae54d6a13451f018cb9a2221b4c31df8829f551803864ff"
+  },
+  {
+    "kernel": "aten_segment_reduce_lengths_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_segment_reduce_lengths_backward_cpu.c",
+    "sha256": "ae38e5ff37f8eff07b4370590fb9cd94799a92c63b12f03715039fed7a8fc6c5"
+  },
+  {
+    "kernel": "aten_segment_reduce_lengths_cpu",
+    "source": "issues/aten_c_kernels/aten_segment_reduce_lengths_cpu.c",
+    "sha256": "d9aa8db9423ef555f5f03454621733b1c63e604d999d69c095cf121e6b7d0826"
+  },
+  {
+    "kernel": "aten_sgn_complex_scalarized",
+    "source": "issues/aten_c_kernels/aten_sgn_complex_scalarized.c",
+    "sha256": "512805a80a008ed6d036b8ea76046654c70c378bfd0e948f0e3b2bfce5bb6977"
+  },
+  {
+    "kernel": "aten_shrink_backward",
+    "source": "issues/aten_c_kernels/aten_shrink_backward.c",
+    "sha256": "e1694170ca06e7e2e978785930850c4c5f7adc3ec60383799272c3dba0835acd"
+  },
+  {
+    "kernel": "aten_sigmoid",
+    "source": "issues/aten_c_kernels/aten_sigmoid.c",
+    "sha256": "ab553c9f2a0e7449fde9a12228df0492a158d629a5f88cae4efc30a89de13534"
+  },
+  {
+    "kernel": "aten_sigmoid_backward",
+    "source": "issues/aten_c_kernels/aten_sigmoid_backward.c",
+    "sha256": "134e464a20f0b3163e63eb372547ef8bfb64a8a63f8945a4215a953fde099669"
+  },
+  {
+    "kernel": "aten_sign",
+    "source": "issues/aten_c_kernels/aten_sign.c",
+    "sha256": "df702c26d9e25763a82a059ec14c40c31a407dd26945639f35462470107cdbe6"
+  },
+  {
+    "kernel": "aten_signbit",
+    "source": "issues/aten_c_kernels/aten_signbit.c",
+    "sha256": "f36feb88605bf533b222ee3b05dbede593e1fca595867ef4765f3261d60fe5bb"
+  },
+  {
+    "kernel": "aten_silu",
+    "source": "issues/aten_c_kernels/aten_silu.c",
+    "sha256": "b715c976aa1970507551a6c91730e6eda811d3c3e9c01c73d8d33273449c1faa"
+  },
+  {
+    "kernel": "aten_silu_backward",
+    "source": "issues/aten_c_kernels/aten_silu_backward.c",
+    "sha256": "35477d76f440ad7f4d2f99cd5f113d0a0b8f17f7cd71294d926717acda571677"
+  },
+  {
+    "kernel": "aten_silu_cpu",
+    "source": "issues/aten_c_kernels/aten_silu_cpu.c",
+    "sha256": "d2e4a8842b9f88d97b771de2dccdd5ee42c69f932fb4558c76b097459d117e3d"
+  },
+  {
+    "kernel": "aten_sin",
+    "source": "issues/aten_c_kernels/aten_sin.c",
+    "sha256": "6d55fdaa5143d526140d5a63ed030533f57cddd621a0c2e8d252c159811c0d14"
+  },
+  {
+    "kernel": "aten_sinc",
+    "source": "issues/aten_c_kernels/aten_sinc.c",
+    "sha256": "9c6cc95471e2a096a0c77f3795aa5e0d40e787f9d512ed5dc85b8be5079ba9c8"
+  },
+  {
+    "kernel": "aten_sinh",
+    "source": "issues/aten_c_kernels/aten_sinh.c",
+    "sha256": "b19eff963a35676784a207ad5495ca85f81d5e759416e10a115cee662efed203"
+  },
+  {
+    "kernel": "aten_slow_conv3d_backward_input_cpu",
+    "source": "issues/aten_c_kernels/aten_slow_conv3d_backward_input_cpu.c",
+    "sha256": "8ca9ce8b7e4d8c0169869b4b71c7b3ba56f1bc0289b64ec41cc4b6fae1e2a3d1"
+  },
+  {
+    "kernel": "aten_slow_conv3d_backward_weight_cpu",
+    "source": "issues/aten_c_kernels/aten_slow_conv3d_backward_weight_cpu.c",
+    "sha256": "fd63415b016c714e0c5d67de6885636d6a98847fc86283a4741f1479063f1e73"
+  },
+  {
+    "kernel": "aten_slow_conv3d_forward_cpu",
+    "source": "issues/aten_c_kernels/aten_slow_conv3d_forward_cpu.c",
+    "sha256": "c53ea53793007a354e3b367caa133308c42b50658562267c1f2ffca16d6b1e28"
+  },
+  {
+    "kernel": "aten_smooth_l1_backward",
+    "source": "issues/aten_c_kernels/aten_smooth_l1_backward.c",
+    "sha256": "cc86b1a1dafeca1cd1bfb942d4620cb353f91da2f1dbb21deba46af8d4c8d56d"
+  },
+  {
+    "kernel": "aten_smooth_l1_elementwise",
+    "source": "issues/aten_c_kernels/aten_smooth_l1_elementwise.c",
+    "sha256": "92c62e05cb98825bd4e0432d86191fcb134b626e5782deffe5f7984aee59e0ed"
+  },
+  {
+    "kernel": "aten_sobol_draw_cpu",
+    "source": "issues/aten_c_kernels/aten_sobol_draw_cpu.c",
+    "sha256": "93b473b187c30c80d7ad78e3ff177416dd61e7d752fb10de74e5748bf1d2729a"
+  },
+  {
+    "kernel": "aten_sobol_fast_forward_cpu",
+    "source": "issues/aten_c_kernels/aten_sobol_fast_forward_cpu.c",
+    "sha256": "33e60a22eb363f0d75abc0c26f867bca2eed29d36ba1000de9e11fac011a1138"
+  },
+  {
+    "kernel": "aten_sobol_initialize_cpu",
+    "source": "issues/aten_c_kernels/aten_sobol_initialize_cpu.c",
+    "sha256": "ea45afa7f685df2fcc9c4b4cf254d590777bd9bf6ab2bdd4b659c6796586f1f7"
+  },
+  {
+    "kernel": "aten_sobol_scramble_cpu",
+    "source": "issues/aten_c_kernels/aten_sobol_scramble_cpu.c",
+    "sha256": "0c543a15904710458adc12de0beda59539a768d058d195d3328b952b9085ea7b"
+  },
+  {
+    "kernel": "aten_softmax",
+    "source": "issues/aten_c_kernels/aten_softmax.c",
+    "sha256": "7c0a04ac81e01d6caabcc923574c96c398452a4abbb376a6b2f6e61102087095"
+  },
+  {
+    "kernel": "aten_softplus",
+    "source": "issues/aten_c_kernels/aten_softplus.c",
+    "sha256": "8ab526c1a497226cbf9ba32a82390715fb6b71a1e8da7de59e642615220915d5"
+  },
+  {
+    "kernel": "aten_softplus_backward",
+    "source": "issues/aten_c_kernels/aten_softplus_backward.c",
+    "sha256": "95a6cad4367c593678529c207dd440c69af32b2315bec5b8ac23bfe6dfc779ca"
+  },
+  {
+    "kernel": "aten_softshrink",
+    "source": "issues/aten_c_kernels/aten_softshrink.c",
+    "sha256": "a5b722ef590e59aa8e035f8dce9d4e77c6eea919cf52f5f9599e2ede5b266ebf"
+  },
+  {
+    "kernel": "aten_sort_cpu",
+    "source": "issues/aten_c_kernels/aten_sort_cpu.c",
+    "sha256": "bc91fab5650febd53d0ae20147607399f04c65d6bb35a2914065c489e3f1d9dc"
+  },
+  {
+    "kernel": "aten_sparse_add_values_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_add_values_cpu.c",
+    "sha256": "13bb67a39b0e37c40eed2f8ab1c37c6d97110ccf6578e81bddeb62442128fa55"
+  },
+  {
+    "kernel": "aten_sparse_addmm_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_addmm_cpu.c",
+    "sha256": "399de0dbbe195ceb8c17f4181431a464a29e37f2ad134924ccac35c3982fdcd0"
+  },
+  {
+    "kernel": "aten_sparse_addmv_bsr_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_addmv_bsr_cpu.c",
+    "sha256": "36860955c064b37ff657b5b0145ccf92f10e695cbe10a49212cd0edf823e287c"
+  },
+  {
+    "kernel": "aten_sparse_addmv_csr_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_addmv_csr_cpu.c",
+    "sha256": "4b58bf4d91858946df01231c52e091a7b1362b222300e69177254352a6ab8e80"
+  },
+  {
+    "kernel": "aten_sparse_bmm_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_bmm_cpu.c",
+    "sha256": "371296d3f7a055871d576a0e2ff3ab4a07d872fdf185245a09d4772ffd4087a5"
+  },
+  {
+    "kernel": "aten_sparse_coo_softmax_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_coo_softmax_backward_cpu.c",
+    "sha256": "e0574ef2b7e0813ea61a08da165d650c18919194798dc5e388a550cf0ceb9ee0"
+  },
+  {
+    "kernel": "aten_sparse_coo_softmax_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_coo_softmax_cpu.c",
+    "sha256": "b2f74f59b2402d33cfc7b17c0939db99248ceca5fac87b1d371fd7a09b700851"
+  },
+  {
+    "kernel": "aten_sparse_coo_to_csr_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_coo_to_csr_cpu.c",
+    "sha256": "80730fcfcb991711a3761551d6da27ccc85470a27b60e6f0e2df04b96e650cfd"
+  },
+  {
+    "kernel": "aten_sparse_csr_add_dense_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_csr_add_dense_cpu.c",
+    "sha256": "fda8b75d97e8415ea6ba9a2fb8ecfa7fc8a833c8b7f548a8dc4cd52b32a7cf19"
+  },
+  {
+    "kernel": "aten_sparse_csr_addmm_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_csr_addmm_cpu.c",
+    "sha256": "ea055ab554e2f96213ecb279fc65b3c5551b51cebdba358318c5734653c3e21d"
+  },
+  {
+    "kernel": "aten_sparse_csr_reduce_all_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_csr_reduce_all_cpu.c",
+    "sha256": "772a1a092a5a3ff1233e8fcfe145db3746696e5820a3d49e7227335e45226235"
+  },
+  {
+    "kernel": "aten_sparse_csr_reduce_dim0_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_csr_reduce_dim0_cpu.c",
+    "sha256": "22fc0f105321cfeebb5ac09d656bf47f893135116436cd64d921f3dde9d3618a"
+  },
+  {
+    "kernel": "aten_sparse_csr_reduce_dim1_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_csr_reduce_dim1_cpu.c",
+    "sha256": "9f8530d806e79582aae241665197f6d984b92d1f9673952203d15a2bf4e41ec4"
+  },
+  {
+    "kernel": "aten_sparse_dense_intersection_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_dense_intersection_cpu.c",
+    "sha256": "a4bd398d8eb3beae0b1ec33dcb514e9e483d1fc19be672fb233842533fa869a8"
+  },
+  {
+    "kernel": "aten_sparse_flatten_indices_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_flatten_indices_cpu.c",
+    "sha256": "8f7116b77217e1b0cae2b210ebe5134df85ec3c91b30d2ff08f1f88e2d1367da"
+  },
+  {
+    "kernel": "aten_sparse_full_coo_indices_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_full_coo_indices_cpu.c",
+    "sha256": "01ab69db79803581d84dc0c4fc61978f121eaa2a95c05f3ebdd2a1d8a55bcbfe"
+  },
+  {
+    "kernel": "aten_sparse_intersection_apply_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_intersection_apply_cpu.c",
+    "sha256": "f7767920f3f7a6b7296bad7d71c2575f40ee8c611768ee77f61e958f824b016e"
+  },
+  {
+    "kernel": "aten_sparse_intersection_launch_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_intersection_launch_cpu.c",
+    "sha256": "999d755b3c9fdacb473a8891751f598852f33eb8a019849cedbf6bc38129ff65"
+  },
+  {
+    "kernel": "aten_sparse_matmul_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_matmul_cpu.c",
+    "sha256": "984fc13d2b4d2368bbe4f4896e47af5da648051ffbf8de5fc2ff470122681a4c"
+  },
+  {
+    "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_matmul_csr_to_coo_cpu.c",
+    "sha256": "f8e99131222a72112b0f53f6e1c9f8054f6427a7a9c02f4d28a9a399f19a40dc"
+  },
+  {
+    "kernel": "aten_sparse_matmul_maxnnz_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_matmul_maxnnz_cpu.c",
+    "sha256": "51ed04fbc3179c3afd3e6dfb626899b68377e0e04a70450c87d8473f1be4c4b8"
+  },
+  {
+    "kernel": "aten_sparse_mul_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_mul_cpu.c",
+    "sha256": "09c5aecedb2b8f65e32dc5314520d2b0c481264cb63702068829bcec02d5e552"
+  },
+  {
+    "kernel": "aten_sparse_norm_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_norm_cpu.c",
+    "sha256": "38aaf00c930b2a2f18c9bd9129f5a16fef500faa819ab468b6695b1886f39382"
+  },
+  {
+    "kernel": "aten_sparse_softmax_offsets_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_softmax_offsets_cpu.c",
+    "sha256": "e1b684c13f180572ea4a8368893f1d31e5a8a3e91586f723636cef5d90260efe"
+  },
+  {
+    "kernel": "aten_sparse_softmax_pools_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_softmax_pools_cpu.c",
+    "sha256": "a6ea225b603c8d3a286ab5cf30b9141d9b0de41717455ab9dd0d4a2c32cc7775"
+  },
+  {
+    "kernel": "aten_sparse_sum_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_sum_backward_cpu.c",
+    "sha256": "8921f974b9dac2b07843f0fc6f7435e5af4d5339bc62855b2f7ef52461c31873"
+  },
+  {
+    "kernel": "aten_sparse_sum_cpu",
+    "source": "issues/aten_c_kernels/aten_sparse_sum_cpu.c",
+    "sha256": "8fb26db714c8eb5aa7166139e6caf428af46080f07224e35580b44a2b58b2162"
+  },
+  {
+    "kernel": "aten_spdiags_cpu",
+    "source": "issues/aten_c_kernels/aten_spdiags_cpu.c",
+    "sha256": "eb9aec339f6708dd6a62887474bb7f7d5c400f9cb1370592f78ee967419172e7"
+  },
+  {
+    "kernel": "aten_spherical_bessel_j0",
+    "source": "issues/aten_c_kernels/aten_spherical_bessel_j0.c",
+    "sha256": "2df6dbef2c4304fa6f26913dc7e6496a8503176092503b85c18f5289c4fe81f6"
+  },
+  {
+    "kernel": "aten_split_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_split_copy_cpu.c",
+    "sha256": "a4565356e2a3afd092e68f727a6fc2e028a9389b72a731bf94cc13f72bc4d493"
+  },
+  {
+    "kernel": "aten_spmm_reduce_arg_cpu",
+    "source": "issues/aten_c_kernels/aten_spmm_reduce_arg_cpu.c",
+    "sha256": "df5328f0204f248aa68c060b8e5ecf4bac59ebdff449727b5d34e0b5a167f8d4"
+  },
+  {
+    "kernel": "aten_spmm_reduce_backward_input_arg_cpu",
+    "source": "issues/aten_c_kernels/aten_spmm_reduce_backward_input_arg_cpu.c",
+    "sha256": "a3b4f4e61229741cad2925c39fa11fe64460345689284efe0ab8b0bc31d62d77"
+  },
+  {
+    "kernel": "aten_spmm_reduce_backward_input_cpu",
+    "source": "issues/aten_c_kernels/aten_spmm_reduce_backward_input_cpu.c",
+    "sha256": "838612c20f6f9a89d768cf76d136ee205da74e7febc1a08fbfc8d256abd164b9"
+  },
+  {
+    "kernel": "aten_spmm_reduce_backward_other_arg_cpu",
+    "source": "issues/aten_c_kernels/aten_spmm_reduce_backward_other_arg_cpu.c",
+    "sha256": "792c4865af18d93fe2b323209b9b40a12fcb76da7306925800050efb3b9598f4"
+  },
+  {
+    "kernel": "aten_spmm_reduce_backward_other_cpu",
+    "source": "issues/aten_c_kernels/aten_spmm_reduce_backward_other_cpu.c",
+    "sha256": "ab16c21899c5debdfa06d9b58d52dbdf926cb4ba0452d7a56080c5c5fe52fc5a"
+  },
+  {
+    "kernel": "aten_spmm_reduce_cpu",
+    "source": "issues/aten_c_kernels/aten_spmm_reduce_cpu.c",
+    "sha256": "3cb9f918819860f912dd1f548702f319c17b5d0778a7fe1eeda181bd05d821fd"
+  },
+  {
+    "kernel": "aten_sqrt",
+    "source": "issues/aten_c_kernels/aten_sqrt.c",
+    "sha256": "960506e57615930e3ff027687f0f3277c18ceea620cb4aeaa0f7daa00f787bd8"
+  },
+  {
+    "kernel": "aten_square",
+    "source": "issues/aten_c_kernels/aten_square.c",
+    "sha256": "4bfb0defb75e7bfc08a255b96ba0d9913d05b4387e388a51956f0dae70878050"
+  },
+  {
+    "kernel": "aten_sspaddmm_cpu",
+    "source": "issues/aten_c_kernels/aten_sspaddmm_cpu.c",
+    "sha256": "a2a0a49db5f629aeb2b19fe51275af1f59502d9c4b7f0a006cd16dae1cb23d64"
+  },
+  {
+    "kernel": "aten_stack_serial_cpu",
+    "source": "issues/aten_c_kernels/aten_stack_serial_cpu.c",
+    "sha256": "3f2acae48687bb38a22d03be243252b6e9b1f8c033be792e0b9cc4281bc60908"
+  },
+  {
+    "kernel": "aten_standard_gamma_grad_cpu",
+    "source": "issues/aten_c_kernels/aten_standard_gamma_grad_cpu.c",
+    "sha256": "c48e5885ea06f44149d2f80ab68f34894104cf4072219a5f4c6218459a34c9a8"
+  },
+  {
+    "kernel": "aten_std_var_all_cpu",
+    "source": "issues/aten_c_kernels/aten_std_var_all_cpu.c",
+    "sha256": "ce980459733a6f7d78bf8f98bf44f923464203d31e8fb297ea850ca2b5a54a4e"
+  },
+  {
+    "kernel": "aten_std_var_cpu",
+    "source": "issues/aten_c_kernels/aten_std_var_cpu.c",
+    "sha256": "9a0ee5c348091faa655970f58757d72fb9c2a5fac1cb197a81bbb17d584ed7da"
+  },
+  {
+    "kernel": "aten_sum",
+    "source": "issues/aten_c_kernels/aten_sum.c",
+    "sha256": "cc6297e8268435d0b714b45906f031081d4ae549ee3494b72a7fb468345233f2"
+  },
+  {
+    "kernel": "aten_sum_cpu_backend",
+    "source": "issues/aten_c_kernels/aten_sum_cpu_backend.c",
+    "sha256": "eebdb73058ad1998b44e2cc82863e3ddb84834e3a56359698dcf40af8934fcf6"
+  },
+  {
+    "kernel": "aten_sumproduct_pair_cpu",
+    "source": "issues/aten_c_kernels/aten_sumproduct_pair_cpu.c",
+    "sha256": "fd8864e6bb751e52ff9ddc6110ee82f694b9b34e12e2dbcd85aa97d33ec51290"
+  },
+  {
+    "kernel": "aten_take_cpu",
+    "source": "issues/aten_c_kernels/aten_take_cpu.c",
+    "sha256": "15a0f6a87895567f0b59013f635ffc54fb3766a075e8fe0c8ed609472fea5baa"
+  },
+  {
+    "kernel": "aten_tan",
+    "source": "issues/aten_c_kernels/aten_tan.c",
+    "sha256": "d48a3d442ad61efe5a9d59e26ba4c56a05197c6bebe2827d0ef8bf18991127c0"
+  },
+  {
+    "kernel": "aten_tanh",
+    "source": "issues/aten_c_kernels/aten_tanh.c",
+    "sha256": "461cf6c1ef198403d68a1ff3ae04d63f23427b88a1c7d5a9cb2b361d41cedeb1"
+  },
+  {
+    "kernel": "aten_tanh_backward",
+    "source": "issues/aten_c_kernels/aten_tanh_backward.c",
+    "sha256": "9e8549a1d0ed3cf0c679da1742643f5612594e620e9a7809e61d773e45967c75"
+  },
+  {
+    "kernel": "aten_threshold_backward",
+    "source": "issues/aten_c_kernels/aten_threshold_backward.c",
+    "sha256": "4f8e13fc29926606e065f6917827043cba22dc38265a70296153866d960e0d1d"
+  },
+  {
+    "kernel": "aten_topk_cpu",
+    "source": "issues/aten_c_kernels/aten_topk_cpu.c",
+    "sha256": "f90e4e3d3036b9df073a3d6bb5e07f6721ca69936f44430f8cbd012c1b9d3c7a"
+  },
+  {
+    "kernel": "aten_trace_cpu",
+    "source": "issues/aten_c_kernels/aten_trace_cpu.c",
+    "sha256": "88baf4b4ee4a6c52bfc7360e8af0a82c59f2351e592bc6a9a8cab156b4cb1f50"
+  },
+  {
+    "kernel": "aten_transform_bias_rescale_qkv_cpu",
+    "source": "issues/aten_c_kernels/aten_transform_bias_rescale_qkv_cpu.c",
+    "sha256": "88efba95af926b20b0cdb4c8de2764f5712509dfecb4294ad33898fb135291e7"
+  },
+  {
+    "kernel": "aten_transpose_copy",
+    "source": "issues/aten_c_kernels/aten_transpose_copy.c",
+    "sha256": "9cdba1af49ece65115fddb65016db997b5c0fdd71274c5eb8c007ab9d95108f6"
+  },
+  {
+    "kernel": "aten_trigamma",
+    "source": "issues/aten_c_kernels/aten_trigamma.c",
+    "sha256": "b9ec5f5adef8a53303621f555fda7abcd0535364ef2e5b8584dc92156ca81dc3"
+  },
+  {
+    "kernel": "aten_tril_indices_cpu",
+    "source": "issues/aten_c_kernels/aten_tril_indices_cpu.c",
+    "sha256": "a6bd1c30e73ac65f4274f6a76eacb6d235e4c869965e7d03c8124423915c32b3"
+  },
+  {
+    "kernel": "aten_trilinear_cpu",
+    "source": "issues/aten_c_kernels/aten_trilinear_cpu.c",
+    "sha256": "17ec52e56f5e410652902eabb130451613ff1a7d0e26b272d8ea022e3008a33b"
+  },
+  {
+    "kernel": "aten_triu_indices_cpu",
+    "source": "issues/aten_c_kernels/aten_triu_indices_cpu.c",
+    "sha256": "4381c40c2bbc9fed8d84b8335962bece458f973a266c21c85e8de74d0435a40a"
+  },
+  {
+    "kernel": "aten_triu_mask_cpu",
+    "source": "issues/aten_c_kernels/aten_triu_mask_cpu.c",
+    "sha256": "6198b7da17b76cdefd8560b36cf145d399ed1bd8aa041bba7657f922c0c8dcf0"
+  },
+  {
+    "kernel": "aten_triu_tril_batch_cpu",
+    "source": "issues/aten_c_kernels/aten_triu_tril_batch_cpu.c",
+    "sha256": "da6a49d12e2ec4bd32389ca438d1db4d5a38ddd30427a7a2fb61964d0cebad08"
+  },
+  {
+    "kernel": "aten_triu_tril_single_cpu",
+    "source": "issues/aten_c_kernels/aten_triu_tril_single_cpu.c",
+    "sha256": "8033f1db3884a43000a030e8c142ae2a27d19d5f8574c8880e1a7ef33fc8c844"
+  },
+  {
+    "kernel": "aten_trunc",
+    "source": "issues/aten_c_kernels/aten_trunc.c",
+    "sha256": "9ee99576371b96f91484dbc0204287a7781d5d95994d7965d8b22a888d25b30a"
+  },
+  {
+    "kernel": "aten_unbind_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_unbind_copy_cpu.c",
+    "sha256": "0a1446609ea270734817870c7a9787c62011c76157713baaba172ee7a9052bc5"
+  },
+  {
+    "kernel": "aten_unfold3d_acc_cpu",
+    "source": "issues/aten_c_kernels/aten_unfold3d_acc_cpu.c",
+    "sha256": "7dc2f0456ea4f8691906d016bf4e2f9e56eb61e36ac749e26a3622206a546832"
+  },
+  {
+    "kernel": "aten_unfold3d_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_unfold3d_copy_cpu.c",
+    "sha256": "510e397236eecb62b07c2caf0d8fbc97a65585193fe2295ca72a92c3bddb4c7f"
+  },
+  {
+    "kernel": "aten_unfold3d_zero_acc_cpu",
+    "source": "issues/aten_c_kernels/aten_unfold3d_zero_acc_cpu.c",
+    "sha256": "cee543792e0d48a439dccb3d400278ca510f83a1f7f392d5c9402c01a615072c"
+  },
+  {
+    "kernel": "aten_unfold3d_zero_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_unfold3d_zero_copy_cpu.c",
+    "sha256": "c6fb5d79f68997a4011858aae2de3ff259d3779eb5f89193261bda8dd3560d29"
+  },
+  {
+    "kernel": "aten_unfold_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_unfold_backward_cpu.c",
+    "sha256": "45d31edce6e04a011fb501df4d2e3aed5e8a64577f2e4aa093bfa30b7be537ca"
+  },
+  {
+    "kernel": "aten_unfolded2d_acc_cpu",
+    "source": "issues/aten_c_kernels/aten_unfolded2d_acc_cpu.c",
+    "sha256": "3af174e84b7f0bdd87fdd6a2cda82934a4c0146916b1acfade8431cf4013971c"
+  },
+  {
+    "kernel": "aten_unfolded2d_copy_cpu",
+    "source": "issues/aten_c_kernels/aten_unfolded2d_copy_cpu.c",
+    "sha256": "2d37488fab0e73af730fdb3c536e424709895eac36b8d424f1e318bba5e614c1"
+  },
+  {
+    "kernel": "aten_uniform_cpu",
+    "source": "issues/aten_c_kernels/aten_uniform_cpu.c",
+    "sha256": "16022bc8ad8fd0f5ab66e86e218d9b88b730b7af1e1c3c42b80e4a42746798b5"
+  },
+  {
+    "kernel": "aten_unique_bool_cpu",
+    "source": "issues/aten_c_kernels/aten_unique_bool_cpu.c",
+    "sha256": "be649e4de6d702a2a12848cbff84af638ded0dc45d53921db3593a2306b97050"
+  },
+  {
+    "kernel": "aten_unique_consecutive_cpu",
+    "source": "issues/aten_c_kernels/aten_unique_consecutive_cpu.c",
+    "sha256": "5257587c71a68c06a1f7bc8ef86c674095d1b33db05ccefbb49c4e11d1e60a05"
+  },
+  {
+    "kernel": "aten_unique_dim_impl_cpu",
+    "source": "issues/aten_c_kernels/aten_unique_dim_impl_cpu.c",
+    "sha256": "f1da6104948e78e469866dfee1613333f8e0149ff80f4463833b86a64cd0c04a"
+  },
+  {
+    "kernel": "aten_unique_dim_template_cpu",
+    "source": "issues/aten_c_kernels/aten_unique_dim_template_cpu.c",
+    "sha256": "705830e076e1664e7c17d7e2a5ead17ef883f30fa3938edbc150d29eb6b36704"
+  },
+  {
+    "kernel": "aten_unique_sorted_cpu",
+    "source": "issues/aten_c_kernels/aten_unique_sorted_cpu.c",
+    "sha256": "721f0f56c95d252de57e78cc63164e5709bdf1eda4fedfb3fb307f84acfe7ffe"
+  },
+  {
+    "kernel": "aten_unpack_pivots_cpu",
+    "source": "issues/aten_c_kernels/aten_unpack_pivots_cpu.c",
+    "sha256": "e1005086d6492a7c26d2d2c523333ca82194025c3a0613af16d91acfdef2e3d4"
+  },
+  {
+    "kernel": "aten_unsafe_index_cpu",
+    "source": "issues/aten_c_kernels/aten_unsafe_index_cpu.c",
+    "sha256": "d97a85687de614bdf29f946b74eec4eb4904642c41bdad4230877e817c03762c"
+  },
+  {
+    "kernel": "aten_upper_bound_cpu",
+    "source": "issues/aten_c_kernels/aten_upper_bound_cpu.c",
+    "sha256": "eb416ff10799098454b16fdce87122dc06bd7cf7d7b303dd05a75b964b1be2d2"
+  },
+  {
+    "kernel": "aten_upsample_bicubic2d_aa_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bicubic2d_aa_backward_cpu.c",
+    "sha256": "4bfdf91779fa3402c7f60e0360fcec28b77952e9758e4577a9ebba92915ed044"
+  },
+  {
+    "kernel": "aten_upsample_bicubic2d_aa_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bicubic2d_aa_cpu.c",
+    "sha256": "264360a083a5334912cec6e584ad7d773ed2b5e470c8af6643cb98e358479b69"
+  },
+  {
+    "kernel": "aten_upsample_bicubic2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bicubic2d_backward_cpu.c",
+    "sha256": "cedcdb1d73150a7ac06a21164b20788f07825a5e55a500f7cc3d06905ed96e06"
+  },
+  {
+    "kernel": "aten_upsample_bicubic2d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bicubic2d_cpu.c",
+    "sha256": "5dd4907c8f4e5d8d85f7484f078eae5a6e2ab9c967ce24e5beeca4c9ddeb7d5b"
+  },
+  {
+    "kernel": "aten_upsample_bilinear2d",
+    "source": "issues/aten_c_kernels/aten_upsample_bilinear2d.c",
+    "sha256": "db58cbdc72f1615b05ae1f14ee7bd3025fe78d4bc543cb0ae4d868d443f9e294"
+  },
+  {
+    "kernel": "aten_upsample_bilinear2d_aa_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bilinear2d_aa_backward_cpu.c",
+    "sha256": "d1022ff954b6364a5ade4d9467f847dd4cd11c0fb926a380e939220092bf2ac8"
+  },
+  {
+    "kernel": "aten_upsample_bilinear2d_aa_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bilinear2d_aa_cpu.c",
+    "sha256": "80e569afadeb7d7e1f8742cf36b0eb368ee1234919a9457fb02eedddd9c5ba3b"
+  },
+  {
+    "kernel": "aten_upsample_bilinear2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bilinear2d_backward_cpu.c",
+    "sha256": "a72f1e44576464919dfa374003328561267690e905e3a0ccb8299a1b84e997d4"
+  },
+  {
+    "kernel": "aten_upsample_bilinear2d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_bilinear2d_cpu.c",
+    "sha256": "d45cbc907b70b140157aab7766b7faca2442ce8686fb4ce229cf14966a67ef8b"
+  },
+  {
+    "kernel": "aten_upsample_lanczos2d_aa_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_lanczos2d_aa_backward_cpu.c",
+    "sha256": "75a944c4458649a6a21673a612309233b9f330de4db7c8842b18b81a9190b5a7"
+  },
+  {
+    "kernel": "aten_upsample_lanczos2d_aa_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_lanczos2d_aa_cpu.c",
+    "sha256": "6e5cfcc943155b5272c1ebda424093312332e65f0bcf1e82e9b9d32d46245916"
+  },
+  {
+    "kernel": "aten_upsample_linear1d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_linear1d_backward_cpu.c",
+    "sha256": "d53ae8e38b243edb3252eab8af430c4773789bf3f5de64712e85b8b563dbb963"
+  },
+  {
+    "kernel": "aten_upsample_linear1d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_linear1d_cpu.c",
+    "sha256": "24760cda10666e624f4362f9968a62c3f98de7e0f5e675753168f67417a6640f"
+  },
+  {
+    "kernel": "aten_upsample_nearest1d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest1d_backward_cpu.c",
+    "sha256": "a0ba1da6609d19ed7e15e19f28d0a8201beefdbfe5c4aa5a6e0d7e4dfb36a815"
+  },
+  {
+    "kernel": "aten_upsample_nearest1d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest1d_cpu.c",
+    "sha256": "6d2d37692a27fde1806823f808b4bca7105c6c612df4e9e4d255be502cefbdb7"
+  },
+  {
+    "kernel": "aten_upsample_nearest2d",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest2d.c",
+    "sha256": "afd2ffc6693f515a11f60f2fc7669a6955e057be8dbf45e6f628d0ef94018312"
+  },
+  {
+    "kernel": "aten_upsample_nearest2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest2d_backward_cpu.c",
+    "sha256": "cbdf963a7f45f7374d1bc8e5234d38aab0e43a5d73f5a3f9127525af158ee4a8"
+  },
+  {
+    "kernel": "aten_upsample_nearest2d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest2d_cpu.c",
+    "sha256": "e74099387251b26cbd7b9c57a67d532996d368c8ee155b5d5407d3d118f286a4"
+  },
+  {
+    "kernel": "aten_upsample_nearest3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest3d_backward_cpu.c",
+    "sha256": "5a6600ed5f835dba97d729f79f09fe1ee4deff41fb92bda2bfbf7fdf4978b676"
+  },
+  {
+    "kernel": "aten_upsample_nearest3d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest3d_cpu.c",
+    "sha256": "7d61fec576b52a07f47c12fb33d9f3982fcb0a8c15d28fb9d2655bfc0c3721c1"
+  },
+  {
+    "kernel": "aten_upsample_nearest_exact1d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest_exact1d_backward_cpu.c",
+    "sha256": "7a5b1002b30d8a3d373e8e0d8debb4147d508d1ec72f68428817e5b779819f0a"
+  },
+  {
+    "kernel": "aten_upsample_nearest_exact1d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest_exact1d_cpu.c",
+    "sha256": "eb276a2085b11f91c35b68eb737610ac808937bdb0a37413ba28b602ddc4fb03"
+  },
+  {
+    "kernel": "aten_upsample_nearest_exact2d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest_exact2d_backward_cpu.c",
+    "sha256": "6d7bac534c3246dd58ce6506bbe43d9886ec7fab11730613c69d7ae17be1b954"
+  },
+  {
+    "kernel": "aten_upsample_nearest_exact2d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest_exact2d_cpu.c",
+    "sha256": "1cbe03eb07020e0723fef49c00db1a0d2bbe6ab4391a32bc31d42ee061565bfb"
+  },
+  {
+    "kernel": "aten_upsample_nearest_exact3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest_exact3d_backward_cpu.c",
+    "sha256": "a14dd4ce083775436bfb20c34228d7ff2fc587177a17dc9600c2584d5863ea15"
+  },
+  {
+    "kernel": "aten_upsample_nearest_exact3d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_nearest_exact3d_cpu.c",
+    "sha256": "b8dcba5ccf3681cb21fc998e7b162eb60de38a1289f42cedc3256343bfc29abd"
+  },
+  {
+    "kernel": "aten_upsample_trilinear3d_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_trilinear3d_backward_cpu.c",
+    "sha256": "ba7641b0cbbf1cbb8f025bb62e7f4d32de51ed018ec0050261000190fe7cc4c8"
+  },
+  {
+    "kernel": "aten_upsample_trilinear3d_cpu",
+    "source": "issues/aten_c_kernels/aten_upsample_trilinear3d_cpu.c",
+    "sha256": "77246d6d26656e708f4410b577c45179ced5f8b24135bb23d9ccd40c58755a67"
+  },
+  {
+    "kernel": "aten_vector_norm_out_cpu",
+    "source": "issues/aten_c_kernels/aten_vector_norm_out_cpu.c",
+    "sha256": "820306308a5757422e23b4042e161c5faadb9ffa8ea1cd40a0d426e5fe3d652b"
+  },
+  {
+    "kernel": "aten_weight_norm_backward_cpu",
+    "source": "issues/aten_c_kernels/aten_weight_norm_backward_cpu.c",
+    "sha256": "b947a4d328a423cfdeef1c86b9aad8364ed05d7330644d003035e87c31bdfcd6"
+  },
+  {
+    "kernel": "aten_weight_norm_cpu",
+    "source": "issues/aten_c_kernels/aten_weight_norm_cpu.c",
+    "sha256": "c19309f8ebe7b8a5f44999716f194ed00dd7c03444f61010f33ffe0e86adca42"
+  },
+  {
+    "kernel": "aten_weight_to_int4pack_cpu",
+    "source": "issues/aten_c_kernels/aten_weight_to_int4pack_cpu.c",
+    "sha256": "8204e3e86929be6e8dd1ff073b3f56031f1245bc840ca86896088438df855106"
+  },
+  {
+    "kernel": "aten_where_cpu",
+    "source": "issues/aten_c_kernels/aten_where_cpu.c",
+    "sha256": "be5ff07e9e4596f3adc16690ad1a22d2196aed3647bb2204aadc7998ad54410e"
+  },
+  {
+    "kernel": "aten_xlog1py",
+    "source": "issues/aten_c_kernels/aten_xlog1py.c",
+    "sha256": "ddd5311a23627a665bb38871081f08df41cc3abc9cf2114f46b291c7886e1fce"
+  },
+  {
+    "kernel": "aten_xlogy",
+    "source": "issues/aten_c_kernels/aten_xlogy.c",
+    "sha256": "e96eeed9bd6e54631369e4ae0ed28388a38ead4a3cc585c36de456116570bf43"
+  },
+  {
+    "kernel": "aten_xor_sum_cpu",
+    "source": "issues/aten_c_kernels/aten_xor_sum_cpu.c",
+    "sha256": "ca2cf2b4d2bea70b978fbde3800be887a22558ccd036f3ee075d42cf875db3f4"
+  },
+  {
+    "kernel": "aten_zeros_cpu",
+    "source": "issues/aten_c_kernels/aten_zeros_cpu.c",
+    "sha256": "6b62ab31620170b4c7886220e0a7cc8fb938f21eae3d11bc41163315ea99df0e"
+  },
+  {
+    "kernel": "aten_zeta",
+    "source": "issues/aten_c_kernels/aten_zeta.c",
+    "sha256": "f1fdf4fe86ad987e739b5b8e526b56dcb60e69162a2eae01a27b914a11cd1ef0"
+  }
+]
