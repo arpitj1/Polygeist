@@ -1,0 +1,219 @@
+[
+  {
+    "kernel": "interp_value_2d_scratch_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/value_scratch_sliced.c",
+    "function": "mfem_interp_value_2d_scratch_sliced",
+    "support_source": null,
+    "sha256": "8d872b872a02965b0363ca82946b968e224f833913af686185e1c2f21b6d49cd"
+  },
+  {
+    "kernel": "interp_value_3d_scratch_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/value_scratch_sliced.c",
+    "function": "mfem_interp_value_3d_scratch_sliced",
+    "support_source": null,
+    "sha256": "8d872b872a02965b0363ca82946b968e224f833913af686185e1c2f21b6d49cd"
+  },
+  {
+    "kernel": "integrate_value_2d_scratch_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/value_scratch_sliced.c",
+    "function": "mfem_integrate_value_2d_scratch_sliced",
+    "support_source": null,
+    "sha256": "8d872b872a02965b0363ca82946b968e224f833913af686185e1c2f21b6d49cd"
+  },
+  {
+    "kernel": "integrate_value_3d_scratch_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/value_scratch_sliced.c",
+    "function": "mfem_integrate_value_3d_scratch_sliced",
+    "support_source": null,
+    "sha256": "8d872b872a02965b0363ca82946b968e224f833913af686185e1c2f21b6d49cd"
+  },
+  {
+    "kernel": "mass_apply_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/mass_stage_sliced.c",
+    "function": "mfem_pa_mass_apply_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "82f10136103b36fd496cb47f82709c9a3101b0968a03f216ebd5a407722e4cf3"
+  },
+  {
+    "kernel": "mass_apply_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/mass_stage_sliced.c",
+    "function": "mfem_pa_mass_apply_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "82f10136103b36fd496cb47f82709c9a3101b0968a03f216ebd5a407722e4cf3"
+  },
+  {
+    "kernel": "interp_grad_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/gradient_stage_sliced.c",
+    "function": "mfem_interp_grad_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "f500968482b02e1513a5de7e2083b36628e8bd78dbb25d6e02528ad831d7e8eb"
+  },
+  {
+    "kernel": "interp_grad_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/gradient_stage_sliced.c",
+    "function": "mfem_interp_grad_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "f500968482b02e1513a5de7e2083b36628e8bd78dbb25d6e02528ad831d7e8eb"
+  },
+  {
+    "kernel": "integrate_grad_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/gradient_stage_sliced.c",
+    "function": "mfem_integrate_grad_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "f500968482b02e1513a5de7e2083b36628e8bd78dbb25d6e02528ad831d7e8eb"
+  },
+  {
+    "kernel": "integrate_grad_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/gradient_stage_sliced.c",
+    "function": "mfem_integrate_grad_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "f500968482b02e1513a5de7e2083b36628e8bd78dbb25d6e02528ad831d7e8eb"
+  },
+  {
+    "kernel": "diffusion_apply_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/diffusion_stage_sliced.c",
+    "function": "mfem_pa_diffusion_apply_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "482b7f8f6b154e99569a0902fb3890844d16183b8fc72f887448a2898da3cfb1"
+  },
+  {
+    "kernel": "diffusion_apply_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/diffusion_stage_sliced.c",
+    "function": "mfem_pa_diffusion_apply_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "482b7f8f6b154e99569a0902fb3890844d16183b8fc72f887448a2898da3cfb1"
+  },
+  {
+    "kernel": "convection_apply_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/convection_stage_sliced.c",
+    "function": "mfem_pa_convection_apply_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "d6433547f1f30cacd91f4f49919ba50a65b3723c94db8743ed23cd37f482deea"
+  },
+  {
+    "kernel": "convection_apply_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/convection_stage_sliced.c",
+    "function": "mfem_pa_convection_apply_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "d6433547f1f30cacd91f4f49919ba50a65b3723c94db8743ed23cd37f482deea"
+  },
+  {
+    "kernel": "elasticity_qpoint_2d_scalarized",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/elasticity_scalarized.c",
+    "function": "mfem_elasticity_qpoint_2d_scalarized",
+    "support_source": null,
+    "sha256": "f766478f20af576212d0df017da1c86447382307a8c0da6870e8cae82babfa31"
+  },
+  {
+    "kernel": "elasticity_qpoint_3d_scalarized",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/elasticity_scalarized.c",
+    "function": "mfem_elasticity_qpoint_3d_scalarized",
+    "support_source": null,
+    "sha256": "f766478f20af576212d0df017da1c86447382307a8c0da6870e8cae82babfa31"
+  },
+  {
+    "kernel": "curlcurl_apply_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/de_rham2_stage_sliced.c",
+    "function": "mfem_pa_curlcurl_apply_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "1ec9abd1c30e950afc9efdfd31d280308bff674eed0c58368d0fea84096cff80"
+  },
+  {
+    "kernel": "divdiv_apply_2d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/de_rham2_stage_sliced.c",
+    "function": "mfem_pa_divdiv_apply_2d_stage_sliced",
+    "support_source": null,
+    "sha256": "1ec9abd1c30e950afc9efdfd31d280308bff674eed0c58368d0fea84096cff80"
+  },
+  {
+    "kernel": "divdiv_apply_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/divdiv3_stage_sliced.c",
+    "function": "mfem_pa_divdiv_apply_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "bc7179eddb6bda6584e759c6eb3fbdb259ceaa1c41e58db918ae2830b6a093b5"
+  },
+  {
+    "kernel": "curlcurl_apply_3d_stage_sliced",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/normalized/curlcurl3_stage_sliced.c",
+    "function": "mfem_pa_curlcurl_apply_3d_stage_sliced",
+    "support_source": null,
+    "sha256": "6e511389bebc570f524b4063fa735a24d273d985fff753d067704934be99c170"
+  },
+  {
+    "kernel": "mfem_app_mtop_iso_elasticity_dfem_2d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/mtop_iso_elasticity_dfem_2d.c",
+    "function": "mfem_app_mtop_iso_elasticity_dfem_2d",
+    "support_source": null,
+    "sha256": "ddfe97ad0a4f038397b2f3167b50197fdd0baa6baee16f0f4bf5badfa092a53f"
+  },
+  {
+    "kernel": "mfem_app_dfem_minimal_surface_2d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/dfem_minimal_surface_2d.c",
+    "function": "mfem_app_dfem_minimal_surface_2d",
+    "support_source": null,
+    "sha256": "6e59bae343b8a7b1bf66d3267a48b95b1924bf00e8cbcf79be29bc021f970ed3"
+  },
+  {
+    "kernel": "mfem_app_ex35p_h1_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/ex35p_pa_operators.c",
+    "function": "mfem_app_ex35p_h1_3d",
+    "support_source": null,
+    "sha256": "99f9523b7208da9516203104f9f94a53c3d86596df630b01e6ba702702813d6c"
+  },
+  {
+    "kernel": "mfem_app_ex35p_hcurl_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/ex35p_pa_operators.c",
+    "function": "mfem_app_ex35p_hcurl_3d",
+    "support_source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/missing_stage_kernels.c",
+    "sha256": "99f9523b7208da9516203104f9f94a53c3d86596df630b01e6ba702702813d6c"
+  },
+  {
+    "kernel": "mfem_app_ex35p_hdiv_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/ex35p_pa_operators.c",
+    "function": "mfem_app_ex35p_hdiv_3d",
+    "support_source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/missing_stage_kernels.c",
+    "sha256": "99f9523b7208da9516203104f9f94a53c3d86596df630b01e6ba702702813d6c"
+  },
+  {
+    "kernel": "mfem_app_ex9p_mass_convection_2d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/ex9p_mass_convection_2d.c",
+    "function": "mfem_app_ex9p_mass_convection_2d",
+    "support_source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/missing_stage_kernels.c",
+    "sha256": "df0eb6010712ed220de50a5246cf53e1c949fb0420786623758b513a5bf409f4"
+  },
+  {
+    "kernel": "mfem_app_grad_div_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/grad_div_3d.c",
+    "function": "mfem_app_grad_div_3d",
+    "support_source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/missing_stage_kernels.c",
+    "sha256": "fc68c54ab87b9642cacb5e09db618ffb20a737a47b1ff6057f46f1f4900cf6fe"
+  },
+  {
+    "kernel": "mfem_app_abs_l1_mass_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/abs_l1_jacobi_operators.c",
+    "function": "mfem_app_abs_l1_mass_3d",
+    "support_source": null,
+    "sha256": "2a266b35b202de237185205654fb04ee58d6e3b1150d2d1ea63f20778ec32a82"
+  },
+  {
+    "kernel": "mfem_app_abs_l1_diffusion_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/abs_l1_jacobi_operators.c",
+    "function": "mfem_app_abs_l1_diffusion_3d",
+    "support_source": null,
+    "sha256": "2a266b35b202de237185205654fb04ee58d6e3b1150d2d1ea63f20778ec32a82"
+  },
+  {
+    "kernel": "mfem_app_abs_l1_curlcurl_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/abs_l1_jacobi_operators.c",
+    "function": "mfem_app_abs_l1_curlcurl_3d",
+    "support_source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/missing_stage_kernels.c",
+    "sha256": "2a266b35b202de237185205654fb04ee58d6e3b1150d2d1ea63f20778ec32a82"
+  },
+  {
+    "kernel": "mfem_app_navier_tgv_pa_operators_3d",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/navier_tgv_pressure_diffusion_3d.c",
+    "function": "mfem_app_navier_tgv_pa_operators_3d",
+    "support_source": "/home/arjaiswal/Polygeist-polybench-compile-study/issues/mfem_c_kernels/application_extractions/missing_stage_kernels.c",
+    "sha256": "3ca805c74f4aca827206bd5add0eb2fa16365c1fc9356f1733aea9e907d6b31b"
+  }
+]

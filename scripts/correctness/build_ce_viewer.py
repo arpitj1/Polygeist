@@ -268,6 +268,14 @@ BUILD_TIME_RESULTS_DIR = env_path(
     "POLYGEIST_BUILD_TIME_RESULTS_DIR",
     EQUALITY_SATURATION_RESULTS_DIR / "polybench_whole_compile_20260909",
 )
+EGGLOG_BUILD_TIME_RESULTS = (
+    ("ATen", EQUALITY_SATURATION_RESULTS_DIR
+     / "aten_whole_compile_egglog_20260910", "aten_build_time_artifacts"),
+    ("MFEM", EQUALITY_SATURATION_RESULTS_DIR
+     / "mfem_whole_compile_egglog_20260910", "mfem_build_time_artifacts"),
+    ("Llama", EQUALITY_SATURATION_RESULTS_DIR
+     / "llama_whole_compile_egglog_20260910", "llama_build_time_artifacts"),
+)
 GINSBACH_SUMMARY = env_path(
     "POLYGEIST_GINSBACH_SUMMARY",
     REPO_ROOT / "issues/ginsbach_asplos18/program_summary_2026-09-05.csv",
@@ -9236,15 +9244,18 @@ def _saturation_paper_study_page() -> str:
 
 def write_build_time_artifact_link() -> None:
     """Expose raw whole-compilation measurements from the viewer."""
-    artifact_link = OUTPUT_DIR / "build_time_artifacts"
-    if artifact_link.is_symlink():
-        if artifact_link.resolve() != BUILD_TIME_RESULTS_DIR.resolve():
-            artifact_link.unlink()
-            artifact_link.symlink_to(
-                BUILD_TIME_RESULTS_DIR, target_is_directory=True)
-    elif not artifact_link.exists():
-        artifact_link.symlink_to(
-            BUILD_TIME_RESULTS_DIR, target_is_directory=True)
+    targets = (("build_time_artifacts", BUILD_TIME_RESULTS_DIR),) + tuple(
+        (link_name, directory)
+        for _, directory, link_name in EGGLOG_BUILD_TIME_RESULTS
+    )
+    for link_name, target in targets:
+        artifact_link = OUTPUT_DIR / link_name
+        if artifact_link.is_symlink():
+            if artifact_link.resolve() != target.resolve():
+                artifact_link.unlink()
+                artifact_link.symlink_to(target, target_is_directory=True)
+        elif not artifact_link.exists():
+            artifact_link.symlink_to(target, target_is_directory=True)
 
 
 def refresh_build_time_viewer_links() -> None:
@@ -9265,8 +9276,8 @@ def refresh_build_time_viewer_links() -> None:
         return
     card = (
         card_href + '<b>Build time</b><span>30 PolyBench kernels</span>'
-        '<small>Five Egglog and five exact-syntax source-to-AArch64 builds: '
-        'whole compilation time, matcher cost, peak memory, coverage, and '
+        '<small>Whole source-to-AArch64 compilation for PolyBench, ATen, MFEM, '
+        'and Llama: wall time, matcher cost, peak memory, coverage, and '
         'failures.</small></a>')
     marker = '</div><a name="taxonomy"></a>'
     if marker not in text:
@@ -9354,6 +9365,7 @@ def _build_time_page() -> str:
     load = metadata.get("load_average_at_campaign_start", [])
     load_text = ", ".join(f"{float(value):.2f}" for value in load) or "unavailable"
     failed_names = ", ".join(summary["failed_kernels_both_modes"])
+    egglog_only = _egglog_only_build_time_section()
     return (
         '<div class="section-header"><h2 class="section-title">Build time</h2></div>'
         '<div class="intro"><b>Whole source-to-executable compilation is '
@@ -9404,6 +9416,7 @@ def _build_time_page() -> str:
         f'<a href="{artifacts}/summary.json">summary JSON</a></span></div>'
         f'<div><b>Provenance</b><span><a href="{artifacts}/metadata.json">compiler, source, '
         'manifest, parameters, and hashes</a></span></div></div>'
+        + egglog_only +
         '<script>(function(){const t=document.getElementById("build-time-table");'
         'if(!t)return;let col=-1,asc=true;[...t.tHead.rows[0].cells].forEach((h,i)=>{'
         'h.tabIndex=0;h.addEventListener("click",()=>{asc=col===i?!asc:true;col=i;'
@@ -9413,6 +9426,124 @@ def _build_time_page() -> str:
         'x.localeCompare(y):nx-ny;return asc?c:-c;});rows.forEach(r=>t.tBodies[0].appendChild(r));'
         '});h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();h.click();}});'
         '});})();</script>')
+
+
+def _egglog_only_build_time_section() -> str:
+    """Render absolute whole-build costs for the Egglog-only campaigns."""
+    suites = []
+    for suite_name, campaign, artifact_link in EGGLOG_BUILD_TIME_RESULTS:
+        summary_path = campaign / "summary.json"
+        per_kernel_path = campaign / "per_kernel.csv"
+        if not summary_path.is_file() or not per_kernel_path.is_file():
+            continue
+        suites.append((suite_name, json.loads(summary_path.read_text()),
+                       _read_csv(per_kernel_path), artifact_link))
+    if not suites:
+        return ""
+
+    total_attempts = sum(item[1]["attempted_builds"] for item in suites)
+    total_successes = sum(item[1]["successful_builds"] for item in suites)
+    total_fixtures = sum(item[1]["fixture_count"] for item in suites)
+    total_full = sum(item[1]["fully_successful_fixtures"] for item in suites)
+    overview_rows = []
+    detail_sections = []
+
+    for suite_name, summary, rows, artifact_link in suites:
+        overview_rows.append(
+            '<tr>'
+            f'<td><b>{html.escape(suite_name)}</b></td>'
+            f'<td>{summary["fixture_count"]:,}</td>'
+            f'<td>{summary["attempted_builds"]:,}</td>'
+            f'<td>{summary["successful_builds"]:,} / '
+            f'{summary["attempted_builds"]:,}</td>'
+            f'<td>{summary["fully_successful_fixtures"]} / '
+            f'{summary["fixture_count"]}</td>'
+            f'<td>{summary["partially_successful_fixtures"]}</td>'
+            f'<td>{summary["failed_fixtures"]}</td>'
+            f'<td>{summary["successful_wall_median_seconds"]:.2f} s '
+            f'[{summary["successful_wall_q1_seconds"]:.2f}, '
+            f'{summary["successful_wall_q3_seconds"]:.2f}]</td>'
+            f'<td>{summary["successful_matcher_median_ms"]:,.1f} ms</td>'
+            f'<td>{summary["successful_peak_rss_median_kib"] / 1024:.1f} MiB</td>'
+            '</tr>')
+
+        kernel_rows = []
+        for row in rows:
+            status = row["status"]
+            status_text = ("5/5" if status == "pass" else
+                           f'{row["successful_builds"]}/5 {status}')
+            status_html = (
+                f'<span class="result-status {"pass" if status == "pass" else "fail"}">'
+                f'{html.escape(status_text)}</span>')
+
+            def value_cell(key, suffix="", divisor=1.0, digits=2):
+                raw = row.get(key, "")
+                if raw in ("", None):
+                    return '<td data-sort="inf"><span class="none">failed</span></td>'
+                value = float(raw) / divisor
+                return (f'<td data-sort="{value}">{value:,.{digits}f}'
+                        f'{suffix}</td>')
+
+            matches = row.get("selected_matches_median", "")
+            matches_cell = ('<td><span class="none">failed</span></td>'
+                            if matches in ("", None) else
+                            f'<td>{float(matches):.0f}</td>')
+            reason = row.get("failure_reason", "")
+            kernel_rows.append(
+                f'<tr class="{"" if status == "pass" else "build-failed"}">'
+                f'<td><code>{html.escape(row["kernel"])}</code></td>'
+                f'<td>{status_html}</td>'
+                + value_cell("wall_median_seconds", " s")
+                + value_cell("peak_rss_median_kib", " MiB", 1024.0, 1)
+                + value_cell("matcher_median_ms", " ms", digits=1)
+                + matches_cell
+                + f'<td>{html.escape(reason) if reason else "&mdash;"}</td></tr>')
+        detail_sections.append(
+            '<details class="paper-details"><summary>'
+            f'{html.escape(suite_name)} per-fixture results '
+            f'({summary["fixture_count"]} fixtures)</summary>'
+            '<div class="table-wrap"><table class="audit-table paper-family"><thead><tr>'
+            '<th>fixture</th><th>build status</th><th>successful wall median</th>'
+            '<th>successful RSS median</th><th>matcher median</th>'
+            '<th>selected launches</th><th>failure reason</th>'
+            '</tr></thead><tbody>' + ''.join(kernel_rows) + '</tbody></table></div>'
+            '<div class="paper-notes">'
+            f'<div><b>{html.escape(suite_name)} artifacts</b><span>'
+            f'<a href="{artifact_link}/SUMMARY.md">report</a> &middot; '
+            f'<a href="{artifact_link}/runs.csv">raw runs</a> &middot; '
+            f'<a href="{artifact_link}/per_kernel.csv">per-fixture CSV</a> &middot; '
+            f'<a href="{artifact_link}/metadata.json">provenance</a>'
+            '</span></div></div></details>')
+
+    return (
+        '<div class="section-header"><h2 class="section-title">'
+        'Egglog-enabled suite builds</h2></div>'
+        '<div class="intro"><b>Absolute whole-build cost with equality '
+        'saturation enabled.</b> These campaigns intentionally have no '
+        'syntactic/equality-saturation-off arm and therefore do not estimate '
+        'the incremental cost of saturation. They measure five fresh, '
+        'sequential C-source-to-linked-AArch64 builds per fixture with semantic '
+        'fallback disabled. Executables were linked but not run.</div>'
+        '<div class="audit-metrics">'
+        f'<div class="audit-metric"><b>{total_attempts:,}</b><span>sequential builds</span></div>'
+        f'<div class="audit-metric"><b>{total_successes:,}</b><span>successful builds</span></div>'
+        f'<div class="audit-metric"><b>{total_full}/{total_fixtures}</b>'
+        '<span>fixtures passing all five builds</span></div>'
+        '</div>'
+        '<div class="intro paper-provisional"><b>Timing denominator.</b> Wall, '
+        'RSS, and matcher medians include successful attempts only. Failed '
+        'attempts and fixtures remain visible as failures; early failures are '
+        'not treated as fast compilations. MFEM covers 20 normalized kernels '
+        'and 11 source-selectable application extractions. Five additional '
+        'partial MFEM MLIR views are not separate C entry points and are '
+        'excluded from this source-to-executable study.</div>'
+        '<div class="table-wrap"><table class="audit-table paper-family"><thead><tr>'
+        '<th>suite</th><th>fixtures</th><th>attempts</th><th>successful builds</th>'
+        '<th>5/5 fixtures</th><th>partial</th><th>failed</th>'
+        '<th>successful wall median [Q1, Q3]</th><th>matcher median</th>'
+        '<th>peak RSS median</th></tr></thead><tbody>'
+        + ''.join(overview_rows) + '</tbody></table></div>'
+        + ''.join(detail_sections))
 
 
 def build_site_pages(polybench_stats: dict[str, dict],

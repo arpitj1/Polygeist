@@ -1,0 +1,163 @@
+[
+  {
+    "kernel": "token_embedding",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_token_embedding",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "attention_rmsnorm",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_attention_rmsnorm",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "qkv_projection",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_qkv_projection",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "rope_interleaved",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_rope",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "rope_split",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_rope_split",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "kv_cache_rw",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_kv_cache_rw",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "attention_scores",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_attention_scores",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "attention_mask_if",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_attention_mask",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "attention_mask_select",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_attention_mask_select",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "attention_softmax",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_attention_softmax",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "attention_output",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_attention_output",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "output_projection",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_output_projection",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "residual_add",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_residual_add",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "ffn_rmsnorm",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_ffn_rmsnorm",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "gate_up_projection",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_gate_up_projection",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "swiglu",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_swiglu",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "down_projection",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_down_projection",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "final_rmsnorm",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_final_rmsnorm",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "lm_head_projection",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama_forward_ops.c",
+    "function": "kernel_llama_lm_head_projection",
+    "support_source": null,
+    "sha256": "d3418261c839f9f768c3a6f03943d0e70dd48ba085c2bbfb7c7b2ad492fbc5e4"
+  },
+  {
+    "kernel": "extended_forward",
+    "source": "/home/arjaiswal/Polygeist-polybench-compile-study/third_party/cnn-extracted/llama2_extended_forward_bench.c",
+    "function": "kernel_llama2_extended_forward",
+    "support_source": null,
+    "sha256": "8959d283d2fd03fcbc0d2f5c3cf6c7a046ee633f47f70fb62d35625f5cac9af2"
+  },
+  {
+    "kernel": "llama2c_matmul",
+    "source": "/home/arjaiswal/Polygeist/third_party/llama2.c/run.c",
+    "function": "matmul",
+    "support_source": null,
+    "sha256": "9c4f2d5c6ae01b71726d1cc37530d71e60bff0ec7cc012565f16a43c1ca658bd"
+  },
+  {
+    "kernel": "llama2c_rmsnorm",
+    "source": "/home/arjaiswal/Polygeist/third_party/llama2.c/run.c",
+    "function": "rmsnorm",
+    "support_source": null,
+    "sha256": "9c4f2d5c6ae01b71726d1cc37530d71e60bff0ec7cc012565f16a43c1ca658bd"
+  },
+  {
+    "kernel": "llama2c_softmax",
+    "source": "/home/arjaiswal/Polygeist/third_party/llama2.c/run.c",
+    "function": "softmax",
+    "support_source": null,
+    "sha256": "9c4f2d5c6ae01b71726d1cc37530d71e60bff0ec7cc012565f16a43c1ca658bd"
+  }
+]

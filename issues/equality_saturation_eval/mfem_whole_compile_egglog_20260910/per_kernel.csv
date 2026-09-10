@@ -1,0 +1,32 @@
+kernel,successful_builds,failed_builds,status,wall_median_seconds,wall_q1_seconds,wall_q3_seconds,peak_rss_median_kib,matcher_median_ms,selected_matches_median,failure_reason
+convection_apply_2d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+convection_apply_3d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+curlcurl_apply_2d_stage_sliced,5,0,pass,12.420,12.320,12.520,157764.0,1045.0,5.0,
+curlcurl_apply_3d_stage_sliced,5,0,pass,43.880,43.500,44.120,157728.0,5498.7,29.0,
+diffusion_apply_2d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+diffusion_apply_3d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+divdiv_apply_2d_stage_sliced,5,0,pass,12.920,12.800,13.100,157736.0,1104.9,6.0,
+divdiv_apply_3d_stage_sliced,5,0,pass,15.290,15.130,15.670,157768.0,1938.3,12.0,
+elasticity_qpoint_2d_scalarized,0,5,fail,,,,,,,generated wrapper compilation failed
+elasticity_qpoint_3d_scalarized,0,5,fail,,,,,,,generated wrapper compilation failed
+integrate_grad_2d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+integrate_grad_3d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+integrate_value_2d_scratch_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+integrate_value_3d_scratch_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+interp_grad_2d_stage_sliced,5,0,pass,11.090,10.810,11.100,157860.0,576.1,4.0,
+interp_grad_3d_stage_sliced,0,5,fail,,,,,,,ABI lowering failed
+interp_value_2d_scratch_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+interp_value_3d_scratch_sliced,0,5,fail,,,,,,,ABI lowering failed
+mass_apply_2d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+mass_apply_3d_stage_sliced,0,5,fail,,,,,,,polygeist submap cleanup failed
+mfem_app_abs_l1_curlcurl_3d,5,0,pass,51.000,50.540,51.110,157828.0,7202.6,29.0,
+mfem_app_abs_l1_diffusion_3d,0,5,fail,,,,,,,polygeist submap cleanup failed
+mfem_app_abs_l1_mass_3d,0,5,fail,,,,,,,polygeist submap cleanup failed
+mfem_app_dfem_minimal_surface_2d,0,5,fail,,,,,,,polygeist submap cleanup failed
+mfem_app_ex35p_h1_3d,0,5,fail,,,,,,,polygeist submap cleanup failed
+mfem_app_ex35p_hcurl_3d,5,0,pass,50.720,50.640,50.790,157760.0,7098.4,29.0,
+mfem_app_ex35p_hdiv_3d,5,0,pass,21.660,21.550,21.960,157788.0,2778.7,12.0,
+mfem_app_ex9p_mass_convection_2d,0,5,fail,,,,,,,cuTensorNet network composition failed
+mfem_app_grad_div_3d,5,0,pass,21.690,21.560,21.760,157816.0,2793.9,12.0,
+mfem_app_mtop_iso_elasticity_dfem_2d,0,5,fail,,,,,,,polygeist submap cleanup failed
+mfem_app_navier_tgv_pa_operators_3d,0,5,fail,,,,,,,polygeist submap cleanup failed
