@@ -12,6 +12,7 @@
   failing fixtures: 6.
 - Successful-build wall median: 7.710 s
   [Q1 7.540, Q3 7.870].
+- Minimum successful whole-build time: 7.320 s.
 - Successful-build peak-RSS median: 154.1 MiB.
 - Successful-build matcher median: 338.3 ms.
 - Whole-build timeouts: 0.

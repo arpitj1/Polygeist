@@ -42,6 +42,8 @@ def main():
             modes[mode] = {
                 "ok": len(good),
                 "errors": len(subset) - len(good),
+                "wall_min_seconds": min([float(r["wall_seconds"]) for r in good],
+                                        default=None),
                 "wall_median_seconds": median([float(r["wall_seconds"]) for r in good]),
                 "peak_rss_median_kib": median([int(r["peak_rss_kib"]) for r in good]),
                 "matcher_median_ms": median([float(t["matcher_elapsed_ms"]) for t in tel]),
@@ -62,6 +64,8 @@ def main():
             "kernel": kernel,
             "egglog_ok": modes["egglog"]["ok"],
             "syntactic_ok": modes["syntactic"]["ok"],
+            "egglog_wall_min_seconds": modes["egglog"]["wall_min_seconds"],
+            "syntactic_wall_min_seconds": modes["syntactic"]["wall_min_seconds"],
             "egglog_wall_median_seconds": modes["egglog"]["wall_median_seconds"],
             "syntactic_wall_median_seconds": modes["syntactic"]["wall_median_seconds"],
             "paired_wall_delta_seconds": (
@@ -85,6 +89,8 @@ def main():
             "runs": sum(r["mode"] == mode for r in runs),
             "successful_full_builds": len(good),
             "failed_full_builds": sum(r["mode"] == mode and r["status"] != "ok" for r in runs),
+            "wall_min_seconds": min([float(r["wall_seconds"]) for r in good],
+                                    default=None),
             "wall_median_seconds": median([float(r["wall_seconds"]) for r in good]),
             "wall_sum_seconds": sum(float(r["wall_seconds"]) for r in good),
             "peak_rss_median_kib": median([int(r["peak_rss_kib"]) for r in good]),
@@ -143,6 +149,8 @@ def main():
         f"seven kernels: {', '.join(failed_kernels)}.",
         f"- Median successful whole-build wall time: {egg['wall_median_seconds']:.3f} s Egglog versus "
         f"{syn['wall_median_seconds']:.3f} s syntactic.",
+        f"- Minimum successful whole-build wall time: {egg['wall_min_seconds']:.3f} s Egglog versus "
+        f"{syn['wall_min_seconds']:.3f} s syntactic.",
         f"- Median paired Egglog minus syntactic whole-build delta: {delta['total_wall_median_seconds']:+.3f} s; "
         f"mean paired delta: {delta['total_wall_mean_seconds']:+.3f} s across {len(paired_wall_deltas)} pairs.",
         f"- Median successful peak RSS: {egg['peak_rss_median_kib'] / 1024:.2f} MiB Egglog versus "

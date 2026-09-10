@@ -12,6 +12,7 @@
   "successful_matcher_median_ms": 332.1513906121254,
   "successful_peak_rss_median_kib": 157796.0,
   "successful_wall_median_seconds": 7.8,
+  "successful_wall_min_seconds": 7.16,
   "successful_wall_q1_seconds": 7.63,
   "successful_wall_q3_seconds": 8.01,
   "suite": "ATen",

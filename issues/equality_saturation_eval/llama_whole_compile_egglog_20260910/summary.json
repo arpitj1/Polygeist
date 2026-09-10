@@ -12,6 +12,7 @@
   "successful_matcher_median_ms": 338.30948919057846,
   "successful_peak_rss_median_kib": 157800.0,
   "successful_wall_median_seconds": 7.71,
+  "successful_wall_min_seconds": 7.32,
   "successful_wall_q1_seconds": 7.54,
   "successful_wall_q3_seconds": 7.87,
   "suite": "Llama",
