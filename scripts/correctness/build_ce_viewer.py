@@ -9314,8 +9314,12 @@ def _build_time_page() -> str:
         '<span>kernels linked in both modes</span></div>',
         f'<div class="audit-metric"><b>{egg["wall_median_seconds"]:.2f} s</b>'
         '<span>Egglog median whole build</span></div>',
+        f'<div class="audit-metric"><b>{egg["wall_min_seconds"]:.2f} s</b>'
+        '<span>Egglog minimum whole build</span></div>',
         f'<div class="audit-metric"><b>{syntax["wall_median_seconds"]:.2f} s</b>'
         '<span>syntax median whole build</span></div>',
+        f'<div class="audit-metric"><b>{syntax["wall_min_seconds"]:.2f} s</b>'
+        '<span>syntax minimum whole build</span></div>',
         f'<div class="audit-metric"><b>{delta["matcher_median_ms"]:+.1f} ms</b>'
         '<span>paired Egglog matcher overhead</span></div>',
         f'<div class="audit-metric"><b>{egg["peak_rss_median_kib"] / 1024:.1f} MiB</b>'
@@ -9347,7 +9351,9 @@ def _build_time_page() -> str:
             f'<td data-sort="{html.escape(row["kernel"])}"><code>'
             f'{html.escape(row["kernel"])}</code></td>'
             f'<td data-sort="{0 if failed else 1}">{status}</td>'
+            + cell(number(row, "egglog_wall_min_seconds"), " s")
             + cell(number(row, "egglog_wall_median_seconds"), " s")
+            + cell(number(row, "syntactic_wall_min_seconds"), " s")
             + cell(number(row, "syntactic_wall_median_seconds"), " s")
             + cell(number(row, "paired_wall_delta_seconds"), " s", 3)
             + cell((number(row, "egglog_peak_rss_median_kib") or 0) / 1024
@@ -9386,12 +9392,12 @@ def _build_time_page() -> str:
         'runtime-correctness claim.</div>'
         '<div class="section-header"><h3 class="section-title">Per-kernel results</h3></div>'
         '<div class="intro">Click a column heading to sort. Wall time and peak '
-        'RSS are medians of the five successful builds. Delta is Egglog minus '
+        'RSS are over successful builds. Delta uses medians and is Egglog minus '
         'syntax; positive values mean Egglog took longer.</div>'
         '<div class="table-wrap"><table id="build-time-table" '
         'class="audit-table paper-family"><thead><tr>'
-        '<th>kernel</th><th>build status</th><th>Egglog wall</th>'
-        '<th>syntax wall</th><th>wall delta</th><th>Egglog RSS</th>'
+        '<th>kernel</th><th>build status</th><th>Egglog min</th><th>Egglog median</th>'
+        '<th>syntax min</th><th>syntax median</th><th>median wall delta</th><th>Egglog RSS</th>'
         '<th>syntax RSS</th><th>Egglog matcher</th><th>syntax matcher</th>'
         '<th>Egglog launches</th><th>syntax launches</th>'
         '</tr></thead><tbody>' + ''.join(table_rows) + '</tbody></table></div>'
@@ -9460,6 +9466,7 @@ def _egglog_only_build_time_section() -> str:
             f'{summary["fixture_count"]}</td>'
             f'<td>{summary["partially_successful_fixtures"]}</td>'
             f'<td>{summary["failed_fixtures"]}</td>'
+            f'<td>{summary["successful_wall_min_seconds"]:.2f} s</td>'
             f'<td>{summary["successful_wall_median_seconds"]:.2f} s '
             f'[{summary["successful_wall_q1_seconds"]:.2f}, '
             f'{summary["successful_wall_q3_seconds"]:.2f}]</td>'
@@ -9493,6 +9500,7 @@ def _egglog_only_build_time_section() -> str:
                 f'<tr class="{"" if status == "pass" else "build-failed"}">'
                 f'<td><code>{html.escape(row["kernel"])}</code></td>'
                 f'<td>{status_html}</td>'
+                + value_cell("wall_min_seconds", " s")
                 + value_cell("wall_median_seconds", " s")
                 + value_cell("peak_rss_median_kib", " MiB", 1024.0, 1)
                 + value_cell("matcher_median_ms", " ms", digits=1)
@@ -9503,7 +9511,8 @@ def _egglog_only_build_time_section() -> str:
             f'{html.escape(suite_name)} per-fixture results '
             f'({summary["fixture_count"]} fixtures)</summary>'
             '<div class="table-wrap"><table class="audit-table paper-family"><thead><tr>'
-            '<th>fixture</th><th>build status</th><th>successful wall median</th>'
+            '<th>fixture</th><th>build status</th><th>successful wall min</th>'
+            '<th>successful wall median</th>'
             '<th>successful RSS median</th><th>matcher median</th>'
             '<th>selected launches</th><th>failure reason</th>'
             '</tr></thead><tbody>' + ''.join(kernel_rows) + '</tbody></table></div>'
@@ -9539,7 +9548,7 @@ def _egglog_only_build_time_section() -> str:
         'excluded from this source-to-executable study.</div>'
         '<div class="table-wrap"><table class="audit-table paper-family"><thead><tr>'
         '<th>suite</th><th>fixtures</th><th>attempts</th><th>successful builds</th>'
-        '<th>5/5 fixtures</th><th>partial</th><th>failed</th>'
+        '<th>5/5 fixtures</th><th>partial</th><th>failed</th><th>successful wall min</th>'
         '<th>successful wall median [Q1, Q3]</th><th>matcher median</th>'
         '<th>peak RSS median</th></tr></thead><tbody>'
         + ''.join(overview_rows) + '</tbody></table></div>'

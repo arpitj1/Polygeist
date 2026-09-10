@@ -12,6 +12,7 @@ The total wall interval includes cgeist, affine-to-Linalg raising, submap loweri
 - Successful linked builds: 115 Egglog and 115 syntactic (23 kernels completed all five runs in both modes).
 - Failed builds: 35 Egglog and 35 syntactic, covering the same seven kernels: adi, atax, bicg, doitgen, gemver, gesummv, mvt.
 - Median successful whole-build wall time: 8.220 s Egglog versus 8.220 s syntactic.
+- Minimum successful whole-build wall time: 7.650 s Egglog versus 7.520 s syntactic.
 - Median paired Egglog minus syntactic whole-build delta: -0.010 s; mean paired delta: +0.009 s across 115 pairs.
 - Median successful peak RSS: 154.11 MiB Egglog versus 154.10 MiB syntactic; median paired delta +0.016 MiB.
 - Median paired matcher-only overhead: +26.821 ms for Egglog.

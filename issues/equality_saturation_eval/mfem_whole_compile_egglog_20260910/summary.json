@@ -12,6 +12,7 @@
   "successful_matcher_median_ms": 2758.3067379891872,
   "successful_peak_rss_median_kib": 157768.0,
   "successful_wall_median_seconds": 21.55,
+  "successful_wall_min_seconds": 10.46,
   "successful_wall_q1_seconds": 12.8,
   "successful_wall_q3_seconds": 44.12,
   "suite": "MFEM",

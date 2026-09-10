@@ -12,6 +12,7 @@ import statistics
 
 FIELDS = (
     "kernel", "successful_builds", "failed_builds", "status",
+    "wall_min_seconds",
     "wall_median_seconds", "wall_q1_seconds", "wall_q3_seconds",
     "peak_rss_median_kib", "matcher_median_ms",
     "selected_matches_median", "failure_reason",
@@ -106,6 +107,7 @@ def main():
             "successful_builds": ok_count,
             "failed_builds": len(rows) - ok_count,
             "status": status,
+            "wall_min_seconds": format_optional(min(walls, default=None)),
             "wall_median_seconds": format_optional(optional_median(walls)),
             "wall_q1_seconds": format_optional(percentile(walls, 0.25)),
             "wall_q3_seconds": format_optional(percentile(walls, 0.75)),
@@ -141,6 +143,7 @@ def main():
         "fully_successful_fixtures": status_counts["pass"],
         "partially_successful_fixtures": status_counts["partial"],
         "failed_fixtures": status_counts["fail"],
+        "successful_wall_min_seconds": min(walls, default=None),
         "successful_wall_median_seconds": optional_median(walls),
         "successful_wall_q1_seconds": percentile(walls, 0.25),
         "successful_wall_q3_seconds": percentile(walls, 0.75),
@@ -165,6 +168,7 @@ def main():
   failing fixtures: {summary['failed_fixtures']}.
 - Successful-build wall median: {summary['successful_wall_median_seconds']:.3f} s
   [Q1 {summary['successful_wall_q1_seconds']:.3f}, Q3 {summary['successful_wall_q3_seconds']:.3f}].
+- Minimum successful whole-build time: {summary['successful_wall_min_seconds']:.3f} s.
 - Successful-build peak-RSS median: {summary['successful_peak_rss_median_kib'] / 1024:.1f} MiB.
 - Successful-build matcher median: {summary['successful_matcher_median_ms']:.1f} ms.
 - Whole-build timeouts: {summary['timeout_builds']}.

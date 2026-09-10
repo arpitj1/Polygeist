@@ -1,24 +1,24 @@
-kernel,successful_builds,failed_builds,status,wall_median_seconds,wall_q1_seconds,wall_q3_seconds,peak_rss_median_kib,matcher_median_ms,selected_matches_median,failure_reason
-attention_mask_if,5,0,pass,7.630,7.540,7.790,157756.0,274.0,0.0,
-attention_mask_select,5,0,pass,7.780,7.760,8.010,157816.0,614.3,1.0,
-attention_output,5,0,pass,7.550,7.510,7.710,157812.0,339.9,1.0,
-attention_rmsnorm,5,0,pass,7.820,7.730,7.880,157856.0,338.9,1.0,
-attention_scores,5,0,pass,7.810,7.760,7.890,157776.0,338.5,0.0,
-attention_softmax,5,0,pass,7.790,7.590,7.870,157804.0,484.7,1.0,
-down_projection,5,0,pass,7.850,7.680,7.900,157808.0,327.3,0.0,
-extended_forward,0,5,fail,,,,,,,cuTensorNet network composition failed
-ffn_rmsnorm,5,0,pass,7.820,7.590,7.840,157744.0,332.0,1.0,
-final_rmsnorm,5,0,pass,7.570,7.490,7.670,157780.0,330.5,1.0,
-gate_up_projection,0,5,fail,,,,,,,cuTensorNet network composition failed
-kv_cache_rw,0,5,fail,,,,,,,ABI lowering failed
-llama2c_matmul,5,0,pass,7.710,7.610,7.910,157800.0,341.5,0.0,
-llama2c_rmsnorm,0,5,fail,,,,,,,generated wrapper compilation failed
-llama2c_softmax,0,5,fail,,,,,,,generated wrapper compilation failed
-lm_head_projection,5,0,pass,7.460,7.370,7.580,157768.0,324.1,0.0,
-output_projection,5,0,pass,7.680,7.520,7.740,157736.0,338.8,0.0,
-qkv_projection,0,5,fail,,,,,,,cuTensorNet network composition failed
-residual_add,5,0,pass,7.460,7.370,7.690,157812.0,305.0,1.0,
-rope_interleaved,5,0,pass,7.790,7.670,7.840,157800.0,305.8,0.0,
-rope_split,5,0,pass,7.990,7.790,8.140,157732.0,487.3,4.0,
-swiglu,5,0,pass,7.640,7.490,7.750,157916.0,359.8,1.0,
-token_embedding,5,0,pass,7.550,7.500,7.690,157720.0,405.8,1.0,
+kernel,successful_builds,failed_builds,status,wall_min_seconds,wall_median_seconds,wall_q1_seconds,wall_q3_seconds,peak_rss_median_kib,matcher_median_ms,selected_matches_median,failure_reason
+attention_mask_if,5,0,pass,7.390,7.630,7.540,7.790,157756.0,274.0,0.0,
+attention_mask_select,5,0,pass,7.750,7.780,7.760,8.010,157816.0,614.3,1.0,
+attention_output,5,0,pass,7.410,7.550,7.510,7.710,157812.0,339.9,1.0,
+attention_rmsnorm,5,0,pass,7.550,7.820,7.730,7.880,157856.0,338.9,1.0,
+attention_scores,5,0,pass,7.420,7.810,7.760,7.890,157776.0,338.5,0.0,
+attention_softmax,5,0,pass,7.570,7.790,7.590,7.870,157804.0,484.7,1.0,
+down_projection,5,0,pass,7.410,7.850,7.680,7.900,157808.0,327.3,0.0,
+extended_forward,0,5,fail,,,,,,,,cuTensorNet network composition failed
+ffn_rmsnorm,5,0,pass,7.390,7.820,7.590,7.840,157744.0,332.0,1.0,
+final_rmsnorm,5,0,pass,7.400,7.570,7.490,7.670,157780.0,330.5,1.0,
+gate_up_projection,0,5,fail,,,,,,,,cuTensorNet network composition failed
+kv_cache_rw,0,5,fail,,,,,,,,ABI lowering failed
+llama2c_matmul,5,0,pass,7.590,7.710,7.610,7.910,157800.0,341.5,0.0,
+llama2c_rmsnorm,0,5,fail,,,,,,,,generated wrapper compilation failed
+llama2c_softmax,0,5,fail,,,,,,,,generated wrapper compilation failed
+lm_head_projection,5,0,pass,7.330,7.460,7.370,7.580,157768.0,324.1,0.0,
+output_projection,5,0,pass,7.490,7.680,7.520,7.740,157736.0,338.8,0.0,
+qkv_projection,0,5,fail,,,,,,,,cuTensorNet network composition failed
+residual_add,5,0,pass,7.320,7.460,7.370,7.690,157812.0,305.0,1.0,
+rope_interleaved,5,0,pass,7.350,7.790,7.670,7.840,157800.0,305.8,0.0,
+rope_split,5,0,pass,7.620,7.990,7.790,8.140,157732.0,487.3,4.0,
+swiglu,5,0,pass,7.370,7.640,7.490,7.750,157916.0,359.8,1.0,
+token_embedding,5,0,pass,7.440,7.550,7.500,7.690,157720.0,405.8,1.0,

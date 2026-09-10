@@ -19,6 +19,7 @@
       "selected_matches_sum": 160,
       "successful_full_builds": 115,
       "wall_median_seconds": 8.22,
+      "wall_min_seconds": 7.65,
       "wall_sum_seconds": 950.3599999999994
     },
     "syntactic": {
@@ -30,6 +31,7 @@
       "selected_matches_sum": 145,
       "successful_full_builds": 115,
       "wall_median_seconds": 8.22,
+      "wall_min_seconds": 7.52,
       "wall_sum_seconds": 949.2899999999998
     }
   },
