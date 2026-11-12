@@ -1,0 +1,6 @@
+/results/
+/dependencies/
+config.json
+__pycache__/
+*.pyc
+!dependency_sources/aarch64-cuda.cmake

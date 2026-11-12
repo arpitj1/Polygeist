@@ -1,0 +1,21 @@
+{
+  "ssh_host": "jetson-orin",
+  "remote_library_path": "/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu",
+  "cpu": 0,
+  "host_cpu": 0,
+  "jobs": 3,
+  "speq_root": "/path/to/speq",
+  "speq_image": "speq-lleq:extract",
+  "kernelfarer_root": "/path/to/KernelFaRer",
+  "ginsbach_root": "/path/to/ginsbach-toolchain",
+  "openblas_root": "/path/to/aarch64-openblas-sysroot",
+  "environment": {
+    "CUDA": "/path/to/cuda/targets/sbsa-linux",
+    "POLYGEIST_CUTENSOR_ROOT": "/path/to/aarch64-cutensor",
+    "POLYGEIST_GGML_BUILD": "/path/to/aarch64-ggml-build"
+  },
+  "nvcc": "/usr/local/cuda/bin/nvcc",
+  "cuda_target": "/usr/local/cuda/targets/sbsa-linux",
+  "match_timeout": 1800,
+  "speq_timeout": 1800
+}

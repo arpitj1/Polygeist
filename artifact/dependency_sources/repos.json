@@ -1,0 +1,32 @@
+[
+  {
+    "path": "third_party/polybenchGpu",
+    "url": "https://github.com/sgrauerg/polybenchGpu.git",
+    "revision": "5584aaa7d0be810ff5eb0b61c49fb64ecc81ba4c"
+  },
+  {
+    "path": "third_party/whisper.cpp",
+    "url": "https://github.com/ggml-org/whisper.cpp.git",
+    "revision": "f24588a272ae8e23280d9c220536437164e6ed28"
+  },
+  {
+    "path": "third_party/ggml",
+    "url": "https://github.com/ggml-org/ggml.git",
+    "revision": "1e33fed33e87c43aa4c4078e2a9c239d4c1f1bd3"
+  },
+  {
+    "path": "third_party/pytorch",
+    "url": "https://github.com/pytorch/pytorch.git",
+    "revision": "d7af122d81a49b1fa7a31ba52bd57c026f092646"
+  },
+  {
+    "path": "third_party/opencv",
+    "url": "https://github.com/opencv/opencv.git",
+    "revision": "8bc22eba5946100e9b2470c60939c3f2588c28d7"
+  },
+  {
+    "path": "third_party/cutlass",
+    "url": "https://github.com/NVIDIA/cutlass.git",
+    "revision": "e406c186f510a15091cce01f782020ceb7ba8eb5"
+  }
+]

@@ -1,0 +1,178 @@
+diff --git a/passes/source/ReplacerPass.cpp b/passes/source/ReplacerPass.cpp
+index 772e652..6fb192b 100644
+--- a/passes/source/ReplacerPass.cpp
++++ b/passes/source/ReplacerPass.cpp
+@@ -13,6 +13,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "llvm/ADT/SmallString.h"
++#include "llvm/ADT/SmallPtrSet.h"
+ #include "llvm/IR/CFG.h"
+ #include "llvm/IR/Function.h"
+ #include "llvm/IR/IRBuilder.h"
+@@ -36,6 +37,8 @@ using namespace KernelFaRer;
+ // Anonymous namespace containing rewriter functions.
+ namespace {
+ 
++using MatrixBuilderT = MatrixBuilder<IRBuilder<>>;
++
+ // Alpha and Beta can be passed through CLI for the cases when the matcher does
+ // not yet match them
+ static cl::opt<double> AlphaInit("alpha", cl::desc("alpha"), cl::ValueRequired,
+@@ -66,7 +69,7 @@ constexpr size_t EigenSizeWidth = 64;
+ 
+ // A helper function that returns Matrix loaded in column-major order as a
+ // flat-vector.
+-Value *loadMatrixToFlatVector(MatrixBuilder &MBuilder, Type &EltTy,
++Value *loadMatrixToFlatVector(MatrixBuilderT &MBuilder, Type &EltTy,
+                               Value &Matrix, Value &Rows, Value &Columns,
+                               Value &Stride, bool IsColMajor,
+                               const Align &Alignment) {
+@@ -75,12 +78,12 @@ Value *loadMatrixToFlatVector(MatrixBuilder &MBuilder, Type &EltTy,
+   uint64_t ColsAsUInt64 = cast<ConstantInt>(Columns).getZExtValue();
+ 
+   if (IsColMajor)
+-    Vec = MBuilder.CreateColumnMajorLoad(&EltTy, &Matrix, Alignment, &Stride,
++    Vec = MBuilder.CreateColumnMajorLoad(&Matrix, Alignment, &Stride,
+                                          /*isVolatile*/ false, RowsAsUInt64,
+                                          ColsAsUInt64);
+   else
+     Vec = MBuilder.CreateMatrixTranspose(
+-        MBuilder.CreateColumnMajorLoad(&EltTy, &Matrix, Alignment, &Stride,
++        MBuilder.CreateColumnMajorLoad(&Matrix, Alignment, &Stride,
+                                        /*isVolatile*/ false, ColsAsUInt64,
+                                        RowsAsUInt64),
+         ColsAsUInt64, RowsAsUInt64);
+@@ -90,7 +93,7 @@ Value *loadMatrixToFlatVector(MatrixBuilder &MBuilder, Type &EltTy,
+ 
+ // A helper function that stores column-major order Matrix into Dest as either
+ // column or row-major order depending on isColMajor value.
+-void storeFlatVectorMatrix(MatrixBuilder &MBuilder, Value &Matrix, Value &Dest,
++void storeFlatVectorMatrix(MatrixBuilderT &MBuilder, Value &Matrix, Value &Dest,
+                            Value &Rows, Value &Columns, Value &Stride,
+                            bool IsColMajor, const Align &Alignment) {
+   uint64_t RowsAsUInt64 = cast<ConstantInt>(Rows).getZExtValue();
+@@ -169,7 +172,7 @@ inline void insertNoInlineCall(Module &M, IRBuilder<> &IR,
+ }
+ 
+ void buildBLASGEMMCall(Module &Mod, IRBuilder<> &IR,
+-                       const KernelFaRer::GEMM &Gemm) {
++                       const KernelFaRer::GEMM &Gemm, bool MaterializedSeed = false) {
+ 
+   const KernelFaRer::Matrix &MA = Gemm.getMatrixA();
+   const KernelFaRer::Matrix &MB = Gemm.getMatrixB();
+@@ -208,6 +211,7 @@ void buildBLASGEMMCall(Module &Mod, IRBuilder<> &IR,
+   // Make args for alpha/beta.
+   Value *Alpha = prepBLASScalar(IR, Gemm.getAlpha(), OpTy);
+   Value *Beta =
++      MaterializedSeed ? ConstantFP::get(OpTy, 1.0) :
+       prepBLASScalar(IR, Gemm.getBeta(), OpTy, Gemm.IsCReduced() ? 1.0 : 0.0);
+ 
+   // Sanity type checking.
+@@ -333,7 +337,7 @@ void buildMMIntrinsicCall(IRBuilder<> &IR, const KernelFaRer::GEMM &Gemm) {
+   auto *LDC = IR.CreateSExt(&MC.getLeadingDimensionSize(), IR.getInt64Ty());
+ 
+   // Helper matrix builder to create calls to llvm.matrix.* intrinsics
+-  MatrixBuilder MBuilder(IR);
++  MatrixBuilderT MBuilder(IR);
+ 
+   const unsigned BitsInAByte = 8;
+ 
+@@ -491,7 +495,8 @@ namespace KernelFaRer {
+ 
+ // Replaces the corresponding basic blocks of MatMul IR with a call to
+ // llvm.matrix.multiply.
+-bool runImpl(Function &F, KernelMatcher::Result &GMPR, OptimizationRemarkEmitter &ORE) {
++bool runImpl(Function &F, KernelMatcher::Result &GMPR, OptimizationRemarkEmitter &ORE,
++             DominatorTree &DT, LoopInfo &LI) {
+   // Have we changed in this function?
+   bool Changed = false;
+ 
+@@ -535,7 +540,58 @@ bool runImpl(Function &F, KernelMatcher::Result &GMPR, OptimizationRemarkEmitter
+     BasicBlock *ExitBlock = L.getExitBlock();
+     assert(ExitBlock != nullptr && "Loop had multiple exit blocks.");
+ 
+-    IRBuilder<> IR(ExitBlock, ExitBlock->getFirstInsertionPt());
++    // The reduction may carry its initial value only in SSA, after LLVM
++    // eliminates the source initialization store. Preserve that value before
++    // deleting the reduction. In particular, a scaled load of C is not zero.
++    bool MaterializedSeed = false;
++    if (ReplaceMode == KernelFaRer::CBLAS && isa<KernelFaRer::GEMM>(Ker.get()) &&
++        !Ker->getBeta()) {
++      auto *Store = dyn_cast<StoreInst>(&Ker->getReductionStore());
++      SmallVector<Value *, 16> Work;
++      SmallPtrSet<Value *, 16> Seen;
++      SmallVector<PHINode *, 2> Phis;
++      if (Store)
++        Work.push_back(Store->getValueOperand());
++      while (!Work.empty()) {
++        Value *V = Work.pop_back_val();
++        if (!Seen.insert(V).second)
++          continue;
++        if (auto *Phi = dyn_cast<PHINode>(V)) {
++          if (Phi->getType()->isFloatingPointTy())
++            Phis.push_back(Phi);
++        } else if (auto *Op = dyn_cast<BinaryOperator>(V)) {
++          if (Op->getType()->isFloatingPointTy())
++            for (Value *Operand : Op->operands())
++              Work.push_back(Operand);
++        }
++      }
++      if (Phis.size() == 1) {
++        PHINode *Phi = Phis.front();
++        Loop *ReductionLoop = LI.getLoopFor(Phi->getParent());
++        BasicBlock *Preheader = ReductionLoop ? ReductionLoop->getLoopPreheader() : nullptr;
++        int Incoming = Preheader ? Phi->getBasicBlockIndex(Preheader) : -1;
++        if (Incoming >= 0 && ReductionLoop != &L && L.contains(ReductionLoop)) {
++          Value *Seed = Phi->getIncomingValue(Incoming);
++          auto *Constant = dyn_cast<ConstantFP>(Seed);
++          if (!Constant || !Constant->isZero()) {
++            if (!DT.dominates(Store->getPointerOperand(), Preheader->getTerminator())) {
++              ORE.emit(ORM << "Cannot preserve reduction initialization.");
++              continue;
++            }
++            IRBuilder<> Init(Preheader->getTerminator());
++            Init.CreateStore(Seed, Store->getPointerOperand());
++            MaterializedSeed = true;
++          }
++        }
++      }
++    }
++
++    // Preserve initialization in the matched loop. A dedicated exit edge
++    // executes the replacement once, even when the successor is the header
++    // of a following loop.
++    BasicBlock *CallBlock = SplitEdge(ExitingBlock, ExitBlock, &DT, &LI,
++                                      nullptr, "kernelfarer.exit");
++    IRBuilder<> IR(CallBlock->getTerminator());
+ 
+     if (ReplaceMode == KernelFaRer::MatrixIntrinsics)
+       // Make the call to llvm.matrix.multiply
+@@ -546,7 +602,7 @@ bool runImpl(Function &F, KernelMatcher::Result &GMPR, OptimizationRemarkEmitter
+     else if (ReplaceMode == KernelFaRer::CBLAS) {
+       // Make the call using the CBLAS interface
+       if (const auto *GEMM = dyn_cast_or_null<KernelFaRer::GEMM>(Ker.get()))
+-        buildBLASGEMMCall(*F.getParent(), IR, *GEMM);
++        buildBLASGEMMCall(*F.getParent(), IR, *GEMM, MaterializedSeed);
+       if (const auto *SYR2K = dyn_cast_or_null<KernelFaRer::SYR2K>(Ker.get()))
+         buildBLASSYR2KCall(*F.getParent(), IR, *SYR2K);
+     } else if (ReplaceMode == KernelFaRer::EIGEN)
+@@ -576,11 +632,17 @@ bool runImpl(Function &F, KernelMatcher::Result &GMPR, OptimizationRemarkEmitter
+ /// the change is legal
+ PreservedAnalyses KernelReplacerPass::run(Function &F,
+                                         FunctionAnalysisManager &FAM) {
++  // Clang may invoke the VectorizerStart extension point more than once.  A
++  // second KernelFaRer run can rediscover partially dead loop structure and
++  // insert duplicate BLAS calls, so transform each function only once.
++  if (F.hasFnAttribute("kernelfarer-processed"))
++    return PreservedAnalyses::all();
++  F.addFnAttr("kernelfarer-processed");
+   OptimizationRemarkEmitter &ORE = FAM.getResult<OptimizationRemarkEmitterAnalysis>(F);
+   LoopInfo &LI = FAM.getResult<LoopAnalysis>(F);
+   DominatorTree &DT = FAM.getResult<DominatorTreeAnalysis>(F);
+   KernelFaRer::KernelMatcher::Result GMPR = KernelFaRer::KernelMatcher::run(F, LI, DT, ORE);
+-  bool Changed = runImpl(F, GMPR, ORE);
++  bool Changed = runImpl(F, GMPR, ORE, DT, LI);
+   if (!Changed)
+     return PreservedAnalyses::all();
+   PreservedAnalyses PA;

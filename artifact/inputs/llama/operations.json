@@ -1,0 +1,78 @@
+[
+  {
+    "name": "token_embedding",
+    "function": "kernel_llama_token_embedding"
+  },
+  {
+    "name": "attention_rmsnorm",
+    "function": "kernel_llama_attention_rmsnorm"
+  },
+  {
+    "name": "qkv_projection",
+    "function": "kernel_llama_qkv_projection"
+  },
+  {
+    "name": "rope_interleaved",
+    "function": "kernel_llama_rope"
+  },
+  {
+    "name": "rope_split",
+    "function": "kernel_llama_rope_split"
+  },
+  {
+    "name": "kv_cache_rw",
+    "function": "kernel_llama_kv_cache_rw"
+  },
+  {
+    "name": "attention_scores",
+    "function": "kernel_llama_attention_scores"
+  },
+  {
+    "name": "attention_mask_if",
+    "function": "kernel_llama_attention_mask"
+  },
+  {
+    "name": "attention_mask_select",
+    "function": "kernel_llama_attention_mask_select"
+  },
+  {
+    "name": "attention_softmax",
+    "function": "kernel_llama_attention_softmax"
+  },
+  {
+    "name": "attention_output",
+    "function": "kernel_llama_attention_output"
+  },
+  {
+    "name": "output_projection",
+    "function": "kernel_llama_output_projection"
+  },
+  {
+    "name": "residual_add",
+    "function": "kernel_llama_residual_add"
+  },
+  {
+    "name": "ffn_rmsnorm",
+    "function": "kernel_llama_ffn_rmsnorm"
+  },
+  {
+    "name": "gate_up_projection",
+    "function": "kernel_llama_gate_up_projection"
+  },
+  {
+    "name": "swiglu",
+    "function": "kernel_llama_swiglu"
+  },
+  {
+    "name": "down_projection",
+    "function": "kernel_llama_down_projection"
+  },
+  {
+    "name": "final_rmsnorm",
+    "function": "kernel_llama_final_rmsnorm"
+  },
+  {
+    "name": "lm_head_projection",
+    "function": "kernel_llama_lm_head_projection"
+  }
+]
