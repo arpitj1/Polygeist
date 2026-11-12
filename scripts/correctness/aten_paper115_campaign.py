@@ -64,13 +64,16 @@ def worker(request):
                                  else v for k, v in raised.items()})
         result['stages'] = {k: dict(ok=raised[k].ok, recovery=raised[k].recovery)
                             for k in ('cgeist', 'raise', 'debuf') if k in raised}
-        if not all(raised.get(k) and raised[k].ok for k in ('cgeist', 'raise', 'debuf')):
+        matching_stage = req.get('matching_stage', 'debuf')
+        required = ('cgeist', 'raise', 'debuf') if matching_stage == 'debuf' else ('cgeist', 'raise')
+        if not all(raised.get(k) and raised[k].ok for k in required):
             result['status'] = 'frontend_or_raising_failure'
         else:
-            source = Path(raised['paths']['debuf']).read_text()
+            source = Path(raised['paths'][matching_stage]).read_text()
+            result['matching_stage'] = matching_stage
             result['raised_counts'] = counts(source)
             for rank in req['ranks']:
-                options = dict(backend='cuda', region=req['region'],
+                options = dict(backend='cuda', only=req.get('specifications'), region=req['region'],
                                region_budget=req['region_budget'],
                                split_reduction_inputs=req.get('split_reduction_inputs',False),
                                split_pointwise_inputs=req.get('split_pointwise_inputs',False))
@@ -82,7 +85,8 @@ def worker(request):
                     (out / 'matched.mlir').write_text(matched)
                     save(out / 'proof.json', proof)
                     S.verify(matched, proof, backend='cuda')
-                    record = dict(rank=rank, options=options, emitted=proof['emitted'],
+                    record = dict(rank=rank, matching_stage=matching_stage,
+                                  options=options, emitted=proof['emitted'],
                                   counts=counts(matched), elapsed_ms=proof['elapsed_ms'],
                                   rejected_specifications=proof['rejected_specifications'], abi_ok=False)
                     result['variants'].append(record)
@@ -143,8 +147,11 @@ def main():
     p.add_argument('--checklist', type=Path, default=ROOT / 'issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv')
     p.add_argument('--jobs', type=int, default=3)
     p.add_argument('--ranks', type=int, nargs='+', default=[0])
+    p.add_argument('--specifications', nargs='+', help='Optional library catalog subset; all proofs and ABI checks remain required')
     p.add_argument('--region', action='store_true')
     p.add_argument('--region-budget', type=int, default=30)
+    p.add_argument('--matching-stage', choices=['debuf', 'linalg'], default='debuf',
+                   help='Application representation supplied to the same specification matchers')
     p.add_argument('--split-reduction-inputs',action='store_true')
     p.add_argument('--split-pointwise-inputs',action='store_true')
     p.add_argument('--numeric-model', choices=['strict', 'relaxed'], default='strict')
@@ -202,13 +209,14 @@ def main():
             materialize(original, source, shapes[row['kernel']])
             row.update(original_source=row['source'], original_source_sha256=sha(original),
                        source=str(source), shape_record=shapes[row['kernel']])
-        row.update(ranks=args.ranks, region=args.region, region_budget=args.region_budget,
+        row.update(ranks=args.ranks, region=args.region, region_budget=args.region_budget, specifications=args.specifications,
                    split_reduction_inputs=args.split_reduction_inputs,
                    split_pointwise_inputs=args.split_pointwise_inputs,
-                   numeric_model=args.numeric_model, legacy_match=old.get(row['kernel'], {}).get('current_match'))
+                   numeric_model=args.numeric_model, matching_stage=args.matching_stage,
+                   legacy_match=old.get(row['kernel'], {}).get('current_match'))
         row.update({k: v for k, v in case_options.get(row['kernel'], {}).items()
                     if k in ('ranks', 'region', 'region_budget', 'numeric_model',
-                             'split_reduction_inputs', 'split_pointwise_inputs')})
+                             'split_reduction_inputs', 'split_pointwise_inputs', 'matching_stage')})
         request = dest / 'request.json'; save(request, row)
         with (dest / 'worker.log').open('w') as log:
             try:

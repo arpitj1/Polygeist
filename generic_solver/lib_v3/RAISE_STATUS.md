@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (total 254)
+Summary: NOT_RAISED: 13, PARTIAL: 48, RAISED: 181, UNSOUND: 2, UNVALIDATED: 16 (total 260)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -22,6 +22,7 @@ Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (
 | `aten_atan_f32` | aten_atan | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_atan2_f32` | aten_atan2 | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_atanh_f32` | aten_atanh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_avg_pool3d_backward_k2_f32` | aten_avg_pool3d_backward | RAISED | 2 | - | EXACT / EXACT |  |
 | `aten_ceil_f32` | aten_ceil | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_clamp_max_f32` | aten_clamp_max | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_clamp_min_f32` | aten_clamp_min | RAISED | 1 | - | EXACT / EXACT |  |
@@ -62,6 +63,7 @@ Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (
 | `aten_reciprocal_f32` | aten_reciprocal | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_renorm_scale_f32` | aten_renorm_scale | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_rsqrt_f32` | aten_rsqrt | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sampled_addmm_csr_f32` | aten_sampled_addmm_csr | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
 | `aten_scaled_add_f32` | aten_scaled_add | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_shrink_backward_f32` | aten_shrink_backward | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_sigmoid_f32` | aten_sigmoid | RAISED | 1 | - | EXACT / EXACT |  |
@@ -103,6 +105,7 @@ Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (
 | `cub_ordered_rows_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_ordered_rows_scaled_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_ordered_rows_divided_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_ragged_reduce_and_i32` | cub_ragged_logical | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
 | `cub_reduce_sum_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_sum_f64` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_product_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
@@ -119,12 +122,15 @@ Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (
 | `cudnn_conv2d_valid_d1_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_valid_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_valid_unbatched_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
+| `cudnn_conv1d_bias_f32` | cudnn_conv1d_bias | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_valid_f32` | cudnn_conv3d | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_backward_data_valid_f32` | cudnn_conv_backward_data2d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_backward_data_valid_f32` | cudnn_conv_backward_data3d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (5 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv1d_backward_data_tbc_f32` | cudnn_conv_backward_data_tbc | PARTIAL | 2 | affine.for | LOWER_FAIL / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_backward_filter_valid_f32` | cudnn_conv_backward_filter3d | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv1d_tbc_f32` | cudnn_conv_tbc | RAISED | 2 | - | EXACT / EXACT |  |
+| `cudnn_depthwise_conv2d_bias_f32` | cudnn_depthwise_conv2d | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses) |
+| `cusp_bsr_matvec_beta0_f32` | cusp_bsr_matvec | PARTIAL | 2 | affine.for, scf.while | UNSOUND / EXACT | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
 | `cusp_coo_matvecs_beta0_f32` | cusp_coo_matvecs | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `cusp_csr_matvec_beta0_f32` | cusp_csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
 | `cusp_csr_matvecs_beta0_f32` | cusp_csr_matvecs | PARTIAL | 2 | affine.for, scf.while | UNSOUND / EXACT | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
@@ -180,21 +186,21 @@ Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dtrmm_llnn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lltu` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lltn` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_runu` | dtrmm | PARTIAL | 2 | affine.for | LOWER_FAIL / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_runn` | dtrmm | PARTIAL | 2 | affine.for | LOWER_FAIL / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_runu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_runn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_rutu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_rutn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_rlnu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_rlnn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rltu` | dtrmm | PARTIAL | 2 | affine.for | LOWER_FAIL / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rltn` | dtrmm | PARTIAL | 2 | affine.for | LOWER_FAIL / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rltu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rltn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lunn_alpha0` | dtrmm | RAISED | 1 | - | EXACT / EXACT |  |
-| `netlib_dtrsv_unn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrsv_unu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrsv_unn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrsv_unu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_utn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_utu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_lnn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrsv_lnu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrsv_lnu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_ltn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_ltu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `ggml_swiglu_f32` | ggml_swiglu | RAISED | 1 | - | EXACT / EXACT |  |
@@ -268,6 +274,18 @@ Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (
 ## Minimal reproducers for non-RAISED specs
 
 Each reproducer is the generated wrapper (`raised/<spec>.c`, which only `#define`s the manifest flags and `#include`s `ref_c/<routine>.c`) plus the exact recipe commands, run from the repository root after `source envsetup.sh`.
+
+### `aten_sampled_addmm_csr_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.for
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/aten_sampled_addmm_csr_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only aten_sampled_addmm_csr_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.c --function=aten_sampled_addmm_csr_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=aten_sampled_addmm_csr_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.mlir -o generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32_linalg.mlir -o generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32_debuf.mlir
+```
 
 ### `numpy_bincount` -- PARTIAL
 
@@ -425,6 +443,30 @@ build/bin/polygeist-opt '--select-func=func-name=cub_ordered_row_prefix_sum_f32 
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32_debuf.mlir
 ```
 
+### `cub_ragged_reduce_and_i32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.for
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cub_ragged_reduce_and_i32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cub_ragged_reduce_and_i32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.c --function=cub_ragged_reduce_and_i32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cub_ragged_reduce_and_i32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.mlir -o generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32_linalg.mlir -o generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32_debuf.mlir
+```
+
+### `cudnn_conv1d_bias_f32` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_conv1d_bias_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cudnn_conv1d_bias_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.c --function=cudnn_conv1d_bias_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_bias_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_debuf.mlir
+```
+
 ### `cudnn_conv2d_backward_data_valid_f32` -- PARTIAL
 
 Reason: 2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses)
@@ -459,6 +501,30 @@ Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_co
 build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.c --function=cudnn_conv1d_backward_data_tbc_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.mlir
 build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_backward_data_tbc_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_linalg.mlir
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_debuf.mlir
+```
+
+### `cudnn_depthwise_conv2d_bias_f32` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_depthwise_conv2d_bias_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cudnn_depthwise_conv2d_bias_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.c --function=cudnn_depthwise_conv2d_bias_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cudnn_depthwise_conv2d_bias_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.mlir -o generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32_debuf.mlir
+```
+
+### `cusp_bsr_matvec_beta0_f32` -- PARTIAL
+
+Reason: 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cusp_bsr_matvec_beta0_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cusp_bsr_matvec_beta0_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.c --function=cusp_bsr_matvec_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cusp_bsr_matvec_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32_debuf.mlir
 ```
 
 ### `cusp_coo_matvecs_beta0_f32` -- PARTIAL

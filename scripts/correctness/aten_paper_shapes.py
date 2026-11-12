@@ -5,6 +5,19 @@ from pathlib import Path
 import re
 
 
+def dimension_aliases(record):
+    """Explicit publication-harness names for existing C dimensions."""
+    aliases = record.get('dimension_aliases', {})
+    if not isinstance(aliases, dict):
+        raise ValueError('Dimension aliases must be a mapping')
+    dims = record['dims']
+    for alias, source in aliases.items():
+        if (alias == source or alias not in dims or source not in dims or
+                source in aliases or dims[alias] != dims[source]):
+            raise ValueError('Invalid or inconsistent dimension alias: '+alias)
+    return aliases
+
+
 def load_shapes(path):
     rows = json.loads(Path(path).read_text())
     result = {}
@@ -15,6 +28,7 @@ def load_shapes(path):
         if not row['dims'] or any(not re.fullmatch(r'[A-Za-z_]\w*', k)
                 or type(v) is not int or v <= 0 for k, v in row['dims'].items()):
             raise ValueError('invalid benchmark dimensions: '+name)
+        dimension_aliases(row)
         result[name] = row
     return result
 
@@ -22,8 +36,11 @@ def load_shapes(path):
 def apply_shape(name, cfg, record):
     if record['kernel'] != name:
         raise ValueError('Shape record names a different kernel')
-    if set(record['dims']) - set(cfg['dims']):
+    aliases = dimension_aliases(record)
+    if set(record['dims']) - set(cfg['dims']) - set(aliases):
         raise ValueError('Shape record contains unknown C dimensions')
+    if any(source not in cfg['dims'] for source in aliases.values()):
+        raise ValueError('Dimension alias lacks a C dimension')
     floating = any(a[1] == 'ptr' for a in cfg['args'])
     if floating and record['dtype'] != ('f64' if cfg.get('dtype') == 'double' else 'f32'):
         raise ValueError('Benchmark datatype differs from the C fixture')
@@ -40,11 +57,16 @@ def materialize(original, output, record):
     if original.resolve() == output.resolve():
         raise ValueError('Never replace the original benchmark source')
     text = original.read_text()
+    aliases = dimension_aliases(record)
     for name, value in record['dims'].items():
         if type(value) is not int or value <= 0:
             raise ValueError('invalid dimension '+name)
         # Preserve conditional default guards and every computation statement.
         pattern = rf'(^[ \t]*#[ \t]*define[ \t]+{re.escape(name)}[ \t]+)\d+[ \t]*$'
+        if name in aliases:
+            if re.search(pattern, text, flags=re.M):
+                raise ValueError('Harness alias is also a C dimension: '+name)
+            continue
         text, count = re.subn(pattern, lambda m: m[1]+str(value), text, flags=re.M)
         if count != 1:
             raise ValueError('Expected one literal dimension definition: '+name)

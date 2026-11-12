@@ -54,6 +54,8 @@ void polygeist_cub_reduce_product_f32(int32_t n, float seed, const float *input,
 int polygeist_cub_reduce_value_and_i32(int n, int seed, const int *input);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_segmented_count_nonzero_f32 */
 void polygeist_cub_segmented_count_nonzero_f32(int rows, int cols, const float *input, int *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_ragged_reduce_and_i32 */
+void polygeist_cub_ragged_reduce_and_i32(int rows, int cols, const int *input, const int *length, int *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_segmented_reduce_and_i32 */
 void polygeist_cub_segmented_reduce_and_i32(int rows, int cols, int seed, const int *input, int *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_segmented_reduce_or_i32 */
@@ -147,6 +149,13 @@ void polygeist_cusparse_spmm_coo_f32_sized(
     int32_t value_count, const float *values,
     int32_t b_rows, int32_t b_cols, const float *b,
     int32_t c_rows, int32_t c_cols, float *c);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuSPARSE cusparseSpMM polygeist_reference_bsr_matvec_beta0_f32 */
+void polygeist_reference_bsr_matvec_beta0_f32(
+    int32_t block_rows, int32_t block_dim,
+    int32_t row_offset_count, const int32_t *row_offsets,
+    int32_t column_index_count, const int32_t *column_indices,
+    int32_t value_block_count, const float *values,
+    int32_t x_blocks, const float *x, int32_t y_blocks, float *y);
 void polygeist_cusparse_spmm_bsr_f32_sized(
     int32_t block_rows, int32_t block_dim,
     int32_t row_offset_count, const int32_t *row_offsets,
@@ -154,6 +163,7 @@ void polygeist_cusparse_spmm_bsr_f32_sized(
     int32_t value_block_count, int32_t value_block_rows,
     int32_t value_block_cols, const float *values,
     int32_t x_count, const float *x, int32_t y_count, float *y);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuSPARSE cusparseSDDMM polygeist_cusparse_sddmm_csr_f32_sized */
 void polygeist_cusparse_sddmm_csr_f32_sized(
     int32_t rows,
     int32_t row_offset_count, const int32_t *row_offsets,
@@ -496,6 +506,11 @@ void polygeist_cudnn_conv2d_uniform_window_f32(
 // 0=adaptive-average forward, 1=adaptive-average backward, 2=max forward,
 // 3=max backward, 4=fixed-average forward, 5=fixed-average backward, and
 // 6=the supported FP32 bilinear 2x forward subset.
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnPoolingBackward polygeist_reference_avg_pool3d_backward_k2_f32 */
+void polygeist_reference_avg_pool3d_backward_k2_f32(
+    int32_t S, int32_t O0, int32_t O1, int32_t O2,
+    int32_t R0, int32_t R1, int32_t R2,
+    const float *grad_output, float *grad_input);
 void polygeist_cudnn_adaptive_pool_f32(
     int32_t operation, int32_t rank, int32_t N, int32_t C,
     int32_t I0, int32_t I1, int32_t I2,
@@ -727,6 +742,10 @@ void polygeist_cudnn_conv2d_batched(
     int32_t B, int32_t IC, int32_t OC,
     int32_t H, int32_t W, int32_t K,
     const float *A, const float *F, float *Out);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionForward polygeist_reference_conv1d_bias_f32 */
+void polygeist_reference_conv1d_bias_f32(
+    int32_t B, int32_t IC, int32_t OC, int32_t K, int32_t OL,
+    const float *input, const float *filter, const float *bias, float *output);
 void polygeist_cudnn_conv1d_bias_f32(
     int32_t B, int32_t IC, int32_t OC, int32_t L, int32_t K,
     const float *input, const float *filter, const float *bias, float *output);
@@ -763,6 +782,10 @@ void polygeist_cudnn_conv_backward_filter3d_f32(
     const float *input, const float *grad_output, float *grad_filter);
 void polygeist_cudnn_depthwise_conv2d_f32(
     int32_t B, int32_t C, int32_t H, int32_t W, int32_t KH, int32_t KW,
+    const float *input, const float *filter, const float *bias, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionForward polygeist_reference_depthwise_conv2d_f32 */
+void polygeist_reference_depthwise_conv2d_f32(
+    int32_t B, int32_t C, int32_t H, int32_t W, int32_t RH, int32_t RW,
     const float *input, const float *filter, const float *bias, float *output);
 void polygeist_cutensor_kronecker_product2d_f32(
     int32_t A, int32_t B, int32_t C, int32_t D,

@@ -1,0 +1,13 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+SAMPLE path=raised sample=0 ms=8.300812960
+SAMPLE path=native_aten_cuda sample=0 ms=8.407407045
+SAMPLE path=native_aten_cuda sample=1 ms=8.309516907
+SAMPLE path=raised sample=1 ms=8.211660147
+SAMPLE path=raised sample=2 ms=8.208458900
+SAMPLE path=native_aten_cuda sample=2 ms=8.447280169
+SAMPLE path=native_aten_cuda sample=3 ms=8.305166006
+SAMPLE path=raised sample=3 ms=8.268044949
+SAMPLE path=raised sample=4 ms=8.213515043
+SAMPLE path=native_aten_cuda sample=4 ms=8.310253859
+PASS timing
+[W1112 20:22:27.336908636 SparseCsrTensorImpl.cpp:53] Warning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (function operator())

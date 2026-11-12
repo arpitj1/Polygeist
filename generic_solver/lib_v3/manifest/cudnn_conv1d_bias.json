@@ -1,0 +1,135 @@
+{
+  "routine": "cudnn_conv1d_bias",
+  "source": "NVIDIA cuDNN9 public sample CPU reference, specialization described in ref_c",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "adaptation": "Public cuDNN conv_cpu_ref specialized to one spatial axis, NCL/OIL arrays, cross-correlation and a channel-bias beta=1 epilogue. The bias is broadcast as the initial output of the reference; the adapter calls real cudnnConvolutionForward and cudnnAddTensor.",
+  "specs": [
+    {
+      "name": "cudnn_conv1d_bias_f32",
+      "args": [
+        "B",
+        "IC",
+        "OC",
+        "K",
+        "OL",
+        "input",
+        "filter",
+        "bias",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_conv1d_bias_f32",
+          "arguments": [
+            "B",
+            "IC",
+            "OC",
+            "K",
+            "OL",
+            "input",
+            "filter",
+            "bias",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "B",
+              "IC",
+              {
+                "terms": {
+                  "OL": 1,
+                  "K": 1
+                },
+                "offset": -1
+              }
+            ],
+            "filter": [
+              "OC",
+              "IC",
+              "K"
+            ],
+            "bias": [
+              "OC"
+            ],
+            "output": [
+              "B",
+              "OC",
+              "OL"
+            ]
+          },
+          "bounds": {
+            "B": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "IC": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "OC": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "K": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "OL": {
+              "min": 1,
+              "max": 1073741823
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Positive disjoint FP32 arrays; input length OL+K-1, with every dimension at most INT_MAX/2",
+        "Finite FP32; relaxed arithmetic is required to move the bias from a reduction seed to the epilogue and to accept parallel backend accumulation"
+      ],
+      "deviations": [
+        "Select cross-correlation branch from sample, which hardcodes convolution mode."
+      ],
+      "validation": {
+        "scalars": {
+          "B": 2,
+          "IC": 3,
+          "OC": 5,
+          "K": 3,
+          "OL": 9
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            11
+          ],
+          "filter": [
+            5,
+            3,
+            3
+          ],
+          "bias": [
+            5
+          ],
+          "output": [
+            2,
+            5,
+            9
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -29,7 +29,7 @@
   },
   {
     "kernel": "aten_conv_transpose3d_grad_weight_cpu",
-    "cause": "Raised and native cuDNN outputs agree with each other, but differ from the long sequential FP32 C reduction. Accumulation order is the leading explanation; saved evidence does not yet include an independent higher-precision oracle for each failing output.",
+    "cause": "Raised/native outputs are bit-identical, but differ from sequential C. Exact-integer accumulation diagnoses the rounding error without changing the gate. All supported legacy FP32/FMA cuDNN backward-filter algorithms were tested and none passed the existing C gate.",
     "observed": {
       "values": 3456,
       "raised_vs_native_bad": 0,
@@ -37,13 +37,37 @@
       "maximum_absolute_error": 0.0025100708
     },
     "evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_conv_transpose3d_grad_weight_cpu/gpu-result.json",
-    "proposed_fix": "First quantify each failing result against a higher-precision oracle without changing acceptance. To satisfy the existing sequential-C gate, investigate supported cuDNN algorithms with the required arithmetic ordering or a generic order-preserving reduction backend; deterministic alone does not imply the same order.",
+    "proposed_fix": "Keep the strict failure. No tested supported FP32/FMA algorithm meets the existing C/native contract. Exact sequential-C reproduction requires an order-preserving fallback; changing to a mathematical-error or native-equivalence contract requires an explicit methodological decision, not a silent tolerance change.",
+    "exact_oracle_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/weight-gradient-oracle/exact-oracle-comparison.json",
+    "supported_algorithm_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/weight-gradient-oracle/algorithm-probe/comparison.json",
+    "exact_oracle_failing_subset": {
+      "count": 94,
+      "raised": {
+        "max_absolute_error": 0.00022708966382860296,
+        "mean_absolute_error": 7.218713188047821e-05,
+        "median_absolute_error": 5.8160234911203146e-05
+      },
+      "reference": {
+        "max_absolute_error": 0.0015192170844247344,
+        "mean_absolute_error": 0.0010219916141417042,
+        "median_absolute_error": 0.0010340598495605438
+      },
+      "native": {
+        "max_absolute_error": 0.00022708966382860296,
+        "mean_absolute_error": 7.218713188047821e-05,
+        "median_absolute_error": 5.8160234911203146e-05
+      },
+      "raised_closer_than_reference": 94,
+      "reference_closer_than_raised": 0,
+      "equal_error": 0
+    },
+    "exact_sum_C_tolerance_failures": 94,
     "strict_status": "failed_preserved",
     "memory_guards_and_inputs": "pass"
   },
   {
     "kernel": "aten_slow_conv3d_backward_weight_cpu",
-    "cause": "Raised and native cuDNN outputs agree, but differ from sequential FP32 C accumulation; same numerical-contract issue as the transpose weight gradient.",
+    "cause": "Raised/native outputs are bit-identical, but differ from sequential C. Exact-integer accumulation diagnoses the rounding error without changing the gate. All supported legacy FP32/FMA cuDNN backward-filter algorithms were tested and none passed the existing C gate.",
     "observed": {
       "values": 3456,
       "raised_vs_native_bad": 0,
@@ -51,7 +75,31 @@
       "maximum_absolute_error": 0.000274658203
     },
     "evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_slow_conv3d_backward_weight_cpu/gpu-result.json",
-    "proposed_fix": "Use a higher-precision oracle to diagnose the discrepancies, while preserving this failed gate. Strict sequential-C reproduction requires an algorithm/reference that preserves the required accumulation behavior, not a looser tolerance.",
+    "proposed_fix": "Keep the strict failure. No tested supported FP32/FMA algorithm meets the existing C/native contract. Exact sequential-C reproduction requires an order-preserving fallback; changing to a mathematical-error or native-equivalence contract requires an explicit methodological decision, not a silent tolerance change.",
+    "exact_oracle_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/weight-gradient-oracle/exact-oracle-comparison.json",
+    "supported_algorithm_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/weight-gradient-oracle/algorithm-probe/comparison.json",
+    "exact_oracle_failing_subset": {
+      "count": 10,
+      "raised": {
+        "max_absolute_error": 0.0014803781275670724,
+        "mean_absolute_error": 0.0007113959373819354,
+        "median_absolute_error": 0.0007817000171545466
+      },
+      "reference": {
+        "max_absolute_error": 0.001255549407474299,
+        "mean_absolute_error": 0.0006206209837638213,
+        "median_absolute_error": 0.0006609559080007991
+      },
+      "native": {
+        "max_absolute_error": 0.0014803781275670724,
+        "mean_absolute_error": 0.0007113959373819354,
+        "median_absolute_error": 0.0007817000171545466
+      },
+      "raised_closer_than_reference": 3,
+      "reference_closer_than_raised": 7,
+      "equal_error": 0
+    },
+    "exact_sum_C_tolerance_failures": 85,
     "strict_status": "failed_preserved",
     "memory_guards_and_inputs": "pass"
   }

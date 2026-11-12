@@ -8,7 +8,7 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from region_match.mlir_parse import parse_module
 from region_match.symexec import execute
-from region_match.equations import build_system, Reject
+from region_match.equations import build_system, FBin, FFold, FSum, fwalk
 from region_match.matcher import Binding, compare_systems
 
 
@@ -49,8 +49,17 @@ class RegionScalarCarry(unittest.TestCase):
 
     def test_integer_carry_does_not_use_a_real_arithmetic_reduction_summary(self):
         p=self.program('i32','3')
-        with self.assertRaisesRegex(Reject,'accumulation is not'):
-            build_system(p,set(range(len(p.top_ops))))
+        result=build_system(p,set(range(len(p.top_ops))))
+        nodes=list(fwalk(result.equations[0].formula))
+        self.assertTrue(any(isinstance(n,FFold) for n in nodes))
+        self.assertFalse(any(isinstance(n,FSum) for n in nodes))
+        self.assertTrue(any(isinstance(n,FBin) and n.op=='arith.addi:i32'
+                            for n in nodes))
+        other=self.program('i32','4')
+        wrong=build_system(other,set(range(len(other.top_ops))))
+        binding=Binding({k:(k,k if k in result.outputs else None,tuple(range(v.rank)))
+                         for k,v in result.arrays.items()}, {}, {})
+        self.assertFalse(compare_systems(result,wrong,binding).ok)
 
     def test_float_carry_keeps_declared_precision(self):
         self.program('f32','0.0')

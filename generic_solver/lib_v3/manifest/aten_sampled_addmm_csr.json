@@ -1,0 +1,192 @@
+{
+  "routine": "aten_sampled_addmm_csr",
+  "source": "Public PyTorch CPU sampled_addmm implementation, reference counterpart for closed-source cuSPARSE SDDMM",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cpu/SampledAddmmKernel.cpp",
+      "sha256": "268bfde860aebf2db4f1c10e17f45bc6da5ef51b8032319561ade41537a40615"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/sparse/SparseBlas.cpp",
+      "sha256": "cfdfeee34a18a35794d64238026ba8ebd0a5166794a7142cc26c15313b34997e"
+    }
+  ],
+  "adaptation": "Instantiate FP32/int32 and unbatched matrices. Serialize vector map2_reduce_all under relaxed arithmetic. Compose the caller mat2 transpose into indexing and split copied self values from output storage. Expose dimensions and buffer capacities as VLA parameters.",
+  "specs": [
+    {
+      "name": "aten_sampled_addmm_csr_f32",
+      "args": [
+        "rows",
+        "row_offset_count",
+        "row_offsets",
+        "column_index_count",
+        "column_indices",
+        "self_value_count",
+        "self_values",
+        "a_rows",
+        "a_cols",
+        "a",
+        "b_rows",
+        "b_cols",
+        "b",
+        "alpha",
+        "beta",
+        "out_value_count",
+        "out_values"
+      ],
+      "target": {
+        "library": "cuSPARSE",
+        "call": "cusparseSDDMM",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cusparse_sddmm_csr_f32_sized",
+          "arguments": [
+            "rows",
+            "row_offset_count",
+            "row_offsets",
+            "column_index_count",
+            "column_indices",
+            "self_value_count",
+            "self_values",
+            "a_rows",
+            "a_cols",
+            "a",
+            "b_rows",
+            "b_cols",
+            "b",
+            "alpha",
+            "beta",
+            "out_value_count",
+            "out_values"
+          ],
+          "arrays": {
+            "row_offsets": [
+              "row_offset_count"
+            ],
+            "column_indices": [
+              "column_index_count"
+            ],
+            "self_values": [
+              "self_value_count"
+            ],
+            "a": [
+              "a_rows",
+              "a_cols"
+            ],
+            "b": [
+              "b_rows",
+              "b_cols"
+            ],
+            "out_values": [
+              "out_value_count"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "row_offset_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "column_index_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "self_value_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "a_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "a_cols": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "b_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "b_cols": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "out_value_count": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Valid zero-based CSR: row_offsets[0]=0, nondecreasing row offsets, row_offsets[rows] within all sparse capacities, and columns in [0,b_cols).",
+        "Positive dimensions with a_rows >= rows, b_rows == a_cols, and row_offset_count >= rows+1; disjoint buffers.",
+        "Finite FP32 values and scalars; relaxed arithmetic permits reordered and fused vendor reductions."
+      ],
+      "deviations": [
+        "Public CPU counterpart is the specification source; the backend is real cusparseSDDMM, not an import of proprietary cuSPARSE implementation code.",
+        "The vector dot product is serialized, batching specialized to one, and caller transpose/output copy composed into the reference."
+      ],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "row_offset_count": 4,
+          "column_index_count": 5,
+          "self_value_count": 5,
+          "a_rows": 3,
+          "a_cols": 4,
+          "b_rows": 4,
+          "b_cols": 6,
+          "out_value_count": 5,
+          "alpha": 1.25,
+          "beta": 0.5
+        },
+        "arrays": {
+          "row_offsets": [
+            4
+          ],
+          "column_indices": [
+            5
+          ],
+          "self_values": [
+            5
+          ],
+          "a": [
+            3,
+            4
+          ],
+          "b": [
+            4,
+            6
+          ],
+          "out_values": [
+            5
+          ]
+        },
+        "array_values": {
+          "row_offsets": [
+            0,
+            2,
+            2,
+            5
+          ],
+          "column_indices": [
+            0,
+            4,
+            5,
+            1,
+            3
+          ]
+        }
+      }
+    }
+  ]
+}

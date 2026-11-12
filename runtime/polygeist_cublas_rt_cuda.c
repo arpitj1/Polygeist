@@ -1949,6 +1949,25 @@ void polygeist_cusparse_spmm_coo_f32_sized(
   CUSPARSE_CHECK(cusparseDestroySpMat(matrix));
 }
 
+void polygeist_reference_bsr_matvec_beta0_f32(
+    int32_t block_rows, int32_t block_dim,
+    int32_t row_offset_count, const int32_t *row_offsets,
+    int32_t column_index_count, const int32_t *column_indices,
+    int32_t value_block_count, const float *values,
+    int32_t x_blocks, const float *x, int32_t y_blocks, float *y) {
+  int64_t x_count = (int64_t)x_blocks * block_dim;
+  int64_t y_count = (int64_t)y_blocks * block_dim;
+  if (block_dim <= 0 || x_count <= 0 || x_count > INT32_MAX ||
+      y_count <= 0 || y_count > INT32_MAX) {
+    fprintf(stderr, "Polygeist cuSPARSE: invalid BSR vector extent\n");
+    abort();
+  }
+  polygeist_cusparse_spmm_bsr_f32_sized(
+      block_rows, block_dim, row_offset_count, row_offsets,
+      column_index_count, column_indices, value_block_count,
+      block_dim, block_dim, values, (int32_t)x_count, x, (int32_t)y_count, y);
+}
+
 void polygeist_cusparse_spmm_bsr_f32_sized(
     int32_t block_rows, int32_t block_dim,
     int32_t row_offset_count, const int32_t *row_offsets,
@@ -2573,25 +2592,18 @@ void *mgpuStreamCreate(void) {
 }
 
 // MLIR GPU runtime ABI used by compiler-planned device-resident buffers.
-// Allocation and transfers are deliberately outside CUDA Graph capture; the
-// graph itself only contains the connected library/generated-kernel work.
+// Allocation and transfers remain outside CUDA Graph capture. Optional bounded
+// reuse retains exclusive ownership and completion semantics at release.
+#include "polygeist_gpu_workspace_cache.h"
+
 void *mgpuMemAlloc(uint64_t size_bytes, void *stream, uint8_t host_shared) {
   (void)stream;
-  void *pointer = NULL;
-  if (size_bytes == 0)
-    return NULL;
-  if (host_shared)
-    CUDA_CHECK(cudaHostAlloc(&pointer, (size_t)size_bytes,
-                             cudaHostAllocMapped));
-  else
-    CUDA_CHECK(cudaMalloc(&pointer, (size_t)size_bytes));
-  return pointer;
+  return pv2_workspace_allocate(size_bytes, host_shared);
 }
 
 void mgpuMemFree(void *pointer, void *stream) {
   (void)stream;
-  if (pointer)
-    CUDA_CHECK(cudaFree(pointer));
+  pv2_workspace_release(pointer);
 }
 
 void mgpuMemcpy(void *destination, void *source, size_t size_bytes,
@@ -5528,6 +5540,63 @@ static void integer_origin_bilinear_2x_f32(
   sync_stream_if_outside_pipeline();
 }
 
+void polygeist_reference_avg_pool3d_backward_k2_f32(
+    int32_t S, int32_t O0, int32_t O1, int32_t O2,
+    int32_t R0, int32_t R1, int32_t R2,
+    const float *grad_output, float *grad_input) {
+  if (S <= 0 || O0 <= 0 || O1 <= 0 || O2 <= 0 ||
+      O0 > INT32_MAX / 2 || O1 > INT32_MAX / 2 || O2 > INT32_MAX / 2 ||
+      R0 < 0 || R0 > 1 || R1 < 0 || R1 > 1 || R2 < 0 || R2 > 1 ||
+      !grad_output || !grad_input) {
+    fprintf(stderr, "cuDNN average pooling backward: invalid dimensions\n");
+    abort();
+  }
+  polygeist_cublas_init();
+  ensure_cudnn();
+  int inputDims[5] = {S, 1, 2 * O0 + R0, 2 * O1 + R1, 2 * O2 + R2};
+  int outputDims[5] = {S, 1, O0, O1, O2};
+  int inputStrides[5], outputStrides[5];
+  int64_t inputCount = 1, outputCount = 1;
+  for (int d = 4; d >= 0; --d) {
+    if (inputCount > INT32_MAX || outputCount > INT32_MAX) {
+      fprintf(stderr, "cuDNN average pooling backward: stride overflow\n");
+      abort();
+    }
+    inputStrides[d] = (int)inputCount;
+    outputStrides[d] = (int)outputCount;
+    inputCount *= inputDims[d];
+    outputCount *= outputDims[d];
+  }
+  float *dy = (float *)register_host_safe((void *)grad_output,
+                                        (size_t)outputCount * sizeof(float));
+  float *dx = (float *)register_host_safe(grad_input,
+                                        (size_t)inputCount * sizeof(float));
+  cudnnTensorDescriptor_t inputDesc, outputDesc;
+  cudnnPoolingDescriptor_t poolDesc;
+  CUDNN_CHECK(cudnnCreateTensorDescriptor(&inputDesc));
+  CUDNN_CHECK(cudnnCreateTensorDescriptor(&outputDesc));
+  CUDNN_CHECK(cudnnCreatePoolingDescriptor(&poolDesc));
+  CUDNN_CHECK(cudnnSetTensorNdDescriptor(inputDesc, CUDNN_DATA_FLOAT, 5,
+                                        inputDims, inputStrides));
+  CUDNN_CHECK(cudnnSetTensorNdDescriptor(outputDesc, CUDNN_DATA_FLOAT, 5,
+                                        outputDims, outputStrides));
+  int window[3] = {2, 2, 2}, padding[3] = {0, 0, 0}, step[3] = {2, 2, 2};
+  CUDNN_CHECK(cudnnSetPoolingNdDescriptor(poolDesc,
+      CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, CUDNN_PROPAGATE_NAN,
+      3, window, padding, step));
+  float one = 1.0f, zero = 0.0f;
+  // cuDNN permits NULL forward inputs and descriptors for average pooling:
+  // https://docs.nvidia.com/deeplearning/cudnn/backend/v9.13.0/api/cudnn-ops-library.html#cudnnpoolingbackward
+  CUDNN_CHECK(cudnnPoolingBackward(g_cudnn, poolDesc, &one,
+      NULL, NULL, outputDesc, dy, NULL, NULL, &zero, inputDesc, dx));
+  sync_stream_if_outside_pipeline();
+  CUDNN_CHECK(cudnnDestroyPoolingDescriptor(poolDesc));
+  CUDNN_CHECK(cudnnDestroyTensorDescriptor(inputDesc));
+  CUDNN_CHECK(cudnnDestroyTensorDescriptor(outputDesc));
+  unregister_host_safe((void *)grad_output);
+  unregister_host_safe(grad_input);
+}
+
 void polygeist_cudnn_adaptive_pool_f32(
     int32_t operation, int32_t rank, int32_t N, int32_t C,
     int32_t I0, int32_t I1, int32_t I2,
@@ -7251,50 +7320,85 @@ void polygeist_cudnn_conv1d_bias_f32(
   float *dFilter = (float *)register_host_safe((void *)filter, filterBytes);
   float *dBias = (float *)register_host_safe((void *)bias, biasBytes);
   float *dOutput = (float *)register_host_safe(output, outputBytes);
-  cudnnTensorDescriptor_t inputDesc, outputDesc, biasDesc;
-  cudnnFilterDescriptor_t filterDesc;
-  cudnnConvolutionDescriptor_t convDesc;
-  CUDNN_CHECK(cudnnCreateTensorDescriptor(&inputDesc));
-  CUDNN_CHECK(cudnnCreateTensorDescriptor(&outputDesc));
+  int inputDims[4] = {B, IC, 1, L};
+  int inputStrides[4] = {IC * L, L, L, 1};
+  int outputDims[4] = {B, OC, 1, OL};
+  int outputStrides[4] = {OC * OL, OL, OL, 1};
+  int filterDims[4] = {OC, IC, 1, K};
+  int padding[2] = {0, 0};
+  int strides[2] = {1, 1};
+  int dilations[2] = {1, 1};
+  PolygeistCudnnConvFwdPlan *cachedPlan = get_cudnn_conv_fwd_plan(
+      4, inputDims, inputStrides, filterDims, outputDims, outputStrides, 2,
+      padding, strides, dilations, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
+      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, 1, CUDNN_DEFAULT_MATH);
+  cudnnTensorDescriptor_t inputDesc = NULL, outputDesc = NULL, biasDesc = NULL;
+  cudnnFilterDescriptor_t filterDesc = NULL;
+  cudnnConvolutionDescriptor_t convDesc = NULL;
+  cudnnConvolutionFwdAlgo_t algorithm;
+  size_t workspaceBytes = 0;
+  void *workspace = NULL;
   CUDNN_CHECK(cudnnCreateTensorDescriptor(&biasDesc));
-  CUDNN_CHECK(cudnnCreateFilterDescriptor(&filterDesc));
-  CUDNN_CHECK(cudnnCreateConvolutionDescriptor(&convDesc));
-  CUDNN_CHECK(cudnnSetTensor4dDescriptor(
-      inputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, IC, 1, L));
-  CUDNN_CHECK(cudnnSetTensor4dDescriptor(
-      outputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, OC, 1, OL));
   CUDNN_CHECK(cudnnSetTensor4dDescriptor(
       biasDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, 1, OC, 1, 1));
-  CUDNN_CHECK(cudnnSetFilter4dDescriptor(
-      filterDesc, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, OC, IC, 1, K));
-  CUDNN_CHECK(cudnnSetConvolution2dDescriptor(
-      convDesc, 0, 0, 1, 1, 1, 1,
-      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
-  cudnnConvolutionFwdAlgoPerf_t perf;
-  int returned = 0;
-  CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(
-      g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, 1, &returned,
-      &perf));
-  if (returned < 1) abort();
-  size_t workspaceBytes = 0;
-  CUDNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
-      g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, perf.algo,
-      &workspaceBytes));
-  void *workspace = NULL;
-  if (workspaceBytes) DEVICE_MALLOC(&workspace, workspaceBytes);
+  if (cachedPlan) {
+    inputDesc = cachedPlan->input_desc;
+    outputDesc = cachedPlan->output_desc;
+    filterDesc = cachedPlan->filter_desc;
+    convDesc = cachedPlan->convolution_desc;
+    algorithm = cachedPlan->algorithm;
+    workspaceBytes = cachedPlan->workspace_bytes;
+    workspace = cachedPlan->workspace;
+  } else {
+    CUDNN_CHECK(cudnnCreateTensorDescriptor(&inputDesc));
+    CUDNN_CHECK(cudnnCreateTensorDescriptor(&outputDesc));
+    CUDNN_CHECK(cudnnCreateFilterDescriptor(&filterDesc));
+    CUDNN_CHECK(cudnnCreateConvolutionDescriptor(&convDesc));
+    CUDNN_CHECK(cudnnSetTensor4dDescriptor(
+        inputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, IC, 1, L));
+    CUDNN_CHECK(cudnnSetTensor4dDescriptor(
+        outputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, OC, 1, OL));
+    CUDNN_CHECK(cudnnSetFilter4dDescriptor(
+        filterDesc, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, OC, IC, 1, K));
+    CUDNN_CHECK(cudnnSetConvolution2dDescriptor(
+        convDesc, 0, 0, 1, 1, 1, 1,
+        CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
+    cudnnConvolutionFwdAlgoPerf_t perf;
+    int returned = 0;
+    CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(
+        g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, 1, &returned,
+        &perf));
+    if (returned < 1) abort();
+    algorithm = perf.algo;
+    CUDNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
+        g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, algorithm,
+        &workspaceBytes));
+    if (workspaceBytes) DEVICE_MALLOC(&workspace, workspaceBytes);
+  }
   float one = 1.0f, zero = 0.0f;
   CUDNN_CHECK(cudnnConvolutionForward(
       g_cudnn, &one, inputDesc, dInput, filterDesc, dFilter, convDesc,
-      perf.algo, workspace, workspaceBytes, &zero, outputDesc, dOutput));
+      algorithm, workspace, workspaceBytes, &zero, outputDesc, dOutput));
   CUDNN_CHECK(cudnnAddTensor(
       g_cudnn, &one, biasDesc, dBias, &one, outputDesc, dOutput));
   sync_stream_if_outside_pipeline();
-  if (workspace) DEVICE_FREE(workspace);
-  cudnnDestroyTensorDescriptor(inputDesc);
-  cudnnDestroyTensorDescriptor(outputDesc);
   cudnnDestroyTensorDescriptor(biasDesc);
-  cudnnDestroyFilterDescriptor(filterDesc);
-  cudnnDestroyConvolutionDescriptor(convDesc);
+  if (!cachedPlan) {
+    if (workspace) DEVICE_FREE(workspace);
+    cudnnDestroyTensorDescriptor(inputDesc);
+    cudnnDestroyTensorDescriptor(outputDesc);
+    cudnnDestroyFilterDescriptor(filterDesc);
+    cudnnDestroyConvolutionDescriptor(convDesc);
+  }
+}
+
+// Positive output extent is the imported ABI parameter. Recover the input
+// extent mechanically; the typed contract checks OL+K-1 and the array shapes.
+void polygeist_reference_conv1d_bias_f32(
+    int32_t B, int32_t IC, int32_t OC, int32_t K, int32_t OL,
+    const float *input, const float *filter, const float *bias, float *output) {
+  polygeist_cudnn_conv1d_bias_f32(B, IC, OC, OL + K - 1, K,
+                               input, filter, bias, output);
 }
 
 void polygeist_cudnn_conv2d_dilated_f32(
@@ -7786,6 +7890,13 @@ void polygeist_cudnn_conv_backward_filter3d_f32(
   unregister_host_safe((void*)input);unregister_host_safe((void*)grad_output);unregister_host_safe(grad_filter);
 }
 
+void polygeist_reference_depthwise_conv2d_f32(
+    int32_t B, int32_t C, int32_t H, int32_t W, int32_t RH, int32_t RW,
+    const float *input, const float *filter, const float *bias, float *output) {
+  polygeist_cudnn_depthwise_conv2d_f32(
+      B, C, H, W, 2 * RH + 1, 2 * RW + 1, input, filter, bias, output);
+}
+
 void polygeist_cudnn_depthwise_conv2d_f32(
     int32_t B, int32_t C, int32_t H, int32_t W, int32_t KH, int32_t KW,
     const float *input, const float *filter, const float *bias, float *output) {
@@ -7798,52 +7909,75 @@ void polygeist_cudnn_depthwise_conv2d_f32(
   float *deviceBias = (float *)register_host_safe(
       (void *)bias, (size_t)C * sizeof(float));
   float *deviceOutput = (float *)register_host_safe(output, tensorBytes);
-  cudnnTensorDescriptor_t inputDesc, outputDesc, biasDesc;
-  cudnnFilterDescriptor_t filterDesc;
-  cudnnConvolutionDescriptor_t convDesc;
-  CUDNN_CHECK(cudnnCreateTensorDescriptor(&inputDesc));
-  CUDNN_CHECK(cudnnCreateTensorDescriptor(&outputDesc));
+  cudnnTensorDescriptor_t inputDesc = NULL, outputDesc = NULL, biasDesc = NULL;
+  cudnnFilterDescriptor_t filterDesc = NULL;
+  cudnnConvolutionDescriptor_t convDesc = NULL;
+  int tensorDims[4] = {B, C, H, W};
+  int tensorStrides[4] = {C * H * W, H * W, W, 1};
+  int filterDims[4] = {C, 1, KH, KW};
+  int padding[2] = {KH / 2, KW / 2};
+  int step[2] = {1, 1};
+  PolygeistCudnnConvFwdPlan *cachedPlan = get_cudnn_conv_fwd_plan(
+      4, tensorDims, tensorStrides, filterDims, tensorDims, tensorStrides,
+      2, padding, step, step, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
+      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, C, CUDNN_DEFAULT_MATH);
+  cudnnConvolutionFwdAlgo_t algorithm;
+  size_t workspaceBytes = 0;
+  void *workspace = NULL;
+  if (cachedPlan) {
+    inputDesc = cachedPlan->input_desc;
+    outputDesc = cachedPlan->output_desc;
+    filterDesc = cachedPlan->filter_desc;
+    convDesc = cachedPlan->convolution_desc;
+    algorithm = cachedPlan->algorithm;
+    workspaceBytes = cachedPlan->workspace_bytes;
+    workspace = cachedPlan->workspace;
+  } else {
+    CUDNN_CHECK(cudnnCreateTensorDescriptor(&inputDesc));
+    CUDNN_CHECK(cudnnCreateTensorDescriptor(&outputDesc));
+    CUDNN_CHECK(cudnnCreateFilterDescriptor(&filterDesc));
+    CUDNN_CHECK(cudnnCreateConvolutionDescriptor(&convDesc));
+    CUDNN_CHECK(cudnnSetTensor4dDescriptor(
+        inputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, C, H, W));
+    CUDNN_CHECK(cudnnSetTensor4dDescriptor(
+        outputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, C, H, W));
+    CUDNN_CHECK(cudnnSetFilter4dDescriptor(
+        filterDesc, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, C, 1, KH, KW));
+    CUDNN_CHECK(cudnnSetConvolution2dDescriptor(
+        convDesc, KH / 2, KW / 2, 1, 1, 1, 1,
+        CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
+    CUDNN_CHECK(cudnnSetConvolutionGroupCount(convDesc, C));
+    cudnnConvolutionFwdAlgoPerf_t perf;
+    int returned = 0;
+    CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(
+        g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, 1, &returned,
+        &perf));
+    if (returned < 1) abort();
+    algorithm = perf.algo;
+    CUDNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
+        g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, perf.algo,
+        &workspaceBytes));
+    if (workspaceBytes) DEVICE_MALLOC(&workspace, workspaceBytes);
+  }
   CUDNN_CHECK(cudnnCreateTensorDescriptor(&biasDesc));
-  CUDNN_CHECK(cudnnCreateFilterDescriptor(&filterDesc));
-  CUDNN_CHECK(cudnnCreateConvolutionDescriptor(&convDesc));
-  CUDNN_CHECK(cudnnSetTensor4dDescriptor(
-      inputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, C, H, W));
-  CUDNN_CHECK(cudnnSetTensor4dDescriptor(
-      outputDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, C, H, W));
   CUDNN_CHECK(cudnnSetTensor4dDescriptor(
       biasDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, 1, C, 1, 1));
-  CUDNN_CHECK(cudnnSetFilter4dDescriptor(
-      filterDesc, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, C, 1, KH, KW));
-  CUDNN_CHECK(cudnnSetConvolution2dDescriptor(
-      convDesc, KH / 2, KW / 2, 1, 1, 1, 1,
-      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
-  CUDNN_CHECK(cudnnSetConvolutionGroupCount(convDesc, C));
-  cudnnConvolutionFwdAlgoPerf_t perf;
-  int returned = 0;
-  CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(
-      g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, 1, &returned,
-      &perf));
-  if (returned < 1) abort();
-  size_t workspaceBytes = 0;
-  CUDNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
-      g_cudnn, inputDesc, filterDesc, convDesc, outputDesc, perf.algo,
-      &workspaceBytes));
-  void *workspace = NULL;
-  if (workspaceBytes) DEVICE_MALLOC(&workspace, workspaceBytes);
   float one = 1.0f, zero = 0.0f;
   CUDNN_CHECK(cudnnConvolutionForward(
       g_cudnn, &one, inputDesc, deviceInput, filterDesc, deviceFilter,
-      convDesc, perf.algo, workspace, workspaceBytes, &zero,
+      convDesc, algorithm, workspace, workspaceBytes, &zero,
       outputDesc, deviceOutput));
   CUDNN_CHECK(cudnnAddTensor(
       g_cudnn, &one, biasDesc, deviceBias, &one, outputDesc, deviceOutput));
   sync_stream_if_outside_pipeline();
-  if (workspace) DEVICE_FREE(workspace);
-  cudnnDestroyTensorDescriptor(inputDesc);
-  cudnnDestroyTensorDescriptor(outputDesc);
   cudnnDestroyTensorDescriptor(biasDesc);
-  cudnnDestroyFilterDescriptor(filterDesc);
-  cudnnDestroyConvolutionDescriptor(convDesc);
+  if (!cachedPlan) {
+    if (workspace) DEVICE_FREE(workspace);
+    cudnnDestroyTensorDescriptor(inputDesc);
+    cudnnDestroyTensorDescriptor(outputDesc);
+    cudnnDestroyFilterDescriptor(filterDesc);
+    cudnnDestroyConvolutionDescriptor(convDesc);
+  }
 }
 
 void polygeist_cutensor_kronecker_product2d_f32(

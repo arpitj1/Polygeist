@@ -1,0 +1,21 @@
+{
+  "python_tests": {
+    "command": "/usr/bin/python3 -m unittest discover -s scripts/correctness/tests -p test_*.py",
+    "tests": 339,
+    "seconds": 196.927,
+    "exit_code": 0
+  },
+  "compiler_regression": {
+    "fixture": "test/polygeist-opt/delinearize-flat-fill.mlir",
+    "command": "build/bin/polygeist-opt --delinearize-memref-accesses --split-input-file test/polygeist-opt/delinearize-flat-fill.mlir | llvm-project/build/bin/FileCheck test/polygeist-opt/delinearize-flat-fill.mlir",
+    "exit_code": 0
+  },
+  "reference_import": {
+    "specifications": 260,
+    "fresh": 260,
+    "command": "POLYGEIST_SPEC_SUITE=lib_v3 /usr/bin/python3 scripts/correctness/lib_v2/build_lib_v2.py --incremental -j 4",
+    "exit_code": 0
+  },
+  "gpu_evidence": "runtime-report.md",
+  "scope": "No new GPU benchmark counts are inferred from host tests."
+}

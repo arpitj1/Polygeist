@@ -1,0 +1,151 @@
+{
+  "routine": "cudnn_depthwise_conv2d",
+  "source": "NVIDIA public cuDNN conv_cpu_ref, independent single-channel group specialization",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "adaptation": "Public cuDNN conv_cpu_ref is applied independently to single-input/single-output-channel groups, with cross-correlation, unit stride/dilation and radius padding. Expand spatial coordinate helpers into loops, remove the singleton channel reduction, and use broadcast bias for beta=1. Odd filter extents are represented as 2*radius+1. The adapter calls grouped cudnnConvolutionForward and cudnnAddTensor.",
+  "specs": [
+    {
+      "name": "cudnn_depthwise_conv2d_bias_f32",
+      "args": [
+        "B",
+        "C",
+        "H",
+        "W",
+        "RH",
+        "RW",
+        "input",
+        "filter",
+        "bias",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_depthwise_conv2d_f32",
+          "arguments": [
+            "B",
+            "C",
+            "H",
+            "W",
+            "RH",
+            "RW",
+            "input",
+            "filter",
+            "bias",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "B",
+              "C",
+              "H",
+              "W"
+            ],
+            "filter": [
+              "C",
+              {
+                "terms": {
+                  "RH": 2
+                },
+                "offset": 1
+              },
+              {
+                "terms": {
+                  "RW": 2
+                },
+                "offset": 1
+              }
+            ],
+            "bias": [
+              "C"
+            ],
+            "output": [
+              "B",
+              "C",
+              "H",
+              "W"
+            ]
+          },
+          "bounds": {
+            "B": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "C": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "H": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "W": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "RH": {
+              "min": 0,
+              "max": 536870911
+            },
+            "RW": {
+              "min": 0,
+              "max": 536870911
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Disjoint finite FP32 arrays; positive tensor dimensions and nonnegative filter radii; all tensor strides must fit the cuDNN int32 descriptor ABI",
+        "Relaxed numerical model permits moving the bias seed to an epilogue and vendor parallel accumulation"
+      ],
+      "deviations": [
+        "Select cross-correlation branch from sample, which hardcodes convolution mode.",
+        "Public sample has no group parameter: specialize one input/output channel per call, then batch these independent calls through the vendor group-count parameter."
+      ],
+      "validation": {
+        "scalars": {
+          "B": 2,
+          "C": 3,
+          "H": 5,
+          "W": 7,
+          "RH": 1,
+          "RW": 2
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            5,
+            7
+          ],
+          "filter": [
+            3,
+            3,
+            5
+          ],
+          "bias": [
+            3
+          ],
+          "output": [
+            2,
+            3,
+            5,
+            7
+          ]
+        }
+      }
+    }
+  ]
+}

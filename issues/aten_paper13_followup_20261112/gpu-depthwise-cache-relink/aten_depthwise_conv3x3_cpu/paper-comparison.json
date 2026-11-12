@@ -1,0 +1,31 @@
+{
+  "kernel": "aten_depthwise_conv3x3_cpu",
+  "fully_validated": true,
+  "paper": {
+    "id": "93",
+    "kernel": "aten_depthwise_conv3x3_cpu",
+    "native_us": "1303.488",
+    "raised_us": "1603.680176",
+    "raised_over_native": "1.2302991481317818",
+    "speedup_percent": "-18.71895534362458",
+    "semantic_family": "convolution",
+    "raised_library": "cuDNN",
+    "raised_call": "cudnnDepthwiseConvolution2D_f32_memref",
+    "timing_source": "historical resident sweep",
+    "timing_protocol": "raised best of 20; retained native baseline"
+  },
+  "actual_samples": 5,
+  "baseline_scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "binary_sha256": "bb3288cc9a356ed953ec15104150d3ce0666e672ed5d4a201432ea669bd3269d",
+  "cudnn_plan_cache": true,
+  "selected_statistic": "minimum_first_five_ms",
+  "workspace_cache": false,
+  "cache_disabled_correctness_passed": true,
+  "raised_ms": 2.145029068,
+  "native_ms": 1.798207045,
+  "current_native_over_raised": 0.8383136022844797,
+  "raised_over_paper": 1.337566617148231,
+  "timing_statistic_matches_paper": false,
+  "previous_uncached_raised_ms": 2.274182796,
+  "previous_over_current": 1.0602107122587487
+}

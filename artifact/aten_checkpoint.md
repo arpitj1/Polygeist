@@ -1,7 +1,7 @@
 # ATen checkpoint — 2026-11-12
 
-The paper cohort contains 115 non-pointwise cases. This checkpoint has 102
-complete library matches and 98 strict GPU correctness passes. Thirteen cases
+The paper cohort contains 115 non-pointwise cases. This checkpoint has 106
+complete library matches and 102 strict GPU correctness passes. Nine cases
 still lack a complete match; four matched cases retain failed comparisons.
 Matching coverage, correctness, and performance are tracked separately.
 
@@ -13,6 +13,7 @@ Matching coverage, correctness, and performance are tracked separately.
 - [Historical paper data](../issues/aten_c_kernels/paper_analysis/aten_gpu_nonpointwise_115.csv)
 - [Pinned dimensions](../issues/aten_paper86_correctness_20261112/shapes.json)
 - [COO baseline attribution](../issues/aten_paper29_followup_20261112/coo-native-attribution/paper-comparisons.json)
+- [Latest reference imports and runtime improvements](../issues/aten_paper13_followup_20261112/runtime-report.md)
 
 The retained records include correctness output, timing samples, build metadata,
 proof receipts, and machine snapshots. Absolute paths record the original run
@@ -22,9 +23,9 @@ These records are evidence, not inputs substituting for a fresh build.
 
 ## Scope and remaining work
 
-There are 97 validated timings at the recorded paper dimensions: 44 are within
-5% of the reported raised runtime or faster, 16 are 5–20% slower, and 37 are
-more than 20% slower. Only 89 also use the same recorded statistic. These are
+There are 101 validated timings at the recorded paper dimensions: 46 are within
+5% of the reported raised runtime or faster, 16 are 5–20% slower, and 39 are
+more than 20% slower. Only 90 also use the same recorded statistic. These are
 runtime comparisons, not a claim that every native-baseline speedup reproduces.
 The ledger retains baseline-scope and input-distribution caveats. The separate
 COO follow-up isolates the historical native API/preparation scope.
@@ -37,6 +38,13 @@ CUDA in signed zero. They remain failed in the strict pass count.
 
 New timing runs use five warmups and five alternating synchronized pairs.
 Historical twenty-pair records remain labeled with their original protocol.
+
+The latest generic descriptor-copy implementation passes byte-exact GPU checks
+over 722,206,720 bytes. Current raised runtimes are 1.088 ms for adaptive average
+pooling, 1.581 ms for pixel shuffle, and 2.924 ms for batch normalization. All
+three pass strict paper-size correctness but remain slower than the paper.
+BSR matrix-vector and average-pool backward proof/import work is retained as
+pending work and does not increase the completed GPU counts above.
 
 ## Reproduction drivers
 
@@ -64,7 +72,10 @@ configuration, not in the repository.
 
 ## Checkpoint validation
 
-All 304 Python correctness tests passed. The four compiler regression fixtures
-for flat fills, large injectivity proofs, permuted initializers, and private
-state normalization passed their RUN commands and FileCheck assertions. The
-GPU pass count above comes from the recorded campaign, not this host test suite.
+All 339 Python correctness tests passed after refreshing all 260 reference
+imports. The new static flat-fill compiler regression passed its RUN command
+and FileCheck assertions. Average-pool backward now validates exactly through
+the affine, memref-Linalg, and tensor-definition routes. BSR's tensor-definition
+route remains excluded because it fails numerical validation; its affine and
+memref-Linalg routes validate exactly. The GPU pass count above comes from the
+recorded campaigns, not this host test suite.

@@ -1,0 +1,99 @@
+{
+  "kernel": "aten_batch_norm",
+  "fully_validated": true,
+  "paper": {
+    "id": "26",
+    "kernel": "aten_batch_norm",
+    "native_us": "306.688",
+    "raised_us": "262.591797",
+    "raised_over_native": "0.8562180359192404",
+    "speedup_percent": "16.79268107525842",
+    "semantic_family": "normalization",
+    "raised_library": "cuDNN",
+    "raised_call": "cudnnBatchNormalizationForwardInference",
+    "timing_source": "historical resident sweep",
+    "timing_protocol": "raised best of 20; retained native baseline"
+  },
+  "actual_samples": 5,
+  "baseline_scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "binary_sha256": "09c6162c04149ef4eaaf0744b689367e1dfbd050003f166c96ae96c78aa7b87b",
+  "selected_statistic": "minimum_first_five_ms",
+  "workspace_cache": true,
+  "cache_disabled_correctness_passed": true,
+  "prior_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_batch_norm/gpu-result.json",
+  "prior_timing": {
+    "passed": true,
+    "samples": [
+      {
+        "path": "raised",
+        "sample": 0,
+        "ms": 49.887729168
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 0,
+        "ms": 0.778156996
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 1,
+        "ms": 0.35126996
+      },
+      {
+        "path": "raised",
+        "sample": 1,
+        "ms": 50.127381086
+      },
+      {
+        "path": "raised",
+        "sample": 2,
+        "ms": 50.04408288
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 2,
+        "ms": 0.389863014
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 3,
+        "ms": 0.338534117
+      },
+      {
+        "path": "raised",
+        "sample": 3,
+        "ms": 50.496923208
+      },
+      {
+        "path": "raised",
+        "sample": 4,
+        "ms": 50.776832104
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 4,
+        "ms": 0.399302959
+      }
+    ],
+    "input_kind": "paper",
+    "all_raised_input_modes_passed": true,
+    "normal_input_only_override": false,
+    "native_edge_disagreement": false,
+    "statistic": "minimum of 5 synchronized resident samples after five warmups; alternating order; reset outside timing",
+    "minimum_ms": {
+      "raised": 49.887729168,
+      "native_aten_cuda": 0.338534117
+    },
+    "minimum_first_five_ms": {
+      "raised": 49.887729168,
+      "native_aten_cuda": 0.338534117
+    },
+    "native_over_raised": 0.006785919556690294
+  },
+  "raised_ms": 25.637203932,
+  "native_ms": 0.324677944,
+  "current_native_over_raised": 0.01266432739159755,
+  "raised_over_paper": 97.63139681016006,
+  "previous_first_five_over_current": 1.945911469141564,
+  "timing_statistic_matches_paper": false
+}

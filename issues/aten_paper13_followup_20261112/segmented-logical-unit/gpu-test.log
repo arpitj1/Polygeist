@@ -1,0 +1,1 @@
+PASS segmented logical: 1350 exact values; empty/mixed/full lengths, nonboolean integers, repeated calls, guards and unchanged inputs

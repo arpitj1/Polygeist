@@ -43,7 +43,7 @@ from egglog import (EGraph, Expr, StringLike, String, i64, i64Like, function, re
                     rewrite, rule, ruleset, union, vars_, var)
 
 from .affine import Aff, atom_info, is_atom  # noqa: E402
-from .equations import F, FBin, FConst, FIndex, FLast, FParam, FRead, FSel, FSum, FUn  # noqa: E402
+from .equations import F, FAcc, FBin, FConst, FFold, FIndex, FLast, FParam, FRead, FSel, FSum, FUn  # noqa: E402
 
 Term = km.Term
 
@@ -89,6 +89,15 @@ def rm_sum(v: RmIx, lo: RmIx, hi: RmIx, body: Term) -> Term: ...
 @function
 def rm_last(v: RmIx, lo: RmIx, hi: RmIx, guard: Term,
             body: Term, default: Term) -> Term: ...
+
+
+@function
+def rm_fold(v: RmIx, lo: RmIx, hi: RmIx, guard: Term,
+            body: Term, seed: Term) -> Term: ...
+
+
+@function
+def rm_acc(v: RmIx) -> Term: ...
 
 
 @function
@@ -276,8 +285,12 @@ def _cond_terms(cons, ns, bound: Optional[str]):
     return out
 
 
-def encode(f: F, ns: str, arr_name, bound: Optional[str] = None) -> Term:
+def encode(f: F, ns: str, arr_name, bound: Optional[str] = None, acc=None) -> Term:
     """arr_name(arr, ver) -> egglog array name."""
+    if isinstance(f, FAcc):
+        if acc is None:
+            raise TypeError('unbound ordered-fold accumulator')
+        return acc
     if isinstance(f, FRead):
         return rm_elem(RmArr(arr_name(f.arr, f.ver)), enc_idx(f.idx, ns))
     if isinstance(f, FConst):
@@ -287,11 +300,11 @@ def encode(f: F, ns: str, arr_name, bound: Optional[str] = None) -> Term:
     if isinstance(f, FParam):
         return rm_param(RmArr(arr_name(f.name, "param")))
     if isinstance(f, FBin):
-        a, b = encode(f.a, ns, arr_name, bound), encode(f.b, ns, arr_name, bound)
+        a, b = encode(f.a, ns, arr_name, bound, acc), encode(f.b, ns, arr_name, bound, acc)
         return {"add": a + b, "sub": a - b, "mul": a * b, "div": a / b}.get(f.op) \
             if f.op in ("add", "sub", "mul", "div") else Term.Binary(f.op, a, b)
     if isinstance(f, FUn):
-        a = encode(f.a, ns, arr_name, bound)
+        a = encode(f.a, ns, arr_name, bound, acc)
         if f.op == "sqrt":
             return Term.Sqrt(a)
         if f.op == "absf":
@@ -300,25 +313,27 @@ def encode(f: F, ns: str, arr_name, bound: Optional[str] = None) -> Term:
             return Term.Exp(a)
         return Term.Unary(f.op, a)
     if isinstance(f, FSel):
-        a, b = encode(f.a, ns, arr_name, bound), encode(f.b, ns, arr_name, bound)
+        a, b = encode(f.a, ns, arr_name, bound, acc), encode(f.b, ns, arr_name, bound, acc)
         if f.cond[0] == "aff":
             conds = _cond_terms(f.cond[1], ns, bound)
             out = a
             for c in reversed(conds):
                 out = Term.Select(c, out, b)
             return out
-        ca, cb = encode(f.cond[2], ns, arr_name, bound), encode(f.cond[3], ns, arr_name, bound)
+        ca, cb = encode(f.cond[2], ns, arr_name, bound, acc), encode(f.cond[3], ns, arr_name, bound, acc)
         return Term.Select(Term.Cmp(f.cond[1], ca, cb), a, b)
     if isinstance(f, FSum):
         return rm_sum(RmIx(f.var), enc_ix(f.lo, ns), enc_ix(f.hi, ns),
-                      encode(f.body, ns, arr_name, f.var))
+                      encode(f.body, ns, arr_name, f.var, acc))
     if isinstance(f, FLast):
         guard = Term.Lit(1.0)
         for condition in _cond_terms(f.guard, ns, f.var):
             guard = Term.Binary('and', guard, condition)
-        return rm_last(RmIx(f.var), enc_ix(f.lo, ns), enc_ix(f.hi, ns), guard,
-                       encode(f.body, ns, arr_name, f.var),
-                       encode(f.default, ns, arr_name, bound))
+        constructor = rm_fold if isinstance(f, FFold) else rm_last
+        body_acc = rm_acc(RmIx(f.var)) if isinstance(f, FFold) else acc
+        return constructor(RmIx(f.var), enc_ix(f.lo, ns), enc_ix(f.hi, ns), guard,
+                           encode(f.body, ns, arr_name, f.var, body_acc),
+                           encode(f.default, ns, arr_name, bound, acc))
     raise TypeError(f)
 
 

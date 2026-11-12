@@ -104,6 +104,7 @@ def semantic_inputs():
         'polygeist_cublas_rt.h', 'polygeist_cublas_rt_cuda.c',
         'polygeist_v2_rt_pva.c', 'polygeist_pva_image_rt.c',
         'polygeist_cub_scan_rt.cu', 'polygeist_cuda_graph_rt.h',
+        'polygeist_gpu_workspace_cache.h',
         'polygeist_v2_matrix_layout.inc', 'polygeist_v2_memref_copy.inc',
         'polygeist_pointwise_partition.h', 'polygeist_pointwise_rounding.inc',
         'polygeist_pointwise_division.inc', 'polygeist_thrust_rt.cu')]

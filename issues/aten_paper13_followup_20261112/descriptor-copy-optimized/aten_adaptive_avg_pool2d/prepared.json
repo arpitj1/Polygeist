@@ -1,0 +1,112 @@
+{
+  "kernel": "aten_adaptive_avg_pool2d",
+  "original_binary_sha256": "b7ceba9142aef91e6354060a1c0a3c67abdd0c17d62b70ac01ec7991a79b897d",
+  "timing_binary_sha256": "1870ca7689dbb343f87a1d73c6c4d93aaffdc73b164b47d53d039a8e65d44e31",
+  "original_harness_sha256": "6fb65ed0ae41c40e37513d0c8e723a2f23c902a4907bb7a513fbe00f9847a6b5",
+  "timing_harness_sha256": "d9b7408c927f023de14e6156897a0a7eed13854b178fc22f36b85531b59acb23",
+  "frozen_object_sha256": {
+    "work/kernel.o": "2e12d8de929bce8a7bd92416c7378a4880a85e2e50207597f61ab1c6f98e0b05",
+    "work/wrapper.o": "b5547ef42c94f2c460bdc3445848c2f73bb98a5dc5f0a6293513b4b5a70bb81c",
+    "objects/timing-harness.o": "3e2e2641a102dfb0bf42b60636ad379ea9f6536f15cbd1df0f71e178f6323e55",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "objects/spec_runtime.o": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "work/cub_runtime.o": "a95309a9714c859ca721738db994515be10f1e932cd5ea15ffe7104e3f27473b",
+    "objects/reference.o": "c3aed43039083ce74c14f9493c00984376518e62a91acb5372340715f1fd068e",
+    "objects/native.o": "9cb650c5925aa8bfa9cf0017a77f32a0d6a39680c0fba21352266c8a07f223a8"
+  },
+  "original_configuration": {
+    "dims": {
+      "B": 4,
+      "C": 32,
+      "H": 256,
+      "W": 256,
+      "OH": 128,
+      "OW": 128
+    },
+    "args": [
+      [
+        "input",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        false,
+        "normal"
+      ],
+      [
+        "output",
+        "ptr",
+        "(B)*(C)*(OH)*(OW)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_adaptive_avg_pool2d",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "input": "((float)(i%101)-50.0f)/37.0f",
+      "output": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "original_proof_sha256": "ae46c56c22b9c818b0d19c23e1c88c689d82c6d9a215ea609325f861f5762c95",
+  "timing_samples": 5,
+  "adaptation": "Only the saved harness TIMING_SAMPLES changes to 5; all application, compiler runtime, C reference and native ATen objects are frozen.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-O3",
+      "-fno-inline",
+      "-fno-inline-functions",
+      "-fsemantic-interposition",
+      "-fno-ipa-cp",
+      "-fno-ipa-cp-clone",
+      "-fno-ipa-sra",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/timing-harness.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/objects/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/work/cub_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/descriptor-copy-optimized/aten_adaptive_avg_pool2d/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ]
+}

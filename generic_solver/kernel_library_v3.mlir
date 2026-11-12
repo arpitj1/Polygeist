@@ -203,6 +203,43 @@ module {
     kernel.yield %6 : tensor<?xf32>
   }
 
+  // lib_v2-meta: {"array_dimensions": {"O0": [{"array": "grad_output", "axis": 1}], "O1": [{"array": "grad_output", "axis": 2}], "O2": [{"array": "grad_output", "axis": 3}]}, "declarations": [], "leading_dims": {}, "outputs": ["grad_input"], "params": ["S", "O0", "O1", "O2", "R0", "R1", "R2", "grad_output", "grad_input"], "returns": [], "spec": "aten_avg_pool3d_backward_k2_f32", "unreferenced": []}
+  kernel.defn @aten_avg_pool3d_backward_k2_f32(%S: i32, %O0: i32, %O1: i32, %O2: i32, %R0: i32, %R1: i32, %R2: i32, %grad_output: tensor<?x?x?x?xf32>, %grad_input: tensor<?x?x?x?xf32>) -> tensor<?x?x?x?xf32> {
+    %c2_i32 = arith.constant 2 : i32
+    %cst = arith.constant 0.000000e+00 : f32
+    %cst_0 = arith.constant 8.000000e+00 : f32
+    %c2 = arith.constant 2 : index
+    %2 = arith.index_cast %S : i32 to index
+    %3 = arith.muli %O0, %c2_i32 : i32
+    %4 = arith.addi %3, %R0 : i32
+    %5 = arith.index_cast %4 : i32 to index
+    %6 = arith.muli %O1, %c2_i32 : i32
+    %7 = arith.addi %6, %R1 : i32
+    %8 = arith.index_cast %7 : i32 to index
+    %9 = arith.muli %O2, %c2_i32 : i32
+    %10 = arith.addi %9, %R2 : i32
+    %11 = arith.index_cast %10 : i32 to index
+    %12 = arith.index_cast %O0 : i32 to index
+    %13 = arith.index_cast %O1 : i32 to index
+    %14 = arith.index_cast %O2 : i32 to index
+    %15 = polygeist.submap(%grad_input, %2, %5, %8, %11) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %16 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "parallel", "parallel"], library_call = ""} outs(%15 : tensor<?x?x?x?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %cst : f32
+    } -> tensor<?x?x?x?xf32>
+    %17 = polygeist.submapInverse(%grad_input, %16, %2, %5, %8, %11) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %18 = polygeist.submap(%grad_output, %2, %12, %13, %14, %c2, %c2, %c2) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %19 = polygeist.submap(%17, %2, %12, %13, %14, %c2, %c2, %c2) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d4 + d1 * 2, d5 + d2 * 2, d6 + d3 * 2)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %20 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>, affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>], iterator_types = ["parallel", "parallel", "parallel", "parallel", "parallel", "parallel", "parallel"], library_call = ""} ins(%18 : tensor<?x?x?x?x?x?x?xf32>) outs(%19 : tensor<?x?x?x?x?x?x?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %23 = arith.divf %in, %cst_0 : f32
+      %24 = arith.addf %out, %23 : f32
+      linalg.yield %24 : f32
+    } -> tensor<?x?x?x?x?x?x?xf32>
+    %21 = polygeist.submapInverse(%17, %20, %2, %12, %13, %14, %c2, %c2, %c2) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d4 + d1 * 2, d5 + d2 * 2, d6 + d3 * 2)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?xf32>
+    kernel.yield %21 : tensor<?x?x?x?xf32>
+  }
+
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "a", "output"], "returns": [], "spec": "aten_ceil_f32", "unreferenced": []}
   kernel.defn @aten_ceil_f32(%n: i32, %a: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
     %2 = arith.index_cast %n : i32 to index

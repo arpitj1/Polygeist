@@ -1,0 +1,51 @@
+{
+  "kernel": "aten_sampled_addmm_sparse_csr_cpu",
+  "paper_family": "sparse_linear_algebra",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/sddmm-shape-validated/aten_sampled_addmm_sparse_csr_cpu/aten_sampled_addmm_sparse_csr_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_sampled_addmm_sparse_csr_cpu.c",
+  "original_source_sha256": "7c015e659f963dcfa9a556b8e133871660ac1890852d21263a9257822726848d",
+  "shape_record": {
+    "kernel": "aten_sampled_addmm_sparse_csr_cpu",
+    "op": "addmm",
+    "cat": "sparse_sampled_addmm",
+    "dims": {
+      "R": 4096,
+      "K": 512,
+      "C": 4096,
+      "NNZ": 262144,
+      "N": 262144
+    },
+    "n": 590295810358705651712,
+    "shape": "R=4096_K=512_C=4096_NNZ=262144_N=262144",
+    "dtype": "f32",
+    "scalar_args": {
+      "alpha": "0.75",
+      "beta": "-0.25"
+    },
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full CSR sampled dense product via cuSPARSE SDDMM",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "3c077624966ff30d",
+    "dimension_aliases": {
+      "N": "NNZ"
+    },
+    "dimension_alias_note": "The historical harness names CSR capacity N; the C fixture names the same capacity NNZ. Both recorded sizes are retained without changing the computation."
+  },
+  "ranks": [
+    0
+  ],
+  "region": true,
+  "region_budget": 45,
+  "specifications": [
+    "aten_sampled_addmm_csr_f32"
+  ],
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cusparseSDDMM_CSR_f32_memref"
+}

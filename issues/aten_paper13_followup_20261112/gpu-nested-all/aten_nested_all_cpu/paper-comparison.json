@@ -1,0 +1,34 @@
+{
+  "kernel": "aten_nested_all_cpu",
+  "fully_validated": true,
+  "paper": {
+    "id": "47",
+    "kernel": "aten_nested_all_cpu",
+    "native_us": "408.16",
+    "raised_us": "1672.672012",
+    "raised_over_native": "4.098079214033712",
+    "speedup_percent": "-75.59832429359737",
+    "semantic_family": "reduction",
+    "raised_library": "CUB",
+    "raised_call": "cubSegmentedPrefixLogicalAnd_i32",
+    "timing_source": "current Section 4.2 campaign",
+    "timing_protocol": "minimum of 5 after 5 warmups"
+  },
+  "actual_samples": 5,
+  "baseline_scope": "ATen CUDA length mask, nonzero, where, all_out and int32 copy; preallocated intermediates, matching historical native_exact_region API scope",
+  "binary_sha256": "60abc679f9605e0e75656a49ab8a712d1e570185701fb12c0b85b5885fae3062",
+  "selected_statistic": "minimum_first_five_ms",
+  "cudnn_plan_cache": true,
+  "native_baseline_matches_paper_scope": true,
+  "native_inputs_match_paper": false,
+  "paper_native_scope_note": "Recovered publication harness has zero x and lengths; historical native_exact_region uses patterned boolean x and lengths N-(b%31). Current raised and native use identical recorded inputs; paper speedup has different native inputs.",
+  "traced_library_calls": [
+    "DeviceSegmentedReduce_cub_ragged_reduce_and_i32",
+    "DeviceSegmentedReduce_cub_ragged_reduce_and_i32"
+  ],
+  "raised_ms": 0.049697161,
+  "native_ms": 0.421030998,
+  "current_native_over_raised": 8.47193259188387,
+  "raised_over_paper": 0.029711240843073302,
+  "timing_statistic_matches_paper": true
+}

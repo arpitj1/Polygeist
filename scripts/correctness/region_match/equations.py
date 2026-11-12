@@ -172,6 +172,20 @@ class FLast(F):
         return f'Last[{self.var} in [{self.lo}, {self.hi}); {self.guard}]({self.body!r}, else={self.default!r})'
 
 
+class FFold(FLast):
+    """Exact ascending scalar recurrence; ACC is bound only in body.
+
+    The seed is default, and a false guard leaves the accumulator unchanged.
+    No associative reduction or loop-order rewrite applies to this node.
+    """
+    def key(self):
+        return ('fold', self.var, self.lo, self.hi, self.guard,
+                self.body.key(), self.default.key())
+
+    def __repr__(self):
+        return f'Fold[{self.var} in [{self.lo}, {self.hi})]({self.body!r}, seed={self.default!r})'
+
+
 class FAcc(F):
     def key(self):
         return ("acc",)
@@ -204,7 +218,7 @@ def fmap_aff(f: F, fn) -> F:
     if isinstance(f, FSum):
         return FSum(f.var, fn(f.lo), fn(f.hi), fmap_aff(f.body, fn))
     if isinstance(f, FLast):
-        return FLast(f.var, fn(f.lo), fn(f.hi),
+        return type(f)(f.var, fn(f.lo), fn(f.hi),
                      [Cons(fn(c.aff), c.kind) for c in f.guard],
                      fmap_aff(f.body, fn), fmap_aff(f.default, fn))
     raise TypeError(f)
@@ -235,10 +249,26 @@ def fwalk(f: F):
 
 
 def has_acc(f: F) -> bool:
-    return any(isinstance(x, FAcc) for x in fwalk(f))
+    if isinstance(f, FFold):
+        return has_acc(f.default)
+    if isinstance(f, FAcc):
+        return True
+    if isinstance(f, FBin):
+        return has_acc(f.a) or has_acc(f.b)
+    if isinstance(f, FUn):
+        return has_acc(f.a)
+    if isinstance(f, FSel):
+        return (any(has_acc(x) for x in f.cond[2:]) if f.cond[0] == 'cmpf' else False) or has_acc(f.a) or has_acc(f.b)
+    if isinstance(f, FSum):
+        return has_acc(f.body)
+    if isinstance(f, FLast):
+        return has_acc(f.body) or has_acc(f.default)
+    return False
 
 
 def replace_acc(f: F, v: F) -> F:
+    if isinstance(f, FFold):
+        return FFold(f.var, f.lo, f.hi, f.guard, f.body, replace_acc(f.default, v))
     if isinstance(f, FAcc):
         return v
     if isinstance(f, FBin):
@@ -253,7 +283,7 @@ def replace_acc(f: F, v: F) -> F:
     if isinstance(f, FSum):
         return FSum(f.var, f.lo, f.hi, replace_acc(f.body, v))
     if isinstance(f, FLast):
-        return FLast(f.var, f.lo, f.hi, f.guard,
+        return type(f)(f.var, f.lo, f.hi, f.guard,
                      replace_acc(f.body, v), replace_acc(f.default, v))
     return f
 
@@ -406,6 +436,100 @@ def _privatise_scalars(stmts: list[Stmt]) -> tuple[list[Stmt], list[str]]:
     return stmts, notes
 
 
+
+def _coalesce_nested_scalar_carries(stmts: list[Stmt]) -> tuple[list[Stmt], list[str]]:
+    """Eliminate private scalar seed/copy cells around a nested recurrence.
+
+    An inner carry B seeded from an outer carry or output element A, and
+    copied directly back to A afterward, may use A's cell when the old value has no
+    other uses inside that outer iteration. This is ordered storage reuse,
+    not a reassociation: the updates retain their original domains, guards,
+    expressions, and timestamps. It also covers a rank-zero tensor temporary
+    after scalar privatisation. Restrict to one inner update and one outer
+    copy; more general lifetimes continue through ordinary dependence checks.
+    """
+    notes = []
+    while True:
+        writers = {}
+        for w in stmts:
+            writers.setdefault(w.buf.id, []).append(w)
+        chosen = None
+        for seed in stmts:
+            B = seed.buf
+            if (B.kind != 'scratch' or B.rank != 0 or
+                    not isinstance(seed.value, ERead)):
+                continue
+            A = seed.value.buf
+            av = seed.value.idx
+            bv = tuple(Aff.var(v) for v in B.priv)
+            if (A is B or A.elem != B.elem or
+                    (A.kind == 'scratch' and
+                     (A.rank != 0 or len(A.priv) >= len(B.priv) or
+                      B.priv[:len(A.priv)] != A.priv or
+                      av != tuple(Aff.var(v) for v in A.priv))) or
+                    tuple(seed.idx) != bv or
+                    seed.vars != B.priv or seed.guard or seed.value.guard):
+                continue
+            aw, bw = writers.get(A.id, []), writers.get(B.id, [])
+            if len(aw) != 2 or len(bw) != 2:
+                continue
+            copies = [w for w in aw if isinstance(w.value, ERead) and
+                      w.value.buf is B and w.value.idx == bv]
+            if len(copies) != 1:
+                continue
+            copy = copies[0]
+            initial = next(w for w in aw if w is not copy)
+            update = next(w for w in bw if w is not seed)
+            if (copy.vars != B.priv or tuple(copy.idx) != av or copy.guard or
+                    copy.value.guard or copy.domain != seed.domain or
+                    update.vars[:len(B.priv)] != B.priv or
+                    len(update.vars) <= len(B.priv) or tuple(update.idx) != bv):
+                continue
+            # The only other writer of A must precede this seed, including
+            # when A is an output array element used as an inner carry. Match
+            # its index under independent loop variables before comparing time.
+            im = {v: Aff.var(v + "'carry") for v in initial.vars}
+            ic = (list(seed.domain) + [c.subst(im) for c in initial.domain + initial.guard]
+                  + [eq(a.subst(im), b) for a, b in zip(initial.idx, av)])
+            if (len(initial.idx) != len(av) or
+                    feasible_dnf(ic, lex_lt_dnf(seed.value.time,
+                                               [a.subst(im) for a in initial.time]))):
+                continue
+            # The seed and copy bracket every inner update. Comparing their
+            # static lexical positions also handles an empty inner range.
+            if (feasible_dnf(seed.domain, lex_lt_dnf(copy.time, seed.time)) or
+                    not feasible_dnf(seed.domain, lex_lt_dnf(seed.time, copy.time)) or
+                    feasible_dnf(update.domain + update.guard,
+                                 lex_lt_dnf(update.time, seed.time)) or
+                    feasible_dnf(update.domain + update.guard,
+                                 lex_lt_dnf(copy.value.time, update.time))):
+                continue
+            safe = True
+            for w in stmts:
+                for r in _expr_reads(w.value, []):
+                    if r.buf is B and (w is not update and w is not copy or r.idx != bv):
+                        safe = False
+                    if (r.buf is A and list(r.vars[:len(B.priv)]) == B.priv and
+                            w is not seed):
+                        safe = False  # An independently captured old outer value.
+                if not safe:
+                    break
+            if safe:
+                chosen = (A, B, seed, copy, av)
+                break
+        if chosen is None:
+            return stmts, notes
+        A, B, seed, copy, av = chosen
+        def remap(r):
+            return (ERead(A, av, r.time, r.guard, r.vars) if r.buf is B else r)
+        stmts = [Stmt(w.id, w.vars, w.domain, w.guard, w.time,
+                      A if w.buf is B else w.buf,
+                      list(av) if w.buf is B else w.idx,
+                      _expr_map_reads(w.value, remap), w.par_dims, w.top, w.origin)
+                 for w in stmts if w is not seed and w is not copy]
+        notes.append(f"nested scalar carry {B.name} coalesced with {A.name}")
+
+
 def _incoming_scalar_constants(prog: Program, window: set[int], selected: list[Stmt]):
     """Carry proven private scalar constants across a region boundary.
 
@@ -442,6 +566,8 @@ class Builder:
         selected = [s for s in prog.stmts if s.top in window]
         incoming = _incoming_scalar_constants(prog, window, selected)
         self.stmts, self.priv_notes = _privatise_scalars(incoming + selected)
+        self.stmts, carry_notes = _coalesce_nested_scalar_carries(self.stmts)
+        self.priv_notes.extend(carry_notes)
         self.writers: dict[int, list[Stmt]] = {}
         for s in self.stmts:
             self.writers.setdefault(s.buf.id, []).append(s)
@@ -661,6 +787,19 @@ class Builder:
             lo = self.pick_bound(lows, R, fv, lower=True)
             hi = self.pick_bound(ups, R, fv, lower=False) + 1
             return FLast(fv, lo, hi, dom + grd + residual, f, prev)
+        # Integer recurrences retain their exact typed operation and order.
+        # The opaque fold is valid for arbitrary pure scalar updates, including
+        # non-associative updates; it does not classify a library operation.
+        if has_acc(f) and len(fiber) == 1 and buf.elem.startswith('i'):
+            if prev is None:
+                raise Reject('ordered fold into uninitialised scratch')
+            fv = fiber[0]
+            lows, ups, _ = bounds_of(fv, dom)
+            lows = [b for b in lows if fv not in deps(b.vars())]
+            ups = [b for b in ups if fv not in deps(b.vars())]
+            lo = self.pick_bound(lows, R, fv, lower=True)
+            hi = self.pick_bound(ups, R, fv, lower=False) + 1
+            return FFold(fv, lo, hi, dom + grd + residual, f, prev)
         # This summary separates the incoming accumulator from a sum, which
         # permits reassociation. Do not use it in strict scalar-order mode.
         from kernel_match import numeric_model
@@ -953,7 +1092,7 @@ def _freshen(f: F) -> F:
     if isinstance(f, FLast):
         nv = _fresh()
         m = {f.var: Aff.var(nv)}
-        return FLast(nv, f.lo, f.hi, [c.subst(m) for c in f.guard],
+        return type(f)(nv, f.lo, f.hi, [c.subst(m) for c in f.guard],
                      _freshen(fsubst(f.body, m)), _freshen(f.default))
     if isinstance(f, FBin):
         return FBin(f.op, _freshen(f.a), _freshen(f.b))
@@ -1040,7 +1179,7 @@ def fold_integer_casts(f: F, bindings=None) -> F:
     if isinstance(f,FSum):
         return FSum(f.var,f.lo,f.hi,fold_integer_casts(f.body,bindings))
     if isinstance(f, FLast):
-        return FLast(f.var, f.lo, f.hi, f.guard,
+        return type(f)(f.var, f.lo, f.hi, f.guard,
                      fold_integer_casts(f.body, bindings),
                      fold_integer_casts(f.default, bindings))
     if isinstance(f,FSel):
@@ -1056,7 +1195,7 @@ def _simplify_sel(f: F, ctx: list[Cons]) -> F:
         inner = ctx + [ge(Aff.var(f.var), f.lo), lt(Aff.var(f.var), f.hi)]
         if not feasible(inner + list(f.guard)):
             return _simplify_sel(f.default, ctx)
-        return FLast(f.var, f.lo, f.hi, f.guard,
+        return type(f)(f.var, f.lo, f.hi, f.guard,
                      _simplify_sel(f.body, inner + list(f.guard)),
                      _simplify_sel(f.default, ctx))
     if isinstance(f, FSel) and f.cond[0] == "aff":
@@ -1101,7 +1240,7 @@ def _occurrences(f: F, var: str):
 def _orient_sums(f: F, ctx) -> F:
     if isinstance(f, FLast):
         inner = ctx + [ge(Aff.var(f.var), f.lo), lt(Aff.var(f.var), f.hi)] + list(f.guard)
-        return FLast(f.var, f.lo, f.hi, f.guard,
+        return type(f)(f.var, f.lo, f.hi, f.guard,
                      _orient_sums(f.body, inner), _orient_sums(f.default, ctx))
     """Change of variables so that the summation variable appears as a pure
     index (natural index), independent of loop direction / offset."""
@@ -1142,7 +1281,7 @@ def _rename_bound(f: F, depth: int) -> F:
     if isinstance(f, FLast):
         nv = f'r{depth}'
         m = {f.var: Aff.var(nv)}
-        return FLast(nv, f.lo, f.hi, [c.subst(m) for c in f.guard],
+        return type(f)(nv, f.lo, f.hi, [c.subst(m) for c in f.guard],
                      _rename_bound(fsubst(f.body, m), depth + 1),
                      _rename_bound(f.default, depth))
     if isinstance(f, FSum):

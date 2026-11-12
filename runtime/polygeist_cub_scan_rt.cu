@@ -176,12 +176,10 @@ struct RowOffset {
     return row * columns;
   }
 };
-template<class T, class Input, class Op>
-static void cub_segmented_reduce(int rows, int cols, T seed,
-                                 Input input, T *output, Op op) {
+template<class T, class Input, class Begin, class End, class Op>
+static void cub_segmented_reduce_offsets(int rows, int cols, T seed,
+    Input input, T *output, Begin begin, End end, Op op) {
   cudaStream_t stream = (cudaStream_t)polygeist_cuda_graph_stream();
-  auto offsets = thrust::make_transform_iterator(
-      thrust::counting_iterator<int64_t>(0), RowOffset{cols});
   int device;
   reduce_require_cuda(cudaGetDevice(&device), "segmented device");
   struct Scratch { int device; void *pointer; size_t capacity; Scratch *next; };
@@ -191,7 +189,7 @@ static void cub_segmented_reduce(int rows, int cols, T seed,
   if (!scratch) { scratch = new Scratch{device, nullptr, 0, head}; head = scratch; }
   size_t bytes = 0;
   reduce_require_cuda(cub::DeviceSegmentedReduce::Reduce(nullptr, bytes, input,
-      output, rows, offsets, offsets + 1, op, seed, stream), "segmented scratch query");
+      output, rows, begin, end, op, seed, stream), "segmented scratch query");
   if (bytes > scratch->capacity) {
     reduce_require_cuda(cudaStreamSynchronize(stream), "segmented scratch synchronization");
     reduce_require_cuda(cudaFree(scratch->pointer), "segmented scratch free");
@@ -200,10 +198,34 @@ static void cub_segmented_reduce(int rows, int cols, T seed,
     scratch->capacity = bytes;
   }
   reduce_require_cuda(cub::DeviceSegmentedReduce::Reduce(scratch->pointer,
-      bytes, input, output, rows, offsets, offsets + 1, op, seed, stream), "segmented reduce");
+      bytes, input, output, rows, begin, end, op, seed, stream), "segmented reduce");
   const char *trace = std::getenv("POLYGEIST_CUB_TRACE");
   if (trace && *trace && std::strcmp(trace, "0"))
     std::fprintf(stderr, "POLYGEIST_CUB_CALL entry=DeviceSegmentedReduce rows=%d cols=%d\n", rows, cols);
+}
+template<class T, class Input, class Op>
+static void cub_segmented_reduce(int rows, int cols, T seed,
+                                 Input input, T *output, Op op) {
+  auto offsets = thrust::make_transform_iterator(
+      thrust::counting_iterator<int64_t>(0), RowOffset{cols});
+  cub_segmented_reduce_offsets(rows, cols, seed, input, output,
+                               offsets, offsets + 1, op);
+}
+struct RowPrefixEnd {
+  int64_t columns;
+  const int *length;
+  __host__ __device__ int64_t operator()(int64_t row) const {
+    return row * columns + length[row];
+  }
+};
+extern "C" void polygeist_cub_ragged_reduce_and_i32(
+    int rows, int cols, const int *input, const int *length, int *output) {
+  auto begin = thrust::make_transform_iterator(
+      thrust::counting_iterator<int64_t>(0), RowOffset{cols});
+  auto end = thrust::make_transform_iterator(
+      thrust::counting_iterator<int64_t>(0), RowPrefixEnd{cols, length});
+  cub_segmented_reduce_offsets(rows, cols, 1, input, output,
+                               begin, end, LogicalAndI32{});
 }
 extern "C" void polygeist_cub_segmented_reduce_and_i32(
     int rows, int cols, int seed, const int *input, int *output) {

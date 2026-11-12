@@ -1,0 +1,1 @@
+PASS H2D/D2H/D2D copies, strided holes, overlap, source preservation and queued cuBLAS producers for device/mapped/registered-host buffers

@@ -1,0 +1,152 @@
+[
+  {
+    "folder": "descriptor-copy-optimized",
+    "kernels": [
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIhLb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 496,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 45
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationItLb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 496,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 48
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIjLb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 496,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 48
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint2Lb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 496,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 48
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint4Lb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 496,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 54
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIhLb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 992,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationItLb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 992,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIjLb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 992,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint2Lb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 992,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint4Lb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 992,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 48
+      }
+    ]
+  },
+  {
+    "folder": "descriptor-copy-unrolled",
+    "kernels": [
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIhLb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 54
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationItLb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIjLb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 42
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint2Lb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint4Lb0EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 8,
+        "spill_store_bytes": 8,
+        "spill_load_bytes": 8,
+        "registers": 48
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIhLb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationItLb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationIjLb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSA_11use_defaultESC_SC_NSA_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 40
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint2Lb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 38
+      },
+      {
+        "kernel": "_ZN3cub16_V_300200_SM_8706detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tElNS2_12op_wrapper_tIl19MemrefCopyOperationI5uint4Lb1EEN6thrust16_V_300200_SM_87017counting_iteratorIlNSB_11use_defaultESD_SD_NSB_18compile_time_valueILi1EEEEEEEEEvT0_T1_",
+        "stack_bytes": 0,
+        "spill_store_bytes": 0,
+        "spill_load_bytes": 0,
+        "registers": 48
+      }
+    ]
+  }
+]

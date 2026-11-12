@@ -1,0 +1,355 @@
+[
+  {
+    "kernel": "aten_sampled_addmm_sparse_csr_cpu",
+    "rc": 0,
+    "configuration": {
+      "dims": {
+        "R": 4096,
+        "K": 512,
+        "C": 4096,
+        "NNZ": 262144,
+        "N": 262144
+      },
+      "args": [
+        [
+          "crow",
+          "iptr",
+          "(R+1)",
+          false,
+          "index"
+        ],
+        [
+          "col",
+          "iptr",
+          "(NNZ)",
+          false,
+          "index"
+        ],
+        [
+          "self",
+          "ptr",
+          "(NNZ)",
+          false,
+          "normal"
+        ],
+        [
+          "a",
+          "ptr",
+          "(R)*(K)",
+          false,
+          "normal"
+        ],
+        [
+          "b",
+          "ptr",
+          "(K)*(C)",
+          false,
+          "normal"
+        ],
+        [
+          "alpha",
+          "scalar",
+          "0.5",
+          false,
+          ""
+        ],
+        [
+          "beta",
+          "scalar",
+          "0.5",
+          false,
+          ""
+        ],
+        [
+          "out",
+          "ptr",
+          "(NNZ)",
+          true,
+          "normal"
+        ]
+      ],
+      "coverage": "auto: aten_sampled_addmm_sparse_csr_cpu",
+      "rtol": 0.002,
+      "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+      "paper_initializers": {
+        "crow": "(int)(i*(size_t)N/R)",
+        "col": "(int)(((i*17)+(i/(N/R))*13)%C)",
+        "self": "((float)(i%101)-50.0f)/37.0f",
+        "a": "((float)(i%101)-50.0f)/37.0f",
+        "b": "((float)(i%101)-50.0f)/37.0f",
+        "out": "((float)(i%101)-50.0f)/37.0f"
+      },
+      "paper_parameters": {
+        "alpha": "0.75",
+        "beta": "-0.25"
+      },
+      "timing_samples": 5
+    },
+    "commands": [
+      [
+        "aarch64-linux-gnu-gcc",
+        "-O2",
+        "-fno-fast-math",
+        "-ffp-contract=off",
+        "-Daten_sampled_addmm_sparse_csr_cpu=native_reference",
+        "-c",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/aten_sampled_addmm_sparse_csr_cpu.c",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/reference.o"
+      ],
+      [
+        "aarch64-linux-gnu-g++",
+        "-O2",
+        "-std=c++17",
+        "-DHAVE_SVE256_CPU_DEFINITION",
+        "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+        "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+        "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+        "-c",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/native.cpp",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/native.o"
+      ],
+      [
+        "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+        "--target=jetson",
+        "--function=aten_sampled_addmm_sparse_csr_cpu",
+        "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/rank0/matched.mlir",
+        "--harness=/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/harness.c",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/raised-program",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/aten_sampled_addmm_sparse_csr_cpu.c",
+        "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+      ],
+      [
+        "aarch64-linux-gnu-g++",
+        "-O2",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/kernel.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/wrapper.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/harness.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/rt.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/mlir_runner_utils.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/spec_runtime.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/work/thrust_runtime.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/reference.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/native.o",
+        "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+        "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+        "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+        "-L/usr/lib/aarch64-linux-gnu",
+        "-Wl,--allow-shlib-undefined",
+        "-Wl,--no-as-needed",
+        "-ltorch",
+        "-ltorch_cpu",
+        "-ltorch_cuda",
+        "-lc10_cuda",
+        "-lc10",
+        "-lcudnn",
+        "-lcublasLt",
+        "-lcublas",
+        "-lcusolver",
+        "-lcudart",
+        "-lm",
+        "-lpthread",
+        "-ldl",
+        "-Wl,--gc-sections",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_sampled_addmm_sparse_csr_cpu/raised-program",
+        "-lcusparse"
+      ]
+    ],
+    "rank": 0,
+    "compiler_cache": "/usr/lib/ccache",
+    "persistent_workspace": true,
+    "source_sha256": "fe928b507186d8e1e54f4598707686e87f1340a43be2cbf366557c3572ed60d0",
+    "proof_sha256": "92d2ff1a43b1db46a847e55cfc84443e64b5c793a09b1ce180b61c633cff962d",
+    "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+    "original_source_sha256": "7c015e659f963dcfa9a556b8e133871660ac1890852d21263a9257822726848d",
+    "shape_record": {
+      "kernel": "aten_sampled_addmm_sparse_csr_cpu",
+      "op": "addmm",
+      "cat": "sparse_sampled_addmm",
+      "dims": {
+        "R": 4096,
+        "K": 512,
+        "C": 4096,
+        "NNZ": 262144,
+        "N": 262144
+      },
+      "n": 590295810358705651712,
+      "shape": "R=4096_K=512_C=4096_NNZ=262144_N=262144",
+      "dtype": "f32",
+      "scalar_args": {
+        "alpha": "0.75",
+        "beta": "-0.25"
+      },
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full CSR sampled dense product via cuSPARSE SDDMM",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "3c077624966ff30d",
+      "dimension_aliases": {
+        "N": "NNZ"
+      },
+      "dimension_alias_note": "The historical harness names CSR capacity N; the C fixture names the same capacity NNZ. Both recorded sizes are retained without changing the computation."
+    },
+    "shape_specs_sha256": "955f2e1c80c580572cb06901f2df2b8aea26d34235ce64c30887c8599c5557e9",
+    "binary_sha256": "9b8715cef8b9fd08a286d81c8afd36430113d919d0b7dc96ddb47d25633c0fc0"
+  },
+  {
+    "kernel": "aten_depthwise_conv3x3_cpu",
+    "rc": 0,
+    "configuration": {
+      "dims": {
+        "B": 2,
+        "C": 64,
+        "H": 256,
+        "W": 256
+      },
+      "args": [
+        [
+          "x",
+          "ptr",
+          "(B)*(C)*(H)*(W)",
+          false,
+          "normal"
+        ],
+        [
+          "weight",
+          "ptr",
+          "(C)*(3)*(3)",
+          false,
+          "normal"
+        ],
+        [
+          "bias",
+          "ptr",
+          "(C)",
+          false,
+          "normal"
+        ],
+        [
+          "out",
+          "ptr",
+          "(B)*(C)*(H)*(W)",
+          true,
+          "normal"
+        ]
+      ],
+      "coverage": "auto: aten_depthwise_conv3x3_cpu",
+      "rtol": 0.002,
+      "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+      "paper_initializers": {
+        "x": "((float)(i%101)-50.0f)/37.0f",
+        "weight": "((float)(i%101)-50.0f)/37.0f",
+        "bias": "((float)(i%101)-50.0f)/37.0f",
+        "out": "((float)(i%101)-50.0f)/37.0f"
+      },
+      "paper_parameters": {},
+      "timing_samples": 5
+    },
+    "commands": [
+      [
+        "aarch64-linux-gnu-gcc",
+        "-O2",
+        "-fno-fast-math",
+        "-ffp-contract=off",
+        "-Daten_depthwise_conv3x3_cpu=native_reference",
+        "-c",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/aten_depthwise_conv3x3_cpu.c",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/reference.o"
+      ],
+      [
+        "aarch64-linux-gnu-g++",
+        "-O2",
+        "-std=c++17",
+        "-DHAVE_SVE256_CPU_DEFINITION",
+        "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+        "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+        "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+        "-c",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/native.cpp",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/native.o"
+      ],
+      [
+        "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+        "--target=jetson",
+        "--function=aten_depthwise_conv3x3_cpu",
+        "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/rank0/matched.mlir",
+        "--harness=/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/harness.c",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/raised-program",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/aten_depthwise_conv3x3_cpu.c",
+        "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+      ],
+      [
+        "aarch64-linux-gnu-g++",
+        "-O2",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/kernel.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/wrapper.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/harness.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/rt.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/mlir_runner_utils.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/spec_runtime.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/work/thrust_runtime.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/reference.o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/native.o",
+        "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+        "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+        "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+        "-L/usr/lib/aarch64-linux-gnu",
+        "-Wl,--allow-shlib-undefined",
+        "-Wl,--no-as-needed",
+        "-ltorch",
+        "-ltorch_cpu",
+        "-ltorch_cuda",
+        "-lc10_cuda",
+        "-lc10",
+        "-lcudnn",
+        "-lcublasLt",
+        "-lcublas",
+        "-lcusolver",
+        "-lcudart",
+        "-lm",
+        "-lpthread",
+        "-ldl",
+        "-Wl,--gc-sections",
+        "-o",
+        "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/gpu-sparse-depthwise-stable/aten_depthwise_conv3x3_cpu/raised-program"
+      ]
+    ],
+    "rank": 0,
+    "compiler_cache": "/usr/lib/ccache",
+    "persistent_workspace": true,
+    "source_sha256": "a1d499428bcf723b696ff0622fd7c3c14326cbc8567fa3240693265e08d238f2",
+    "proof_sha256": "4f0d6af00b5c1132770b15f82ce4c61aa24dabdd49a256dbc2abfcf51b1736b4",
+    "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+    "original_source_sha256": "c5bc0d8d6f2a6baa14232fde4c76f60142d7bc27cad826b50266f5dadb6d3fd5",
+    "shape_record": {
+      "kernel": "aten_depthwise_conv3x3_cpu",
+      "op": "depthwise_conv3x3",
+      "cat": "native_fixture",
+      "dims": {
+        "B": 2,
+        "C": 64,
+        "H": 256,
+        "W": 256
+      },
+      "n": 8388608,
+      "shape": "B=2_C=64_H=256_W=256",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "bias plus same-padding depthwise convolution through grouped cuDNN",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "54680f0482adafca"
+    },
+    "shape_specs_sha256": "955f2e1c80c580572cb06901f2df2b8aea26d34235ce64c30887c8599c5557e9",
+    "binary_sha256": "6d43bd5ff7f88cec6dfb77e32ff252ab6962f71e845b6364e3cc5ca8f623659c"
+  }
+]

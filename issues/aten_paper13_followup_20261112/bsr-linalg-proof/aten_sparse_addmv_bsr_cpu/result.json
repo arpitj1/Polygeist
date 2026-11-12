@@ -1,0 +1,38 @@
+{
+  "kernel": "aten_sparse_addmv_bsr_cpu",
+  "family": "sparse_linear_algebra",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/bsr-linalg-proof/aten_sparse_addmv_bsr_cpu/aten_sparse_addmv_bsr_cpu.c",
+  "source_sha256": "7fa5a37684e60c5d97118a679f4d4f95cbb5326994e65c170a75631004357be7",
+  "legacy_match": "cusparseSpMM_BSR_f32_memref",
+  "variants": [
+    {
+      "rank": 0,
+      "error": "Traceback (most recent call last):\n  File \"/home/arjaiswal/Polygeist/scripts/correctness/aten_paper115_campaign.py\", line 87, in worker\n    S.verify(matched, proof, backend='cuda')\n  File \"/home/arjaiswal/Polygeist/scripts/correctness/spec_match.py\", line 394, in verify\n    raise SpecificationError('stored launch no longer has a valid reference import and ABI')\nspec_match.SpecificationError: stored launch no longer has a valid reference import and ABI\n"
+    }
+  ],
+  "correctness": "not_run",
+  "performance": "not_run",
+  "stages": {
+    "cgeist": {
+      "ok": true,
+      "recovery": null
+    },
+    "raise": {
+      "ok": true,
+      "recovery": null
+    },
+    "debuf": {
+      "ok": true,
+      "recovery": null
+    }
+  },
+  "matching_stage": "linalg",
+  "raised_counts": {
+    "linalg": 0,
+    "loops": 4,
+    "copies": 0,
+    "launches": []
+  },
+  "status": "no_proven_match",
+  "seconds": 49.43
+}

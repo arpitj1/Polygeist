@@ -599,6 +599,10 @@ class Matcher:
                 if known == value:
                     yield from self.match_seq(rest, env, ctx)
                 return
+            inferred = self.infer_integer_parameter(sname, value, env)
+            if inferred is not None:
+                yield from self.match_seq(rest, inferred, ctx)
+                return
             definition = self.sdef(sname)
             if definition and definition[0].name == 'arith.index_cast':
                 parameter = definition[0].operands[0]
@@ -680,6 +684,12 @@ class Matcher:
         if sname in env.vals:
             if same_binding(env.vals[sname], ("ssa", akey)):
                 yield env
+            elif akey[0] == 'op':
+                known = self.bound_integer(sname, env)
+                value = self.integer_constant(self.A, self.A.ops[akey[1]])
+                if (known is not None and known == value and
+                        self.spec.params.get(sname) == self.atype(akey)):
+                    yield env
             return
         sd = self.sdef(sname)
         if sd is None:
@@ -704,6 +714,11 @@ class Matcher:
             if av is not None and sv is not None and sty == self.atype(akey) and av == sv:
                 yield env
                 return
+            if av is not None and sv is None and sty == self.atype(akey):
+                inferred = self.infer_integer_parameter(sname, av, env)
+                if inferred is not None:
+                    yield inferred
+                    return
         if sop.idx in env.opmap:
             if aop is not None and env.opmap[sop.idx] == aop.idx:
                 if sop.name == "linalg.generic":
@@ -813,6 +828,70 @@ class Matcher:
             return None
         m = re.search(r"constant\s+(-?\d+)\s*:\s*(?:index|i\d+)\s*$", op.text.strip())
         return int(m[1]) if m else None
+
+    def integer_polynomial(self, name, env, depth=0):
+        """Symbolic integer DAG, used only to propose an exact scalar binding."""
+        if depth > 16:
+            return None
+        known = self.bound_integer(name, env)
+        if known is not None:
+            return ML.p_const(known)
+        if name in env.vals:
+            return None
+        if name in self.spec.params:
+            return {(name,): 1} if self.spec.params[name] in ('i32','i64','index') else None
+        definition = self.sdef(name)
+        if definition is None:
+            return None
+        op, result = definition
+        ty = op.result_types[result] if result < len(op.result_types) else ''
+        if ty not in ('index','i32','i64'):
+            return None
+        values = [self.integer_polynomial(v, env, depth+1) for v in op.operands]
+        if any(v is None for v in values):
+            return None
+        if op.name == 'arith.index_cast' and len(values) == 1:
+            return values[0]
+        if len(values) == 2:
+            a, b = values
+            if op.name == 'arith.addi': return ML.p_add(a,b)
+            if op.name == 'arith.subi': return ML.p_add(a,b,-1)
+            if op.name == 'arith.muli': return ML.p_mul(a,b)
+        if op.name == 'affine.apply':
+            match = re.search(r'affine_map<.*>', ML.inline_aliases(op.text,self.L.aliases))
+            if match:
+                try:
+                    nd, ns, expressions = ML.parse_affine_map(match[0])
+                    if len(expressions) == 1 and nd+ns == len(values):
+                        return ML.map_apply(match[0],values[:nd],values[nd:])[0]
+                except (ML.AffineParseError, IndexError, ValueError):
+                    pass
+        return None
+
+    def infer_integer_parameter(self, name, target, env):
+        polynomial = self.integer_polynomial(name, env)
+        if polynomial is None:
+            return None
+        variables = [(k,v) for k,v in polynomial.items() if k]
+        if len(variables) != 1 or len(variables[0][0]) != 1:
+            return None
+        (parameter,), coefficient = variables[0]
+        difference = target - polynomial.get((),0)
+        if not coefficient or difference % coefficient:
+            return None
+        value = difference // coefficient
+        ty = self.spec.params.get(parameter)
+        bits = 32 if ty == 'index' else int(ty[1:])
+        if not -(1 << (bits-1)) <= value < (1 << (bits-1)):
+            return None
+        if not self.literal_allowed(parameter,value,'int'):
+            return None
+        candidate = self.bind(env,parameter,('int',value,ty))
+        # Re-evaluate the original typed DAG, checking every intermediate's
+        # representable range. Algebraic cancellation cannot hide overflow.
+        if candidate is not None and self.bound_integer(name,candidate) == target:
+            return candidate
+        return None
 
     def bound_integer(self, name, env, depth=0):
         if depth > 16:
@@ -1592,7 +1671,7 @@ def splice_region_matches(text: str, report: list, budget: int = 600,
     # the entire search budget before any application binding is considered.
     started = time.perf_counter()
     try:
-        load_specs(str(SPEC_DIR))
+        load_specs(str(SPEC_DIR), allowed_specs=allowed_specs)
     except Exception as e:
         report.append({"region_match": f"catalog error {type(e).__name__}: {e}"})
         return text

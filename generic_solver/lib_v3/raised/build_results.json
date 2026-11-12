@@ -47,9 +47,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ec122a3de1e30e074f05155d75dfd7e62f0d3a2ae7518d773482d1b451c6ecf0"
   }
  },
  {
@@ -102,9 +99,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d9f16b1c864b4e8fab5da47bba9c4e694d430ab9c3dde48063dbfe2635253700"
   }
  },
  {
@@ -157,9 +151,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f3020708d27a56b8aa4c0634f54343a47de29b79386690b627768a436cd9e731"
   }
  },
  {
@@ -211,9 +202,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7ba0624f75bb1efb96730be01669878a1f6c69063a90d655772873cd835bd18c"
   }
  },
  {
@@ -267,9 +255,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "794b73b7ebffc97ed1a6e04f71c8c5a4090c5aef12873d573f59637ce7464b57"
   }
  },
  {
@@ -323,9 +308,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1c268d89b81d44a3049abac9ec582bad1766415956555ec1bd940dacd35bb3e1"
   }
  },
  {
@@ -380,9 +362,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5e267a7b320ff00111b8c42844e9d121b498e62714ab2d43626e5101385caea7"
   }
  },
  {
@@ -435,9 +414,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "94324f51639db24bd3e3b9682a9262379d8e8729b1b073ccae6a7e912417967f"
   }
  },
  {
@@ -490,9 +466,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7e6d593c1d4ce0cb517066f4d63c2d34190ff89e70c279ea5db23689ebdfd86f"
   }
  },
  {
@@ -543,9 +516,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "80c572d7891a5ed6e7970b609c6527852b668744539c0bf856d9776b1a9487a7"
   }
  },
  {
@@ -597,9 +567,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d25e0ff7058d98114eb8b70e9b7399c7aadecbbd4fbbd2bbd35d4c6b268239b8"
   }
  },
  {
@@ -652,9 +619,82 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "aten_avg_pool3d_backward_k2_f32",
+  "routine": "aten_avg_pool3d_backward",
+  "wrapper": "generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32.c --function=aten_avg_pool3d_backward_k2_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=aten_avg_pool3d_backward_k2_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32.mlir -o generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32_linalg.mlir -o generic_solver/lib_v3/raised/aten_avg_pool3d_backward_k2_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
   },
-  "validation_reuse": {
-   "input_sha256": "3a43780829b7f3fa9c9e9bd87c51ccc36b2115c1eed66d3f1c45ae532c77500e"
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "aten_avg_pool3d_backward_k2_f32",
+   "declarations": [],
+   "params": [
+    "S",
+    "O0",
+    "O1",
+    "O2",
+    "R0",
+    "R1",
+    "R2",
+    "grad_output",
+    "grad_input"
+   ],
+   "outputs": [
+    "grad_input"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [],
+   "array_dimensions": {
+    "O0": [
+     {
+      "array": "grad_output",
+      "axis": 1
+     }
+    ],
+    "O1": [
+     {
+      "array": "grad_output",
+      "axis": 2
+     }
+    ],
+    "O2": [
+     {
+      "array": "grad_output",
+      "axis": 3
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -705,9 +745,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2317cc8f821522d8b21a5c4e34c7dd10ed3d72a7004d5f4665b70943fade2040"
   }
  },
  {
@@ -759,9 +796,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8d4c91c047d8afa8dedc7a5c735b11a46dde5f0afa52ca03394256c84c103914"
   }
  },
  {
@@ -813,9 +847,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6b2604fc83c64ef032f2868f11a29675bed25680eecd8fe0ff5fea332f41dbaf"
   }
  },
  {
@@ -868,9 +899,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a45fd333a9e3f0fc608701b2a95458c72b292d5281007cb05f2c50629a41fdfc"
   }
  },
  {
@@ -921,9 +949,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "49d184da527f7a99b6fa5e44ee6df7798c5383b07c5bfab2f39e3bbfdd309727"
   }
  },
  {
@@ -976,9 +1001,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a281f5aba606d8f7cfc86cedefc752910c2989098d96795b0bfb37eb61481309"
   }
  },
  {
@@ -1032,9 +1054,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3fa5da20e61339cfcca41f02854b9ba640d8a1b296028cb8695de31f25e89729"
   }
  },
  {
@@ -1086,9 +1105,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "62c24c09dfd14832b37d6a1ceba45449931b620a9f1affeed2c8a7044cd5651b"
   }
  },
  {
@@ -1140,9 +1156,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a785caf00dd20215d1bed0693377b53ffec34672ba7b04cb4fd51d53fb85be6f"
   }
  },
  {
@@ -1193,9 +1206,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3c6723c3a7105654db5d7f79eb143d3c54c8cdd1f11b7df701b1905ff4b7a7c4"
   }
  },
  {
@@ -1246,9 +1256,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c6d769403778740e280fc0d22366a6a2518c9a53f7e0a4fd9767c95b4252f063"
   }
  },
  {
@@ -1299,9 +1306,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5f06eb1fe34d629a3483ceeb00d137e7835e91ff72390575821a824c5e8ebe7c"
   }
  },
  {
@@ -1352,9 +1356,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d569573c3d7d13374f60664fa858ffbae65f6ec91e368bae11ac76092f107bac"
   }
  },
  {
@@ -1406,9 +1407,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "db21ff30339fac722ee5f39f52ca79fae708563b6acb8b811297cd9e7d7eff00"
   }
  },
  {
@@ -1459,9 +1457,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d1ff2d4038000c0a884056668db00cec9bc4b7302f6996909cbfcba754888b4a"
   }
  },
  {
@@ -1512,9 +1507,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7b7e95f885a293e70d7307c960283eada4cb9a4ca19bb9d820284a1403233a97"
   }
  },
  {
@@ -1566,9 +1558,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "56c6b04a0cebbcf2d3a055722c249f7b55d46924e6abfc115c59d8fe8a3ee887"
   }
  },
  {
@@ -1619,9 +1608,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "516c49c605faa323d325fc25bb14bb84e2ea41a1a69891242b7a37294681c882"
   }
  },
  {
@@ -1673,9 +1659,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8389c7546c032bde5ac41502ad493c6a54f08b6837f1a5f8e746bc0d4af53e6f"
   }
  },
  {
@@ -1726,9 +1709,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "424d8f586ad82edcd64c3afc013826efa0231afd04fba119e242168f05b3bad7"
   }
  },
  {
@@ -1780,9 +1760,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "87dcc3ded8ece11704bccdc354510393fe69b57c5654f8293610c5678c6de022"
   }
  },
  {
@@ -1836,9 +1813,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cbb821a005f84ce0f8881d69a538dc3b4a8bc0a6142a27e1082dd540174cad6b"
   }
  },
  {
@@ -1890,9 +1864,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1d5e0ce8126b0d0e885642a41d79387c24d1df11bb395b9ac3b12bb50f69a4db"
   }
  },
  {
@@ -1944,9 +1915,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "95f05fbb4dbb91ba41bfbc04dc47d0e9bca946483e9817f82d576bd330afd317"
   }
  },
  {
@@ -1997,9 +1965,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "79cc241cf65c6d63f3dbc4dfbcdb3a7261563fa363a51ce5fa53ec1321e6ad8b"
   }
  },
  {
@@ -2052,9 +2017,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2dc63d951b7925835da9146495192a2ba8bc6cfa345852c3db96a30fc8f2bd5a"
   }
  },
  {
@@ -2106,9 +2068,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "16ddbae45422ac91283604ace1abd93518ddee268f0f2a7f2ead9599ac0a7c89"
   }
  },
  {
@@ -2159,9 +2118,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "11a6183d389ed06d96bafb174a84a8c299729365cd3df606ac2a4cd103a3dc2b"
   }
  },
  {
@@ -2213,9 +2169,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "98d53fb93620fabc83abf0c46ac47e8e2f178c2d07603131ee9a2aa73fd4e1d7"
   }
  },
  {
@@ -2267,9 +2220,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4f8c27aac7de8d4d3f669cc794043da3680cbb4941b472accfbe635549ef7a7a"
   }
  },
  {
@@ -2321,9 +2271,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e9068c7be6b1712e66ce839467a7aa51a98f529c7bfcf9fe052ffd72480c06d2"
   }
  },
  {
@@ -2375,9 +2322,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "889481a91073b7c01570af39df563cff7d9c93af5f88a58b9d3a304c207b54b0"
   }
  },
  {
@@ -2431,9 +2375,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5e2724c778a71f639803db51d31470dc76f7277b752f733088729b1aa5e4c7de"
   }
  },
  {
@@ -2485,9 +2426,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7d5cbe577b84b1909ecef57a023ef2dc0a956ff713362e367b7750c03aa45d33"
   }
  },
  {
@@ -2538,9 +2476,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c51157d43502c32c97c0ca9e695af4ce6854e03170b5605f1408d2586cdd780e"
   }
  },
  {
@@ -2592,9 +2527,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c8c07fe8fd92451559b6feab2bb4a0ffbcb675037e31ea84395f7ad2ac98bc80"
   }
  },
  {
@@ -2646,9 +2578,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "20dba0000eff8bb3d1588f6785f7915dceab1870025dc5dad7b73a04ea3c3ae0"
   }
  },
  {
@@ -2699,9 +2628,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3f72a079d5c694071aca047ed7b3899691dd82b7b5535e1d35c482b24db57e3a"
   }
  },
  {
@@ -2753,9 +2679,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9f136cb8e97959b22ad06327223ccdb61efbcce6c2863b0208afbd7d08c116e2"
   }
  },
  {
@@ -2806,9 +2729,47 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "aten_sampled_addmm_csr_f32",
+  "routine": "aten_sampled_addmm_csr",
+  "wrapper": "generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.c --function=aten_sampled_addmm_csr_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=aten_sampled_addmm_csr_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32.mlir -o generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32_linalg.mlir -o generic_solver/lib_v3/raised/aten_sampled_addmm_csr_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.for"
+   ],
+   "loop_count": 3,
+   "memref_access": 0,
+   "submaps": 0
   },
-  "validation_reuse": {
-   "input_sha256": "21c81f8a457abea2f61e37744019414b15a5ad27362e164536c1d67a84c414fb"
+  "linalg_analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.for"
+   ],
+   "loop_count": 3,
+   "memref_access": 11,
+   "submaps": 0
+  },
+  "status": "NOT_RAISED",
+  "reason": "no linalg.generic after raising; residual affine.for, scf.for",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -2861,9 +2822,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ab2df4bceccf28cbe4e0c06e6bec59215a19951390cc4eed9e5f8949b9fef416"
   }
  },
  {
@@ -2916,9 +2874,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7fb5e493e901a22c43cf6c5fbaeca49cb83718b58102bd8ced538467ff649fb5"
   }
  },
  {
@@ -2969,9 +2924,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "82ef9b2ab337d7475c64fdf6485784c1e086179f61e4000ca929b08514ed7d3c"
   }
  },
  {
@@ -3023,9 +2975,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "24e7f24c8cfa7169cf0dab3a3fa9c515d7cb526f02bb6992816031d32b0df35c"
   }
  },
  {
@@ -3076,9 +3025,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "57918cdcdcd53539d42527e192e993db2eb717ac7fe789872611df6ad3a7d681"
   }
  },
  {
@@ -3129,9 +3075,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9cdee2fc356cc50e8522adf6c992ae0a422f0cef291594b314966e718c6c95b4"
   }
  },
  {
@@ -3183,9 +3126,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fce41ee3078f66361fda7700374f7c05ad54f2cdf01cd41821a51ffb1bed433e"
   }
  },
  {
@@ -3236,9 +3176,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "74b1d853454147457d6e3de5731337a73d7e78a389b2f5c28bf27cf26f8bdd88"
   }
  },
  {
@@ -3291,9 +3228,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9c0e8383eaf080a504884dcc40225e3bee266c740c41f187607e7c92c5daa3e9"
   }
  },
  {
@@ -3344,9 +3278,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dd5fecdf1683f6b1cae61514ed29123ed828cbbd6364cabe282f925065adffca"
   }
  },
  {
@@ -3398,9 +3329,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2fc87261a6474f3be21eef8dc1611af21dc84bdb2a9ea68404f451ba85b50abf"
   }
  },
  {
@@ -3452,9 +3380,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "746e4192d8b0594d72b5654345d8624f4dfb4b01f78393fa0daccecd5acdcde8"
   }
  },
  {
@@ -3505,9 +3430,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "afeb32e0ab3ec05ddc6f570627e814754ebaea645caa941e89a30dc148d0cd21"
   }
  },
  {
@@ -3558,9 +3480,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7e9edda31dd264fa881cfa436291b64715baa7f4ec1449d443223f5eae2f7a7f"
   }
  },
  {
@@ -3611,9 +3530,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b1df3a31a8210631c35483f41934ebde833f89710ab4453f8f2457d4f779caa7"
   }
  },
  {
@@ -3665,9 +3581,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ce67b7503a0beb8c2107cb3148457cee32ceedbb9eba218399ff108c20947a89"
   }
  },
  {
@@ -3721,9 +3634,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "858791aca707ffb173f27001aee373005779752f8ce20bb8b729a505e136512f"
   }
  },
  {
@@ -3774,9 +3684,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e497a8e8bdf901b9302b08b80549c28eed9f9e6356d55e6a14db8cefa3a9c5a4"
   }
  },
  {
@@ -4276,9 +4183,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "10b345e7dc625ca003eb55f7db78b495c5da9df1b387201a99dfb77a6e991e67"
   }
  },
  {
@@ -4369,9 +4273,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "20f4580e36f8537e10194f5ca15d710e87753fb7d735c2c63a616e3b4b97ae55"
   }
  },
  {
@@ -4423,9 +4324,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d9b4bcc349166aa913b7552f50ff25c08c049ed47c9daf80d960a1ad73c5bf17"
   }
  },
  {
@@ -4476,9 +4374,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "674f2e7b9d1027a67c47a6da9e760dd008ebe9acd4045947b50f4b5ef600e186"
   }
  },
  {
@@ -4529,9 +4424,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cc7aeccd3e3b6e50643e8fd42310e315780b96309b9dc2c1281a20f13007aba1"
   }
  },
  {
@@ -4583,9 +4475,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3a7c407f145e7ee710b262852c50245f3437d66ddefa7de06f1667375821b72f"
   }
  },
  {
@@ -4637,9 +4526,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0e2212c8a0d784fa0aafd11ef19e0aa400f77cb63f6e68a6028dc85867aa8a01"
   }
  },
  {
@@ -4735,9 +4621,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "71e36e03c18f9bf15841886f7b86c070afc33c8b7922b186a01c8939b2559a8a"
   }
  },
  {
@@ -4793,9 +4676,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2ad9362cb2af71d50ba0245034086d0be996a878736ee20eca7c39598120ab4e"
   }
  },
  {
@@ -4851,9 +4731,47 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cub_ragged_reduce_and_i32",
+  "routine": "cub_ragged_logical",
+  "wrapper": "generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.c --function=cub_ragged_reduce_and_i32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_ragged_reduce_and_i32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32.mlir -o generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32_linalg.mlir -o generic_solver/lib_v3/raised/cub_ragged_reduce_and_i32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 0
   },
-  "validation_reuse": {
-   "input_sha256": "452535af7258cf0323ce2be2484fe5c72efca687e7f0886aad6f4adebd7ba9b0"
+  "linalg_analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 3,
+   "submaps": 0
+  },
+  "status": "NOT_RAISED",
+  "reason": "no linalg.generic after raising; residual affine.for, scf.for",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -4905,9 +4823,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d00b3e21a24fae4c0471fbb3f7d35c901bc3714dadbe493d420e58e49d1360b9"
   }
  },
  {
@@ -4959,9 +4874,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "31dd83c7af58170781dda4afff650597e84beb404aa4c8731a244c21326f59f2"
   }
  },
  {
@@ -5013,9 +4925,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "31853e9b571a9fed5ff86341f67855545c90f7aad9dd8579bce92589332e610d"
   }
  },
  {
@@ -5066,9 +4975,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "51e3c27ab31999c6c62627afd5633b85320add4fc5399c1858804360db554d36"
   }
  },
  {
@@ -5119,9 +5025,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0456d130ac05a683f39a0ac85c73b554689267bbf8a1f52d072c627bf6110fd2"
   }
  },
  {
@@ -5176,9 +5079,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dc96d7e510c366ce2b129933c950419dcbd0b07d0e71ead7db2fd294ce0b8449"
   }
  },
  {
@@ -5233,9 +5133,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "52bd858a6442ce323753380b50b77fd3539159073768633962323e989fb7b91e"
   }
  },
  {
@@ -5290,9 +5187,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "46207cf5bb362b44445536e45c71b16ced3023ef7c392bbbbc0d4302664f58e9"
   }
  },
  {
@@ -5347,9 +5241,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fcb9a4123701adc2a03305f0bd1f8872ae7c3e2c90595186d14b465802e0a764"
   }
  },
  {
@@ -5403,9 +5294,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ecf607feb0dbd179944bf770ad7ea92fba319659386dd4fb8251bba87046b3f8"
   }
  },
  {
@@ -5460,9 +5348,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ba0e547d2ca64d796d5270f9e82b82b517d29d47ffbe7f5dcd3db088b17ee60c"
   }
  },
  {
@@ -5517,9 +5402,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "61544f86035872a04c442546af61441ccd70ac06d8bbd7911c3559ec2c521982"
   }
  },
  {
@@ -5574,9 +5456,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "87ddc562e1dd5fcc90669075ae49971fa8612a2d3b082837214d86669ff21039"
   }
  },
  {
@@ -5693,9 +5572,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ebaf8b9dc494a7b77061e248857988e629110959baec041176442aabe6b5da0c"
   }
  },
  {
@@ -5812,9 +5688,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "13dd515ba7a4b031a66f28ba836b2a0199bf6d1abc208b85b555e5553ec430e7"
   }
  },
  {
@@ -5920,9 +5793,45 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cudnn_conv1d_bias_f32",
+  "routine": "cudnn_conv1d_bias",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.c --function=cudnn_conv1d_bias_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_bias_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 3,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 7
   },
-  "validation_reuse": {
-   "input_sha256": "166b94c66ae8306066e16de6e267d1e4e4e3d6fdc15512e82c2c574a762956ff"
+  "linalg_analysis": {
+   "generics": 3,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 7
+  },
+  "status": "PARTIAL",
+  "reason": "3 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -6050,9 +5959,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a819ff444ffe1f594c919a376c117975ae8e97f86234aafe50cc86f42d26118d"
   }
  },
  {
@@ -6297,9 +6203,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b2c40099ffb6c101ef73b7a0fbe35248662353e9244ec226f280688fb2a19237"
   }
  },
  {
@@ -6387,9 +6290,86 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cudnn_depthwise_conv2d_bias_f32",
+  "routine": "cudnn_depthwise_conv2d",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.c --function=cudnn_depthwise_conv2d_bias_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_depthwise_conv2d_bias_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32.mlir -o generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_depthwise_conv2d_bias_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 3,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 3,
+   "memref_access": 0,
+   "submaps": 7
   },
-  "validation_reuse": {
-   "input_sha256": "3b4e65cd73287a69070112e69f177f879eb576db4dcfb804842af0afdb1bfdf6"
+  "linalg_analysis": {
+   "generics": 3,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 3,
+   "memref_access": 0,
+   "submaps": 7
+  },
+  "status": "PARTIAL",
+  "reason": "3 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cusp_bsr_matvec_beta0_f32",
+  "routine": "cusp_bsr_matvec",
+  "wrapper": "generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.c --function=cusp_bsr_matvec_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cusp_bsr_matvec_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_bsr_matvec_beta0_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for",
+    "scf.while"
+   ],
+   "loop_count": 2,
+   "memref_access": 5,
+   "submaps": 2
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for",
+    "scf.while"
+   ],
+   "loop_count": 2,
+   "memref_access": 5,
+   "submaps": 2
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses)",
+  "validation": {
+   "defn": "UNSOUND",
+   "defn_maxabs": 0.8961,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -6608,9 +6588,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "797c57f1b76f85d9cb02798ddeec8e892a23a19f591132f0b28b795641550e10"
   }
  },
  {
@@ -6662,9 +6639,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b5b948fd3189ff8b1c03773c1059de1d5736e20a18459b39b20f5a2c55eafe59"
   }
  },
  {
@@ -6717,9 +6691,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f01c5ef66af9c0d09196afa3fc3408a4bd9efaf07d1af3cef7146e804803beeb"
   }
  },
  {
@@ -7277,9 +7248,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a7a882acfd93add7c27c0b3a91b7876c2defb3cb58669af1447b6cee68327856"
   }
  },
  {
@@ -7346,9 +7314,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "73f9d2cf04555d8c62d57f87b9030461fdfbb4b05ff3f00c85382e67aa13e3f2"
   }
  },
  {
@@ -7413,9 +7378,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0c9f97c3828003b422c2c5ba726aa61f792ed0b3c98d7ec766293fa3059d36ba"
   }
  },
  {
@@ -7480,9 +7442,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cdab4b291cfed00fb56a6ebb9b9d0e3bc5c69ce2ac89765312f40a61d3a8273c"
   }
  },
  {
@@ -7548,9 +7507,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2649a1076de98f458adde2641370c3f6ea27f6562291f92454163bbfc751e50a"
   }
  },
  {
@@ -7966,9 +7922,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "aaa2284c8e1f62946ea1eed41934f30fa5eeaa703b888dd0baf40608dc52be4d"
   }
  },
  {
@@ -8036,9 +7989,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "83e8b729b55e96dc98d37271c3ad8601aab42bb8f77b56b5aa8bf033fbb68b70"
   }
  },
  {
@@ -8232,9 +8182,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6ec6c6a688641672f04ff6396ea726d15caacd0ae202b49330461a41ef01a557"
   }
  },
  {
@@ -8295,9 +8242,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e233a82feb4ca1c48f148c825093aaf748a8aee20c151c703be0a74c9af8300f"
   }
  },
  {
@@ -8359,9 +8303,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ee90d33358d7203ae47765d32aed4816427d95662c4abc4e1aa7e197df83d4c5"
   }
  },
  {
@@ -8422,9 +8363,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c408aa21a88aa6aee151234fbc546e6c09273a36f9dea8e024d1c5dc78ccfe28"
   }
  },
  {
@@ -8486,9 +8424,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "879a09a6ad86127ab653793d056532815b846032d724cc2e25b25c1b98725388"
   }
  },
  {
@@ -8852,9 +8787,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "774444f25068d77870425b8ccbdab9af4bbd05e8f51da6e3b4ed3c007f07876e"
   }
  },
  {
@@ -8917,9 +8849,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6f95933ae49f92c3610f8561d7ffea8b8efbcf02cd5d2b9005627281094783cd"
   }
  },
  {
@@ -9388,8 +9317,8 @@
   "status": "PARTIAL",
   "reason": "2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -9427,8 +9356,8 @@
   "status": "PARTIAL",
   "reason": "2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -9622,8 +9551,8 @@
   "status": "PARTIAL",
   "reason": "2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -9661,8 +9590,8 @@
   "status": "PARTIAL",
   "reason": "2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -9727,9 +9656,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "00b9dad0d78d5a2c8862fdc6234636bf3cc98a42cfd8eebcae50ea713525cdd4"
   }
  },
  {
@@ -9763,8 +9689,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -9802,8 +9728,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -9958,8 +9884,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -10093,9 +10019,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fed33169c1e8c91d34421d4ce9ccbe66d9aa09958d9d0f971959f660f801fa67"
   }
  },
  {
@@ -10148,9 +10071,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "564fa01de18b49dec2720edee9990770d3283829f89a64fabd13654e5a58a58e"
   }
  },
  {
@@ -10202,9 +10122,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "56b51f2549101bbeb50f729a5a461d5f5268f2801389b9dbccbf9eb57e062bb3"
   }
  },
  {
@@ -10257,9 +10174,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6baa5b7bf779a631b5f15c7765db59ae6df3e83559c5cdb5376b5a06cd3eaabf"
   }
  },
  {
@@ -10311,9 +10225,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6424184e796b9f4e81dc0c06d9e0f44e79eb60449fc220f48882c32cd35e704f"
   }
  },
  {
@@ -10379,9 +10290,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8d4e1eb098d87fab6408c29451120f1be8befcd25a2eabcbebc2f03e469391d9"
   }
  },
  {
@@ -10448,9 +10356,6 @@
    "linalg_maxabs": 8.882e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7e35a38a180236d2ffaf887719bb9b0c1d81229b4f5a583b7c75be582dc66a43"
   }
  },
  {
@@ -10516,9 +10421,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c82f90c4ed979b8e31412fd601ccf6821c52c81796803884d6efe67db7f6ff42"
   }
  },
  {
@@ -10585,9 +10487,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "edf47351af6b4bdf39227b8c1b468cc0a838912a85a4b98575bf52789d00fbb8"
   }
  },
  {
@@ -10653,9 +10552,6 @@
    "linalg_maxabs": 2.776e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d420b5bd5a3cbef652aaf25169cc7f345dec97b4420b9eaf7d8e9f33944c964a"
   }
  },
  {
@@ -10722,9 +10618,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "935f43a9fe1f476f4b25d2f3f0c7f4e7ee0faeea4fdc69dc62a5a7bd41cc7ebf"
   }
  },
  {
@@ -10790,9 +10683,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ae8b23163841ec6a13d9b5ef17863a1eb5cee5da5f1bbd5ad414fd6d37a9df5d"
   }
  },
  {
@@ -10859,9 +10749,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e23237711b8b3517738763927d662598d1de4433ab0a12cbdaddc9833a22e1fb"
   }
  },
  {
@@ -10926,9 +10813,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c96161b624cbc00cc019f3be9b916af6051ee4574b7bfeb2d2e3e2b8228a7360"
   }
  },
  {
@@ -10993,9 +10877,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3e38c19f792ad8ffb17232381a054bea978713e322ed60846f1b434e66ef1974"
   }
  },
  {
@@ -11060,9 +10941,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a05f1d6dd0fefb39d0aea9cdf4b37e44b8fb3580c05d09df7169b4654539e528"
   }
  },
  {
@@ -11127,9 +11005,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f6ebe1b4d437754f610a54565ad49b2add28a535dcc745535ee98a6856c18331"
   }
  },
  {
@@ -11363,9 +11238,6 @@
    "linalg_maxabs": 2.22e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5ed78603d2bc470e6c9da406336816aaa01224188a050b33b1d8701bf905661d"
   }
  },
  {
@@ -11424,9 +11296,6 @@
    "linalg_maxabs": 2.22e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "277f320a463d1eae50197a4052eab1706d84688b25f6d368d927b794a7fa2385"
   }
  },
  {
@@ -11486,9 +11355,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fdede80ae15f291552918503637ec56b327c02cab6ce781b7e42e6b01c9fa1f8"
   }
  },
  {
@@ -11597,9 +11463,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3276546b159416543f48ec68b68834b68a000620de3a9bcc22859643baa78778"
   }
  },
  {
@@ -11651,9 +11514,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "685b40acf132c95380095c3a9eeea1b1f7ee56544608616768b3725bdf078229"
   }
  },
  {
@@ -11705,9 +11565,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7033b05a66515132aa5724b9ab7d0310bcfd80b64c0744b4fba48347215fd981"
   }
  },
  {
@@ -11765,9 +11622,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "65adbedaffdc189a0abe27654373976dbca11f6f5ec88e20d371bfcc3cadb745"
   }
  },
  {
@@ -11825,9 +11679,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f78addeffe3119b9b630364b9b340b04e4670bed15d69e82feaa3665d19d7bf4"
   }
  },
  {
@@ -11892,9 +11743,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9e67424e0554c132792c08eff41e7045a250808be4a4d444ad5e66523c0ff4b1"
   }
  },
  {
@@ -11959,9 +11807,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "bdfd7f3626624b98c10ef04fc221b1ad2603e100ffea91a8a13ef99888c8d192"
   }
  },
  {
@@ -12012,9 +11857,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d8a8e7d027ae3f120fcf9b0c646ed8debfb207edadd78b9d82a2618c91423962"
   }
  },
  {
@@ -12072,9 +11914,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "412c0c9ff1cb8d5f3230f60185d437e843167109cbe8ce34c87314e5c489b739"
   }
  },
  {
@@ -12163,9 +12002,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ca38f8172b016532bac58b0bca8890cc1a1fb9df52f9f9a3795df6b3707cc5fe"
   }
  },
  {
@@ -12250,9 +12086,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2e042d073a69ed3470fd4391e4ed6e62985adb4187ea989b3e1ef9ee313b59f3"
   }
  },
  {
@@ -12498,9 +12331,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cff61b09c07f4f568785932029356f2eb87af14b931e8440781261fa74eea090"
   }
  },
  {
@@ -12560,9 +12390,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9788c235c43a9df35e74a53d2078651aba257c7b7e1f081814cd6d2aa23fc6ab"
   }
  },
  {
@@ -12622,9 +12449,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "be442d0ebbde7731ea914068eed8851eab54eafdc4d7aec9f259bacac19bddcb"
   }
  },
  {
@@ -12678,9 +12502,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2393f8f4ba4cd6bee84e0c290af5230861ca372f63e22f957c4150860eee020a"
   }
  },
  {
@@ -12734,9 +12555,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "891ffdea9988e724bc73679dff051f172bf52d0df31248f05460d6b208f66d42"
   }
  },
  {
@@ -12790,9 +12608,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "15e4015b3f34ea73a2de4946a63f9c878df541a9ae9ad90a92550b578a49bc49"
   }
  },
  {
@@ -12846,9 +12661,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "21f49ed50ce0d13d28454237f9d3f8b162a622fd9c96030728ba9992b4cbbbd3"
   }
  },
  {
@@ -12980,9 +12792,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6f6dce1c426219058bc6dbca14641d5b3133ef2f66ee7756bd31f9177f9a8fc9"
   }
  },
  {
@@ -13034,9 +12843,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "083a84af0fbb2cd99a49f8f3c23c2f282165abd375d5d58165feff2ed36c336a"
   }
  },
  {
@@ -13088,9 +12894,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "69204d3b46b2d611c8beddbc519513e14ab24873d00202369cd0c4e78ff4d36a"
   }
  },
  {
@@ -13142,9 +12945,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4e88e111337fc3c50983996352576eca0e557b55da8f3d04a09ae2db72ac5e34"
   }
  },
  {
@@ -13196,9 +12996,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f0a2ee5c8bf66829baf7e4c0de71c0ad9313ab01637f810c11dc37d0281b99d9"
   }
  },
  {
@@ -13250,9 +13047,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9c9724be846b75578cb74cbef54c14fec327c674b7d6d0495da940e0f2498d59"
   }
  },
  {
@@ -13304,9 +13098,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b1af4fba40714b56e64e3945db122ac0226684debee9c0f7554ee7ee78d16343"
   }
  },
  {
@@ -13358,9 +13149,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "bdc2ac0e9e5d270dfb1b452de9e00d4c3352ae23efd72d77ed4522ffa988c9d3"
   }
  },
  {
@@ -13412,9 +13200,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cc8ab001ffd6b100975ee5dcf2dd23722e2c522a3cc23fd9c90914d29bdf6f21"
   }
  },
  {
@@ -13466,9 +13251,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "bf362da7ba7bc5e9f1bcb8714e5074a257c926880ff0fe394df85dbfe88c80fb"
   }
  },
  {
@@ -13520,9 +13302,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4cf32497b239d8e5e10ac6a64556640c2e100f0e634d527e9ace30a1b1116075"
   }
  },
  {
@@ -13574,9 +13353,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7b942f5c1553f534da3701b097026664a3386c38ce4af0d51cb1a76af8795c59"
   }
  },
  {
@@ -13628,9 +13404,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0579c01c540074e1a6a93680815f8b431503d6244d9425341d9457bc3af40315"
   }
  },
  {
@@ -13682,9 +13455,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1fb7e7d0345554e905034a11cf976da42f35f38713c93d7d5c19feb26a39d5eb"
   }
  },
  {
@@ -13736,9 +13506,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a3265fa73146b6e12aaf2515f43fd955a8044670dc807c58650da7d757990909"
   }
  },
  {
@@ -13790,9 +13557,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1057d323c41ecd0a1a4d9bc747b6ed89963972be19901b7942a9e2b1242071d2"
   }
  },
  {
@@ -13844,9 +13608,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "eb1b458314d28d06af2145fd51d75fb89668046c6326a7595415fcb9702675a3"
   }
  },
  {
@@ -13897,9 +13658,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "529735fd954a6ad13b60736d289d516b919e29357fa861bebfa8fa54235e7af2"
   }
  },
  {
@@ -13950,9 +13708,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0239671327c8455e2c5095ff49cc13fd98a46864b2d7531abeda55fa93497645"
   }
  },
  {
@@ -14006,9 +13761,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8ca925d2aa63a5bed7fa1f56fe8006135bc7b9fa2b1aa719772b7d5c67613e7a"
   }
  }
 ]

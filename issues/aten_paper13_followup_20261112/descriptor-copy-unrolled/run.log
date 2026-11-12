@@ -1,0 +1,10 @@
+UNIT 0 PASS exact descriptor copies: 297402368 bytes, IEEE bits, guards and source preservation
+aten_adaptive_avg_pool2d paper True
+GPU validated 1 / 1
+CASE aten_adaptive_avg_pool2d strict passed raised_ms 1.08791995 native_ms 0.487367868 paper_ratio 1.571993348909591 old_over_new 11.603463202416686
+aten_pixel_shuffle_cpu_backend paper True
+GPU validated 2 / 2
+CASE aten_pixel_shuffle_cpu_backend strict passed raised_ms 1.714843035 native_ms 0.670218945 paper_ratio 5.349256007442279 old_over_new 13.1415963362501
+aten_batch_norm paper True
+GPU validated 3 / 3
+CASE aten_batch_norm strict passed raised_ms 2.923820972 native_ms 0.317764997 paper_ratio 11.134471850999978 old_over_new 8.768390464913868

@@ -1,0 +1,4 @@
+UNIT 0 PASS exact descriptor copies: 722206720 bytes, IEEE bits, guards and source preservation
+aten_pixel_shuffle_cpu_backend paper True
+GPU validated 1 / 1
+CASE aten_pixel_shuffle_cpu_backend strict passed raised_ms 1.580666065 native_ms 0.66020298 paper_ratio 4.930706351185896 old_over_new 1.084886348211695

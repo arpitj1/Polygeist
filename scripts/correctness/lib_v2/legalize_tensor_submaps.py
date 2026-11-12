@@ -19,7 +19,9 @@ stride) or loop invariant, into
     %w   = tensor.insert_slice %g into %base_o[...]
 which one-shot-bufferize lowers normally.  This is the tensor analogue of the
 memref-form lowering the campaign recipe applies before debufferization.
-Unsupported groups are left untouched (and later fail to lower, visibly).
+Residual injective affine scatter writebacks are lowered to sequential
+loop-carried tensors. Overlapping and unsupported maps remain untouched
+(and later fail to lower, visibly).
 Usage: legalize_tensor_submaps.py IN.mlir -o OUT.mlir
 """
 from __future__ import annotations
@@ -349,6 +351,130 @@ def legalize_func_ops(mod: ML.Module) -> list[tuple[int, int, str]]:
     return edits
 
 
+def _constant_index(mod: ML.Module, name: str, context: ML.Op):
+    definition = mod.def_of(name, context)
+    if definition is None:
+        return None
+    op = definition[0]
+    match = re.search(r"arith\.constant\s+(-?\d+)\s*:\s*(?:index|i\d+)\b", op.text)
+    return int(match[1]) if match else None
+
+
+def _injective_tiled_map(accesses, sizes):
+    """Prove disjoint mixed-radix axes without assuming dynamic-size bounds.
+
+    Each destination coordinate may combine independent source axes.  In order
+    of increasing absolute stride, every next stride must exceed the complete
+    variation of the preceding axes.  Only the final axis may have unknown
+    extent.  The coordinate groups must partition all non-unit source axes.
+    This is conservative: unsupported maps remain for the normal compiler to
+    handle, and overlapping reduction views are never treated as overwrites.
+    """
+    if any(size is not None and size < 0 for size in sizes):
+        return False
+    if 0 in sizes:
+        return True
+    used = set()
+    for access in accesses:
+        group = []
+        for monomial, coefficient in access.items():
+            if any(atom[0] == 'x' for atom in monomial):
+                return False
+            dimensions = [atom[1] for atom in monomial if atom[0] == 'd']
+            if not dimensions:
+                continue
+            if len(monomial) != 1 or len(dimensions) != 1:
+                return False
+            dimension = dimensions[0]
+            if sizes[dimension] == 1:
+                continue
+            if dimension in used:
+                return False
+            used.add(dimension)
+            group.append((abs(coefficient), dimension))
+        span = 0
+        for position, (stride, dimension) in enumerate(sorted(group)):
+            if stride <= span:
+                return False
+            size = sizes[dimension]
+            if position + 1 < len(group):
+                if size is None:
+                    return False
+                span += stride * (size - 1)
+    return used == {axis for axis, size in enumerate(sizes) if size != 1}
+
+
+def legalize_inverse_writebacks(mod: ML.Module):
+    """Sequential tensor scatter for proven-injective affine writebacks.
+
+    Explicit view bounds, including prefixes of a larger tensor, are retained.
+    The source remains an immutable tensor snapshot and every loop carries the
+    destination, so all base elements outside the scatter remain unchanged.
+    """
+    edits = []
+    for op in mod.ops:
+        if op.name != 'polygeist.submapInverse' or len(op.results) != 1:
+            continue
+        try:
+            affine_map, symbols_count = submap_parts(mod, op)
+            rank, _, expressions = ML.parse_affine_map(affine_map)
+            base, source = op.operands[:2]
+            symbols = op.operands[2:2 + symbols_count]
+            bounds = op.operands[2 + symbols_count:]
+            # Functional operand types are explicit on this op. In particular,
+            # an upstream tensor.insert_slice has two type spellings, which the
+            # small generic parser does not always distinguish as a result.
+            signature = re.search(r':\s*\((.*?)\)\s*->', op.text, re.S)
+            if signature is None:
+                continue
+            operand_types = ML.split_top(signature[1])
+            base_type, source_type = operand_types[:2]
+            parse_type = lambda ty: re.fullmatch(r'tensor<((?:(?:\?|\d+)x)*)([if]\d+|index)>', ty or '')
+            bt, st = parse_type(base_type), parse_type(source_type)
+            if (bt is None or st is None or bt[2] != st[2] or
+                    bt[1].count('x') != len(expressions) or st[1].count('x') != rank or
+                    len(bounds) != rank or len(symbols) != symbols_count or
+                    op.result_types != [base_type]):
+                continue
+            access = ML.map_apply(affine_map, ML.identity_dims(rank),
+                                  [{(('v', name),): 1} for name in symbols])
+            sizes = [_constant_index(mod, bound, op) for bound in bounds]
+            if not _injective_tiled_map(access, sizes):
+                continue
+        except (ML.AffineParseError, IndexError, ValueError):
+            continue
+        indent = re.match(r'\s*', op.text).group(0)
+        emitter = Emitter(indent)
+        zero, one = emitter.const(0), emitter.const(1)
+        indices = []
+        def writeback(depth, destination, result):
+            ind = indent + '  ' * depth
+            if depth < rank:
+                iv, carried = emitter.fresh('iv'), emitter.fresh('dst')
+                emitter.lines.append(f'{ind}{result} = scf.for {iv} = {zero} to {bounds[depth]} step {one} iter_args({carried} = {destination}) -> {base_type} {{')
+                indices.append(iv)
+                updated = emitter.fresh('next')
+                writeback(depth + 1, carried, updated)
+                indices.pop()
+                emitter.lines.append(f'{ind}  scf.yield {updated} : {base_type}')
+                emitter.lines.append(f'{ind}}}')
+                return
+            element = emitter.fresh('element')
+            emitter.lines.append(f'{ind}{element} = tensor.extract {source}[{", ".join(indices)}] : {source_type}')
+            coordinates = []
+            dims = ', '.join('d' + str(i) for i in range(rank))
+            symbolic = '[' + ', '.join('s' + str(i) for i in range(symbols_count)) + ']' if symbols_count else ''
+            operands = '[' + ', '.join(symbols) + ']' if symbols_count else ''
+            for expression in expressions:
+                coordinate = emitter.fresh('coordinate')
+                emitter.lines.append(f'{ind}{coordinate} = affine.apply affine_map<({dims}){symbolic} -> ({expression})>({", ".join(indices)}){operands}')
+                coordinates.append(coordinate)
+            emitter.lines.append(f'{ind}{result} = tensor.insert {element} into {destination}[{", ".join(coordinates)}] : {base_type}')
+        writeback(0, base, op.results[0])
+        edits.append((op.start, op.end, '\n'.join(emitter.lines) + '\n'))
+    return edits
+
+
 def legalize(text: str) -> tuple[str, int]:
     used = [int(x) for x in re.findall(r"%lgz_[a-z]+(\d+)", text)]
     _COUNTER[0] = max([_COUNTER[0], *used])
@@ -357,7 +483,10 @@ def legalize(text: str) -> tuple[str, int]:
     edits = legalize_func_ops(mod)
     for s, e, rep in sorted(edits, key=lambda t: -t[0]):
         text = text[:s] + rep + text[e:]
-    return text, len(edits) + splits
+    inverse_edits = legalize_inverse_writebacks(ML.Module(text))
+    for start, end, replacement in reversed(inverse_edits):
+        text = text[:start] + replacement + text[end:]
+    return text, len(edits) + len(inverse_edits) + splits
 
 
 def main() -> int:

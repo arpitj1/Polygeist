@@ -1,0 +1,109 @@
+{
+  "routine": "cub_ragged_logical",
+  "source": "Pinned public CUB DeviceSegmentedReduce with seeded ThreadReduce and CUDA logical operators",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh",
+      "sha256": "f0dfb01c1cbd0eb590c14cf763370863ce1dd83483de1e105f0332f9105108b1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_reduce.cuh",
+      "sha256": "79dbfc30428098941bb0db6dac316d2ba94cde4351483837076e91334e5c9399"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__functional/operations.h",
+      "sha256": "8b201a02ba305dc0c882cda06680f5dbd77a0b5d65e5c9c7e23e745e78c0da98"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_segmented_reduce.cuh",
+      "sha256": "001d84cdb0741b419c46370e25ea6304fb44aeb1101a4dcfbbf675da1fc59c34"
+    }
+  ],
+  "adaptation": "Specialize the public seeded sequential reduction and logical_and<int> to disjoint row prefixes. Begin offsets are row*cols; end offsets are row*cols+length[row]. Empty segments retain the true identity. The runtime passes lazy offset iterators to actual CUB DeviceSegmentedReduce.",
+  "specs": [
+    {
+      "name": "cub_ragged_reduce_and_i32",
+      "target": {
+        "library": "CUB",
+        "call": "DeviceSegmentedReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_ragged_reduce_and_i32",
+          "arguments": [
+            "rows",
+            "cols",
+            "input",
+            "length",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "rows"
+            ],
+            "length": [
+              "rows"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "rows",
+        "cols",
+        "input",
+        "length",
+        "output"
+      ],
+      "assumptions": [
+        "Positive int32 rows and cols; each length is in [0, cols]",
+        "Contiguous disjoint int32 input, length, and output arrays; logical results are exactly 0 or 1, with empty rows returning 1"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 4,
+          "cols": 7
+        },
+        "arrays": {
+          "input": [
+            4,
+            7
+          ],
+          "length": [
+            4
+          ],
+          "output": [
+            4
+          ]
+        },
+        "array_values": {
+          "length": [
+            0,
+            1,
+            5,
+            7
+          ]
+        }
+      }
+    }
+  ]
+}

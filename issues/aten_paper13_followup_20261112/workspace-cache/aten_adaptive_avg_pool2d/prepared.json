@@ -1,0 +1,58 @@
+{
+  "kernel": "aten_adaptive_avg_pool2d",
+  "original_binary_sha256": "455a362d7ab91b2293538a47a21f974ab096e4971969c82c3ec4e90f84fb8a51",
+  "timing_binary_sha256": "455a362d7ab91b2293538a47a21f974ab096e4971969c82c3ec4e90f84fb8a51",
+  "original_harness_sha256": "d9b7408c927f023de14e6156897a0a7eed13854b178fc22f36b85531b59acb23",
+  "timing_harness_sha256": "d9b7408c927f023de14e6156897a0a7eed13854b178fc22f36b85531b59acb23",
+  "frozen_object_sha256": {
+    "work/kernel.o": "2e12d8de929bce8a7bd92416c7378a4880a85e2e50207597f61ab1c6f98e0b05",
+    "work/wrapper.o": "b5547ef42c94f2c460bdc3445848c2f73bb98a5dc5f0a6293513b4b5a70bb81c",
+    "objects/timing-harness.o": "bd79807963ee7f5d06b777119fd8fca0f76ae1c099dabadad76d6792a8c780f7",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "objects/spec_runtime.o": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "work/thrust_runtime.o": "752165c4ffd4389d8b14e8c5e6c4960e4e71782128c828a47c77cf60239759bf",
+    "work/cub_runtime.o": "a95309a9714c859ca721738db994515be10f1e932cd5ea15ffe7104e3f27473b",
+    "objects/reference.o": "c3aed43039083ce74c14f9493c00984376518e62a91acb5372340715f1fd068e",
+    "objects/native.o": "9cb650c5925aa8bfa9cf0017a77f32a0d6a39680c0fba21352266c8a07f223a8"
+  },
+  "original_configuration": {
+    "dims": {
+      "B": 4,
+      "C": 32,
+      "H": 256,
+      "W": 256,
+      "OH": 128,
+      "OW": 128
+    },
+    "args": [
+      [
+        "input",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        false,
+        "normal"
+      ],
+      [
+        "output",
+        "ptr",
+        "(B)*(C)*(OH)*(OW)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_adaptive_avg_pool2d",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "input": "((float)(i%101)-50.0f)/37.0f",
+      "output": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "original_proof_sha256": "ae46c56c22b9c818b0d19c23e1c88c689d82c6d9a215ea609325f861f5762c95",
+  "timing_samples": 5,
+  "adaptation": "Only the saved harness TIMING_SAMPLES changes to 5; all application, compiler runtime, C reference and native ATen objects are frozen.",
+  "commands": []
+}

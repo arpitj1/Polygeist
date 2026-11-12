@@ -1,0 +1,147 @@
+{
+  "routine": "aten_avg_pool3d_backward",
+  "source": "Pinned public PyTorch ATen avg_pool3d_backward_out_frame<float>, AveragePool3d.cpp:336-415",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/AveragePool3d.cpp",
+      "sha256": "d4a2b4299179ac5861fc50f117d80f0ec61f3a9bc55106d2d94c35a6fb3cfdaa"
+    }
+  ],
+  "adaptation": "Scalar C transliteration of public average-pooling backward with window=stride=2, no padding and floor output shape. The input extents 2*O+R with checked R in {0,1} encode odd tails without an unchecked shape promise. Array delinearization and independent-slice serialization preserve the upstream scatter. Bound to real cudnnPoolingBackward, whose proprietary implementation is validated separately.",
+  "specs": [
+    {
+      "name": "aten_avg_pool3d_backward_k2_f32",
+      "args": [
+        "S",
+        "O0",
+        "O1",
+        "O2",
+        "R0",
+        "R1",
+        "R2",
+        "grad_output",
+        "grad_input"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnPoolingBackward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_avg_pool3d_backward_k2_f32",
+          "arguments": [
+            "S",
+            "O0",
+            "O1",
+            "O2",
+            "R0",
+            "R1",
+            "R2",
+            "grad_output",
+            "grad_input"
+          ],
+          "arrays": {
+            "grad_output": [
+              "S",
+              "O0",
+              "O1",
+              "O2"
+            ],
+            "grad_input": [
+              "S",
+              {
+                "terms": {
+                  "O0": 2,
+                  "R0": 1
+                },
+                "offset": 0
+              },
+              {
+                "terms": {
+                  "O1": 2,
+                  "R1": 1
+                },
+                "offset": 0
+              },
+              {
+                "terms": {
+                  "O2": 2,
+                  "R2": 1
+                },
+                "offset": 0
+              }
+            ]
+          },
+          "bounds": {
+            "O0": {
+              "min": 1,
+              "max": 536870911
+            },
+            "O1": {
+              "min": 1,
+              "max": 536870911
+            },
+            "O2": {
+              "min": 1,
+              "max": 536870911
+            },
+            "R0": {
+              "min": 0,
+              "max": 1
+            },
+            "R1": {
+              "min": 0,
+              "max": 1
+            },
+            "R2": {
+              "min": 0,
+              "max": 1
+            },
+            "S": {
+              "min": 1,
+              "max": 536870911
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Disjoint finite FP32 arrays with positive S,O0,O1,O2, remainders R0,R1,R2 each in {0,1}, and int32-representable tensor strides",
+        "Window and stride both (2,2,2), padding zero, floor output shape, average include-padding mode, no divisor override"
+      ],
+      "deviations": [
+        "Specialize the public library configuration to a nonoverlapping two-element window in every spatial axis; tensor dimensions remain dynamic.",
+        "Retain the public reference nslices=S scalar, expose its flattened spatial indexing as contiguous slice/spatial arrays, and serialize the independent-slice parallel_for. The adapter uses cuDNN N=S,C=1.",
+        "Remove min/max clipping and divisor branches using the checked input=2*output+remainder extent relation."
+      ],
+      "validation": {
+        "scalars": {
+          "O0": 2,
+          "O1": 3,
+          "O2": 4,
+          "R0": 1,
+          "R1": 0,
+          "R2": 1,
+          "S": 6
+        },
+        "arrays": {
+          "grad_output": [
+            6,
+            2,
+            3,
+            4
+          ],
+          "grad_input": [
+            6,
+            5,
+            6,
+            9
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -627,6 +627,59 @@ static Value materialize(OpBuilder &b, Location loc, const LinearExpr &e) {
   return b.create<AffineApplyOp>(loc, map, operands);
 }
 
+/// A contiguous flat fill may span several rows of a recovered static shape.
+/// Expand only a zero-based unit-step loop whose entire body is one invariant
+/// store.  Its trip count must cover whole rows.  Lexicographic traversal of
+/// the new loops visits precisely the same flat indices in the same order;
+/// this normalization is valid independently of later delinearization.
+static bool expandStaticFlatFills(ArrayRef<Access> accesses, const Shape &shape,
+                                  DominanceInfo &dom) {
+  if (shape.symbolic || shape.rank() < 2)
+    return false;
+  bool changed = false;
+  for (const Access &access : accesses) {
+    auto store = dyn_cast<AffineStoreOp>(access.op);
+    if (!store || access.terms.size() != 1)
+      continue;
+    const Term &term = access.terms.front();
+    if (term.coeff != 1 || !term.syms.empty() || !term.var)
+      continue;
+    auto loop = getForInductionVarOwner(term.var);
+    if (!loop || store->getBlock() != loop.getBody() ||
+        loop.getBody()->getOperations().size() != 2 ||
+        loop.getNumResults() != 0 || loop.getStep() != 1 ||
+        !loop.hasConstantBounds() || loop.getConstantLowerBound() != 0 ||
+        !dom.properlyDominates(store.getValueToStore(), loop.getOperation()))
+      continue;
+    int64_t count = loop.getConstantUpperBound();
+    int64_t rowStride = shape.cstStrides.front();
+    if (count <= 0 || count % rowStride != 0)
+      continue;
+    SmallVector<int64_t> extents{count / rowStride};
+    for (unsigned k = 1; k < shape.rank(); ++k)
+      extents.push_back(shape.extents[k].cst);
+
+    OpBuilder builder(loop);
+    Location loc = loop.getLoc();
+    SmallVector<Value> indices;
+    for (int64_t extent : extents) {
+      auto nested = builder.create<AffineForOp>(loc, 0, extent);
+      indices.push_back(nested.getInductionVar());
+      builder.setInsertionPointToStart(nested.getBody());
+    }
+    AffineExpr offset = getAffineConstantExpr(0, builder.getContext());
+    for (unsigned k = 0; k < shape.rank(); ++k)
+      offset = offset +
+               getAffineDimExpr(k, builder.getContext()) * shape.cstStrides[k];
+    auto map = AffineMap::get(shape.rank(), 0, offset);
+    builder.create<AffineStoreOp>(loc, store.getValueToStore(),
+                                  store.getMemRef(), map, indices);
+    loop.erase();
+    changed = true;
+  }
+  return changed;
+}
+
 struct DelinearizeMemrefAccessesPass
     : public polygeist::DelinearizeMemrefAccessesBase<
           DelinearizeMemrefAccessesPass> {
@@ -710,6 +763,14 @@ struct DelinearizeMemrefAccessesPass
     if (!shape || shape->rank() < 2)
       return failure();
     unsigned n = shape->rank();
+    // A flat fill otherwise puts its whole induction range in the innermost
+    // axis and prevents the shared view from being recovered.  Normalize it
+    // using the stride chain inferred from the other accesses, then repeat the
+    // ordinary all-access range proof on the new loops.
+    if (expandStaticFlatFills(accesses, *shape, dom)) {
+      dom.invalidate();
+      return delinearize(f, buf, dom);
+    }
 
     // 3 + 4. Split each access and prove every index in range.
     bool multiDim = false;

@@ -1,0 +1,162 @@
+{
+  "numeric_model": "relaxed",
+  "cases": {
+    "reference": {
+      "source": "issues/aten_paper13_followup_20261112/bsr-reference/reference.c",
+      "source_sha256": "c7f6d7d29c02270ac2f26ff3e41805b620f187d85950337ce248a457d3b27386",
+      "raise": {
+        "paths": {
+          "affine": "issues/aten_paper13_followup_20261112/bsr-reference/reference.mlir",
+          "linalg": "issues/aten_paper13_followup_20261112/bsr-reference/reference_linalg.mlir",
+          "debuf": "issues/aten_paper13_followup_20261112/bsr-reference/reference_debuf.mlir"
+        },
+        "cgeist": {
+          "ok": true,
+          "rc": 0,
+          "cmd": [
+            "/home/arjaiswal/Polygeist/build/bin/cgeist",
+            "issues/aten_paper13_followup_20261112/bsr-reference/reference.c",
+            "--function=cusp_bsr_matvec_beta0_f32",
+            "--resource-dir=/usr/lib/clang/14",
+            "-O3",
+            "--no-inline",
+            "--raise-scf-to-affine",
+            "-fPIC",
+            "-S",
+            "-o",
+            "issues/aten_paper13_followup_20261112/bsr-reference/reference.mlir"
+          ],
+          "stderr": "",
+          "timed_out": false,
+          "recovery": null
+        },
+        "raise": {
+          "ok": true,
+          "rc": 0,
+          "cmd": [
+            "/home/arjaiswal/Polygeist/build/bin/polygeist-opt",
+            "--select-func=func-name=cusp_bsr_matvec_beta0_f32 externalize-dependencies=true",
+            "--delinearize-memref-accesses",
+            "--remove-iter-args",
+            "--affine-loop-normalize",
+            "--affine-parallelize",
+            "--raise-affine-to-linalg-pipeline",
+            "issues/aten_paper13_followup_20261112/bsr-reference/reference.mlir",
+            "-o",
+            "issues/aten_paper13_followup_20261112/bsr-reference/reference_linalg.mlir"
+          ],
+          "stderr": "",
+          "timed_out": false,
+          "recovery": null
+        },
+        "debuf": {
+          "ok": true,
+          "rc": 0,
+          "cmd": [
+            "/home/arjaiswal/Polygeist/build/bin/polygeist-opt",
+            "--linalg-debufferize=use-multi-root=true",
+            "issues/aten_paper13_followup_20261112/bsr-reference/reference_linalg.mlir",
+            "-o",
+            "issues/aten_paper13_followup_20261112/bsr-reference/reference_debuf.mlir"
+          ],
+          "stderr": "",
+          "timed_out": false,
+          "recovery": null
+        }
+      },
+      "equations": {
+        "affine": {
+          "ok": false,
+          "error": "Reject: dependence check failed: read of %arg11[v0, v2] at [21, v0, 6, v1, 14, v2, 1, 0] observes an intermediate value (written both before and after)"
+        },
+        "debuf": {
+          "ok": true,
+          "equations": [
+            "%arg11@out[v0, v1] = (0.0 + Sum[r0 in [@%arg3[v0], @%arg3[v0 + 1])](Sum[r1 in [0, p%arg1)]((%arg7@in[r0, v1, r1] * %arg9@in[@%arg5[r0], r1]))))   for v0 >= 0 && p%arg0 - v0 - 1 >= 0 && v1 >= 0 && p%arg1 - v1 - 1 >= 0"
+          ],
+          "array_ranks": {
+            "%arg3": 1,
+            "%arg5": 1,
+            "%arg7": 3,
+            "%arg9": 2,
+            "%arg11": 2
+          }
+        }
+      }
+    },
+    "application": {
+      "source": "/home/arjaiswal/Polygeist/issues/aten_c_kernels/aten_sparse_addmv_bsr_cpu.c",
+      "source_sha256": "36860955c064b37ff657b5b0145ccf92f10e695cbe10a49212cd0edf823e287c",
+      "raise": {
+        "paths": {
+          "affine": "issues/aten_paper13_followup_20261112/bsr-reference/application.mlir",
+          "linalg": "issues/aten_paper13_followup_20261112/bsr-reference/application_linalg.mlir",
+          "debuf": "issues/aten_paper13_followup_20261112/bsr-reference/application_debuf.mlir"
+        },
+        "cgeist": {
+          "ok": true,
+          "rc": 0,
+          "cmd": [
+            "/home/arjaiswal/Polygeist/build/bin/cgeist",
+            "/home/arjaiswal/Polygeist/issues/aten_c_kernels/aten_sparse_addmv_bsr_cpu.c",
+            "--function=aten_sparse_addmv_bsr_cpu",
+            "--resource-dir=/usr/lib/clang/14",
+            "-O3",
+            "--no-inline",
+            "--raise-scf-to-affine",
+            "-fPIC",
+            "-S",
+            "-o",
+            "issues/aten_paper13_followup_20261112/bsr-reference/application.mlir"
+          ],
+          "stderr": "",
+          "timed_out": false,
+          "recovery": null
+        },
+        "raise": {
+          "ok": true,
+          "rc": 0,
+          "cmd": [
+            "/home/arjaiswal/Polygeist/build/bin/polygeist-opt",
+            "--select-func=func-name=aten_sparse_addmv_bsr_cpu externalize-dependencies=true",
+            "--delinearize-memref-accesses",
+            "--remove-iter-args",
+            "--affine-loop-normalize",
+            "--affine-parallelize",
+            "--raise-affine-to-linalg-pipeline",
+            "issues/aten_paper13_followup_20261112/bsr-reference/application.mlir",
+            "-o",
+            "issues/aten_paper13_followup_20261112/bsr-reference/application_linalg.mlir"
+          ],
+          "stderr": "",
+          "timed_out": false,
+          "recovery": null
+        },
+        "debuf": {
+          "ok": true,
+          "rc": 0,
+          "cmd": [
+            "/home/arjaiswal/Polygeist/build/bin/polygeist-opt",
+            "--linalg-debufferize=use-multi-root=true",
+            "issues/aten_paper13_followup_20261112/bsr-reference/application_linalg.mlir",
+            "-o",
+            "issues/aten_paper13_followup_20261112/bsr-reference/application_debuf.mlir"
+          ],
+          "stderr": "",
+          "timed_out": false,
+          "recovery": null
+        }
+      },
+      "equations": {
+        "affine": {
+          "ok": false,
+          "error": "Reject: dependence check failed: read of scratch1[v0, v1] at [13, v0, 2, v1, 18, v2, 0, 0] observes an intermediate value (written both before and after)"
+        },
+        "debuf": {
+          "ok": false,
+          "error": "Reject: dependence check failed: read of scratch2[v0, v1] at [45, v0, 2, v1, 22, v2, 0, 0] observes an intermediate value (written both before and after)"
+        }
+      }
+    }
+  }
+}

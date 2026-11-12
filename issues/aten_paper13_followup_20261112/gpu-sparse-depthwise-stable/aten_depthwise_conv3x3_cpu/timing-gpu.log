@@ -1,0 +1,12 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+SAMPLE path=raised sample=0 ms=2.280966997
+SAMPLE path=native_aten_cuda sample=0 ms=1.964705944
+SAMPLE path=native_aten_cuda sample=1 ms=1.795390129
+SAMPLE path=raised sample=1 ms=2.346343994
+SAMPLE path=raised sample=2 ms=2.288486958
+SAMPLE path=native_aten_cuda sample=2 ms=1.824959040
+SAMPLE path=native_aten_cuda sample=3 ms=1.793438196
+SAMPLE path=raised sample=3 ms=2.327975988
+SAMPLE path=raised sample=4 ms=2.274182796
+SAMPLE path=native_aten_cuda sample=4 ms=1.808189869
+PASS timing

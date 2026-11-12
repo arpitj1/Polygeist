@@ -1,0 +1,87 @@
+{
+  "kernel": "aten_batch_norm",
+  "original_binary_sha256": "09c6162c04149ef4eaaf0744b689367e1dfbd050003f166c96ae96c78aa7b87b",
+  "timing_binary_sha256": "09c6162c04149ef4eaaf0744b689367e1dfbd050003f166c96ae96c78aa7b87b",
+  "original_harness_sha256": "c5a9c5a1bb413cd6284c96ce29ff1bd915193973334e92dc86fd6cd22cf6e33e",
+  "timing_harness_sha256": "c5a9c5a1bb413cd6284c96ce29ff1bd915193973334e92dc86fd6cd22cf6e33e",
+  "frozen_object_sha256": {
+    "work/kernel.o": "6ee27a98b9b3c2bbb02263d4d9c1f3ef79d3637c752e3136fcc4787c3edea189",
+    "work/wrapper.o": "d7cd2e4d7d0b08af474407e0d4c0d9a2c43102a9c74884ea555fe23d2c77a9c0",
+    "objects/timing-harness.o": "47cd23629d3315cbe560a7d424bbab5cffc4f02500e506372e44d0551c0bc7e9",
+    "work/rt.o": "81b27e40726c8448c31a58e560d1806e6077881ab1a1df484cb97767f16571df",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "objects/spec_runtime.o": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "work/thrust_runtime.o": "752165c4ffd4389d8b14e8c5e6c4960e4e71782128c828a47c77cf60239759bf",
+    "objects/reference.o": "3f087f180349b4f945db4cc9f456bfe2e28f4334c86be4d76a0ce3d1ca544d19",
+    "objects/native.o": "bd8b2b40738924dadc6249ca09363059954bb1065e9c2431b223e74e9296382f"
+  },
+  "original_configuration": {
+    "dims": {
+      "B": 11,
+      "C": 46,
+      "H": 92,
+      "W": 92
+    },
+    "args": [
+      [
+        "input",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        false,
+        "normal"
+      ],
+      [
+        "weight",
+        "ptr",
+        "(C)",
+        false,
+        "normal"
+      ],
+      [
+        "mean",
+        "ptr",
+        "(C)",
+        false,
+        "normal"
+      ],
+      [
+        "inv_std",
+        "ptr",
+        "(C)",
+        false,
+        "positive"
+      ],
+      [
+        "bias",
+        "ptr",
+        "(C)",
+        false,
+        "normal"
+      ],
+      [
+        "output",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_batch_norm",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "input": "((float)(i%101)-50.0f)/37.0f",
+      "weight": "((float)(i%101)-50.0f)/37.0f",
+      "mean": "((float)(i%101)-50.0f)/37.0f",
+      "inv_std": "0.25f + (float)(i%101)/101.0f",
+      "bias": "((float)(i%101)-50.0f)/37.0f",
+      "output": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "original_proof_sha256": "a4a0139bc3530be1854a184668d15ca1746e2e4301d536a6169e9dabaf00c015",
+  "timing_samples": 5,
+  "adaptation": "Only the saved harness TIMING_SAMPLES changes to 5; all application, compiler runtime, C reference and native ATen objects are frozen.",
+  "commands": []
+}

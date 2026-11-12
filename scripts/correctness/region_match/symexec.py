@@ -200,6 +200,7 @@ class Program:
     snaps: list = field(default_factory=list)
     tensor_writes: dict = field(default_factory=dict)   # buffer id -> top ops with tensor-level writes
     env: dict = field(default_factory=dict)             # SSA name -> final abstract value
+    region_views: dict = field(default_factory=dict)    # base argument -> proved contiguous SSA view
 
 
 _FLOAT_TYPES = ("f64", "f32", "f16", "bf16")
@@ -601,8 +602,13 @@ class Executor:
         if n == "arith.cmpi":
             m = re.match(r"arith\.cmpi\s+(\w+),\s*(%[\w$.#-]+),\s*(%[\w$.#-]+)", rest)
             kind, a, b = m.group(1), self.get(m.group(2)), self.get(m.group(3))
-            if not (isinstance(a, IdxVal) and isinstance(b, IdxVal)):
-                self.env[res[0]] = Undef()
+            if kind == 'ne' or not (isinstance(a, IdxVal) and isinstance(b, IdxVal)):
+                if isinstance(a, (IdxVal, FVal)) and isinstance(b, (IdxVal, FVal)):
+                    ty = rest.rsplit(':', 1)[1].strip()
+                    self.env[res[0]] = CondF('arith.cmpi:' + ty + ':' + kind,
+                        self.fval(m.group(2)), self.fval(m.group(3)))
+                else:
+                    self.env[res[0]] = Undef()
                 return
             a, b = a.aff, b.aff
             table = {"slt": [lt(a, b)], "ult": [lt(a, b)], "sle": [le(a, b)], "ule": [le(a, b)],
@@ -618,8 +624,10 @@ class Executor:
             a, b = self.get(m.group(1)), self.get(m.group(2))
             if isinstance(a, CondAff) and isinstance(b, CondAff):
                 self.env[res[0]] = CondAff(a.cons + b.cons)
-            elif isinstance(a, IdxVal) and isinstance(b, IdxVal):
-                self.env[res[0]] = Undef()
+            elif isinstance(a, (IdxVal, FVal)) and isinstance(b, (IdxVal, FVal)):
+                ty = rest.rsplit(':', 1)[1].strip()
+                self.env[res[0]] = FVal(EBin(n + ':' + ty,
+                    self.fval(m.group(1)), self.fval(m.group(2))))
             else:
                 self.env[res[0]] = Undef()
             return
@@ -1376,5 +1384,9 @@ def _strip_guards(val: Expr, out_read: ERead, guard: list[Cons]) -> Expr:
 
 
 def execute(func: Func, aliases: dict[str, str], fixed_ints: Optional[dict] = None,
-            launch_outputs=None) -> Program:
-    return Executor(func, aliases, fixed_ints, launch_outputs).run()
+            launch_outputs=None, *, coordinate_views=False) -> Program:
+    program = Executor(func, aliases, fixed_ints, launch_outputs).run()
+    if coordinate_views:
+        from .coordinate_views import normalize_coordinate_views
+        return normalize_coordinate_views(program)
+    return program

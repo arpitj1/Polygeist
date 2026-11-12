@@ -1,0 +1,42 @@
+{
+  "kernel": "aten_nested_all_cpu",
+  "paper_family": "reduction",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper13_followup_20261112/import-validated/aten_nested_all_cpu/aten_nested_all_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_nested_all_cpu.c",
+  "original_source_sha256": "d1eeacb608e823cdbc62e7120195fa4954371387046649addd0649a0f2893620",
+  "shape_record": {
+    "kernel": "aten_nested_all_cpu",
+    "op": "nested_all",
+    "cat": "native_fixture",
+    "dims": {
+      "B": 724,
+      "N": 5793
+    },
+    "n": 4194132,
+    "shape": "B=724_N=5793",
+    "dtype": "i32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "39273232cbbc40e2"
+  },
+  "ranks": [
+    0
+  ],
+  "region": true,
+  "region_budget": 45,
+  "specifications": [
+    "cudnn_conv1d_bias_f32",
+    "cub_ragged_reduce_and_i32"
+  ],
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cubSegmentedPrefixLogicalAnd_i32"
+}

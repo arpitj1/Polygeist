@@ -13,6 +13,24 @@ import aten_paper_shapes as S
 
 
 class PaperShapes(unittest.TestCase):
+    def test_explicit_harness_dimension_alias(self):
+        source = ROOT/'issues/aten_c_kernels/aten_sampled_addmm_sparse_csr_cpu.c'
+        original = source.read_bytes()
+        row = dict(kernel='aten_sampled_addmm_sparse_csr_cpu', dtype='f32',
+                   dims=dict(R=3,K=7,C=11,NNZ=9,N=9),
+                   dimension_aliases={'N':'NNZ'})
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)/'copy.c'
+            S.materialize(source, output, row)
+            self.assertEqual(source.read_bytes(), original)
+            self.assertIn('#define NNZ 9', output.read_text())
+            self.assertNotIn('#define N ', output.read_text())
+            cfg = B.configuration(row['kernel'], row)
+            self.assertEqual(cfg['dims']['N'], cfg['dims']['NNZ'])
+            for aliases in [{'N':'R'}, {'N':'MISSING'}, {'N':'N'}]:
+                with self.assertRaises(ValueError):
+                    S.materialize(source, output, dict(row, dimension_aliases=aliases))
+
     def test_copy_preserves_body_and_original(self):
         original = ROOT/'issues/aten_c_kernels/aten_conv2d.c'
         old = original.read_bytes()

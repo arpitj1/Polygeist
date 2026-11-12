@@ -28,6 +28,19 @@ TORCH = Path(os.environ.get('ATEN_NATIVE_TORCH_ROOT', '/tmp/aten_native_sysroot_
 # Each expression calls real ATen with preallocated outputs and cached base
 # tensors. Any composition/view construction below is included in its timing.
 NATIVE = {
+    # Same real ATen composition as native_exact_region_bench.cpp. Its
+    # preallocated intermediates and bool-to-int output copy are timed.
+    'nested_all_cpu': '''static auto input=t[0].view({B,N});
+      static auto lengths=t[1].view({B,1});
+      static auto columns=at::arange(N,t[1].options()).view({1,N});
+      static auto mask=at::empty({B,N},t[0].options().dtype(at::kBool));
+      static auto nonzero=at::empty_like(mask);
+      static auto selected=at::empty_like(mask);
+      static auto identity=at::ones_like(mask);
+      static auto reduced=at::empty({B},mask.options());
+      at::lt_out(mask,columns,lengths);at::ne_out(nonzero,input,0);
+      at::where_out(selected,mask,nonzero,identity);
+      at::all_out(reduced,selected,1,false);t[2].copy_(reduced,true);''',
     'embedding_bag_counts_cpu': 't[1].copy_(at::bincount(t[0],{},E));',
     # COO construction/coalescing and index conversion remain in the native
     # timing, as does its allocation/copy into the extracted stage's output.
@@ -46,9 +59,23 @@ NATIVE = {
     'sparse_addmv_csr_cpu': '''static auto matrix=at::sparse_csr_tensor(
       t[0],t[1],t[2],{R,C},t[2].options().layout(at::kSparseCsr));
       at::mv_out(t[4],matrix,t[3]);''',
+    # Match sparse_addmv_bsr_exact's public API, long indices, sparse
+    # construction outside timing, and preallocated single-column output.
+    'sparse_addmv_bsr_cpu': '''static auto matrix=at::sparse_bsr_tensor(
+      t[0].to(at::kLong),t[1].to(at::kLong),t[2].view({N,BR,BC}),
+      {R*BR,C*BC},t[2].options().layout(at::kSparseBsr));
+      auto output=t[4].view({R*BR,1});
+      at::mm_out(output,matrix,t[3].view({C*BC,1}));''',
     'sparse_csr_addmm_cpu': '''static auto matrix=at::sparse_csr_tensor(
       t[0],t[1],t[2],{R,K},t[2].options().layout(at::kSparseCsr));
       auto output=t[4].view({R,C});at::mm_out(output,matrix,t[3].view({K,C}));''',
+    # Same public API and preallocated sparse output as the publication's
+    # whole_sampled_addmm_sparse_csr native harness.
+    'sampled_addmm_sparse_csr_cpu': '''static auto self=at::sparse_csr_tensor(
+      t[0],t[1],t[2],{R,C},t[2].options().layout(at::kSparseCsr));
+      static auto output=at::sparse_csr_tensor(
+      t[0],t[1],t[5],{R,C},t[5].options().layout(at::kSparseCsr));
+      at::sparse_sampled_addmm_out(output,self,t[3].view({R,K}),t[4].view({K,C}),s[1],s[0]);''',
     'sparse_matmul_cpu': '''static auto matrix=at::sparse_csr_tensor(
       t[0],t[1],t[2],{R,R},t[2].options().layout(at::kSparseCsr));
       auto output=t[4].view({R,C});at::mm_out(output,matrix,t[3].view({R,C}));''',
@@ -205,6 +232,9 @@ NATIVE = {
     'or_reduce_cpu': 'static auto logical=at::empty({R},t[0].options().dtype(at::kBool)); at::any_out(logical,t[0].view({R,K}),1,false); t[1].copy_(logical);',
     'batch_norm': 'auto out=t[5].view({B,C,H,W}); at::batch_norm_elemt_out(out,t[0].view({B,C,H,W}),t[1],t[4],t[2],t[3],0.0);',
     'batch_norm_transform_cpu': 'auto out=t[5].view({N,C,H,W}); at::batch_norm_elemt_out(out,t[0].view({N,C,H,W}),t[3],t[4],t[1],t[2],0.0);',
+    'depthwise_conv3x3_cpu': '''auto out=t[3].view({B,C,H,W});
+      at::convolution_out(out,t[0].view({B,C,H,W}),t[1].view({C,1,3,3}),
+        t[2],{1,1},{1,1},{1,1},false,{0,0},C);''',
     'dropout_feature_noise_cpu': 'auto out=t[2].view({B,C,H,W}); at::mul_out(out,t[0].view({B,C,H,W}),t[1].view({B,C,1,1})); out.mul_(s[0]);',
     'transform_bias_rescale_qkv_cpu': 'auto input=t[0].view({B,S,3,H,D}); auto bias=t[1].view({3,H,D}); for(int i=0;i<3;i++){auto out=t[i+2].view({B,H,S,D}); at::add_out(out,input.select(2,i).permute({0,2,1,3}),bias.select(0,i).view({1,H,1,D})); if(i==0)out.mul_(s[0]);}',
 }
@@ -239,6 +269,9 @@ def configuration(name, shape_record=None):
     if name == 'aten_nested_sum_dim_cpu':
         width=cfg['dims']['N']
         cfg['integer_array_values']={'len':[-1,0,1,width,width//2,max(0,width-1),2,width//3]}
+    if name == 'aten_nested_all_cpu':
+        width=cfg['dims']['N']
+        cfg['integer_array_values']={'len':[0,1,width,width//2,max(0,width-1),min(2,width),width//3]}
     return cfg
 
 
@@ -438,6 +471,9 @@ def build(name, args):
         row['baseline']='ATen CUDA sum and subtract composition; preallocated outputs'
     if name == 'aten_nested_sum_dim_cpu':
         row['baseline']='ATen CUDA length mask, where and sum composition; preallocated intermediates'
+    if name == 'aten_nested_all_cpu':
+        row['baseline']='ATen CUDA length mask, nonzero, where, all_out and int32 copy; preallocated intermediates, matching historical native_exact_region API scope'
+        row['paper_baseline_input_caveat']='Recovered publication harness has zero x and lengths; historical native_exact_region uses patterned boolean x and lengths N-(b%31). Current raised and native use identical recorded inputs; paper speedup has different native inputs.'
     if name == 'aten_polar_scalarized':
         row['baseline']='ATen CUDA polar_out plus real/imaginary copies to the separate fixture outputs'
     if name == 'aten_standard_gamma_grad_cpu':

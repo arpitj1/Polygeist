@@ -1,0 +1,184 @@
+{
+  "variants": {
+    "enabled": {
+      "kernel": "aten_depthwise_conv3x3_cpu",
+      "run_id": "20261112T203112Z",
+      "binary_sha256": "bb3288cc9a356ed953ec15104150d3ce0666e672ed5d4a201432ea669bd3269d",
+      "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+      "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+      "cudnn_plan_cache": true,
+      "correctness": {
+        "paper": {
+          "rc": 0,
+          "passed": true,
+          "raised_passed": true,
+          "native_passed": true,
+          "raised_matches_native": true,
+          "checks": [
+            {
+              "kind": 0.0,
+              "parameters": 0.0,
+              "resident": 0.0,
+              "count": 8388608.0,
+              "bad": 0.0,
+              "nativebad": 0.0,
+              "nativerefbad": 0.0,
+              "guardbad": 0.0,
+              "inputbad": 0.0,
+              "maxabs": 1.90734863e-06
+            },
+            {
+              "kind": 0.0,
+              "parameters": 0.0,
+              "resident": 1.0,
+              "count": 8388608.0,
+              "bad": 0.0,
+              "nativebad": 0.0,
+              "nativerefbad": 0.0,
+              "guardbad": 0.0,
+              "inputbad": 0.0,
+              "maxabs": 1.90734863e-06
+            }
+          ],
+          "vendor_calls": 2
+        }
+      },
+      "correctness_scope": [
+        "paper"
+      ],
+      "fully_validated": true,
+      "raised_validated": true,
+      "raised_matches_native": true,
+      "native_matches_reference": true,
+      "timing": {
+        "passed": true,
+        "samples": [
+          {
+            "path": "raised",
+            "sample": 0,
+            "ms": 2.145029068
+          },
+          {
+            "path": "native_aten_cuda",
+            "sample": 0,
+            "ms": 1.819198847
+          },
+          {
+            "path": "native_aten_cuda",
+            "sample": 1,
+            "ms": 1.809406996
+          },
+          {
+            "path": "raised",
+            "sample": 1,
+            "ms": 2.164676189
+          },
+          {
+            "path": "raised",
+            "sample": 2,
+            "ms": 2.150820971
+          },
+          {
+            "path": "native_aten_cuda",
+            "sample": 2,
+            "ms": 1.821310997
+          },
+          {
+            "path": "native_aten_cuda",
+            "sample": 3,
+            "ms": 1.799870968
+          },
+          {
+            "path": "raised",
+            "sample": 3,
+            "ms": 2.16458106
+          },
+          {
+            "path": "raised",
+            "sample": 4,
+            "ms": 2.151844978
+          },
+          {
+            "path": "native_aten_cuda",
+            "sample": 4,
+            "ms": 1.798207045
+          }
+        ],
+        "input_kind": "paper",
+        "all_raised_input_modes_passed": true,
+        "normal_input_only_override": false,
+        "native_edge_disagreement": false,
+        "statistic": "minimum of 5 synchronized resident samples after five warmups; alternating order; reset outside timing",
+        "minimum_ms": {
+          "raised": 2.145029068,
+          "native_aten_cuda": 1.798207045
+        },
+        "minimum_first_five_ms": {
+          "raised": 2.145029068,
+          "native_aten_cuda": 1.798207045
+        },
+        "native_over_raised": 0.8383136022844797
+      },
+      "cache_events_from_untimed_correctness": [
+        "miss",
+        "hit"
+      ]
+    },
+    "disabled": {
+      "kernel": "aten_depthwise_conv3x3_cpu",
+      "run_id": "20261112T203129Z",
+      "binary_sha256": "bb3288cc9a356ed953ec15104150d3ce0666e672ed5d4a201432ea669bd3269d",
+      "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+      "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+      "cudnn_plan_cache": false,
+      "correctness": {
+        "paper": {
+          "rc": 0,
+          "passed": true,
+          "raised_passed": true,
+          "native_passed": true,
+          "raised_matches_native": true,
+          "checks": [
+            {
+              "kind": 0.0,
+              "parameters": 0.0,
+              "resident": 0.0,
+              "count": 8388608.0,
+              "bad": 0.0,
+              "nativebad": 0.0,
+              "nativerefbad": 0.0,
+              "guardbad": 0.0,
+              "inputbad": 0.0,
+              "maxabs": 1.90734863e-06
+            },
+            {
+              "kind": 0.0,
+              "parameters": 0.0,
+              "resident": 1.0,
+              "count": 8388608.0,
+              "bad": 0.0,
+              "nativebad": 0.0,
+              "nativerefbad": 0.0,
+              "guardbad": 0.0,
+              "inputbad": 0.0,
+              "maxabs": 1.90734863e-06
+            }
+          ],
+          "vendor_calls": 2
+        }
+      },
+      "correctness_scope": [
+        "paper"
+      ],
+      "fully_validated": true,
+      "raised_validated": true,
+      "raised_matches_native": true,
+      "native_matches_reference": true,
+      "cache_events_from_untimed_correctness": []
+    }
+  },
+  "cache_events_scope": "Untimed correctness process: host then resident calls. No tracing in timed process.",
+  "output_comparison_scope": "Both modes retain all strict original-C, native-ATen, guard and unchanged-input comparisons. Complete cross-variant bit dumps were not collected.",
+  "historical_cache_state": "Previous stable run used no plan-cache opt-in; original evidence retained separately.",
+  "workspace_cache": false
+}

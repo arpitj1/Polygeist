@@ -1,0 +1,41 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+CHECK kind=0 parameters=0 resident=0 count=4282784 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
+CHECK kind=0 parameters=0 resident=1 count=4282784 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
+PASS correctness
+POLYGEIST_GPU_WORKSPACE event=miss bytes=17131136 retained_bytes=17131136 context_id=1
+POLYGEIST_GPU_WORKSPACE event=miss bytes=17131136 retained_bytes=34262272 context_id=1
+POLYGEIST_GPU_WORKSPACE event=miss bytes=17131136 retained_bytes=51393408 context_id=1
+POLYGEIST_GPU_WORKSPACE event=miss bytes=17131136 retained_bytes=68524544 context_id=1
+POLYGEIST_GPU_WORKSPACE event=miss bytes=17131136 retained_bytes=85655680 context_id=1
+POLYGEIST_GPU_WORKSPACE event=miss bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=minus_f32 n=4282784
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_minus_f32 entry=polygeist_thrust_minus_f32 lib_ms=0.802112 h2d_ms=4.665888 d2h_ms=0.004000
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute lib_ms=376.967957 h2d_ms=0.007424 d2h_ms=0.007232
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute lib_ms=0.394848 h2d_ms=0.006464 d2h_ms=0.003840
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_add_f32 entry=cudnnBackendExecute lib_ms=304.874207 h2d_ms=1.999552 d2h_ms=2.126016
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=hit bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=hit bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=hit bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=hit bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=hit bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=hit bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=minus_f32 n=4282784
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_minus_f32 entry=polygeist_thrust_minus_f32 lib_ms=0.331488 h2d_ms=0.010048 d2h_ms=0.003424
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute lib_ms=0.405376 h2d_ms=0.005952 d2h_ms=0.003584
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute lib_ms=0.368608 h2d_ms=0.006048 d2h_ms=0.005824
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_add_f32 entry=cudnnBackendExecute lib_ms=0.376064 h2d_ms=0.007168 d2h_ms=0.005728
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_GPU_WORKSPACE event=release bytes=17131136 retained_bytes=102786816 context_id=1
+POLYGEIST_V2_STATS backend=cuda call=transform_thrust_minus_f32 entry=polygeist_thrust_minus_f32 count=2 lib_ms=1.133600 h2d_ms=4.675936 d2h_ms=0.007424 h2d_bytes=17131136 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute count=4 lib_ms=378.136789 h2d_ms=0.025888 d2h_ms=0.020480 h2d_bytes=0 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=cudnnBackendExecute_aten_add_f32 entry=cudnnBackendExecute count=2 lib_ms=305.250271 h2d_ms=2.006720 d2h_ms=2.131744 h2d_bytes=17131136 d2h_bytes=17131136

@@ -1,0 +1,170 @@
+{
+  "routine": "cusp_bsr_matvec",
+  "source": "NVIDIA AMGX public CUSP bsr_matvec<int,float> and gemv; reference counterpart for the closed-source cuSPARSE API",
+  "upstream_files": [
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/bsr.h",
+      "sha256": "a0047b0aaa77e73ccc7e5e3018883f4464e8e1f86bf2d1bd07b1c63fd180c42d"
+    },
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/dense.h",
+      "sha256": "8f81a89673b8074efdd6cc71acd8b78fd4b036fb51688999084450b232e07f8a"
+    }
+  ],
+  "adaptation": "Instantiate int32/FP32, select the square-block subset, expose capacities and row-major block values and vectors as VLA dimensions, inline gemv, and zero the output before the accumulating public reference. Use the general path for every positive block dimension, including 1. The typed adapter converts vector block counts to scalar element counts.",
+  "specs": [
+    {
+      "name": "cusp_bsr_matvec_beta0_f32",
+      "args": [
+        "block_rows",
+        "block_dim",
+        "row_offset_count",
+        "row_offsets",
+        "column_index_count",
+        "column_indices",
+        "value_block_count",
+        "values",
+        "x_blocks",
+        "x",
+        "y_blocks",
+        "y"
+      ],
+      "target": {
+        "library": "cuSPARSE",
+        "call": "cusparseSpMM",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_bsr_matvec_beta0_f32",
+          "arguments": [
+            "block_rows",
+            "block_dim",
+            "row_offset_count",
+            "row_offsets",
+            "column_index_count",
+            "column_indices",
+            "value_block_count",
+            "values",
+            "x_blocks",
+            "x",
+            "y_blocks",
+            "y"
+          ],
+          "arrays": {
+            "row_offsets": [
+              "row_offset_count"
+            ],
+            "column_indices": [
+              "column_index_count"
+            ],
+            "values": [
+              "value_block_count",
+              "block_dim",
+              "block_dim"
+            ],
+            "x": [
+              "x_blocks",
+              "block_dim"
+            ],
+            "y": [
+              "y_blocks",
+              "block_dim"
+            ]
+          },
+          "bounds": {
+            "block_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "block_dim": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "row_offset_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "column_index_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "value_block_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "x_blocks": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "y_blocks": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Valid zero-based BSR with nondecreasing row offsets and in-bounds block column indices; all capacities cover accessed elements",
+        "Square positive block dimensions; y_blocks covers block_rows and vector element counts fit int32",
+        "Disjoint FP32 value arrays and int32 index arrays; alpha=1, beta=0",
+        "Relaxed finite arithmetic permits the vendor reduction order"
+      ],
+      "deviations": [
+        "Apply the accumulating reference to zero-filled output for beta=0",
+        "Inline the public gemv helper and express contiguous row-major blocks and vectors with explicit VLA dimensions; array addresses and per-output arithmetic order are unchanged",
+        "Omit the optional 1x1 CSR shortcut; the general reference computes the same result"
+      ],
+      "validation": {
+        "scalars": {
+          "block_rows": 3,
+          "block_dim": 2,
+          "row_offset_count": 4,
+          "column_index_count": 5,
+          "value_block_count": 5,
+          "x_blocks": 4,
+          "y_blocks": 4
+        },
+        "arrays": {
+          "row_offsets": [
+            4
+          ],
+          "column_indices": [
+            5
+          ],
+          "values": [
+            5,
+            2,
+            2
+          ],
+          "x": [
+            4,
+            2
+          ],
+          "y": [
+            4,
+            2
+          ]
+        },
+        "array_values": {
+          "row_offsets": [
+            0,
+            2,
+            2,
+            5
+          ],
+          "column_indices": [
+            0,
+            2,
+            3,
+            1,
+            0
+          ]
+        }
+      }
+    }
+  ]
+}

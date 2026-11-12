@@ -1,0 +1,8 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+CHECK kind=0 parameters=0 resident=0 count=262144 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=2.47955322e-05
+CHECK kind=0 parameters=0 resident=1 count=262144 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=2.47955322e-05
+PASS correctness
+[W1112 20:22:25.957447574 SparseCsrTensorImpl.cpp:53] Warning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (function operator())
+POLYGEIST_V2_CALL backend=cuda call=cusparseSDDMM_aten_sampled_addmm_csr_f32 entry=polygeist_cusparse_sddmm_csr_f32_sized lib_ms=10.312192 h2d_ms=6.617248 d2h_ms=0.184096
+POLYGEIST_V2_CALL backend=cuda call=cusparseSDDMM_aten_sampled_addmm_csr_f32 entry=polygeist_cusparse_sddmm_csr_f32_sized lib_ms=8.836032 h2d_ms=0.020352 d2h_ms=0.005152
+POLYGEIST_V2_STATS backend=cuda call=cusparseSDDMM_aten_sampled_addmm_csr_f32 entry=polygeist_cusparse_sddmm_csr_f32_sized count=2 lib_ms=19.148224 h2d_ms=6.637600 d2h_ms=0.189248 h2d_bytes=19939332 d2h_bytes=1048576

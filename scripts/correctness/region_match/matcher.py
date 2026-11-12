@@ -196,13 +196,15 @@ def _load_one(spec_dir, man, routine, dims, entry, log):
     return spec
 
 
-def _load_specs_uncached(spec_dir: str, log=None) -> list[Spec]:
+def _load_specs_uncached(spec_dir: str, log=None, allowed_specs=None) -> list[Spec]:
     from .compose import signature
     specs = []
     for mpath in sorted(glob.glob(os.path.join(spec_dir, "manifest", "*.json"))):
         man = json.load(open(mpath))
         routine = man.get("routine", os.path.basename(mpath)[:-5])
         for entry in man.get("specs", []):
+            if allowed_specs is not None and entry['name'] not in allowed_specs:
+                continue
             reference = entry.get("ref_c", man.get("ref_c", f"{routine}.c"))
             dims = _c_prototype_dims(os.path.join(spec_dir, "ref_c", reference))
             sp = _load_one(spec_dir, man, routine, dims, entry, log)
@@ -247,12 +249,14 @@ def cache_dir() -> str:
                           os.path.join(os.path.expanduser("~"), ".cache", "polygeist_region_match"))
 
 
-def load_specs(spec_dir: str, log=None, use_cache: Optional[bool] = None) -> list[Spec]:
+def load_specs(spec_dir: str, log=None, use_cache: Optional[bool] = None, allowed_specs=None) -> list[Spec]:
     """Parsed specification systems.  Memoised per process and cached on disk
     (pickle keyed by `_cache_key`; any change to a raised spec file, manifest,
     C reference or matcher source invalidates it).  REGION_MATCH_NO_CACHE=1
     disables the disk cache."""
     ck = _cache_key(spec_dir)
+    if allowed_specs is not None:
+        ck = hashlib.sha256((ck + json.dumps(sorted(allowed_specs))).encode()).hexdigest()
     key = (os.path.abspath(spec_dir), ck)
     if key in _SPEC_CACHE:
         return _SPEC_CACHE[key]
@@ -274,7 +278,7 @@ def load_specs(spec_dir: str, log=None, use_cache: Optional[bool] = None) -> lis
         except (OSError, EOFError, pickle.PickleError, AttributeError, ImportError):
             pass
     logs: list[str] = []
-    specs = _load_specs_uncached(spec_dir, logs.append)
+    specs = _load_specs_uncached(spec_dir, logs.append, allowed_specs)
     if log:
         for m in logs:
             log(m)
@@ -417,6 +421,18 @@ def _affine_guards(f: F) -> list[Cons]:
                       x.cond[1] if isinstance(x, FSel) and x.cond[0] == 'aff' else ())]
 
 
+def _candidate_bounds(domain):
+    # Canonicalization turns a singleton range into an equality. Its two
+    # implied inequalities still carry the extent information needed during
+    # binding search. These are candidates only; retain the original domain
+    # for the later coverage/equivalence proof.
+    for constraint in domain:
+        yield constraint
+        if constraint.kind == 'eq':
+            yield ge(constraint.aff)
+            yield ge(constraint.aff.scale(-1))
+
+
 def _derived_param_values(app: System, spec: System, out_map: dict, s_outs: list, operm,
                           s_params: list, a_params: list) -> dict[str, list[Aff]]:
     """Spec size parameter -> application values it can stand for, read off
@@ -429,13 +445,15 @@ def _derived_param_values(app: System, spec: System, out_map: dict, s_outs: list
     proved by compare_systems."""
     out: dict[str, list[Aff]] = {}
     plain = {Aff.var(a) for a in a_params}
+    all_pairs = []
     for s_out, perm in zip(s_outs, operm):
         rank = spec.arrays[s_out].rank
         vren = {f"v{k}": Aff.var(f"v{perm[k]}") for k in range(rank)}
         s_eqs = [e for e in spec.equations if e.arr == s_out]
         a_eqs = [e for e in app.equations if e.arr == out_map[s_out]]
         pairs = [(cs.aff.subst(vren), ca.aff)
-                 for es in s_eqs for cs in es.domain for ea in a_eqs for ca in ea.domain
+                 for es in s_eqs for cs in _candidate_bounds(es.domain)
+                 for ea in a_eqs for ca in _candidate_bounds(ea.domain)
                  if cs.kind == ca.kind]
         for es in s_eqs:
             sb = _sum_bounds(es.formula)
@@ -451,10 +469,32 @@ def _derived_param_values(app: System, spec: System, out_map: dict, s_outs: list
                           for cs in _affine_guards(es.formula)
                           for ca in _affine_guards(ea.formula)
                           if cs.kind == ca.kind]
+        all_pairs.extend(pairs)
         for sa, aa in pairs:
             r = _solve_param(sa, aa, s_params)
             if r and r[1] not in plain and r[1] not in out.setdefault(r[0], []):
                 out[r[0]].append(r[1])
+    # An extent may occur only in a coupled bound, e.g. L-K+1. First infer
+    # K from a reduction range, then solve the affine relation for L. These
+    # are candidates only: domain coverage, typed ABI bounds, and EqSat still
+    # verify the full binding. Never repeatedly expand already-known choices.
+    for _ in s_params:
+        missing = [p for p in s_params if not out.get(p)]
+        added = False
+        for p in missing:
+            for sa, aa in all_pairs:
+                others = sorted((sa.vars() & set(s_params)) - {p})
+                if not sa.coeff(p) or not others:
+                    continue
+                values = [out.get(q, []) + list(plain) for q in others]
+                if any(not v for v in values):
+                    continue
+                for combo in itertools.islice(itertools.product(*values), 256):
+                    solved = _solve_param(sa.subst(dict(zip(others, combo))), aa, [p])
+                    if solved and solved[1] not in plain and solved[1] not in out.setdefault(p, []):
+                        out[p].append(solved[1]); added = True
+        if not added:
+            break
     return out
 
 
@@ -656,7 +696,7 @@ def _fold_zero(f: F) -> F:
             return ZERO
         return FSum(f.var, f.lo, f.hi, body)
     if isinstance(f, FLast):
-        return FLast(f.var, f.lo, f.hi, f.guard,
+        return type(f)(f.var, f.lo, f.hi, f.guard,
                      _fold_zero(f.body), _fold_zero(f.default))
     return f
 
@@ -1106,6 +1146,9 @@ class _Emit:
         self.lines: list[str] = []
         self.n = 0
         self.app_args = dict(prog.func.args)
+        self.region_views = getattr(prog, 'region_views', {})
+        for base, view in self.region_views.items():
+            self.app_args[base] = view['type']
         self.md: dict[str, str] = {}
         self.consts: dict = {}
         self.operand: dict[str, str] = {}      # app array -> memref operand
@@ -1130,8 +1173,23 @@ class _Emit:
         are passed as bufferization.to_memref of the current tensor."""
         for a, cur in sorted(plan.items()):
             if cur is None:
-                self.operand[a] = a
+                view = self.region_views.get(a, {})
+                if view.get('generated'):
+                    count = self.dimension(a, 0)
+                    width = self.const(view['inner_extent'], 'index')
+                    rows = self.fresh('rows')
+                    self.lines.append(f'{rows} = arith.divui {count}, {width} : index')
+                    value = self.fresh('view')
+                    k = view['inner_extent']
+                    self.lines.append(f'{value} = memref.reinterpret_cast {a} to '
+                                      f'offset: [0], sizes: [{rows}, {k}], strides: [{k}, 1]'
+                                      f' : {view["base_type"]} to {view["type"]}')
+                    self.operand[a] = value
+                else:
+                    self.operand[a] = view.get('ssa', a)
                 continue
+            if a in self.region_views:
+                raise Reject('coordinate view requires a synchronized memory operand')
             ty = self.app_args.get(a)
             m = self.fresh("cur")
             self.lines.append(f"{m} = bufferization.to_memref {cur} : {ty}")
@@ -1145,6 +1203,16 @@ class _Emit:
 
     def mem(self, a: str) -> str:
         return self.operand.get(a, a)
+
+    def dimension(self, a: str, k: int, logical=False) -> str:
+        view = self.region_views.get(a)
+        source = a if view and not logical else self.mem(a)
+        ty = view['base_type'] if view and not logical else self.app_args.get(a)
+        if ty is None or not 0 <= k < _rank(ty):
+            raise Reject(f'invalid dimension {k} of {a}')
+        value = self.fresh('dim')
+        self.lines.append(f'{value} = memref.dim {source}, {self.const(k, "index")} : {ty}')
+        return value
 
     def metadata(self, a: str) -> tuple[str, int]:
         ty = self.app_args.get(a)
@@ -1211,11 +1279,9 @@ def _materialise_aff(E: _Emit, a: Aff, ty: str, cname: str) -> str:
             raise Reject(f"{cname} is a value loaded from memory ({_fmt_param(a)}); "
                          "not materialised for a launch")
         src = E.prog.params.get(k, k)
-        md = re.fullmatch(r"dim\((%[\w$.#-]+),(\d+)\)", src)
+        md = re.fullmatch(r"(viewdim|dim)\((%[\w$.#-]+),(\d+)\)", src)
         if md:
-            x = E.fresh("dim")
-            E.lines.append(f"{x} = memref.dim {E.mem(md.group(1))}, {E.const(int(md.group(2)), 'index')}"
-                           f" : {E.app_args.get(md.group(1))}")
+            x = E.dimension(md.group(2), int(md.group(3)), md.group(1) == 'viewdim')
         else:
             aty = E.app_args.get(src)
             if aty is None:
@@ -1315,12 +1381,10 @@ def _launch(E: _Emit, spec: _LaunchSpec, b: Binding, ignore_perms: bool = False)
         if pv in b.params:
             app_pv = b.params[pv]
             src = prog.params.get(app_pv, app_pv)
-            md = re.fullmatch(r"dim\((%[\w$.#-]+),(\d+)\)", src)
+            md = re.fullmatch(r"(viewdim|dim)\((%[\w$.#-]+),(\d+)\)", src)
             aty = app_args.get(src)
             if md:
-                d = E.fresh("dim")
-                E.lines.append(f"{d} = memref.dim {E.mem(md.group(1))}, {E.const(int(md.group(2)), 'index')}"
-                               f" : {app_args.get(md.group(1))}")
+                d = E.dimension(md.group(2), int(md.group(3)), md.group(1) == 'viewdim')
                 nm = d
                 if ty != "index":
                     nm = E.fresh(re.sub(r"\W", "", cname))
@@ -1968,6 +2032,10 @@ def match_function(text: str, prog: Program, specs: list[Spec], log=None, stats=
         norm_ms = (time.perf_counter() - t0) * 1000
         if not app.equations:
             continue
+        if any(view['defined_at'] >= lo
+               for view in getattr(prog, 'region_views', {}).values()):
+            rejections.append(f"window {lo}-{end}: coordinate view does not dominate replacement")
+            continue
         remat = _rematerialise(prog, lo, end, live, set(app.outputs)) if live else []
         if remat is None:
             continue
@@ -2159,9 +2227,7 @@ def _launch_output_resolver(specs: list[Spec], spec_dir: str):
 
 def match_text(mlir_text: str, spec_dir: str, log=None, stats=None,
                allowed_specs=None) -> list[RegionMatch]:
-    specs = load_specs(spec_dir, log)
-    if allowed_specs is not None:
-        specs = [s for s in specs if s.name in allowed_specs]
+    specs = load_specs(spec_dir, log, allowed_specs=allowed_specs)
     if not specs:
         return []
     funcs, aliases = parse_module(mlir_text)
@@ -2171,7 +2237,7 @@ def match_text(mlir_text: str, spec_dir: str, log=None, stats=None,
         if not f.body:
             continue
         try:
-            prog = execute(f, aliases, None, resolver)
+            prog = execute(f, aliases, None, resolver, coordinate_views=True)
         except (Unsupported, Exception) as ex:  # noqa: BLE001
             if log:
                 log(f"{f.name}: not analysable ({type(ex).__name__}: {ex})")

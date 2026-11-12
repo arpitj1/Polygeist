@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .affine import Aff, Cons
-from .equations import (Equation, F, FBin, FConst, FIndex, FLast, FParam, FRead, FSel, FSum, FUn, Reject,
+from .equations import (Equation, F, FAcc, FBin, FConst, FIndex, FLast, FParam, FRead, FSel, FSum, FUn, Reject,
                         System, _freshen, canonicalize, fsubst, fwalk)
 
 P1, P2 = "a:", "b:"
@@ -166,7 +166,7 @@ class Composite:
                 return FRead(arrs.get(x.arr, x.arr), x.ver, [a.subst(m) for a in x.idx])
             if isinstance(x, FParam):
                 return FParam(fps.get(x.name, x.name))
-            if isinstance(x, FConst):
+            if isinstance(x, (FConst, FAcc)):
                 return x
             if isinstance(x, FBin):
                 return FBin(x.op, go(x.a), go(x.b))
@@ -181,7 +181,7 @@ class Composite:
             if isinstance(x, FSum):
                 return FSum(x.var, x.lo.subst(m), x.hi.subst(m), go(x.body))
             if isinstance(x, FLast):
-                return FLast(x.var, x.lo.subst(m), x.hi.subst(m),
+                return type(x)(x.var, x.lo.subst(m), x.hi.subst(m),
                              [c.subst(m) for c in x.guard], go(x.body), go(x.default))
             if isinstance(x, FIndex):
                 return FIndex(x.value.subst(m))
@@ -233,7 +233,7 @@ class Composite:
             if isinstance(x, FSum):
                 return FSum(x.var, x.lo, x.hi, subst_links(x.body))
             if isinstance(x, FLast):
-                return FLast(x.var, x.lo, x.hi, x.guard,
+                return type(x)(x.var, x.lo, x.hi, x.guard,
                              subst_links(x.body), subst_links(x.default))
             if isinstance(x, FIndex):
                 return x
