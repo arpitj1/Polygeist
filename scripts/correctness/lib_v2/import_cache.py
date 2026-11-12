@@ -51,7 +51,7 @@ def shared_libraries(path):
 
 class ValidatedImports:
     def __init__(self, builder, recipe):
-        import e2e_v2 as E
+        import reference_execution as E
         self.B, self.recipe, self.E = builder, recipe, E
         self.common = self.common_inputs()
         location = digest(str(builder.LIB.resolve()))[:16]
@@ -62,8 +62,7 @@ class ValidatedImports:
         here = Path(__file__).resolve().parent
         paths = [here / name for name in (
             'import_cache.py', 'build_lib_v2.py', 'spec_provenance.py', 'recipe.py',
-            'validate_specs.py', 'e2e_v2.py', 'mlir_lite.py', 'legalize_tensor_submaps.py')]
-        paths.append(here.parent / 'generate_polybench_harness.py')
+            'validate_specs.py', 'reference_execution.py', 'mlir_lite.py', 'legalize_tensor_submaps.py')]
         tools = [B.R.CGEIST, B.R.POLYGEIST_OPT, E.CLANG, E.MLIR_OPT,
                  E.MLIR_TRANSLATE, sys.executable,
                  E.MLIR_LIBDIR / 'libmlir_c_runner_utils.so']
@@ -97,8 +96,8 @@ class ValidatedImports:
         if manifest.get('upstream'):
             upstreams.append(manifest['upstream'])
         for upstream in upstreams:
-            path = (self.B.REPO / upstream['path']).resolve()
-            if not path.is_relative_to(self.B.REPO) or P.file_hash(path) != upstream['sha256']:
+            path = P.input_path(upstream['path'])
+            if P.file_hash(path) != upstream['sha256']:
                 raise ValueError(f'upstream reference changed: {spec.name}')
             sources.append(path)
         wrapper = f'#define NETLIB_SPEC {spec.name}\n'

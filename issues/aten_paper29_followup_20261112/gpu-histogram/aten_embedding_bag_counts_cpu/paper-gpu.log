@@ -1,7 +1,0 @@
-NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
-CHECK kind=0 parameters=0 resident=0 count=65536 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-CHECK kind=0 parameters=0 resident=1 count=65536 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-PASS correctness
-POLYGEIST_V2_CALL backend=cuda call=DeviceHistogramEven_cub_histogram_even_i32 entry=polygeist_cub_histogram_even_i32 lib_ms=9.722304 h2d_ms=13.619648 d2h_ms=0.103328
-POLYGEIST_V2_CALL backend=cuda call=DeviceHistogramEven_cub_histogram_even_i32 entry=polygeist_cub_histogram_even_i32 lib_ms=3.488288 h2d_ms=0.015104 d2h_ms=0.003488
-POLYGEIST_V2_STATS backend=cuda call=DeviceHistogramEven_cub_histogram_even_i32 entry=polygeist_cub_histogram_even_i32 count=2 lib_ms=13.210592 h2d_ms=13.634752 d2h_ms=0.106816 h2d_bytes=67371008 d2h_bytes=262144

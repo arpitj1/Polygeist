@@ -386,7 +386,7 @@ $AARCH64_CC -O3 -I$CUDA/include -I$CUDNN_INC "${RT_EXTRA_CFLAGS[@]}" \
   -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
   --fmad=false --ftz=false --prec-div=true \
   -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
-  -I"$RT/../third_party/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
+  -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
   -c "$RT/polygeist_thrust_rt.cu" -o "$WORK/thrust_runtime.o"
 HARNESS_OBJS=()
 for item in "${HARNESS[@]}"; do

@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_cumprod_cpu,scan,recognized,2,0,,1,thrust_fill_f32,1,1,True,cubSegmentedInclusiveProduct2D_f32_tensor,not_run,not_run

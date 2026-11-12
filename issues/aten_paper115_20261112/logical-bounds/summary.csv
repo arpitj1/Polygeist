@@ -1,8 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_and_reduce_cpu,reduction,recognized,2,0,,1,cub_reduce_and_i32,0,1,True,cubSegmentedLogicalAnd_i32_memref,not_run,not_run
-aten_batch_norm,normalization,recognized,1,0,,1,"thrust_minus_f32,aten_mul_f32,aten_mul_f32,aten_add_f32",0,0,True,cudnnBatchNormalizationForwardInference,not_run,not_run
-aten_batch_norm_transform_cpu,normalization,recognized,1,0,,1,"thrust_minus_f32,aten_mul_f32,aten_mul_f32,aten_add_f32",0,0,True,cudnnBatchNormalizationForwardInference,not_run,not_run
-aten_dropout_feature_noise_cpu,dropout,recognized,1,0,,1,"aten_mul_f32,thrust_multiplies_scalar_left_f32",0,0,True,cudnnFeatureMaskScale_f32_tensor,not_run,not_run
-aten_or_reduce_cpu,reduction,recognized,2,0,,1,cub_reduce_or_i32,0,1,True,cubSegmentedLogicalOr_i32,not_run,not_run
-aten_sparse_norm_cpu,euclidean_norm,recognized,1,0,,1,"aten_mul_f32,cub_reduce_value_sum_f32",0,0,True,cublasSnrm2_f32_memref,not_run,not_run
-aten_transform_bias_rescale_qkv_cpu,qkv_transform,recognized,3,0,,1,"aten_add_f32,thrust_multiplies_scalar_left_f32,aten_add_f32,aten_add_f32",0,6,True,cudnnTransformBiasRescaleQKV_f32_memref,not_run,not_run

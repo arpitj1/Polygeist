@@ -4,13 +4,14 @@ the sequential loop and seed-prefix array construction come from the header.
 Parallel DeviceSegmentedReduce execution is checked separately on the GPU.
 """
 import argparse
+import os
 from pathlib import Path
 import subprocess
 ROOT=Path(__file__).resolve().parents[2]
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
-source=(ROOT/'third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh').read_text()
+source=(Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh').read_text()
 def body(marker):
  start=source.index('{',source.rindex(marker));depth=1;end=start+1
  while depth:
@@ -44,6 +45,6 @@ for routine,entry,flags in [('cub_column_sum','reference',[]),('thrust_arithmeti
  ['-DSCALAR=int','-DLEFT_SCALAR=0','-DRIGHT_SCALAR=1','-DTHRUST_OPERATION=1'])]:
  subprocess.run(['gcc','-O0','-DNETLIB_SPEC='+entry,*flags,'-c',
  str(ROOT/'generic_solver/lib_v3/ref_c'/ (routine+'.c')),'-o',str(out/(entry+'.o'))],check=True)
-subprocess.run(['g++','-O0','-std=c++17','-I'+str(ROOT/'third_party/cuda_headers/cuda_cccl/include/cccl'),
+subprocess.run(['g++','-O0','-std=c++17','-I'+str(Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'cuda_headers/cuda_cccl/include/cccl'),
  str(out/'check.cpp'),str(out/'reference.o'),str(out/'subtract_reference.o'),'-o',str(out/'check')],check=True)
 subprocess.run([str(out/'check')],check=True)

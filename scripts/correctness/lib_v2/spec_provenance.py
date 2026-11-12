@@ -7,10 +7,38 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def dependency_root():
+    return Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT / 'third_party')).resolve()
+
+
+def input_path(name):
+    """Resolve a manifest input against the configured source dependency root."""
+    name = Path(name)
+    if name.is_absolute() or '..' in name.parts:
+        raise ValueError('reference input must be a relative repository path')
+    if name.parts and name.parts[0] == 'third_party':
+        root = dependency_root()
+        path = (root / Path(*name.parts[1:])).resolve()
+    else:
+        root = ROOT
+        path = (root / name).resolve()
+    if not path.is_relative_to(root):
+        raise ValueError('reference input escapes its configured root')
+    return path
+
+
+def input_name(path):
+    path = Path(path).resolve()
+    if path.is_relative_to(ROOT):
+        return str(path.relative_to(ROOT))
+    return str(Path('third_party') / path.relative_to(dependency_root()))
 
 
 @lru_cache(maxsize=128)
@@ -29,13 +57,16 @@ def file_hash(path):
 
 
 def record(paths):
-    return {str(Path(p).resolve().relative_to(ROOT)): file_hash(p) for p in paths}
+    return {input_name(p): file_hash(p) for p in paths}
 
 
 def check(files):
     for name, expected in files.items():
-        path = (ROOT / name).resolve()
-        if not path.is_relative_to(ROOT) or not path.is_file() or file_hash(path) != expected:
+        try:
+            path = input_path(name)
+        except ValueError:
+            return f'invalid import input path: {name}'
+        if not path.is_file() or file_hash(path) != expected:
             return f'import input or artifact changed: {name}'
     return None
 
@@ -44,7 +75,7 @@ def write(path, specs, results, recipe, library, compiler_paths):
     here = Path(__file__).resolve().parent
     common = record([here / name for name in (
         'recipe.py', 'build_lib_v2.py', 'validate_specs.py', 'spec_provenance.py',
-        'e2e_v2.py', 'legalize_tensor_submaps.py', 'mlir_lite.py', 'import_cache.py')]
+        'reference_execution.py', 'legalize_tensor_submaps.py', 'mlir_lite.py', 'import_cache.py')]
                     + list(compiler_paths))
     rows = {}
     by_name = {r['spec']: r for r in results}
@@ -58,8 +89,8 @@ def write(path, specs, results, recipe, library, compiler_paths):
         if manifest.get('upstream'):
             upstreams.append(manifest['upstream'])
         for upstream in upstreams:
-            source = (ROOT / upstream['path']).resolve()
-            if not source.is_relative_to(ROOT) or file_hash(source) != upstream['sha256']:
+            source = input_path(upstream['path'])
+            if file_hash(source) != upstream['sha256']:
                 raise ValueError(f'upstream reference changed: {spec.name}')
             inputs.append(source)
         rows[spec.name] = dict(

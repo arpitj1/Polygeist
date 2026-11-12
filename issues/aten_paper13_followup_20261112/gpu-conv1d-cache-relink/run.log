@@ -1,7 +1,0 @@
-aten_conv1d paper True
-GPU validated 1 / 1
-CACHE True strict True events ['miss', 'hit'] timing {'raised': 5.793699026, 'native_aten_cuda': 5.505470037}
-aten_conv1d paper True
-GPU validated 1 / 1
-CACHE False strict True events [] timing None
-COMPARISON {"kernel": "aten_conv1d", "fully_validated": true, "paper": {"id": "113", "kernel": "aten_conv1d", "native_us": "5172.288", "raised_us": "4714.207993", "raised_over_native": "0.9114357114298354", "speedup_percent": "9.717008831179918", "semantic_family": "convolution", "raised_library": "cuDNN", "raised_call": "cudnnConvolution1D_f32_bias", "timing_source": "current Section 4.2 campaign", "timing_protocol": "minimum of 5 after 5 warmups"}, "actual_samples": 5, "baseline_scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs", "binary_sha256": "7de3e9d2b51b8622673d307e30b0d8d5f6f78df373a1e126665f0746936d9f88", "cudnn_plan_cache": true, "selected_statistic": "minimum_first_five_ms", "cache_disabled_correctness_passed": true, "raised_ms": 5.793699026, "native_ms": 5.505470037, "current_native_over_raised": 0.9502513009898282, "raised_over_paper": 1.2289867215453596, "timing_statistic_matches_paper": true, "previous_uncached_raised_ms": 5.805764198, "previous_over_current": 1.0020824644058755}

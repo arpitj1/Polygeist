@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_nansum_cpu,nan_ignoring_reduction,recognized,2,0,,0,aten_nansum_ordered_f32,0,0,True,cubSegmentedNanSum_f32_memref,not_run,not_run

@@ -9,7 +9,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT/'scripts/correctness'), str(ROOT/'scripts/correctness/lib_v2')]
 import abi_v2 as A
-import e2e_v2 as E
+import reference_execution as E
 import lower_v2 as L
 
 

@@ -1,7 +1,0 @@
-NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
-CHECK kind=0 parameters=0 resident=0 count=4302592 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-CHECK kind=0 parameters=0 resident=1 count=4302592 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-PASS correctness
-POLYGEIST_V2_CALL backend=cuda call=cublasScopy entry=cublasScopy_v2 lib_ms=1.214624 h2d_ms=4.678336 d2h_ms=0.001024
-POLYGEIST_V2_CALL backend=cuda call=cublasScopy entry=cublasScopy_v2 lib_ms=0.333600 h2d_ms=0.007552 d2h_ms=0.001024
-POLYGEIST_V2_STATS backend=cuda call=cublasScopy entry=cublasScopy_v2 count=2 lib_ms=1.548224 h2d_ms=4.685888 d2h_ms=0.002048 h2d_bytes=17210368 d2h_bytes=0

@@ -34,7 +34,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 import recipe as R  # noqa: E402
-import e2e_v2 as E  # noqa: E402
+import reference_execution as E  # noqa: E402
 import mlir_lite as ML  # noqa: E402
 
 REPO = R.REPO

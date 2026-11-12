@@ -11,7 +11,7 @@ parser.add_argument('--output',type=Path,required=True)
 parser.add_argument('--torch-include',type=Path,default=Path(os.environ.get(
     'ATEN_NATIVE_TORCH_ROOT','/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch'))/'include')
 args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=True)
-source=(ROOT/'third_party/pytorch/aten/src/ATen/native/cuda/ComplexKernel.cu').read_text()
+source=(Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'pytorch/aten/src/ATen/native/cuda/ComplexKernel.cu').read_text()
 body=re.findall(r'return c10::complex<scalar_t>\(a \* std::cos\(b\), a \* std::sin\(b\)\);',source)
 assert len(body)==1
 header='''#include <c10/util/complex.h>

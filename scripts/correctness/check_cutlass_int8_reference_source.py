@@ -1,5 +1,6 @@
 """Compare the raised int8 reference with public CUTLASS host compute_gemm."""
 import argparse
+import os
 from pathlib import Path
 import subprocess
 ROOT=Path(__file__).resolve().parents[2]
@@ -14,7 +15,7 @@ subprocess.run(['gcc','-O0','-DNETLIB_SPEC=reference','-c',
 # The pinned CUTLASS header redeclares TensorView as an identically named alias;
 # GCC needs -fpermissive for this upstream declaration. No header is modified.
 subprocess.run(['g++','-std=c++17','-fpermissive','-O0',
- '-I'+str(ROOT/'third_party/cutlass/include'),
- '-I'+str(ROOT/'third_party/cutlass/tools/util/include'),'-I'+str(a.cuda_include),
+ '-I'+str(Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'cutlass/include'),
+ '-I'+str(Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'cutlass/tools/util/include'),'-I'+str(a.cuda_include),
  str(out/'check.cpp'),str(out/'reference.o'),'-o',str(out/'check')],check=True)
 subprocess.run([str(out/'check')],check=True)

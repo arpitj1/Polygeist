@@ -27,12 +27,16 @@ sys.path.insert(0, str(CORR))
 
 import recipe as R  # noqa: E402
 
-OUT_ROOT = REPO / "issues/lib_v2/tests"
+OUT_ROOT = REPO / "build/lib_v2-tests"
+BENCHMARKS = Path(os.environ["POLYGEIST_BENCHMARK_ROOT"]) if os.environ.get("POLYGEIST_BENCHMARK_ROOT") else REPO.parent/"LoopLibrarian-Benchmarks"
+LEGACY = BENCHMARKS / "scripts/legacy/lib_v2"
+sys.path.insert(0, str(LEGACY))
+sys.path.insert(0, str(BENCHMARKS / "scripts/correctness"))
 CASES = HERE / "cases"
 SPEC_DIR = REPO / "generic_solver/lib_v2"
 LIB = REPO / "generic_solver/kernel_library_v2.mlir"
-PB_MANIFEST = REPO / "issues/polybench_section42/manifest.csv"
-PB_UTIL = REPO / "tools/cgeist/Test/polybench/utilities"
+PB_MANIFEST = BENCHMARKS / "results/archive/issues/polybench_section42/manifest.csv"
+PB_UTIL = BENCHMARKS / "polybench/sources/utilities"
 PY = "/usr/bin/python3"
 
 # The 12 PolyBench kernels lib_v2 currently matches (issues/lib_v2/REPORT.md).

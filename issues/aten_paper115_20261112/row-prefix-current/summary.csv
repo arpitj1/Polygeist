@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_nested_sum_dim_cpu,reduction,recognized,0,2,,0,cub_ordered_row_prefix_sum_f32,0,0,True,cubSegmentedPrefixSum_f32,not_run,not_run

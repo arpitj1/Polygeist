@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_adaptive_avg_pool2d,adaptive_pooling,recognized,2,0,,2,cub_ordered_rows_scaled_sum_f32,0,0,True,cudnnAvgPoolWindow_f32,not_run,not_run

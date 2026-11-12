@@ -346,7 +346,7 @@ def ref_objects(app_src: Path, fn: str, cflags: list[str], polybench: bool, d: P
 
 
 def lower_matched(inp: Path, d: Path, tag: str, fn: str, log: Path) -> Path | None:
-    import e2e_v2 as E  # read-only reuse of the lib_v2 lowering
+    import reference_execution as E  # read-only reuse of the lib_v2 lowering
     if "kernel.launch" in inp.read_text():
         inl = d / f"{tag}_inlined.mlir"
         if sh(["polygeist-opt", "--lower-kernel-launch", inp, "-o", inl], log):

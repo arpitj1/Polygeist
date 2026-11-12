@@ -1,5 +1,6 @@
 """Execute the pinned ATen reduction operator against its imported C reference."""
 import argparse
+import os
 from pathlib import Path
 import subprocess
 
@@ -9,7 +10,7 @@ parser.add_argument('--output', type=Path, required=True)
 args = parser.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=True)
-source = (ROOT/'third_party/pytorch/aten/src/ATen/native/SharedReduceOps.h').read_text()
+source = (Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'pytorch/aten/src/ATen/native/SharedReduceOps.h').read_text()
 start = source.index('template <typename acc_t, typename data_t>\nstruct NanSumOps')
 end = source.index('\n};', start) + 3
 operator = source[start:end]

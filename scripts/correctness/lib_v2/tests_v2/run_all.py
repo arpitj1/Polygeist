@@ -82,7 +82,7 @@ def polybench_raised(kernels: list[str], j: int) -> dict[str, dict]:
         log(f"raising {len(todo)} PolyBench kernels (fresh, lib_v2 recipe)")
         res = C.pmap(lambda k: C.raise_polybench(k, WORK / "polybench_raised" / k), todo, j)
         for k, r in zip(todo, res):
-            stored = C.REPO / "issues/lib_v2/polybench_raised" / k / "debuf.mlir"
+            stored = C.BENCHMARKS / "results/archive/issues/lib_v2/polybench_raised" / k / "debuf.mlir"
             if r["ok"] and stored.exists():
                 r["same_as_issues_lib_v2_polybench_raised"] = (
                     Path(r["paths"]["debuf"]).read_bytes() == stored.read_bytes())
@@ -453,7 +453,7 @@ def _swap_first_same_type_operands(text: str) -> str | None:
 
 def run_e2e_large(kernels: list[str], d: Path, j: int) -> dict:
     """LARGE dataset through the unmodified e2e_v2.py (PolyBench init data)."""
-    cmd = [C.PY, str(C.LIBV2 / "e2e_v2.py"), "--dataset", "LARGE", "--out", str(d), "-j", str(j),
+    cmd = [C.PY, str(C.LEGACY / "e2e_v2.py"), "--dataset", "LARGE", "--out", str(d), "-j", str(j),
            *kernels]
     t0 = time.time()
     p = subprocess.run(cmd, capture_output=True, text=True, env=C.env(), timeout=7200)
@@ -644,7 +644,7 @@ def suite_irvariants(a) -> dict:
              "out_dir": str(wd / "match" / f"{g['kernel']}__{g['variant']}"), "region": True,
              "region_diag": True} for g in gen if g["status"] == "generated"]
     # consumability probe: the paper campaign's own 245 inputs (campaign recipe)
-    camp_dir = C.REPO / "issues/equality_saturation_eval/polybench_variants_20260909"
+    camp_dir = C.BENCHMARKS / "results/archive/issues/equality_saturation_eval/polybench_variants_20260909"
     camp_rows = []
     import csv
     with (camp_dir / "manifest.csv").open() as fh:

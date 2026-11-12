@@ -1,7 +1,0 @@
-NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
-CHECK kind=0 parameters=0 resident=0 count=8388608 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=5.96046448e-08
-CHECK kind=0 parameters=0 resident=1 count=8388608 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=5.96046448e-08
-PASS correctness
-POLYGEIST_V2_CALL backend=cuda call=transform_thrust_polar_components_f32 entry=polygeist_thrust_polar_components_f32 lib_ms=3.958016 h2d_ms=17.289824 d2h_ms=4.087968
-POLYGEIST_V2_CALL backend=cuda call=transform_thrust_polar_components_f32 entry=polygeist_thrust_polar_components_f32 lib_ms=0.851136 h2d_ms=0.021056 d2h_ms=0.005248
-POLYGEIST_V2_STATS backend=cuda call=transform_thrust_polar_components_f32 entry=polygeist_thrust_polar_components_f32 count=2 lib_ms=4.809152 h2d_ms=17.310880 d2h_ms=4.093216 h2d_bytes=67108864 d2h_bytes=33554432

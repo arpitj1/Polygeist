@@ -29,6 +29,7 @@ import argparse
 import json
 import re
 import subprocess
+import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -37,6 +38,9 @@ HERE = Path(__file__).resolve().parent
 CORR = HERE.parents[1]
 sys.path.insert(0, str(CORR / "lib_v2"))
 sys.path.insert(0, str(CORR))
+BENCHMARKS = Path(os.environ.get("POLYGEIST_BENCHMARK_ROOT", Path(__file__).resolve().parents[5]/"LoopLibrarian-Benchmarks"))
+sys.path.insert(0, str(BENCHMARKS/"scripts/legacy/lib_v2"))
+sys.path.insert(0, str(BENCHMARKS/"scripts/correctness"))
 import e2e_v2 as E   # noqa: E402  (read-only reuse)
 import recipe as R   # noqa: E402
 

@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_embedding_bag_counts_cpu,histogram_count,recognized,1,1,,0,cub_histogram_even_i32,0,0,True,cubHistogramEvenI32ShiftZero_memref,not_run,not_run

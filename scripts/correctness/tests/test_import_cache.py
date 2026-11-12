@@ -101,7 +101,7 @@ class ImportReuseTests(unittest.TestCase):
     def test_upstream_hash_failure_cannot_be_reused(self):
         self.fragment.write_text(json.dumps({'upstream_files': [
             {'path': 'nested.h', 'sha256': 'wrong'}]}))
-        with self.assertRaisesRegex(ValueError, 'upstream reference changed'):
+        with patch('spec_provenance.ROOT', self.root), self.assertRaisesRegex(ValueError, 'upstream reference changed'):
             self.key()
 
     def test_changes_during_build_block_publication(self):

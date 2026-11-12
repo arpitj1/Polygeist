@@ -1,7 +1,0 @@
-NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
-CHECK kind=0 parameters=0 resident=0 count=2097152 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-CHECK kind=0 parameters=0 resident=1 count=2097152 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-PASS correctness
-POLYGEIST_V2_CALL backend=cuda call=ThreadReduce_cub_ordered_rows_scaled_sum_f32 entry=polygeist_ordered_rows_scaled_sum_f32 lib_ms=2.104128 h2d_ms=2.271904 d2h_ms=1.074144
-POLYGEIST_V2_CALL backend=cuda call=ThreadReduce_cub_ordered_rows_scaled_sum_f32 entry=polygeist_ordered_rows_scaled_sum_f32 lib_ms=0.259712 h2d_ms=0.008832 d2h_ms=0.003904
-POLYGEIST_V2_STATS backend=cuda call=ThreadReduce_cub_ordered_rows_scaled_sum_f32 entry=polygeist_ordered_rows_scaled_sum_f32 count=2 lib_ms=2.363840 h2d_ms=2.280736 d2h_ms=1.078048 h2d_bytes=8388608 d2h_bytes=8388608

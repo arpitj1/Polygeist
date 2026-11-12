@@ -55,7 +55,7 @@ from typing import Optional
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 SPEC_DIR = REPO / "generic_solver" / os.environ.get("POLYGEIST_SPEC_SUITE", "lib_v3")
-CUDA_HEADERS = REPO / "third_party/cuda_headers"
+CUDA_HEADERS = Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', REPO / 'third_party')) / 'cuda_headers'
 NETLIB = Path(os.environ.get("NETLIB_REF", "/home/arjaiswal/netlib_ref/lapack"))
 CLANG = os.environ.get("CLANG", str(REPO / "llvm-project/build/bin/clang"))
 

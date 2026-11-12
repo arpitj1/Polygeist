@@ -1,5 +1,0 @@
-/bin/
-/build-ggml-jetson/
-/ggml-libs-jetson/
-*.pyc
-__pycache__/

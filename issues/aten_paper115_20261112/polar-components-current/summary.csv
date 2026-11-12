@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_polar_scalarized,complex_construction,no_proven_match,2,0,,0,,2,0,False,cudnnPointwiseGraph_f32,not_run,not_run

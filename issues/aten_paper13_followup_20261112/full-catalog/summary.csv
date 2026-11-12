@@ -1,5 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_conv1d,convolution,recognized,2,0,,0,cudnn_conv1d_bias_f32,0,0,True,cudnnConvolution1D_f32_bias,not_run,not_run
-aten_depthwise_conv3x3_cpu,convolution,recognized,2,0,,0,cudnn_depthwise_conv2d_bias_f32,0,0,True,cudnnDepthwiseConvolution2D_f32_memref,not_run,not_run
-aten_nested_all_cpu,reduction,recognized,0,2,,0,cub_ragged_reduce_and_i32,0,0,True,cubSegmentedPrefixLogicalAnd_i32,not_run,not_run
-aten_sampled_addmm_sparse_csr_cpu,sparse_linear_algebra,recognized,1,2,,0,aten_sampled_addmm_csr_f32,0,0,True,cusparseSDDMM_CSR_f32_memref,not_run,not_run

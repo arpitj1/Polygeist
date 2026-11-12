@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import subprocess,argparse
 ROOT=Path(__file__).resolve().parents[2]
@@ -5,7 +6,7 @@ p=argparse.ArgumentParser(description="Compare imported convolution references w
 p.add_argument("--output",type=Path,required=True)
 args=p.parse_args()
 D=args.output.resolve();D.mkdir(parents=True,exist_ok=True)
-source=(ROOT/'third_party/cudnn_reference/conv_sample.cpp').read_text()
+source=(Path(os.environ.get('POLYGEIST_DEPENDENCY_ROOT', ROOT/'third_party'))/'cudnn_reference/conv_sample.cpp').read_text()
 def extract(start):
  a=source.index(start);b=source.index('{',a);depth=1;c=b+1
  while depth:

@@ -1,9 +1,0 @@
-NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
-CHECK kind=0 parameters=0 resident=0 count=4194304 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-CHECK kind=0 parameters=0 resident=1 count=4194304 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
-PASS correctness
-POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=divides_f32 n=4194304
-POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_renorm_scale_f32 entry=cudnnBackendExecute lib_ms=698.661987 h2d_ms=8.374624 d2h_ms=2.046880
-POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=divides_f32 n=4194304
-POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_renorm_scale_f32 entry=cudnnBackendExecute lib_ms=1.657216 h2d_ms=0.014144 d2h_ms=0.005024
-POLYGEIST_V2_STATS backend=cuda call=cudnnBackendExecute_aten_renorm_scale_f32 entry=cudnnBackendExecute count=2 lib_ms=700.319203 h2d_ms=8.388768 d2h_ms=2.051904 h2d_bytes=33554432 d2h_bytes=16777216

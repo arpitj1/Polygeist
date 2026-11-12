@@ -27,6 +27,9 @@ sys.path.insert(0, str(CORR))
 sys.path.insert(0, str(CORR / "lib_v2"))
 sys.path.insert(0, str(HERE))
 
+BENCHMARKS = Path(os.environ.get("POLYGEIST_BENCHMARK_ROOT", Path(__file__).resolve().parents[5]/"LoopLibrarian-Benchmarks"))
+sys.path.insert(0, str(BENCHMARKS/"scripts/legacy/lib_v2"))
+sys.path.insert(0, str(BENCHMARKS/"scripts/correctness"))
 import recipe as R                                   # noqa: E402  (shared raise recipe)
 from raise_polybench import polybench_cflags          # noqa: E402
 from region_match.matcher import (load_specs, match_text, compare_systems, Binding,  # noqa: E402
@@ -41,11 +44,11 @@ from numeric_check import check as numeric_check       # noqa: E402
 os.environ.setdefault("POLYGEIST_SPEC_SUITE", "lib_v2")
 SPEC_DIR = REPO / "generic_solver" / os.environ["POLYGEIST_SPEC_SUITE"]
 OUT = HERE / "raised"
-PB = REPO / "tools/cgeist/Test/polybench/linear-algebra/solvers"
-PB_BLAS = REPO / "tools/cgeist/Test/polybench/linear-algebra/blas"
-PB_KERNELS = REPO / "tools/cgeist/Test/polybench/linear-algebra/kernels"
-SAVED = REPO / "issues/polybench_section42/ir"
-PB_RAISED = REPO / "issues/lib_v2/polybench_raised"
+PB = BENCHMARKS / "polybench/sources/linear-algebra/solvers"
+PB_BLAS = BENCHMARKS / "polybench/sources/linear-algebra/blas"
+PB_KERNELS = BENCHMARKS / "polybench/sources/linear-algebra/kernels"
+SAVED = BENCHMARKS / "results/archive/issues/polybench_section42/ir"
+PB_RAISED = BENCHMARKS / "results/archive/issues/lib_v2/polybench_raised"
 C = HERE / "c"
 
 UTN, UTU, LTN, LNN = ("netlib_dtrsv_utn", "netlib_dtrsv_utu", "netlib_dtrsv_ltn",
@@ -205,7 +208,7 @@ def main() -> int:
         if a.only and not any(o in name for o in a.only):
             continue
         path, info = raise_one(name, kind, src, fn, not a.no_raise)
-        row = {"test": name, "source": str(src.relative_to(REPO)), "function": fn,
+        row = {"test": name, "source": os.path.relpath(src, REPO), "function": fn,
                "expect": expect, **info}
         if path is None:
             row.update(selected=None, ok=expect.get("match", "x") is None,

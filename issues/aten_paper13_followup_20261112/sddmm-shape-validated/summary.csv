@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_sampled_addmm_sparse_csr_cpu,sparse_linear_algebra,recognized,1,2,,0,aten_sampled_addmm_csr_f32,0,0,True,cusparseSDDMM_CSR_f32_memref,not_run,not_run

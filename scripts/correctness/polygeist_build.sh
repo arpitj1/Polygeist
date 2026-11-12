@@ -102,7 +102,9 @@
 #                       Stop after compiling/exporting those objects. This is
 #                       intended for application composition builds whose main
 #                       program is linked separately.
-#   POLYGEIST_POLYBENCH_REPETITIONS=1
+#   POLYGEIST_ITERATION_DRIVER=/path/to/driver.c
+#   POLYGEIST_ITERATION_ENTRY=iteration_entry
+#   POLYGEIST_ITERATION_HEADER=/path/to/entry.h
 #                       Whole-program mode only. Rename the unchanged source's
 #                       main entry and link an algorithm-neutral driver that
 #                       invokes it five warmups plus five measured iterations
@@ -210,10 +212,10 @@ if [ "$TARGET" != "host" ]; then CROSS_AARCH64=1; fi
 [ -z "$OUT" ] && OUT="$(basename "$INPUT" .c)"
 
 WHOLE_PROGRAM_ENTRY=main
-POLYBENCH_REPETITIONS=${POLYGEIST_POLYBENCH_REPETITIONS:-0}
-if [ "$POLYBENCH_REPETITIONS" != 0 ]; then
+ITERATION_DRIVER=${POLYGEIST_ITERATION_DRIVER:-}
+if [ -n "$ITERATION_DRIVER" ]; then
   [ "$WHOLE_PROGRAM" -ne 0 ] || {
-    echo "ERROR: POLYGEIST_POLYBENCH_REPETITIONS requires --whole-program" >&2
+    echo "ERROR: POLYGEIST_ITERATION_DRIVER requires --whole-program" >&2
     exit 1
   }
   POLYGEIST_WARMUP_RUNS=${POLYGEIST_WARMUP_RUNS:-5}
@@ -226,9 +228,11 @@ if [ "$POLYBENCH_REPETITIONS" != 0 ]; then
     echo "ERROR: POLYGEIST_TIMED_RUNS must be a positive integer" >&2
     exit 1
   }
-  WHOLE_PROGRAM_ENTRY=polygeist_polybench_iteration
+  WHOLE_PROGRAM_ENTRY=${POLYGEIST_ITERATION_ENTRY:?set the entry called by the iteration driver}
   GCC_PASSTHROUGH+=("-Dmain=$WHOLE_PROGRAM_ENTRY")
-  GCC_PASSTHROUGH+=("-include" "$RT/polybench_repeat_entry.h")
+  if [ -n "${POLYGEIST_ITERATION_HEADER:-}" ]; then
+    GCC_PASSTHROUGH+=("-include" "$POLYGEIST_ITERATION_HEADER")
+  fi
 fi
 
 # ─── Auto-detect the kernel function name ───────────────────────────────
@@ -275,7 +279,7 @@ fi
 echo "[polygeist] input=$INPUT  function=$FUNCTION  target=$TARGET  output=$OUT"
 if [ "$WHOLE_PROGRAM" -ne 0 ]; then
   echo "[polygeist] integration=whole-program-in-place"
-  if [ "$POLYBENCH_REPETITIONS" != 0 ]; then
+  if [ -n "$ITERATION_DRIVER" ]; then
     echo "[polygeist] repetitions=${POLYGEIST_WARMUP_RUNS}+${POLYGEIST_TIMED_RUNS} in-process"
   fi
 else
@@ -301,7 +305,7 @@ if [ -n "${POLYGEIST_CGEIST_FLAGS:-}" ]; then
 fi
 CGEIST_FUNCTION=$FUNCTION
 [ "$WHOLE_PROGRAM" -eq 0 ] || CGEIST_FUNCTION='*'
-if [ "$POLYBENCH_REPETITIONS" != 0 ]; then
+if [ -n "$ITERATION_DRIVER" ]; then
   # A command-line macro supplies the renamed spelling, so Clang does not
   # classify that declaration as written in the main file for wildcard
   # selection. Select the entry explicitly; its direct callees, including the
@@ -735,7 +739,7 @@ else
     RT_CFLAGS+=("-DPOLYGEIST_ENABLE_CUTENSORNET"
                "-DPOLYGEIST_ENABLE_CUTENSOR"
                "-I$CUTENSORNET_ROOT/include"
-               "-I$REPO_ROOT/third_party/cuda_headers/cutensor/include")
+               "-I${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cutensor/include")
     RT_LIBS="-L$CUTENSORNET_ROOT/lib -lcutensornet -lcutensor $RT_LIBS"
     echo "         + cuTensorNet runtime from $CUTENSORNET_ROOT"
     if [ "${POLYGEIST_MINIMAL_CUTENSORNET_RUNTIME:-0}" != "0" ]; then
@@ -794,7 +798,7 @@ if [ "$N_RUNTIME_CALL" -gt 0 ]; then
   elif [ "$TARGET" = jetson ]; then
     $CC -O2 -ffunction-sections -fdata-sections -I"$CUDA_CROSS/include" \
       -I"$REPO_ROOT/runtime" \
-      -I"$REPO_ROOT/third_party/cuda_headers/cusolver/include" \
+      -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cusolver/include" \
       -I"$CUDNN_CROSS_INC" \
       -c "$WORK/spec_runtime/polygeist_v2_rt_cuda.c" -o "$WORK/spec_runtime.o"
     RT_LIBS="-L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs -L$CUDNN_CROSS_LIB -lcudnn -lcublas -lcusolver -lcudart $RT_LIBS"
@@ -815,7 +819,7 @@ if [ "$TARGET" = jetson ] && [ "$ABI_BACKEND" = cuda ]; then
     -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
     --fmad=false --ftz=false --prec-div=true \
     -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
-    -I"$REPO_ROOT/third_party/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
+    -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
     -c "$RT/polygeist_thrust_rt.cu" -o "$WORK/thrust_runtime.o"
   SPEC_RUNTIME_OBJECTS+=("$WORK/thrust_runtime.o")
   RT_LIBS="-lstdc++ $RT_LIBS"
@@ -837,7 +841,7 @@ if [ "${POLYGEIST_ENABLE_CUB:-0}" != "0" ] || [ "$NEEDS_CUB" -gt 0 ]; then
     -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
     -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
     -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
-    -I"$REPO_ROOT/third_party/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
+    -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
     -c "$RT/polygeist_cub_scan_rt.cu" -o "$WORK/cub_runtime.o"
   SPEC_RUNTIME_OBJECTS+=("$WORK/cub_runtime.o")
   RT_LIBS="-lstdc++ $RT_LIBS"
@@ -894,11 +898,11 @@ if ! "$CC" --version 2>/dev/null | head -1 | grep -qi clang; then
   HARNESS_NOINLINE_CFLAGS+=(-fno-ipa-cp -fno-ipa-cp-clone -fno-ipa-sra)
 fi
 if [ "$WHOLE_PROGRAM" -ne 0 ]; then
-  if [ "$POLYBENCH_REPETITIONS" != 0 ]; then
+  if [ -n "$ITERATION_DRIVER" ]; then
     $CC -O2 \
       "-DPOLYGEIST_WARMUP_RUNS=$POLYGEIST_WARMUP_RUNS" \
       "-DPOLYGEIST_TIMED_RUNS=$POLYGEIST_TIMED_RUNS" \
-      -c "$RT/polybench_repeat_driver.c" -o $WORK/harness_full.o
+      -c "$ITERATION_DRIVER" -o $WORK/harness_full.o
   else
     $CC -x c -c /dev/null -o $WORK/harness_full.o
   fi

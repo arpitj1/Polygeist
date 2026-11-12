@@ -1,2 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_sparse_addmv_bsr_cpu,sparse_linear_algebra,no_proven_match,0,4,,,,,,,cusparseSpMM_BSR_f32_memref,not_run,not_run

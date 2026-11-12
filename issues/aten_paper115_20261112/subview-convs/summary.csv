@@ -1,4 +1,0 @@
-kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
-aten_conv1d,convolution,recognized,2,0,,1,thrust_multiplies_scalar_left_f32,2,4,True,cudnnConvolution1D_f32_bias,not_run,not_run
-aten_conv2d,convolution,recognized,2,0,,1,"thrust_multiplies_scalar_left_f32,cub_reduce_sum_f32",0,7,True,cudnnConvolutionFwd_batched,not_run,not_run
-aten_conv_tbc_cpu,convolution,recognized,2,0,,1,"thrust_multiplies_scalar_left_f32,cub_reduce_sum_f32",0,5,True,cudnnConvolutionTBC_f32_memref,not_run,not_run
