@@ -1,0 +1,41 @@
+{
+  "kernel": "aten_channel_shuffle",
+  "paper_family": "tensor_permutation",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_channel_shuffle/aten_channel_shuffle.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_channel_shuffle.c",
+  "original_source_sha256": "088f758a7d60c591a971421baf0091443d9a9453c6c4a994a57b1b716cef9755",
+  "shape_record": {
+    "kernel": "aten_channel_shuffle",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "B": 14,
+      "CPG": 28,
+      "G": 14,
+      "H": 28,
+      "W": 28
+    },
+    "n": 4302592,
+    "shape": "B=14_CPG=28_G=14_H=28_W=28",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "f199c08db2dbc190"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cutensorPermute_f32_r5_tensor"
+}

@@ -1,0 +1,60 @@
+[
+  {
+    "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+    "paper": {
+      "id": "79",
+      "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+      "native_us": "934.976",
+      "raised_us": "329.983999",
+      "raised_over_native": "0.3529331223475255",
+      "speedup_percent": "183.3397991518977",
+      "semantic_family": "sparse_format",
+      "raised_library": "cuSPARSE",
+      "raised_call": "cusparseXcsr2coo_i32_memref",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "fully_validated": false,
+    "actual_samples": 0,
+    "selected_statistic": "minimum_first_five_ms",
+    "baseline_scope": "Actual ATen repeat_interleave with cached arange row labels; CSR pointer difference computation, output allocation and copy into the fixture output are timed.",
+    "binary_sha256": "0c3e5fa53f75395c3df0fafbe6ef1d3f53193a3d7313910b5313b316273967a2",
+    "cache_scope": "cuDNN cache enabled globally, unused by this cuSPARSE conversion.",
+    "traced_library_calls": [],
+    "calls_per_program": 0.0,
+    "status": "infrastructure_failed_no_timing",
+    "infrastructure_error": true,
+    "planned_samples": 5,
+    "native_support_status": "not yet exercised; raised backend aborted first",
+    "infrastructure_reason": "Runtime compiled with POLYGEIST_DISABLE_CUSPARSE; final link omits -lcusparse"
+  },
+  {
+    "kernel": "aten_convert_csr_to_coo_cpu",
+    "paper": {
+      "id": "80",
+      "kernel": "aten_convert_csr_to_coo_cpu",
+      "native_us": "943.2",
+      "raised_us": "332.288",
+      "raised_over_native": "0.3522985581000848",
+      "speedup_percent": "183.85015408320493",
+      "semantic_family": "sparse_format",
+      "raised_library": "cuSPARSE",
+      "raised_call": "cusparseXcsr2coo_i32_memref",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "fully_validated": false,
+    "actual_samples": 0,
+    "selected_statistic": "minimum_first_five_ms",
+    "baseline_scope": "Actual ATen repeat_interleave with cached arange row labels; CSR pointer difference computation, output allocation and copy into the fixture output are timed.",
+    "binary_sha256": "7973a656b67be73c7b6f8414ed316c9a4f83dcf125e31b29d70ae00f4757e29f",
+    "cache_scope": "cuDNN cache enabled globally, unused by this cuSPARSE conversion.",
+    "traced_library_calls": [],
+    "calls_per_program": 0.0,
+    "status": "infrastructure_failed_no_timing",
+    "infrastructure_error": true,
+    "planned_samples": 5,
+    "native_support_status": "not yet exercised; raised backend aborted first",
+    "infrastructure_reason": "Runtime compiled with POLYGEIST_DISABLE_CUSPARSE; final link omits -lcusparse"
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "kernel": "aten_conv2d",
+  "paper_family": "convolution",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_conv2d/aten_conv2d.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_conv2d.c",
+  "original_source_sha256": "a9bcc5d8353847acd00b1604d3859d7c36bf897170e3b821cb84c2091a9e468c",
+  "shape_record": {
+    "kernel": "aten_conv2d",
+    "op": "conv2d",
+    "cat": "conv2d",
+    "dims": {
+      "B": 4,
+      "IC": 16,
+      "OC": 32,
+      "H": 128,
+      "W": 128,
+      "KH": 3,
+      "KW": 3
+    },
+    "n": 301989888,
+    "shape": "B=4_IC=16_OC=32_H=128_W=128_KH=3_KW=3",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full valid NCHW 2d convolution through cuDNN",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "3b3bcbef73116a11"
+  },
+  "ranks": [
+    0
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cudnnConvolutionFwd_batched"
+}

@@ -1,0 +1,28 @@
+{
+  "launches": [
+    {
+      "spec": "cub_reduce_sum_f64",
+      "call": "polygeist_v2_DeviceReduce_cub_reduce_sum_f64",
+      "cpu_entry": null,
+      "gpu_entry": "DeviceReduce",
+      "operand_types": [
+        "i32",
+        "f64",
+        "memref<?xf64, strided<[1], offset: ?>>",
+        "memref<?xf64, strided<[1], offset: ?>>"
+      ]
+    }
+  ],
+  "opt": [
+    {
+      "cmd": "--lower-polygeist-submap=affine-copy-writeback=true --canonicalize-polygeist",
+      "rc": 0,
+      "stderr": ""
+    },
+    {
+      "cmd": "--lower-affine --empty-tensor-to-alloc-tensor --one-shot-bufferize=allow-unknown-ops bufferize-function-boundaries --canonicalize --cse",
+      "rc": 0,
+      "stderr": ""
+    }
+  ]
+}

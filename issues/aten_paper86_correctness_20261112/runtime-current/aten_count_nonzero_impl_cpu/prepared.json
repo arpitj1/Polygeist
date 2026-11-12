@@ -1,0 +1,100 @@
+{
+  "kernel": "aten_count_nonzero_impl_cpu",
+  "original_binary_sha256": "b17520418f1bea9371af8bb4fba4e62fc0fba0c29ed1bdb53f6423fffa0fe457",
+  "timing_binary_sha256": "b17520418f1bea9371af8bb4fba4e62fc0fba0c29ed1bdb53f6423fffa0fe457",
+  "original_harness_sha256": "19afdad8bd07481cbb2bbe344d4f8c399fd63d0967ee506f62d445e343db1a43",
+  "timing_harness_sha256": "fa079786ce585049507cebbd11ceca2317ea768af50e946e4c94baffcbc7989f",
+  "frozen_object_sha256": {
+    "work/kernel.o": "7c8ec31b3e2ea2e654c457c69e83a3924be78b42125aa9a4be78e8e4f19f6bbb",
+    "work/wrapper.o": "fbcfab174cc587d18d67384243549eb0fe1fe44f86e4bf5c279dd52c53748ba1",
+    "work/harness.o": "a112243faff4552bb77d7e6647efe9ac184b54f4fdcc83c68a87d6ae8deeed74",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "work/spec_runtime.o": "04d5607691885a4ec98422d321d213eee849ea9df04bc3dc80308a6709504c8e",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "work/cub_runtime.o": "a95309a9714c859ca721738db994515be10f1e932cd5ea15ffe7104e3f27473b",
+    "objects/reference.o": "f2ef22f466859378ae53b6a37464ff86325fdbc27721e0c2b109a49b70c401f6",
+    "objects/native.o": "a559ca96ec2eab1cbc4dfda88a73276d3cb1f48f580fd804dd4bcc9e00be7572"
+  },
+  "original_configuration": {
+    "dims": {
+      "R": 131072,
+      "C": 64
+    },
+    "args": [
+      [
+        "x",
+        "ptr",
+        "(R)*(C)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "iptr",
+        "(R)",
+        true,
+        "index"
+      ]
+    ],
+    "coverage": "auto: aten_count_nonzero_impl_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "x": "((float)(i%101)-50.0f)/37.0f",
+      "out": "0"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "original_proof_sha256": "96c93903fb5a73eb83593c6ad411a9d1ca28aee7b188bcc435e095d77bc49530",
+  "timing_samples": 20,
+  "adaptation": "Only the generated spec_runtime.o changes to the bit-tested generic copy runtime; all application, native reference and vendor objects remain frozen;20-sample harness retained.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/work/cub_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_count_nonzero_impl_cpu/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "prior_original_binary_sha256": "3f9ae3d96b45492516758400c15d30e27c13700c36ba6ad7c4c103b943a20816",
+  "prior_timing_binary_sha256": "b17520418f1bea9371af8bb4fba4e62fc0fba0c29ed1bdb53f6423fffa0fe457",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

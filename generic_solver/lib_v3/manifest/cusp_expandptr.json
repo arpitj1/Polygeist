@@ -1,0 +1,94 @@
+{
+  "routine": "cusp_expandptr",
+  "source": "NVIDIA AMGX public CUSP host reference expandptr<int>; reference counterpart for the closed-source cuSPARSE API",
+  "upstream_files": [
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/csr.h",
+      "sha256": "549ba93dc87891e3fe862add7c7208f8dc773c1cdd2f8bc35fa8934620cd6fff"
+    }
+  ],
+  "adaptation": "Instantiate I=int and expose CSR/output capacities as VLA extents; loop bounds and stores are retained verbatim. Binding to cusparseXcsr2coo uses its documented zero-based CSR contract.",
+  "specs": [
+    {
+      "name": "cusp_expandptr_i32",
+      "args": [
+        "rows",
+        "csr_count",
+        "row_offsets",
+        "coo_capacity",
+        "row_indices"
+      ],
+      "target": {
+        "library": "cuSPARSE",
+        "call": "cusparseXcsr2coo",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cusparse_csr2coo_i32_sized",
+          "arguments": [
+            "rows",
+            "csr_count",
+            "row_offsets",
+            "coo_capacity",
+            "row_indices"
+          ],
+          "arrays": {
+            "row_offsets": [
+              "csr_count"
+            ],
+            "row_indices": [
+              "coo_capacity"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "csr_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "coo_capacity": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Valid zero-based nondecreasing CSR row offsets; csr_count >= rows+1 and row_offsets[rows] <= coo_capacity",
+        "Disjoint int32 arrays; entries after the last CSR offset remain unchanged"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 4,
+          "csr_count": 5,
+          "coo_capacity": 9
+        },
+        "arrays": {
+          "row_offsets": [
+            5
+          ],
+          "row_indices": [
+            9
+          ]
+        },
+        "array_values": {
+          "row_offsets": [
+            0,
+            0,
+            2,
+            2,
+            7
+          ]
+        }
+      }
+    }
+  ]
+}

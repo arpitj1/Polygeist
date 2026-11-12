@@ -1,0 +1,106 @@
+{
+  "kernel": "aten_geometric_cpu",
+  "original_binary_sha256": "33c0aefa67a54a0c64292f9402baaaa3c13f0a34da03ff42a46b0fde446cdcbe",
+  "timing_binary_sha256": "33c0aefa67a54a0c64292f9402baaaa3c13f0a34da03ff42a46b0fde446cdcbe",
+  "original_harness_sha256": "dff4a70581b8a1e788b291aba89d8150cd062770809ccf67909737155ca750b1",
+  "timing_harness_sha256": "8fd06d0d24250dc86453a49cb3f5b3edfda1e72d866227dbd1a7f826b33ccb7d",
+  "frozen_object_sha256": {
+    "work/kernel.o": "39cefb2e3adbdeec724a7f11b0cd42c08ee2b99e76f6797b1919d9d0abcefe59",
+    "work/wrapper.o": "8921a868c5e794ba9df7157179c43eded273391816f7be18df02524894c0a2af",
+    "work/harness.o": "7859bc2c18f08f25a2f3bb209a12f6aa19369e0c35052de252b9beaf794406fe",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "work/spec_runtime.o": "04d5607691885a4ec98422d321d213eee849ea9df04bc3dc80308a6709504c8e",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "objects/reference.o": "2094f95d50473fcee3fa363a8f9cfe54f0cee38ed8ec2dc2835111a44c4399af",
+    "objects/native.o": "1f64b029ea63ccb6d944350af5d16f8a7c5d1257193d6e4f8cb2197f9b68d967"
+  },
+  "original_configuration": {
+    "dims": {
+      "N": 4194304
+    },
+    "args": [
+      [
+        "uniform",
+        "ptr",
+        "(N)",
+        false,
+        "unit"
+      ],
+      [
+        "probability",
+        "scalar",
+        "0.5",
+        false,
+        ""
+      ],
+      [
+        "out",
+        "ptr",
+        "(N)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_geometric_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "uniform": "0.05f + 0.9f*(float)(i%101)/101.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {
+      "probability": "0.5"
+    },
+    "timing_samples": 20
+  },
+  "original_proof_sha256": "14c6eda5487112d97a9fbe15d906657b2e4fbcf9d2edcc04eeda6442091eccaa",
+  "timing_samples": 20,
+  "adaptation": "Only the generated spec_runtime.o changes to the bit-tested generic copy runtime; all application, native reference and vendor objects remain frozen;20-sample harness retained.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_geometric_cpu/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "prior_original_binary_sha256": "14e3910f2bdb94e89162c66a094d7bdfd3a85c5bcc6b3d54bc4ae19419341e2c",
+  "prior_timing_binary_sha256": "33c0aefa67a54a0c64292f9402baaaa3c13f0a34da03ff42a46b0fde446cdcbe",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "launches": [
+    {
+      "spec": "cusp_expandptr_i32",
+      "call": "polygeist_v2_cusparseXcsr2coo_cusp_expandptr_i32",
+      "cpu_entry": null,
+      "gpu_entry": "cusparseXcsr2coo",
+      "operand_types": [
+        "i32",
+        "i32",
+        "memref<?xi32>",
+        "i32",
+        "memref<?xi32>"
+      ]
+    }
+  ],
+  "opt": []
+}

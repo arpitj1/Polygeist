@@ -1,0 +1,40 @@
+{
+  "kernel": "aten_cauchy_cpu",
+  "paper_family": "random_distribution",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_cauchy_cpu/aten_cauchy_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_cauchy_cpu.c",
+  "original_source_sha256": "1e5fb50404ace7efc6bf2ba027834ffe7b86c322a239e4ff59942baff2e1c84f",
+  "shape_record": {
+    "kernel": "aten_cauchy_cpu",
+    "op": "cauchy",
+    "cat": "native_fixture",
+    "dims": {
+      "N": 4194304
+    },
+    "n": 4194304,
+    "shape": "N=4194304",
+    "dtype": "f32",
+    "scalar_args": {
+      "median": "0.5",
+      "sigma": "0.5"
+    },
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "06523ec9a7d45565"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnPointwiseGraph_f32"
+}

@@ -1,0 +1,590 @@
+[
+  {
+    "kernel": "aten_bmm",
+    "paper": {
+      "id": "72",
+      "kernel": "aten_bmm",
+      "native_us": "782.208",
+      "raised_us": "848.640001",
+      "raised_over_native": "1.0849288181660122",
+      "speedup_percent": "-7.828054407253893",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasSgemm_strided_batched_nn_zero",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "shape": {
+      "kernel": "aten_bmm",
+      "op": "bmm",
+      "cat": "bmm",
+      "dims": {
+        "BATCH": 70,
+        "K": 282,
+        "M": 141,
+        "N": 211
+      },
+      "n": 587284740,
+      "shape": "BATCH=70_K=282_M=141_N=211",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "c132d6acaaae7ca9"
+    },
+    "original_source_sha256": "d4fc0344bd68ec53186b363afa6244d6ed95b626138d9df11d021d6317054050",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_clamp_max_scalar_cpu",
+    "paper": {
+      "id": "19",
+      "kernel": "aten_clamp_max_scalar_cpu",
+      "native_us": "226.464",
+      "raised_us": "635.007996",
+      "raised_over_native": "2.8040129821958457",
+      "speedup_percent": "-64.33682702792296",
+      "semantic_family": "reduction",
+      "raised_library": "CUB",
+      "raised_call": "cudnnPointwiseGraph_f32",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_clamp_max_scalar_cpu",
+      "op": "clamp_max_scalar",
+      "cat": "native_fixture",
+      "dims": {
+        "N": 4194304
+      },
+      "n": 4194304,
+      "shape": "N=4194304",
+      "dtype": "f32",
+      "scalar_args": {
+        "maxval": "0.5"
+      },
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "20afe51bff9319b3"
+    },
+    "original_source_sha256": "6a556ccd59c955fff4a4566c797297a465526bf0c01f817eb423da7ca3d6a852",
+    "match_options": {
+      "ranks": [
+        0
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_clamp_min_scalar_cpu",
+    "paper": {
+      "id": "16",
+      "kernel": "aten_clamp_min_scalar_cpu",
+      "native_us": "222.144",
+      "raised_us": "635.552002",
+      "raised_over_native": "2.8609910778594063",
+      "speedup_percent": "-65.04707729643813",
+      "semantic_family": "reduction",
+      "raised_library": "CUB",
+      "raised_call": "cudnnPointwiseGraph_f32",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_clamp_min_scalar_cpu",
+      "op": "clamp_min_scalar",
+      "cat": "native_fixture",
+      "dims": {
+        "N": 4194304
+      },
+      "n": 4194304,
+      "shape": "N=4194304",
+      "dtype": "f32",
+      "scalar_args": {
+        "minval": "0.5"
+      },
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "79cad4471d373dda"
+    },
+    "original_source_sha256": "f5ab4dde4fd7d96ef9cdc504df74fc95b779686ac872d40bd05046f795d4932b",
+    "match_options": {
+      "ranks": [
+        0
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_batched_cpu",
+    "paper": {
+      "id": "84",
+      "kernel": "aten_cpu_blas_gemm_batched_cpu",
+      "native_us": "1039.584",
+      "raised_us": "1013.024",
+      "raised_over_native": "0.9744513189891341",
+      "speedup_percent": "2.621852986701212",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasSgemm_strided_batched_nn_zero",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "shape": {
+      "kernel": "aten_cpu_blas_gemm_batched_cpu",
+      "op": null,
+      "cat": "native_fixture",
+      "dims": {
+        "B": 52,
+        "K": 311,
+        "M": 208,
+        "N": 259
+      },
+      "n": 871217984,
+      "shape": "B=52_K=311_M=208_N=259",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "57f08d687ae9d16b"
+    },
+    "original_source_sha256": "98fbb49f6448641807004a6b8d85c1dbdea83194e76dde2f9e13d823fb478a85",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": true,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_cpu",
+    "paper": {
+      "id": "107",
+      "kernel": "aten_cpu_blas_gemm_cpu",
+      "native_us": "3778.624",
+      "raised_us": "3750.080002",
+      "raised_over_native": "0.9924459279356719",
+      "speedup_percent": "0.761157041577154",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasSgemm_nn_zero",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "shape": {
+      "kernel": "aten_cpu_blas_gemm_cpu",
+      "op": null,
+      "cat": "native_fixture",
+      "dims": {
+        "K": 2290,
+        "M": 1374,
+        "N": 1832
+      },
+      "n": 5764314720,
+      "shape": "K=2290_M=1374_N=1832",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "acf1ac1e761ae7e6"
+    },
+    "original_source_sha256": "992005818b60fbc5f44d5596726ab929ec7edac786301906903ea513249204b3",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": true,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_strided_batched_cpu",
+    "paper": {
+      "id": "83",
+      "kernel": "aten_cpu_blas_gemm_strided_batched_cpu",
+      "native_us": "1038.08",
+      "raised_us": "1016.0",
+      "raised_over_native": "0.9787299630086314",
+      "speedup_percent": "2.1732283464566793",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasSgemm_strided_batched_nn_zero",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "shape": {
+      "kernel": "aten_cpu_blas_gemm_strided_batched_cpu",
+      "op": null,
+      "cat": "native_fixture",
+      "dims": {
+        "B": 52,
+        "K": 311,
+        "M": 208,
+        "N": 259
+      },
+      "n": 871217984,
+      "shape": "B=52_K=311_M=208_N=259",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "eb3e1fa75831476a"
+    },
+    "original_source_sha256": "ecb678184067fe1c621008a260d11f21691a4d7bb24d94aca06f9397b5323180",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": true,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_cumprod_cpu",
+    "paper": {
+      "id": "36",
+      "kernel": "aten_cumprod_cpu",
+      "native_us": "328.8",
+      "raised_us": "4850.496094",
+      "raised_over_native": "14.752117074209245",
+      "speedup_percent": "-93.22131193123275",
+      "semantic_family": "scan",
+      "raised_library": "CUB",
+      "raised_call": "cubSegmentedInclusiveProduct2D_f32_tensor",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "shape": {
+      "kernel": "aten_cumprod_cpu",
+      "op": "cumprod",
+      "cat": "cum",
+      "dims": {
+        "K": 2897,
+        "R": 1448
+      },
+      "n": 4194856,
+      "shape": "K=2897_R=1448",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "8c78205482ac384d"
+    },
+    "original_source_sha256": "94ddd95e220654c8b5f1bedfe55d0ba6905ac4162348854386b4f443f6672b15",
+    "match_options": {
+      "ranks": [
+        1
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_mm",
+    "paper": {
+      "id": "109",
+      "kernel": "aten_mm",
+      "native_us": "3975.584",
+      "raised_us": "4102.784",
+      "raised_over_native": "1.0319952993069696",
+      "speedup_percent": "-3.1003338221071264",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasDgemm_simple,memset_zero_2D",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_mm",
+      "op": "mm",
+      "cat": "mm",
+      "dims": {
+        "M": 512,
+        "N": 512,
+        "K": 512
+      },
+      "n": 134217728,
+      "shape": "M=512_N=512_K=512",
+      "dtype": "f64",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full FP64 matrix multiplication",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "cd8356bf8629a037"
+    },
+    "original_source_sha256": "53c236e56e5d89cd3a77227c6c1e9427f53fb99d30e892071e21fd1c41421593",
+    "match_options": {
+      "ranks": [
+        0
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_nested_bmm_cpu",
+    "paper": {
+      "id": "75",
+      "kernel": "aten_nested_bmm_cpu",
+      "native_us": "866.08",
+      "raised_us": "859.007996",
+      "raised_over_native": "0.9918344679475337",
+      "speedup_percent": "0.8232756892754267",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasSgemm_strided_batched_nn_zero",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_nested_bmm_cpu",
+      "op": "nested_bmm",
+      "cat": "native_fixture",
+      "dims": {
+        "B": 83,
+        "K": 248,
+        "M": 165,
+        "N": 206
+      },
+      "n": 699650160,
+      "shape": "B=83_K=248_M=165_N=206",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "052a884874109c4d"
+    },
+    "original_source_sha256": "426f467ec6161bdfe8be0ab88eefe94fe76cbd454c63a179145b138fa3d38a90",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_nested_matmul_broadcast_cpu",
+    "paper": {
+      "id": "65",
+      "kernel": "aten_nested_matmul_broadcast_cpu",
+      "native_us": "726.848",
+      "raised_us": "1024.416",
+      "raised_over_native": "1.4093950867306506",
+      "speedup_percent": "-29.047574422890698",
+      "semantic_family": "batched_matrix_multiply",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasSgemm_strided_batched_broadcast_rhs",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_nested_matmul_broadcast_cpu",
+      "op": "nested_matmul_broadcast",
+      "cat": "native_fixture",
+      "dims": {
+        "B": 89,
+        "K": 266,
+        "M": 178,
+        "N": 222
+      },
+      "n": 935501784,
+      "shape": "B=89_K=266_M=178_N=222",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "7a9f8d11436e5a37"
+    },
+    "original_source_sha256": "28761c8a5e2297cc0ac540eb2f7dfbcdafbf0782a8121941789fb9321befa2d2",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": true,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_sum",
+    "paper": {
+      "id": "67",
+      "kernel": "aten_sum",
+      "native_us": "766.368",
+      "raised_us": "3078.559998",
+      "raised_over_native": "4.017077954716272",
+      "speedup_percent": "-75.10628344102845",
+      "semantic_family": "reduction",
+      "raised_library": "CUB",
+      "raised_call": "cubSegmentedSum_f64_memref",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_sum",
+      "op": "sum",
+      "cat": "reduce",
+      "dims": {
+        "M": 65536,
+        "N": 64
+      },
+      "n": 4194304,
+      "shape": "M=65536_N=64",
+      "dtype": "f64",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full segmented CUB f64 sum reduction",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "8323a8b552b16506"
+    },
+    "original_source_sha256": "cc6297e8268435d0b714b45906f031081d4ae549ee3494b72a7fb468345233f2",
+    "match_options": {
+      "ranks": [
+        1
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_sumproduct_pair_cpu",
+    "paper": {
+      "id": "76",
+      "kernel": "aten_sumproduct_pair_cpu",
+      "native_us": "874.88",
+      "raised_us": "848.896",
+      "raised_over_native": "0.9702999268471104",
+      "speedup_percent": "3.060916767189381",
+      "semantic_family": "tensor_contraction",
+      "raised_library": "cuTENSOR",
+      "raised_call": "cublasSgemm_strided_batched_nn_zero",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "shape": {
+      "kernel": "aten_sumproduct_pair_cpu",
+      "op": null,
+      "cat": "native_fixture",
+      "dims": {
+        "B": 70,
+        "K": 282,
+        "M": 141,
+        "N": 211
+      },
+      "n": 587284740,
+      "shape": "B=70_K=282_M=141_N=211",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "b1d208ea182a8abc"
+    },
+    "original_source_sha256": "fd8864e6bb751e52ff9ddc6110ee82f694b9b34e12e2dbcd85aa97d33ec51290",
+    "match_options": {
+      "ranks": [
+        2
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  },
+  {
+    "kernel": "aten_transpose_copy",
+    "paper": {
+      "id": "64",
+      "kernel": "aten_transpose_copy",
+      "native_us": "643.2",
+      "raised_us": "295.040009",
+      "raised_over_native": "0.45870648165422884",
+      "speedup_percent": "118.00433174471605",
+      "semantic_family": "tensor_permutation",
+      "raised_library": "cuTENSOR",
+      "raised_call": "cutensorPermute_f32_r2_tensor",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "shape": {
+      "kernel": "aten_transpose_copy",
+      "op": "transpose_copy",
+      "cat": "native_fixture",
+      "dims": {
+        "M": 2365,
+        "N": 1774
+      },
+      "n": 4195510,
+      "shape": "M=2365_N=1774",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "5d0809aea12f7880"
+    },
+    "original_source_sha256": "9cdba1af49ece65115fddb65016db997b5c0fdd71274c5eb8c007ab9d95108f6",
+    "match_options": {
+      "ranks": [
+        0
+      ],
+      "region": false,
+      "numeric_model": "strict",
+      "split_reduction_inputs": false,
+      "split_pointwise_inputs": false
+    }
+  }
+]

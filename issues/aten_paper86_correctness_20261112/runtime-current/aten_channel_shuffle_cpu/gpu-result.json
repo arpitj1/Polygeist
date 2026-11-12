@@ -1,0 +1,270 @@
+{
+  "kernel": "aten_channel_shuffle_cpu",
+  "run_id": "20261112T173643Z",
+  "binary_sha256": "60594d0544964334693d480c719a8c9ab73a399a1f866ebe0af0f3404a4a340f",
+  "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+  "cudnn_plan_cache": false,
+  "correctness": {
+    "paper": {
+      "rc": 0,
+      "passed": true,
+      "raised_passed": true,
+      "native_passed": true,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 4147728.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 4147728.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        }
+      ],
+      "vendor_calls": 2
+    }
+  },
+  "correctness_scope": [
+    "paper"
+  ],
+  "fully_validated": true,
+  "raised_validated": true,
+  "raised_matches_native": true,
+  "native_matches_reference": true,
+  "timing": {
+    "passed": true,
+    "samples": [
+      {
+        "path": "raised",
+        "sample": 0,
+        "ms": 13.187075138
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 0,
+        "ms": 0.388965845
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 1,
+        "ms": 0.35680604
+      },
+      {
+        "path": "raised",
+        "sample": 1,
+        "ms": 13.270308971
+      },
+      {
+        "path": "raised",
+        "sample": 2,
+        "ms": 13.174530983
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 2,
+        "ms": 0.401895046
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 3,
+        "ms": 0.349158049
+      },
+      {
+        "path": "raised",
+        "sample": 3,
+        "ms": 13.212643862
+      },
+      {
+        "path": "raised",
+        "sample": 4,
+        "ms": 13.159363031
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 4,
+        "ms": 0.405094862
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 5,
+        "ms": 0.34262991
+      },
+      {
+        "path": "raised",
+        "sample": 5,
+        "ms": 13.306246042
+      },
+      {
+        "path": "raised",
+        "sample": 6,
+        "ms": 13.140482903
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 6,
+        "ms": 0.373766899
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 7,
+        "ms": 0.324902058
+      },
+      {
+        "path": "raised",
+        "sample": 7,
+        "ms": 13.13497901
+      },
+      {
+        "path": "raised",
+        "sample": 8,
+        "ms": 13.08604908
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 8,
+        "ms": 0.35837388
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 9,
+        "ms": 0.316998005
+      },
+      {
+        "path": "raised",
+        "sample": 9,
+        "ms": 13.161987066
+      },
+      {
+        "path": "raised",
+        "sample": 10,
+        "ms": 13.101058006
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 10,
+        "ms": 0.340742111
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 11,
+        "ms": 0.319141865
+      },
+      {
+        "path": "raised",
+        "sample": 11,
+        "ms": 13.097985983
+      },
+      {
+        "path": "raised",
+        "sample": 12,
+        "ms": 13.095809937
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 12,
+        "ms": 0.339173794
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 13,
+        "ms": 0.310693026
+      },
+      {
+        "path": "raised",
+        "sample": 13,
+        "ms": 13.158978939
+      },
+      {
+        "path": "raised",
+        "sample": 14,
+        "ms": 13.107554913
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 14,
+        "ms": 0.340965986
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 15,
+        "ms": 0.315620899
+      },
+      {
+        "path": "raised",
+        "sample": 15,
+        "ms": 13.144737959
+      },
+      {
+        "path": "raised",
+        "sample": 16,
+        "ms": 13.062976837
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 16,
+        "ms": 0.334501982
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 17,
+        "ms": 0.308326006
+      },
+      {
+        "path": "raised",
+        "sample": 17,
+        "ms": 13.106177807
+      },
+      {
+        "path": "raised",
+        "sample": 18,
+        "ms": 13.085856915
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 18,
+        "ms": 0.33021307
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 19,
+        "ms": 0.322694063
+      },
+      {
+        "path": "raised",
+        "sample": 19,
+        "ms": 13.086402178
+      }
+    ],
+    "input_kind": "paper",
+    "all_raised_input_modes_passed": true,
+    "normal_input_only_override": false,
+    "native_edge_disagreement": false,
+    "statistic": "minimum of 20 synchronized resident samples after five warmups; alternating order; reset outside timing",
+    "minimum_ms": {
+      "raised": 13.062976837,
+      "native_aten_cuda": 0.308326006
+    },
+    "minimum_first_five_ms": {
+      "raised": 13.159363031,
+      "native_aten_cuda": 0.349158049
+    },
+    "native_over_raised": 0.023603043153738693
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "routine": "openblas_sgemm_batched",
+  "source": "OpenBLAS v0.3.31 GEMM_BATCH driver and portable FP32 NN small-matrix kernel",
+  "upstream_files": [
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/interface/gemm_batch.c",
+      "sha256": "f92a73c5df5608fa5dccfbce77bada60e0d27df23586ab8459b11082a1ffa2c2"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/generic/gemm_small_matrix_kernel_nn.c",
+      "sha256": "c5c53dc8976afa639953317e5b62231b03df99af174ebcc837c1d8f5f8bb8b2d"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/LICENSE",
+      "sha256": "190b5a9c8d9723fe958ad33916bd7346d96fab3c5ea90832bb02d854f620fcff"
+    }
+  ],
+  "adaptation": "One group, dense column-major arrays, NN alpha=1 beta=0. Pointer-array batches become contiguous VLAs; a repeated A pointer represents a broadcast. Inline the existing scalar kernel without changing accumulation order. Runtime row-major wrapper receives transposed operand roles and swapped M/N.",
+  "specs": [
+    {
+      "name": "openblas_sgemm_batched_nn_b0_alpha1",
+      "defines": {
+        "SHARED_A": 0
+      },
+      "args": [
+        "batch",
+        "M",
+        "N",
+        "K",
+        "A",
+        "B",
+        "C"
+      ],
+      "target": {
+        "library": "cuBLAS",
+        "call": "cublasSgemmStridedBatched",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cublas_sgemm_strided_batched",
+          "arguments": [
+            "batch",
+            "N",
+            "M",
+            "K",
+            "B",
+            "A",
+            "C"
+          ],
+          "arrays": {
+            "A": [
+              "batch",
+              "K",
+              "M"
+            ],
+            "B": [
+              "batch",
+              "N",
+              "K"
+            ],
+            "C": [
+              "batch",
+              "N",
+              "M"
+            ]
+          },
+          "bounds": {
+            "batch": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "positive dimensions; dense arrays; output disjoint from both inputs",
+        "parallel vendor accumulation may differ in rounding; numerical validation required"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "batch": 3,
+          "M": 5,
+          "N": 7,
+          "K": 4
+        },
+        "arrays": {
+          "A": [
+            3,
+            4,
+            5
+          ],
+          "B": [
+            3,
+            7,
+            4
+          ],
+          "C": [
+            3,
+            7,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "name": "openblas_sgemm_batched_shared_a_nn_b0_alpha1",
+      "defines": {
+        "SHARED_A": 1
+      },
+      "args": [
+        "batch",
+        "M",
+        "N",
+        "K",
+        "A",
+        "B",
+        "C"
+      ],
+      "target": {
+        "library": "cuBLAS",
+        "call": "cublasSgemmStridedBatched",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cublas_sgemm_strided_batched_broadcast_rhs",
+          "arguments": [
+            "batch",
+            "N",
+            "M",
+            "K",
+            "B",
+            "A",
+            "C"
+          ],
+          "arrays": {
+            "A": [
+              "K",
+              "M"
+            ],
+            "B": [
+              "batch",
+              "N",
+              "K"
+            ],
+            "C": [
+              "batch",
+              "N",
+              "M"
+            ]
+          },
+          "bounds": {
+            "batch": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "positive dimensions; dense arrays; output disjoint from both inputs",
+        "parallel vendor accumulation may differ in rounding; numerical validation required"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "batch": 3,
+          "M": 5,
+          "N": 7,
+          "K": 4
+        },
+        "arrays": {
+          "A": [
+            4,
+            5
+          ],
+          "B": [
+            3,
+            7,
+            4
+          ],
+          "C": [
+            3,
+            7,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

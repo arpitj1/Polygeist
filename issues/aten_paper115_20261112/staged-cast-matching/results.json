@@ -1,0 +1,36 @@
+{
+  "matches": [
+    {
+      "spec": "thrust_divide_scalar_right_f32",
+      "root": "%13",
+      "func": "aten_exponential_cpu",
+      "binding": {
+        "%n": "index_cast(%c4096)",
+        "%x": "%10",
+        "%y": "%arg1",
+        "%output": "%0"
+      },
+      "generics": {
+        "%5": {
+          "pi": [
+            0
+          ],
+          "rho": [
+            0
+          ],
+          "sigma": [
+            0
+          ],
+          "app": "%12"
+        }
+      },
+      "consumed_ops": 5
+    }
+  ],
+  "diagnostic": {
+    "literal_policy_rejections": [],
+    "alternatives": [],
+    "rejected": [],
+    "residual_generics": []
+  }
+}

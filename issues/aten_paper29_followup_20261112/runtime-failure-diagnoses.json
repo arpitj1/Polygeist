@@ -1,0 +1,58 @@
+[
+  {
+    "kernel": "aten_sparse_norm_cpu",
+    "cause": "Long sequential FP32 accumulation differs from the parallel library accumulation; both GPU results are closer to the independent higher-precision reference.",
+    "observed": {
+      "sequential_c": 1141.379150390625,
+      "raised": 1141.093017578125,
+      "native": 1141.0928955078125,
+      "higher_precision": 1141.092951463651
+    },
+    "evidence": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/sparse-norm-rounding.json",
+    "proposed_fix": "If the unchanged sequential-C gate remains required, supply and import an order-preserving reduction reference/backend. This will sacrifice parallel reduction performance. A higher-precision oracle is useful separate evidence, not a reason to relabel this strict failure.",
+    "strict_status": "failed_preserved",
+    "memory_guards_and_inputs": "pass"
+  },
+  {
+    "kernel": "aten_outer",
+    "cause": "The extracted C initializes output to positive zero and adds the product. Native at::outer_out directly multiplies, preserving negative zero. Under the existing sign-sensitive gate these differ even though all finite numerical values agree.",
+    "observed": {
+      "values": 4194304,
+      "signed_zero_disagreements": 41120,
+      "raised_vs_c_bad": 0,
+      "maximum_absolute_error": 0
+    },
+    "evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_outer/gpu-result.json",
+    "proposed_fix": "Keep the direct native outer result as a failed semantic comparison. To match the extracted C exactly, a separate actual-ATen baseline must implement the same zero-initialize then addition, with that changed baseline scope explicitly documented. Do not normalize zeros or silently change the source/gate.",
+    "strict_status": "failed_preserved",
+    "memory_guards_and_inputs": "pass"
+  },
+  {
+    "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+    "cause": "Raised and native cuDNN outputs agree with each other, but differ from the long sequential FP32 C reduction. Accumulation order is the leading explanation; saved evidence does not yet include an independent higher-precision oracle for each failing output.",
+    "observed": {
+      "values": 3456,
+      "raised_vs_native_bad": 0,
+      "c_disagreements": 94,
+      "maximum_absolute_error": 0.0025100708
+    },
+    "evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_conv_transpose3d_grad_weight_cpu/gpu-result.json",
+    "proposed_fix": "First quantify each failing result against a higher-precision oracle without changing acceptance. To satisfy the existing sequential-C gate, investigate supported cuDNN algorithms with the required arithmetic ordering or a generic order-preserving reduction backend; deterministic alone does not imply the same order.",
+    "strict_status": "failed_preserved",
+    "memory_guards_and_inputs": "pass"
+  },
+  {
+    "kernel": "aten_slow_conv3d_backward_weight_cpu",
+    "cause": "Raised and native cuDNN outputs agree, but differ from sequential FP32 C accumulation; same numerical-contract issue as the transpose weight gradient.",
+    "observed": {
+      "values": 3456,
+      "raised_vs_native_bad": 0,
+      "c_disagreements": 10,
+      "maximum_absolute_error": 0.000274658203
+    },
+    "evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_slow_conv3d_backward_weight_cpu/gpu-result.json",
+    "proposed_fix": "Use a higher-precision oracle to diagnose the discrepancies, while preserving this failed gate. Strict sequential-C reproduction requires an algorithm/reference that preserves the required accumulation behavior, not a looser tolerance.",
+    "strict_status": "failed_preserved",
+    "memory_guards_and_inputs": "pass"
+  }
+]

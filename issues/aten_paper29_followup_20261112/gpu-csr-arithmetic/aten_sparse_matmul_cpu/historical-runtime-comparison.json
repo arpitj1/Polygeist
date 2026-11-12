@@ -1,0 +1,59 @@
+{
+  "kernel": "aten_sparse_matmul_cpu",
+  "historical_commit": "c58b6f11",
+  "historical_record": {
+    "kernel": "aten_sparse_matmul_cpu",
+    "resident_us": "154.144043",
+    "warm_us": "246.192139",
+    "device_speedup": "1.597156",
+    "shape": "C=2047_N=16380_R=2047",
+    "errors": "0",
+    "hardware": "Jetson_AGX_Orin_sm87_CUDA12.6",
+    "date": "2026-09-07",
+    "timing": "best_of_20_synchronized_wall_us",
+    "process_runs": "3",
+    "warmups": "",
+    "correctness_scope": "device_pointer_output_vs_C_reference"
+  },
+  "historical_record_source": "issues/aten_c_kernels/native_cuda_results/resident_silicon.csv",
+  "same": {
+    "shape": {
+      "R": 2047,
+      "C": 2047,
+      "N": 16380
+    },
+    "paper_input_recipe": "CSR rowptr floor(i*N/R), all column indices zero, FP32 values ((i%101)-50)/37; matching recorded recipe fingerprint 2d2accc210a10238",
+    "library_api": "cusparseSpMM",
+    "runtime_entry": "polygeist_cusparse_spmm_csr_f32_sized",
+    "runtime_wrapper_sha256": "a1a090f5813b0c32cf69258c9320ddd017001ee9bb0635b59dc8707cf3671867",
+    "wrapper_byte_identical": true,
+    "alpha": 1,
+    "beta": 0,
+    "storage": "CSR plus row-major dense input/output",
+    "datatype": "FP32",
+    "algorithm": "CUSPARSE_SPMM_ALG_DEFAULT",
+    "stream": "Private stream created by cudaStreamCreate; bound with cusparseSetStream",
+    "descriptor_lifetime": "CSR and two dense descriptors created/destroyed for each call",
+    "nnz_validation": "Read row_offsets[rows] synchronously from GPU, validate against index/value capacities"
+  },
+  "different": {
+    "historical_emission": "One kernel.launch @cusparseSpMM_CSR_f32_memref lowered directly to the sized runtime wrapper",
+    "current_emission": "One imported cusparseSpMM_cusp_csr_matvecs_beta0_f32 call through generated v3 ABI adapter",
+    "current_adapter_overhead": "Shape/capacity/alias checks plus five cudaPointerGetAttributes queries; resident arrays avoid staging",
+    "historical_workspace": "Direct old shim has no generated pipeline scope; DEVICE_MALLOC/FREE allocates/frees each invocation",
+    "current_workspace": "Generated adapter starts/ends a pipeline scope; DEVICE_MALLOC/FREE uses the existing workspace pool after warmup. Earlier diagnosis describing a fresh allocation every invocation was corrected.",
+    "historical_sync": "Shim stream synchronization plus harness cudaDeviceSynchronize",
+    "current_sync": "Pipeline-end stream synchronization plus harness cudaDeviceSynchronize",
+    "historical_timing": "Five warmups including correctness invocation; best of twenty repeated calls without input restoration/native alternation; recorded row has three process runs",
+    "current_timing": "Five warmups then five alternating raised/native pairs; all device arrays restored and synchronized before each interval"
+  },
+  "timings": {
+    "current_raised_ms": 0.390405893,
+    "paper_raised_ms": 0.154144043,
+    "current_native_ms": 0.50781703,
+    "paper_native_ms": 0.603328
+  },
+  "conclusion": "API, shape, input recipe, math, wrapper and algorithm agree. Extra v3 adapter work and changed memory/cache state from input restoration/native alternation remain possible contributors. No isolated attribution is established. Workspace reuse improves in the current path and does not explain the regression in the expected direction.",
+  "optional_gpu_diagnostic": "Not run: no existing cuSPARSE runtime setting was found that plausibly accounts for this gap. cuDNN cache does not affect this call. A controlled harness-protocol or direct-adapter comparison would require a separately authorized diagnostic.",
+  "unavailable_historical_provenance": "No preserved paper executable or exact loaded-library hashes were found; same wrapper source does not prove identical compiler/library binary versions."
+}

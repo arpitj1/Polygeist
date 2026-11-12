@@ -36,6 +36,9 @@ void polygeist_cublas_destroy(void);
 void polygeist_cub_scan_inclusive_seed_f32(int32_t n, float seed,
                                           const float *input, float *output);
 
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceScanInclusiveScanByKey polygeist_cub_row_product_scan_f32 */
+void polygeist_cub_row_product_scan_f32(int32_t rows, int32_t cols, float seed,
+                                       const float *input, float *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceScanInclusiveScanInit polygeist_cub_scan_product_seed_f32 */
 void polygeist_cub_scan_product_seed_f32(int32_t n, float seed,
                                        const float *input, float *output);
@@ -66,6 +69,10 @@ void polygeist_cub_reduce_or_i32(int n, int seed, const int *input, int *output)
 float polygeist_cub_reduce_value_sum_f32(int32_t n, float seed, const float *input);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceReduce polygeist_cub_reduce_value_sum_f64 */
 double polygeist_cub_reduce_value_sum_f64(int32_t n, double seed, const double *input);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceHistogramEven polygeist_cub_histogram_even_i32 */
+void polygeist_cub_histogram_even_i32(int32_t count, const int32_t *samples,
+                                    int32_t bins, int32_t *output);
 
 // Whole-algorithm operations recovered from imperative C loop nests.
 void polygeist_cub_histogram_even_i32_shift_zero(
@@ -119,12 +126,20 @@ void polygeist_cusparse_spmv_csr_f64_sized(
     int32_t value_count, const double *values,
     int32_t x_count, const double *x, int32_t y_count, double *y,
     double alpha, double beta);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuSPARSE cusparseSpMV polygeist_cusparse_spmv_csr_beta0_f32_sized */
+void polygeist_cusparse_spmv_csr_beta0_f32_sized(
+    int32_t rows, int32_t row_offset_count, const int32_t *row_offsets,
+    int32_t column_index_count, const int32_t *column_indices,
+    int32_t value_count, const float *values,
+    int32_t x_count, const float *x, int32_t y_count, float *y);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuSPARSE cusparseSpMM polygeist_cusparse_spmm_csr_f32_sized */
 void polygeist_cusparse_spmm_csr_f32_sized(
     int32_t rows, int32_t row_offset_count, const int32_t *row_offsets,
     int32_t column_index_count, const int32_t *column_indices,
     int32_t value_count, const float *values,
     int32_t b_rows, int32_t b_cols, const float *b,
     int32_t c_rows, int32_t c_cols, float *c);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuSPARSE cusparseSpMM polygeist_cusparse_spmm_coo_f32_sized */
 void polygeist_cusparse_spmm_coo_f32_sized(
     int32_t rows, int32_t nnz,
     int32_t row_index_count, const int32_t *row_indices,
@@ -151,6 +166,7 @@ void polygeist_cusparse_sddmm_csr_f32_sized(
 void polygeist_cusparse_coo2csr_i32_sized(
     int32_t rows, int32_t coo_count, const int32_t *coo_rows,
     int32_t csr_count, int32_t *csr_row_offsets);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuSPARSE cusparseXcsr2coo polygeist_cusparse_csr2coo_i32_sized */
 void polygeist_cusparse_csr2coo_i32_sized(
     int32_t rows, int32_t csr_count, const int32_t *csr_row_offsets,
     int32_t coo_capacity, int32_t *coo_rows);
@@ -288,10 +304,12 @@ void polygeist_cublas_sgemm_transpose_tf32(
 
 // C[batch,M,N] = A[batch,M,K] * B[K,N].  B is broadcast across batches;
 // the CUDA implementation uses a zero RHS batch stride and beta=0.
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuBLAS cublasSgemmStridedBatched polygeist_cublas_sgemm_strided_batched_broadcast_rhs */
 void polygeist_cublas_sgemm_strided_batched_broadcast_rhs(
     int32_t batch, int32_t M, int32_t N, int32_t K,
     const float *A, const float *B, float *C);
 
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuBLAS cublasSgemmStridedBatched polygeist_cublas_sgemm_strided_batched */
 void polygeist_cublas_sgemm_strided_batched(
     int32_t batch, int32_t M, int32_t N, int32_t K,
     const float *A, const float *B, float *C);
@@ -726,14 +744,17 @@ void polygeist_cublas_joint_maxabs_product_f32(
 void polygeist_cudnn_feature_mask_scale_f32(
     int32_t N, int32_t C, int32_t H, int32_t W, float scale,
     const float *input, const float *mask, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionBackwardData polygeist_cudnn_conv_transpose2d_f32 */
 void polygeist_cudnn_conv_transpose2d_f32(
     int32_t B, int32_t IC, int32_t OC, int32_t H, int32_t W,
     int32_t KH, int32_t KW, const float *input, const float *filter,
     float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionBackwardData polygeist_cudnn_conv_transpose3d_f32 */
 void polygeist_cudnn_conv_transpose3d_f32(
     int32_t IC, int32_t OC, int32_t D, int32_t H, int32_t W,
     int32_t KD, int32_t KH, int32_t KW, const float *input,
     const float *filter, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionBackwardFilter polygeist_cudnn_conv_backward_filter3d_f32 */
 void polygeist_cudnn_conv_backward_filter3d_f32(
     int32_t IC, int32_t OC,
     int32_t ID, int32_t IH, int32_t IW,
@@ -748,9 +769,14 @@ void polygeist_cutensor_kronecker_product2d_f32(
     const float *x, const float *y, float *output);
 void polygeist_cudnn_binary_cross_entropy_mean_f32(
     int32_t N, const float *input, const float *target, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionForward polygeist_reference_conv_tbc_f32 */
+void polygeist_reference_conv_tbc_f32(
+    int32_t B, int32_t I, int32_t O, int32_t K, int32_t TO,
+    const float *input, const float *filter, float *output);
 void polygeist_cudnn_conv_tbc_f32(
     int32_t T, int32_t B, int32_t I, int32_t O, int32_t K,
     const float *input, const float *filter, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionBackwardData polygeist_cudnn_conv_tbc_backward_f32 */
 void polygeist_cudnn_conv_tbc_backward_f32(
     int32_t T, int32_t B, int32_t I, int32_t O, int32_t K,
     const float *grad, const float *filter, float *output);
@@ -1110,6 +1136,9 @@ void polygeist_cublas_geam_vector_f64(int32_t n, double alpha,
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_segmented_sum_f32 */
 void polygeist_cub_segmented_sum_f32(int32_t rows, int32_t cols, float seed,
                                     const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_segmented_sum_f64 */
+void polygeist_cub_segmented_sum_f64(int32_t rows, int32_t cols, double seed,
+                                    const double *input, double *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduce polygeist_cub_segmented_xor_i32 */
 void polygeist_cub_segmented_xor_i32(int32_t rows, int32_t cols, int32_t seed,
                                     const int32_t *input, int32_t *output);

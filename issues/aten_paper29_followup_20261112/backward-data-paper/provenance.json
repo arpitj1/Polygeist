@@ -1,0 +1,40 @@
+{
+  "arguments": {
+    "worker": null,
+    "output": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/backward-data-paper",
+    "checklist": "/home/arjaiswal/Polygeist/issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv",
+    "jobs": 2,
+    "ranks": [
+      0,
+      2
+    ],
+    "region": true,
+    "region_budget": 25,
+    "split_reduction_inputs": false,
+    "split_pointwise_inputs": false,
+    "numeric_model": "relaxed",
+    "timeout": 600,
+    "cases": [
+      "aten_conv_transpose3d_cpu",
+      "aten_slow_conv3d_backward_input_cpu"
+    ],
+    "case_options": null,
+    "include_validated": false,
+    "shape_specs": "issues/aten_paper29_followup_20261112/shapes.json",
+    "summarize": false
+  },
+  "git": "e2694ce2dbfa9374f770aa43859a7811cccbfec9",
+  "uptime": "09:44:15 up 448 days, 14:13,  2 users,  load average: 6.39, 4.75, 5.50",
+  "hashes": {
+    "/home/arjaiswal/Polygeist/build/bin/cgeist": "e988434e193238d07fca913c33100eb9e709f92819a8d34bd6c2cd84c5d2940e",
+    "/home/arjaiswal/Polygeist/build/bin/polygeist-opt": "f14b26f4b5f4a2eee601f20dd1706e21e5e3dab92379111d4356d1072dcf7120",
+    "/home/arjaiswal/Polygeist/generic_solver/lib_v3/import_manifest.json": "a0e26a9a314ffc1fa24cc3fa080160101cbb2f120d7aa97a24c0fd70a441d0fb",
+    "/home/arjaiswal/Polygeist/generic_solver/kernel_library_v3.mlir": "1fac2bb4040eebc00a21248c649b5db12a5ed1afd5099e6b5e3536c7a3556b84",
+    "/home/arjaiswal/Polygeist/issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv": "2d7c66473ab20e00a12bbc31bb77fbd92f2525e1934ac0912bd1f5c97a5e684b",
+    "issues/aten_paper29_followup_20261112/shapes.json": "532e322c1584ad535461c696e9fe8ed06d9ea640a000eaef2f23258898785004"
+  },
+  "selected": [
+    "aten_slow_conv3d_backward_input_cpu",
+    "aten_conv_transpose3d_cpu"
+  ]
+}

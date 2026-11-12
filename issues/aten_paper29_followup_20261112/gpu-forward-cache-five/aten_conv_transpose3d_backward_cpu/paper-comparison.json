@@ -1,0 +1,31 @@
+{
+  "kernel": "aten_conv_transpose3d_backward_cpu",
+  "fully_validated": true,
+  "paper": {
+    "id": "4",
+    "kernel": "aten_conv_transpose3d_backward_cpu",
+    "native_us": "88.384",
+    "raised_us": "127.104004",
+    "raised_over_native": "1.438088387038378",
+    "speedup_percent": "-30.463244887234243",
+    "semantic_family": "convolution",
+    "raised_library": "cuDNN",
+    "raised_call": "cudnnConvolution3D_f32",
+    "timing_source": "current Section 4.2 campaign",
+    "timing_protocol": "minimum of 5 after 5 warmups"
+  },
+  "cache_enabled": true,
+  "actual_samples": 5,
+  "selected_statistic": "minimum_first_five_ms",
+  "comparison_scope": "Current cached five-pair minimum; previous uncached first-five minimum from a separately completed campaign. Historical paper cache state unknown.",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_conv_transpose3d_backward_cpu",
+  "binary_sha256": "721d2116e4bf0ed36039eeef96b630c54dc0360a127a3334471b2f04cd275aa4",
+  "old_binary_sha256": "d06706658bc2250ce15bc72049361b3b77d2ace9ed804ec013fdaf9627849a8b",
+  "adaptation": "Only saved timing harness sample count changed; all compute and native objects frozen.",
+  "raised_ms": 0.155458927,
+  "native_ms": 0.101569891,
+  "prior_uncached_first_five_ms": 0.462120056,
+  "previous_over_current": 2.9726183302423026,
+  "current_over_paper": 1.2230844199054498,
+  "timing_statistic_matches_paper": true
+}

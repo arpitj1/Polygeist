@@ -1,0 +1,153 @@
+{
+  "routine": "cudnn_conv_backward_data2d",
+  "source": "NVIDIA public cuDNN dataGrad_cpu_ref<float>, explicit layout/traversal specialization",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "adaptation": "Specialize public cuDNN dataGrad to cross-correlation, alpha=1, beta=0, unit stride/dilation and no padding. Invert its gather relation p=h-r, q=w-s into scatter destinations h=p+r, w=q+s. Traverse the valid gradient/filter product in gradient storage order. This manual adaptation changes floating-point reduction order.",
+  "specs": [
+    {
+      "name": "cudnn_conv2d_backward_data_valid_f32",
+      "args": [
+        "B",
+        "IC",
+        "OC",
+        "H",
+        "W",
+        "KH",
+        "KW",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionBackwardData",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cudnn_conv_transpose2d_f32",
+          "arguments": [
+            "B",
+            "IC",
+            "OC",
+            "H",
+            "W",
+            "KH",
+            "KW",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "B",
+              "IC",
+              "H",
+              "W"
+            ],
+            "filter": [
+              "IC",
+              "OC",
+              "KH",
+              "KW"
+            ],
+            "output": [
+              "B",
+              "OC",
+              {
+                "terms": {
+                  "H": 1,
+                  "KH": 1
+                },
+                "offset": -1
+              },
+              {
+                "terms": {
+                  "W": 1,
+                  "KW": 1
+                },
+                "offset": -1
+              }
+            ]
+          },
+          "bounds": {
+            "B": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "H": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "W": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "KH": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "KW": {
+              "min": 1,
+              "max": 1073741824
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Dense disjoint FP32 arrays with positive dimensions and int32-representable tensor strides",
+        "Relaxed numerical model is required for gather-to-scatter summation reordering"
+      ],
+      "deviations": [
+        "Specialize public cuDNN dataGrad to cross-correlation, alpha=1, beta=0, unit stride/dilation and no padding. Invert its gather relation p=h-r, q=w-s into scatter destinations h=p+r, w=q+s. Traverse the valid gradient/filter product in gradient storage order. This manual adaptation changes floating-point reduction order."
+      ],
+      "validation": {
+        "scalars": {
+          "B": 2,
+          "IC": 2,
+          "OC": 3,
+          "H": 4,
+          "W": 5,
+          "KH": 2,
+          "KW": 3
+        },
+        "arrays": {
+          "input": [
+            2,
+            2,
+            4,
+            5
+          ],
+          "filter": [
+            2,
+            3,
+            2,
+            3
+          ],
+          "output": [
+            2,
+            3,
+            5,
+            7
+          ]
+        }
+      }
+    }
+  ]
+}

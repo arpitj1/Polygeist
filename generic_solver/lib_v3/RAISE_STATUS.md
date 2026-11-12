@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 9, PARTIAL: 39, RAISED: 174, UNSOUND: 2, UNVALIDATED: 16 (total 240)
+Summary: NOT_RAISED: 11, PARTIAL: 45, RAISED: 180, UNSOUND: 2, UNVALIDATED: 16 (total 254)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -92,6 +92,7 @@ Summary: NOT_RAISED: 9, PARTIAL: 39, RAISED: 174, UNSOUND: 2, UNVALIDATED: 16 (t
 | `scipy_csr_matvec_i64` | csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | UNSUPPORTED_SIGNATURE / UNSUPPORTED_SIGNATURE | no linalg.generic after raising; residual affine.for, scf.for |
 | `scipy_csr_matvec_beta0_i64` | csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | UNSUPPORTED_SIGNATURE / UNSUPPORTED_SIGNATURE | no linalg.generic after raising; residual affine.for, scf.for |
 | `cub_column_sum_i8_i32` | cub_column_sum | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_histogram_even_i32` | cub_histogram_even | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `cub_inclusive_product_f32` | cub_inclusive_product | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_inclusive_scan_f32` | cub_inclusive_scan | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_and_i32` | cub_logical_reduce | RAISED | 1 | - | EXACT / EXACT |  |
@@ -107,7 +108,9 @@ Summary: NOT_RAISED: 9, PARTIAL: 39, RAISED: 174, UNSOUND: 2, UNVALIDATED: 16 (t
 | `cub_reduce_product_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_sum_f32` | cub_reduce_value | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_sum_f64` | cub_reduce_value | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_row_product_scan_f32` | cub_row_product_scan | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_sum_f32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_segmented_sum_f64` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_xor_i32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_count_nonzero_f32` | cub_segmented_count_nonzero | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_reduce_and_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / EXACT |  |
@@ -117,6 +120,15 @@ Summary: NOT_RAISED: 9, PARTIAL: 39, RAISED: 174, UNSOUND: 2, UNVALIDATED: 16 (t
 | `cudnn_conv2d_valid_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_valid_unbatched_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv3d_valid_f32` | cudnn_conv3d | RAISED | 2 | - | EXACT / EXACT |  |
+| `cudnn_conv2d_backward_data_valid_f32` | cudnn_conv_backward_data2d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses) |
+| `cudnn_conv3d_backward_data_valid_f32` | cudnn_conv_backward_data3d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (5 loop ops, 0 scalar memory accesses) |
+| `cudnn_conv1d_backward_data_tbc_f32` | cudnn_conv_backward_data_tbc | PARTIAL | 2 | affine.for | LOWER_FAIL / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `cudnn_conv3d_backward_filter_valid_f32` | cudnn_conv_backward_filter3d | RAISED | 2 | - | EXACT / EXACT |  |
+| `cudnn_conv1d_tbc_f32` | cudnn_conv_tbc | RAISED | 2 | - | EXACT / EXACT |  |
+| `cusp_coo_matvecs_beta0_f32` | cusp_coo_matvecs | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `cusp_csr_matvec_beta0_f32` | cusp_csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
+| `cusp_csr_matvecs_beta0_f32` | cusp_csr_matvecs | PARTIAL | 2 | affine.for, scf.while | UNSOUND / EXACT | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
+| `cusp_expandptr_i32` | cusp_expandptr | NOT_RAISED | 0 | affine.for, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.while |
 | `cutlass_gemm_i8_i32` | cutlass_gemm_i8 | RAISED | 2 | - | EXACT / EXACT |  |
 | `cutlass_rmsnorm_f32` | cutlass_rmsnorm | RAISED | 2 | - | EXACT / EXACT |  |
 | `cutlass_rmsnorm_parameterized_f32` | cutlass_rmsnorm_parameterized | RAISED | 2 | - | EXACT / EXACT |  |
@@ -218,6 +230,8 @@ Summary: NOT_RAISED: 9, PARTIAL: 39, RAISED: 174, UNSOUND: 2, UNVALIDATED: 16 (t
 | `openblas_dgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_scopy_f32` | openblas_scopy | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_sgemm_nn_m1_b0_alpha1` | openblas_sgemm | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_sgemm_batched_nn_b0_alpha1` | openblas_sgemm_batched | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_sgemm_batched_shared_a_nn_b0_alpha1` | openblas_sgemm_batched | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_sgemm_nn_b0` | openblas_sgemm_general | UNSOUND | 2 | - | UNSOUND / UNSOUND | raised defn disagrees with the C transliteration (max abs err 2.38e-07; memref-Linalg route: UNSOUND) |
 | `openblas_sgemm_nn` | openblas_sgemm_general | UNSOUND | 2 | - | UNSOUND / UNSOUND | raised defn disagrees with the C transliteration (max abs err 4.77e-07; memref-Linalg route: UNSOUND) |
 | `openblas_sgemv_n_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
@@ -387,6 +401,18 @@ build/bin/polygeist-opt '--select-func=func-name=scipy_csr_matvec_beta0_i64 exte
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/scipy_csr_matvec_beta0_i64_linalg.mlir -o generic_solver/lib_v3/raised/scipy_csr_matvec_beta0_i64_debuf.mlir
 ```
 
+### `cub_histogram_even_i32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cub_histogram_even_i32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cub_histogram_even_i32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cub_histogram_even_i32.c --function=cub_histogram_even_i32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_histogram_even_i32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cub_histogram_even_i32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_histogram_even_i32.mlir -o generic_solver/lib_v3/raised/cub_histogram_even_i32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_histogram_even_i32_linalg.mlir -o generic_solver/lib_v3/raised/cub_histogram_even_i32_debuf.mlir
+```
+
 ### `cub_ordered_row_prefix_sum_f32` -- NOT_RAISED
 
 Reason: no linalg.generic after raising; residual affine.for, scf.for
@@ -397,6 +423,90 @@ Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cub_orde
 build/bin/cgeist generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32.c --function=cub_ordered_row_prefix_sum_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32.mlir
 build/bin/polygeist-opt '--select-func=func-name=cub_ordered_row_prefix_sum_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32.mlir -o generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32_linalg.mlir
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_ordered_row_prefix_sum_f32_debuf.mlir
+```
+
+### `cudnn_conv2d_backward_data_valid_f32` -- PARTIAL
+
+Reason: 2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_conv2d_backward_data_valid_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cudnn_conv2d_backward_data_valid_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.c --function=cudnn_conv2d_backward_data_valid_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cudnn_conv2d_backward_data_valid_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32_debuf.mlir
+```
+
+### `cudnn_conv3d_backward_data_valid_f32` -- PARTIAL
+
+Reason: 2 linalg.generic but residual affine.for (5 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_conv3d_backward_data_valid_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cudnn_conv3d_backward_data_valid_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.c --function=cudnn_conv3d_backward_data_valid_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cudnn_conv3d_backward_data_valid_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32_debuf.mlir
+```
+
+### `cudnn_conv1d_backward_data_tbc_f32` -- PARTIAL
+
+Reason: 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_conv1d_backward_data_tbc_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cudnn_conv1d_backward_data_tbc_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.c --function=cudnn_conv1d_backward_data_tbc_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_backward_data_tbc_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_debuf.mlir
+```
+
+### `cusp_coo_matvecs_beta0_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cusp_coo_matvecs_beta0_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cusp_coo_matvecs_beta0_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.c --function=cusp_coo_matvecs_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cusp_coo_matvecs_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32_debuf.mlir
+```
+
+### `cusp_csr_matvec_beta0_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.for
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cusp_csr_matvec_beta0_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cusp_csr_matvec_beta0_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.c --function=cusp_csr_matvec_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cusp_csr_matvec_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32_debuf.mlir
+```
+
+### `cusp_csr_matvecs_beta0_f32` -- PARTIAL
+
+Reason: 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cusp_csr_matvecs_beta0_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cusp_csr_matvecs_beta0_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.c --function=cusp_csr_matvecs_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cusp_csr_matvecs_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32_debuf.mlir
+```
+
+### `cusp_expandptr_i32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.while
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cusp_expandptr_i32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cusp_expandptr_i32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cusp_expandptr_i32.c --function=cusp_expandptr_i32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_expandptr_i32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cusp_expandptr_i32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_expandptr_i32.mlir -o generic_solver/lib_v3/raised/cusp_expandptr_i32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_expandptr_i32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_expandptr_i32_debuf.mlir
 ```
 
 ### `netlib_dpotf2_u` -- PARTIAL

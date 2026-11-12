@@ -1,0 +1,148 @@
+{
+  "routine": "cusp_csr_matvec",
+  "source": "NVIDIA AMGX public CUSP csr_matvec<int,float>; reference counterpart for the closed-source cuSPARSE API",
+  "upstream_files": [
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/csr.h",
+      "sha256": "549ba93dc87891e3fe862add7c7208f8dc773c1cdd2f8bc35fa8934620cd6fff"
+    }
+  ],
+  "adaptation": "Instantiate int32/FP32 and expose buffer capacities as VLA extents. Apply the accumulating public reference to a zero-filled output for beta=0; the public implementation itself accumulates into its incoming output.",
+  "specs": [
+    {
+      "name": "cusp_csr_matvec_beta0_f32",
+      "args": [
+        "rows",
+        "row_offset_count",
+        "row_offsets",
+        "column_index_count",
+        "column_indices",
+        "value_count",
+        "values",
+        "x_count",
+        "x",
+        "y_count",
+        "y"
+      ],
+      "target": {
+        "library": "cuSPARSE",
+        "call": "cusparseSpMV",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cusparse_spmv_csr_beta0_f32_sized",
+          "arguments": [
+            "rows",
+            "row_offset_count",
+            "row_offsets",
+            "column_index_count",
+            "column_indices",
+            "value_count",
+            "values",
+            "x_count",
+            "x",
+            "y_count",
+            "y"
+          ],
+          "arrays": {
+            "row_offsets": [
+              "row_offset_count"
+            ],
+            "column_indices": [
+              "column_index_count"
+            ],
+            "values": [
+              "value_count"
+            ],
+            "x": [
+              "x_count"
+            ],
+            "y": [
+              "y_count"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "row_offset_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "column_index_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "value_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "x_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "y_count": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Valid zero-based CSR with nondecreasing row offsets and in-bounds column indices; all capacities cover the accessed elements",
+        "Disjoint FP32 value arrays and int32 index arrays; alpha=1, beta=0",
+        "Relaxed finite arithmetic permits the vendor reduction order"
+      ],
+      "deviations": [
+        "Apply the accumulating public reference to a zero-filled output for beta=0; the public implementation itself accumulates into its incoming output."
+      ],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "row_offset_count": 4,
+          "column_index_count": 5,
+          "value_count": 5,
+          "x_count": 4,
+          "y_count": 5
+        },
+        "arrays": {
+          "row_offsets": [
+            4
+          ],
+          "column_indices": [
+            5
+          ],
+          "values": [
+            5
+          ],
+          "x": [
+            4
+          ],
+          "y": [
+            5
+          ]
+        },
+        "array_values": {
+          "row_offsets": [
+            0,
+            2,
+            2,
+            5
+          ],
+          "column_indices": [
+            0,
+            2,
+            3,
+            1,
+            0
+          ]
+        }
+      }
+    }
+  ]
+}

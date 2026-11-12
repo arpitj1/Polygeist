@@ -1,0 +1,39 @@
+{
+  "kernel": "aten_blas_scale_cpu",
+  "paper_family": "dense_vector_update",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_blas_scale_cpu/aten_blas_scale_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_blas_scale_cpu.c",
+  "original_source_sha256": "fc90a70b101523401e8d19e34b0c4e7e9b85cd27c5b0b2f1c273ed4eec485503",
+  "shape_record": {
+    "kernel": "aten_blas_scale_cpu",
+    "op": "blas_scale",
+    "cat": "native_fixture",
+    "dims": {
+      "N": 4194304
+    },
+    "n": 4194304,
+    "shape": "N=4194304",
+    "dtype": "f32",
+    "scalar_args": {
+      "a": "0.5"
+    },
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "cf3d9e50f32fba45"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cublasSscal"
+}

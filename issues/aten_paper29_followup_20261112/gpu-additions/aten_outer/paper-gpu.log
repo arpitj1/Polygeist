@@ -1,0 +1,22 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+NATIVE_MISMATCH array=2 i=50 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=50 got=-0x0p+0 expected=0x0p+0
+NATIVE_MISMATCH array=2 i=151 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=151 got=-0x0p+0 expected=0x0p+0
+NATIVE_MISMATCH array=2 i=252 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=252 got=-0x0p+0 expected=0x0p+0
+NATIVE_MISMATCH array=2 i=353 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=353 got=-0x0p+0 expected=0x0p+0
+CHECK kind=0 parameters=0 resident=0 count=4194304 bad=0 nativebad=41120 nativerefbad=41120 guardbad=0 inputbad=0 maxabs=0
+NATIVE_MISMATCH array=2 i=50 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=50 got=-0x0p+0 expected=0x0p+0
+NATIVE_MISMATCH array=2 i=151 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=151 got=-0x0p+0 expected=0x0p+0
+NATIVE_MISMATCH array=2 i=252 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=252 got=-0x0p+0 expected=0x0p+0
+NATIVE_MISMATCH array=2 i=353 got=0x0p+0 expected=-0x0p+0
+NATIVE_REFERENCE_MISMATCH array=2 i=353 got=-0x0p+0 expected=0x0p+0
+CHECK kind=0 parameters=0 resident=1 count=4194304 bad=0 nativebad=41120 nativerefbad=41120 guardbad=0 inputbad=0 maxabs=0
+POLYGEIST_V2_CALL backend=cuda call=cublasDgemm entry=cublasDgemm_v2 lib_ms=31.510784 h2d_ms=7.120704 d2h_ms=3.998272
+POLYGEIST_V2_CALL backend=cuda call=cublasDgemm entry=cublasDgemm_v2 lib_ms=1.405184 h2d_ms=0.015456 d2h_ms=0.001088
+POLYGEIST_V2_STATS backend=cuda call=cublasDgemm entry=cublasDgemm_v2 count=2 lib_ms=32.915968 h2d_ms=7.136160 d2h_ms=3.999360 h2d_bytes=33587200 d2h_bytes=33554432

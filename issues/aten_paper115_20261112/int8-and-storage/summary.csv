@@ -1,0 +1,5 @@
+kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
+aten_addmm,dense_linear_algebra,recognized,2,0,,0,openblas_dgemm_nn,0,0,True,cublasDgemm,not_run,not_run
+aten_allany_dims_cpu,boolean_reduction,recognized,2,0,,0,cub_segmented_logical_mode_i32,0,0,True,cubSegmentedLogicalSelect_i32_memref,not_run,not_run
+aten_int_mm_out_cpu,dense_linear_algebra,recognized,2,0,,0,cutlass_gemm_i8_i32,0,0,True,cublasGemmEx_i8_i32_tensor,not_run,not_run
+aten_polar_scalarized,complex_construction,recognized,2,0,,0,thrust_polar_components_f32,0,0,True,cudnnPointwiseGraph_f32,not_run,not_run

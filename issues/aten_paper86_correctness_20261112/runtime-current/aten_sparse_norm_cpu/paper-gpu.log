@@ -1,0 +1,13 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+MISMATCH array=1 i=0 got=0x1.1d45f4p+10 expected=0x1.1d5844p+10
+NATIVE_REFERENCE_MISMATCH array=1 i=0 got=0x1.1d45f2p+10 expected=0x1.1d5844p+10
+CHECK kind=0 parameters=0 resident=0 count=1 bad=1 nativebad=0 nativerefbad=1 guardbad=0 inputbad=0 maxabs=0.286132812
+MISMATCH array=1 i=0 got=0x1.1d45f4p+10 expected=0x1.1d5844p+10
+NATIVE_REFERENCE_MISMATCH array=1 i=0 got=0x1.1d45f2p+10 expected=0x1.1d5844p+10
+CHECK kind=0 parameters=0 resident=1 count=1 bad=1 nativebad=0 nativerefbad=1 guardbad=0 inputbad=0 maxabs=0.286132812
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute lib_ms=373.855713 h2d_ms=2.199808 d2h_ms=0.006912
+POLYGEIST_V2_CALL backend=cuda call=DeviceReduce_cub_reduce_value_sum_f32 entry=polygeist_cub_reduce_value_sum_f32 lib_ms=1.328864 h2d_ms=0.006880 d2h_ms=0.004544
+POLYGEIST_V2_CALL backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute lib_ms=0.259744 h2d_ms=0.006688 d2h_ms=0.004128
+POLYGEIST_V2_CALL backend=cuda call=DeviceReduce_cub_reduce_value_sum_f32 entry=polygeist_cub_reduce_value_sum_f32 lib_ms=0.120192 h2d_ms=0.005632 d2h_ms=0.003776
+POLYGEIST_V2_STATS backend=cuda call=cudnnBackendExecute_aten_mul_f32 entry=cudnnBackendExecute count=2 lib_ms=374.115457 h2d_ms=2.206496 d2h_ms=0.011040 h2d_bytes=8388608 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=DeviceReduce_cub_reduce_value_sum_f32 entry=polygeist_cub_reduce_value_sum_f32 count=2 lib_ms=1.449056 h2d_ms=0.012512 d2h_ms=0.008320 h2d_bytes=0 d2h_bytes=0

@@ -1,0 +1,42 @@
+{
+  "kernel": "aten_dropout_feature_noise_cpu",
+  "paper_family": "dropout",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_dropout_feature_noise_cpu/aten_dropout_feature_noise_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_dropout_feature_noise_cpu.c",
+  "original_source_sha256": "a2d1a0fd1f93c81fbc67ce81fb468aaea55e2b3664a89ee258c35eab8b400db3",
+  "shape_record": {
+    "kernel": "aten_dropout_feature_noise_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "B": 32,
+      "C": 64,
+      "H": 64,
+      "W": 64
+    },
+    "n": 8388608,
+    "shape": "B=32_C=64_H=64_W=64",
+    "dtype": "f32",
+    "scalar_args": {
+      "scale": "1.25"
+    },
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "feature-wise broadcast multiply through cuDNN OpTensor",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "bdd5f8a7dcb35084"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnFeatureMaskScale_f32_tensor"
+}

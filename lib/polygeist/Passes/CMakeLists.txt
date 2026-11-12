@@ -52,6 +52,7 @@ add_mlir_dialect_library(MLIRPolygeistTransforms
   MLIRPolygeistPassIncGen
 
   LINK_LIBS PUBLIC
+  MLIRPresburger
   MLIRAffineDialect
   MLIRArithDialect
   MLIRArithTransforms

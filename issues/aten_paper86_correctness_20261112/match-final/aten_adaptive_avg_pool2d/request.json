@@ -1,0 +1,42 @@
+{
+  "kernel": "aten_adaptive_avg_pool2d",
+  "paper_family": "adaptive_pooling",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_adaptive_avg_pool2d/aten_adaptive_avg_pool2d.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_adaptive_avg_pool2d.c",
+  "original_source_sha256": "7bcbb2c295b024c1c1f47373423e2b3753f2226d64bf90b2e71ea131a12fc3c5",
+  "shape_record": {
+    "kernel": "aten_adaptive_avg_pool2d",
+    "op": "adaptive_avg_pool2d",
+    "cat": "adaptavg2d",
+    "dims": {
+      "B": 4,
+      "C": 32,
+      "H": 256,
+      "W": 256,
+      "OH": 128,
+      "OW": 128
+    },
+    "n": 137438953472,
+    "shape": "B=4_C=32_H=256_W=256_OH=128_OW=128",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full regular 2x2 uniform-window convolution",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "1a91e610dab8183b"
+  },
+  "ranks": [
+    2
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnAvgPoolWindow_f32"
+}

@@ -26,6 +26,7 @@ static void mismatch(const char *label,int array,size_t index,const void *got,co
 int main(int argc,char **argv) {
   float *initial[NA],*host[NA],*device[NA],*reference[NA],*native[NA];
   int kind=argc>1&&!strcmp(argv[1],"edge")?1:argc>1&&!strcmp(argv[1],"zeros")?2:0;
+  int paper=PAPER_RECIPE && argc>1 && (!strcmp(argv[1],"paper")||!strcmp(argv[1],"timing"));
   const float edges[]={0.f,-0.f,INFINITY,-INFINITY,NAN,FLT_MAX,-FLT_MAX,FLT_MIN,-FLT_MIN,0x1p-149f,-0x1p-149f,1.f,-1.f,0.25f,-0.25f};
   for(int a=0;a<NA;a++) {
     initial[a]=malloc(bytes(a));host[a]=malloc(bytes(a));reference[a]=malloc(bytes(a));native[a]=malloc(bytes(a));
@@ -41,21 +42,24 @@ int main(int argc,char **argv) {
       float value=((int)((i*104729+a*613)%8192)-4096)/1024.f;
       if(kind==1)value=edges[(i+3*a)%(sizeof(edges)/sizeof(edges[0]))];
       if(kind==2)value=-0.f;
+      if(paper)value=paper_value(a,i);
       if(integer_arrays[a]) {
         const int32_t limits[]={0,1,-1,integer_arrays[a]==2?INT8_MIN:INT32_MIN,integer_arrays[a]==2?INT8_MAX:INT32_MAX,2,-2,integer_arrays[a]==2?63:129};
         int32_t integer=kind==2?0:kind==1?limits[(i+3*a)%8]:(int32_t)(i%5+1)*(i%2?-1:1);
         initialize_integer_metadata(a,i,&integer);
+        if(paper)integer=(int32_t)paper_value(a,i);
         if(integer_arrays[a]==2) { int8_t small=(int8_t)integer;memcpy(slot(a,initial[a],i),&small,sizeof(small)); }
         else memcpy(slot(a,initial[a],i),&integer,sizeof(integer));
       } else memcpy(slot(a,initial[a],i),&value,sizeof(value));
     }
   }
   int bad_total=0;
-  for(int parameter_case=0;parameter_case<(NS?2:1);parameter_case++) {
+  for(int parameter_case=0;parameter_case<(paper?1:NS?2:1);parameter_case++) {
     /* Distinct values expose argument-order errors and nontrivial intervals. */
     for(int s=0;s<NS;s++) parameters[s]=integer_parameters[s]
       ? (parameter_case ? -3-s : s)
       : (parameter_case ? (-0.75f+0.25f*s) : (0.25f+0.5f*s));
+    if(paper)for(int s=0;s<NS;s++)parameters[s]=paper_parameters[s];
     for(int a=0;a<NA;a++) {
       memcpy(allocation(reference[a]),allocation(initial[a]),bytes(a));
       CU(cudaMemcpy(allocation(device[a]),allocation(initial[a]),bytes(a),cudaMemcpyHostToDevice));
@@ -65,7 +69,7 @@ int main(int argc,char **argv) {
     for(int a=0;a<NA;a++) CU(cudaMemcpy(allocation(native[a]),allocation(device[a]),bytes(a),cudaMemcpyDeviceToHost));
     if(argc>1&&!strcmp(argv[1],"timing")) {
       /* Input restoration is outside each measured interval, including in-place operations. */
-      for(int i=-5;i<5;i++) for(int order=0;order<2;order++) {
+      for(int i=-5;i<TIMING_SAMPLES;i++) for(int order=0;order<2;order++) {
         int path=order^(i&1);
         for(int a=0;a<NA;a++) CU(cudaMemcpy(allocation(device[a]),allocation(initial[a]),bytes(a),cudaMemcpyHostToDevice));
         CU(cudaDeviceSynchronize()); double start=now_ms();

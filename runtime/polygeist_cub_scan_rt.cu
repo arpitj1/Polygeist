@@ -232,6 +232,9 @@ extern "C" void polygeist_cub_segmented_count_nonzero_f32(
 extern "C" void polygeist_cub_segmented_sum_f32(int rows,int cols,float seed,const float *input,float *output) {
  cub_segmented_reduce(rows,cols,seed,input,output,cuda::std::plus<float>{});
 }
+extern "C" void polygeist_cub_segmented_sum_f64(int rows,int cols,double seed,const double *input,double *output) {
+ cub_segmented_reduce(rows,cols,seed,input,output,cuda::std::plus<double>{});
+}
 extern "C" void polygeist_cub_segmented_xor_i32(int rows,int cols,int seed,const int *input,int *output) {
  cub_segmented_reduce(rows,cols,seed,input,output,cuda::std::bit_xor<int>{});
 }
@@ -321,4 +324,95 @@ extern "C" void polygeist_ordered_row_prefix_sum_f32(
   ordered_rows<64,IdentityF32,true><<<blocks,128,0,stream>>>(
       rows,cols,0.0f,input,output,IdentityF32{},length);
   require_cuda(cudaGetLastError(),"ordered row prefixes");
+}
+
+struct RowScanKey {
+  int cols;
+  __host__ __device__ int operator()(int index) const { return index / cols; }
+};
+struct SeededRowProductInput {
+  const float *input;
+  int cols;
+  float seed;
+  __host__ __device__ float operator()(int index) const {
+    return index % cols == 0 ? seed * input[index] : input[index];
+  }
+};
+
+extern "C" void polygeist_cub_row_product_scan_f32(
+    int rows, int cols, float seed, const float *input, float *output) {
+  if (rows <= 0 || cols <= 0 || !input || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  int device;
+  require_cuda(cudaGetDevice(&device), "row scan device");
+  struct Scratch { int device; void *pointer; size_t capacity; Scratch *next; };
+  static thread_local Scratch *head = nullptr;
+  Scratch *scratch = head;
+  while (scratch && scratch->device != device) scratch = scratch->next;
+  if (!scratch) {
+    scratch = new Scratch{device, nullptr, 0, head};
+    head = scratch;
+  }
+  // The installed DeviceScan ABI accepts an int item count. Preserve complete
+  // rows when splitting larger tensors; each chunk starts a fresh row key.
+  const int maxRows = INT32_MAX / cols;
+  for (int64_t first = 0; first < rows;) {
+    const int chunkRows = rows - first < maxRows ? rows - first : maxRows;
+    const int count = chunkRows * cols;
+    auto indices = thrust::counting_iterator<int>(0);
+    auto keys = thrust::make_transform_iterator(indices, RowScanKey{cols});
+    auto values = thrust::make_transform_iterator(indices,
+        SeededRowProductInput{input + first * cols, cols, seed});
+    size_t bytes = 0;
+    require_cuda(cub::DeviceScan::InclusiveScanByKey(nullptr, bytes, keys,
+        values, output + first * cols, cuda::std::multiplies<float>{}, count,
+        cuda::std::equal_to<int>{}, stream), "row scan scratch query");
+    if (bytes > scratch->capacity) {
+      require_cuda(cudaStreamSynchronize(stream), "row scan synchronization");
+      require_cuda(cudaFree(scratch->pointer), "row scan scratch free");
+      scratch->pointer = nullptr;
+      scratch->capacity = 0;
+      require_cuda(cudaMalloc(&scratch->pointer, bytes), "row scan scratch allocation");
+      scratch->capacity = bytes;
+    }
+    require_cuda(cub::DeviceScan::InclusiveScanByKey(scratch->pointer, bytes,
+        keys, values, output + first * cols, cuda::std::multiplies<float>{},
+        count, cuda::std::equal_to<int>{}, stream), "row scan");
+    if (std::getenv("POLYGEIST_TRACE_CUB"))
+      std::fprintf(stderr, "POLYGEIST_CUB_CALL entry=DeviceScanInclusiveScanByKey rows=%d cols=%d\n",
+                   chunkRows, cols);
+    first += chunkRows;
+  }
+}
+
+#include <cub/device/device_histogram.cuh>
+
+// DeviceHistogram overwrites all bins, including bins receiving no samples.
+extern "C" void polygeist_cub_histogram_even_i32(
+    int32_t count, const int32_t *samples, int32_t bins, int32_t *output) {
+  if (count < 0 || bins <= 0 || bins == INT32_MAX || !samples || !output)
+    std::abort();
+  cudaStream_t stream = (cudaStream_t)polygeist_cuda_graph_stream();
+  int device;
+  require_cuda(cudaGetDevice(&device), "histogram device");
+  struct Scratch { int device; void *pointer; size_t capacity; Scratch *next; };
+  static thread_local Scratch *head = nullptr;
+  Scratch *scratch = head;
+  while (scratch && scratch->device != device) scratch = scratch->next;
+  if (!scratch) { scratch = new Scratch{device, nullptr, 0, head}; head = scratch; }
+  size_t bytes = 0;
+  require_cuda(cub::DeviceHistogram::HistogramEven(nullptr, bytes, samples,
+      output, bins + 1, 0, bins, count, stream), "histogram scratch query");
+  if (bytes > scratch->capacity) {
+    require_cuda(cudaStreamSynchronize(stream), "histogram scratch synchronization");
+    require_cuda(cudaFree(scratch->pointer), "histogram scratch free");
+    scratch->pointer = nullptr; scratch->capacity = 0;
+    require_cuda(cudaMalloc(&scratch->pointer, bytes), "histogram scratch allocation");
+    scratch->capacity = bytes;
+  }
+  require_cuda(cub::DeviceHistogram::HistogramEven(scratch->pointer, bytes,
+      samples, output, bins + 1, 0, bins, count, stream), "histogram");
+  const char *trace = std::getenv("POLYGEIST_CUB_TRACE");
+  if (trace && *trace && std::strcmp(trace, "0"))
+    std::fprintf(stderr, "POLYGEIST_CUB_CALL entry=DeviceHistogramEven count=%d bins=%d\n", count, bins);
 }

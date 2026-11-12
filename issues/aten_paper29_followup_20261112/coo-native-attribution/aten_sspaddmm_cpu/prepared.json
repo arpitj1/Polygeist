@@ -1,0 +1,147 @@
+{
+  "kernel": "aten_sspaddmm_cpu",
+  "original_binary_sha256": "978dc39f73f8328de39c3f93b2fa7d1b0818b730615144a7c5d36a63010f6d1d",
+  "timing_binary_sha256": "6626c1d5c7ebb750d657886a09b8c1964942a3f0623f697d18c5fa6cc5a207e0",
+  "original_harness_sha256": "2e5f3bfe6b5208f59ca4a1b77b360ebbee849c11371414540afa49b32f739771",
+  "timing_harness_sha256": "b5f0ff4d29f080bb654ccf17d945f2be3b6b26ab7d664256f6c3a3388c691921",
+  "frozen_object_sha256": {
+    "work/kernel.o": "d3121d1d1b5e9936c01b90d76dae54e669a1caa16ec920f44e86024879c924ed",
+    "work/wrapper.o": "a74d01e0932a90927cb406d7c0556ed7256336f3bb5a718eb20fbab8554158c2",
+    "work/harness.o": "5fd80612e3ae8c33c51140ef44a7ffc7274ef75b476859b75e90be3811dd531a",
+    "work/rt.o": "faaf3bba6dd4d08c2f856d7f0ab8d4917695d3f5609bed8b9ef7a759f20adbf8",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "work/spec_runtime.o": "f5dd87245c929070beb6a4d9626ddff68b00dbf255c61f99be69d030d514268e",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "objects/reference.o": "e3624b95306f7ceb98e63195053567a84c454a6d88d2984b5d1e17eb4f1bb40a",
+    "objects/native.o": "1683b107fab96f94d5028b2bcfbd68a6e891cd0fd4ea9b2e070ada012f9b1f8f"
+  },
+  "original_configuration": {
+    "dims": {
+      "R": 2365,
+      "K": 2365,
+      "C": 1774,
+      "N": 18917
+    },
+    "args": [
+      [
+        "row",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "col",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "val",
+        "ptr",
+        "(N)",
+        false,
+        "normal"
+      ],
+      [
+        "b",
+        "ptr",
+        "(K)*(C)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(R)*(C)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_sspaddmm_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "row": "0",
+      "col": "0",
+      "val": "((float)(i%101)-50.0f)/37.0f",
+      "b": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "original_proof_sha256": "8878a8d362af6c1c97e582e135446fd03503346d3b68a00775f40e218eecdfda",
+  "timing_samples": 5,
+  "adaptation": "Only native baseline and validation-only output materialization changed. Prebuilt/coalesced COO matrix; original raised inputs and compute objects unchanged; five alternating pairs with the original input restoration protocol.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/native.o"
+    ],
+    [
+      "aarch64-linux-gnu-gcc",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-O3",
+      "-fno-inline",
+      "-fno-inline-functions",
+      "-fsemantic-interposition",
+      "-fno-ipa-cp",
+      "-fno-ipa-cp-clone",
+      "-fno-ipa-sra",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/timing-harness.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sspaddmm_cpu/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2",
+      "-lcusparse"
+    ]
+  ],
+  "native_attribution": true
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "kernel": "aten_convert_csr_to_coo_cpu",
+    "shape_record": {
+      "kernel": "aten_convert_csr_to_coo_cpu",
+      "op": null,
+      "cat": "native_fixture",
+      "dims": {
+        "N": 4194304,
+        "R": 65536
+      },
+      "n": 274877906944,
+      "shape": "N=4194304_R=65536",
+      "dtype": "i32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full CSR-to-COO row-index conversion via cuSPARSE",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "0d00042f447ff6a2"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_convert_csr_to_coo_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-expand/aten_convert_csr_to_coo_cpu/aten_convert_csr_to_coo_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-expand/aten_convert_csr_to_coo_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-expand/aten_convert_csr_to_coo_cpu/check"
+    ],
+    "source_sha256": "09ff01c7f23fe1bffceca80531b28284f5492cbc8da5d51892b16acfc80841e5",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  },
+  {
+    "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+    "shape_record": {
+      "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+      "op": null,
+      "cat": "native_fixture",
+      "dims": {
+        "N": 4194304,
+        "R": 65536
+      },
+      "n": 274877906944,
+      "shape": "N=4194304_R=65536",
+      "dtype": "i32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full CSR-to-COO row-index conversion via cuSPARSE",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "52305022b28e724d"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_sparse_matmul_csr_to_coo_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-expand/aten_sparse_matmul_csr_to_coo_cpu/aten_sparse_matmul_csr_to_coo_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-expand/aten_sparse_matmul_csr_to_coo_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-expand/aten_sparse_matmul_csr_to_coo_cpu/check"
+    ],
+    "source_sha256": "db9d70b7972223383ab7e6a450b2585f4f2ba612c91d244c080982d47357ab95",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  }
+]

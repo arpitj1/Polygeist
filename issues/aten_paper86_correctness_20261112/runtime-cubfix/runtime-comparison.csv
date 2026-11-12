@@ -1,0 +1,2 @@
+kernel,status,correctness_passed,paper_shape_exact,paper_raised_us,paper_native_us,paper_protocol,raised_us,native_us,current_native_over_raised,paper_native_over_raised,raised_runtime_over_paper,paper_native_over_current_raised,selected_statistic
+aten_cumprod_cpu,timed,True,True,4850.496094,328.8,raised best of 20; retained native baseline,43107.960939000004,355.526924,0.008247361189342474,0.06778688068767261,8.887330306754393,0.007627361462660436,minimum_ms

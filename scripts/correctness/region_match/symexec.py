@@ -130,7 +130,7 @@ class EParam(Expr):
 
 @dataclass(eq=False)
 class EIndex(Expr):
-    """Integer index data, retained beneath its explicit numeric conversion."""
+    """Exact integer index data, including explicitly converted loop indices."""
     value: Aff
 
 
@@ -266,6 +266,10 @@ class Executor:
         self.float_params: dict[str, str] = {}
         self.loop_vars: list[str] = []
         self.domain: list[Cons] = []
+        # Type facts are used to prove conversions, not added as artificial
+        # iteration-domain predicates. An i32 argument bounds a surrounding
+        # induction variable even when its exact value is not known.
+        self.integer_type_facts: list[Cons] = []
         self.loop_count = 0
         self.gen_count = 0
         self.scratch_count = 0
@@ -325,6 +329,11 @@ class Executor:
     def int_as_data(self, a: Aff, tok: str = "") -> Expr:
         """An integer used as a value: constants and loaded integers (atoms,
         through the read they stand for) combine with exact arithmetic."""
+        if a.terms and all(name in self.params or name in self.loop_vars
+                           for name, _ in a.terms):
+            # A loop index can be stored as integer data. Keep its affine
+            # identity instead of inventing a memory read or rounding to f64.
+            return EIndex(a)
         out: Optional[Expr] = EConst(float(a.const)) if a.const or a.is_const() else None
         for name, c in a.terms:
             r = self.atom_reads.get(name)
@@ -397,6 +406,11 @@ class Executor:
                 pv = f"p{name}"
                 self.params[pv] = name
                 self.env[name] = IdxVal(Aff.var(pv))
+                if ty != 'index':
+                    bits = int(ty[1:])
+                    self.integer_type_facts.extend([
+                        ge(Aff.var(pv), -(1 << (bits - 1))),
+                        le(Aff.var(pv), (1 << (bits - 1)) - 1)])
             elif ty in _FLOAT_TYPES:
                 self.float_params[name] = name
                 self.env[name] = FVal(EParam(name))
@@ -473,13 +487,14 @@ class Executor:
                 source_bits = 64 if src == 'index' else int(src[1:])
                 target_bits = 64 if dst == 'index' else int(dst[1:])
                 unsigned = n in ('arith.extui', 'arith.index_castui')
-                if unsigned and not implies(self.domain, ge(v.aff, 0)):
+                facts = self.domain + self.integer_type_facts
+                if unsigned and not implies(facts, ge(v.aff, 0)):
                     raise Unsupported('unsigned index conversion may change a negative value')
                 if target_bits < source_bits:
                     low = 0 if unsigned else -(1 << (target_bits - 1))
                     high = (1 << (target_bits if unsigned else target_bits - 1)) - 1
-                    if not (implies(self.domain, ge(v.aff, low)) and
-                            implies(self.domain, le(v.aff, high))):
+                    if not (implies(facts, ge(v.aff, low)) and
+                            implies(facts, le(v.aff, high))):
                         raise Unsupported('narrowing index conversion may truncate')
                 self.env[res[0]] = v
             else:

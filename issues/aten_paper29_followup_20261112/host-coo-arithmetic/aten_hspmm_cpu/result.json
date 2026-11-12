@@ -1,0 +1,43 @@
+{
+  "kernel": "aten_hspmm_cpu",
+  "shape_record": {
+    "kernel": "aten_hspmm_cpu",
+    "op": "hspmm",
+    "cat": "native_fixture",
+    "dims": {
+      "R": 64,
+      "C": 4096,
+      "N": 4096
+    },
+    "n": 1073741824,
+    "shape": "R=64_C=4096_N=4096",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full Linalg-fill plus structured-loop COO SpMM via cuSPARSE",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "259b92fa65811255"
+  },
+  "command": [
+    "gcc",
+    "-O1",
+    "-g",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-fsanitize=address,undefined",
+    "-fno-sanitize-recover=all",
+    "-fno-omit-frame-pointer",
+    "-Daten_hspmm_cpu=native_reference",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_hspmm_cpu/aten_hspmm_cpu.c",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_hspmm_cpu/check.c",
+    "-lm",
+    "-o",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_hspmm_cpu/check"
+  ],
+  "source_sha256": "bf2f0becaf4c3dee4fb7bb618de0bdae8ef4e3d3bd2907bec2b4dd7c24d732b3",
+  "input_scope": "recorded paper recipe",
+  "compile_rc": 0,
+  "run_rc": 0,
+  "passed": true
+}

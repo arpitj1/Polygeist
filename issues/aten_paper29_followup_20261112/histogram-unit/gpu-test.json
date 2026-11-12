@@ -1,0 +1,6 @@
+{
+  "rc": 0,
+  "passed": true,
+  "binary_sha256": "9cd0a8bad03ec4479700c5fe0b891a7d1cad61027499c069292450bba04419c2",
+  "log": "gpu-test.log"
+}

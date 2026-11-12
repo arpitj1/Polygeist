@@ -1,0 +1,39 @@
+{
+  "kernel": "aten_cpu_blas_gemm_cpu",
+  "paper_family": "dense_linear_algebra",
+  "current_targeted_gpu_validated": "True",
+  "status": "targeted_GPU_correctness_pass",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_cpu_blas_gemm_cpu/aten_cpu_blas_gemm_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_cpu_blas_gemm_cpu.c",
+  "original_source_sha256": "992005818b60fbc5f44d5596726ab929ec7edac786301906903ea513249204b3",
+  "shape_record": {
+    "kernel": "aten_cpu_blas_gemm_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "K": 2290,
+      "M": 1374,
+      "N": 1832
+    },
+    "n": 5764314720,
+    "shape": "K=2290_M=1374_N=1832",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "acf1ac1e761ae7e6"
+  },
+  "ranks": [
+    2
+  ],
+  "region": true,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cublasSgemm_nn_zero"
+}

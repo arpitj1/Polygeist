@@ -25,6 +25,31 @@ using namespace mlir::polygeist;
 
 namespace {
 
+static bool isScalarInitializer(Value value);
+
+// Permutations with equal physical bounds describe exactly the same region,
+// even when their logical dimension order differs. Keep offsets and partial
+// regions explicit; equality of tensor element types is not a coverage proof.
+static bool samePermutedRegion(AffineMap lhs, ValueRange lhsSizes,
+                               AffineMap rhs, ValueRange rhsSizes) {
+  if (!lhs.isPermutation() || !rhs.isPermutation() ||
+      lhs.getNumResults() != rhs.getNumResults() ||
+      lhsSizes.size() != lhs.getNumDims() ||
+      rhsSizes.size() != rhs.getNumDims())
+    return false;
+  for (unsigned axis = 0; axis < lhs.getNumResults(); ++axis) {
+    Value a = lhsSizes[lhs.getResult(axis).cast<AffineDimExpr>().getPosition()];
+    Value b = rhsSizes[rhs.getResult(axis).cast<AffineDimExpr>().getPosition()];
+    if (a == b)
+      continue;
+    APInt av, bv;
+    if (!matchPattern(a, m_ConstantInt(&av)) ||
+        !matchPattern(b, m_ConstantInt(&bv)) || av != bv)
+      return false;
+  }
+  return true;
+}
+
 // Reading exactly the just-written injective view recovers its SSA value.
 // Keep differing bounds and noninjective maps explicit: those are not the
 // same tensor, even when their printed element types happen to agree.
@@ -36,6 +61,28 @@ struct ForwardUpdatedSubview : OpRewritePattern<SubmapOp> {
     if (!inverse)
       return failure();
     Value modified = inverse.getViewModified();
+    Value initializer = modified;
+    while (auto cast = initializer.getDefiningOp<tensor::CastOp>())
+      initializer = cast.getSource();
+    if (isScalarInitializer(initializer) &&
+        samePermutedRegion(op.getMap(), op.getSizes(), inverse.getMap(),
+                           inverse->getOperands().drop_front(2))) {
+      auto producer = initializer.getDefiningOp<linalg::GenericOp>();
+      Value scalar = producer.getBody()->getTerminator()->getOperand(0);
+      Operation *destination = rewriter.clone(*op.getOperation());
+      destination->setOperand(0, inverse.getBaseOriginal());
+      auto type = cast<RankedTensorType>(op.getType());
+      auto fill = rewriter.create<linalg::GenericOp>(
+          op.getLoc(), TypeRange{type}, ValueRange{},
+          ValueRange{destination->getResult(0)},
+          ArrayRef<AffineMap>{rewriter.getMultiDimIdentityMap(type.getRank())},
+          SmallVector<utils::IteratorType>(type.getRank(), utils::IteratorType::parallel),
+          [&](OpBuilder &builder, Location loc, ValueRange) {
+            builder.create<linalg::YieldOp>(loc, scalar);
+          });
+      rewriter.replaceOp(op, fill.getResults());
+      return success();
+    }
     // Bounds refinement may restore a dynamic type around the written value.
     // Look through shape-only casts, retaining the exact requested result type.
     while (modified.getType() != op.getType()) {
@@ -63,16 +110,8 @@ struct DropOverwrittenSubview : OpRewritePattern<SubmapInverseOp> {
     auto prior = op.getBaseOriginal().getDefiningOp<SubmapInverseOp>();
     if (!prior)
       return failure();
-    Value modified = op.getViewModified();
-    Value previous = prior.getViewModified();
-    while (auto cast = modified.getDefiningOp<tensor::CastOp>())
-      modified = cast.getSource();
-    while (auto cast = previous.getDefiningOp<tensor::CastOp>())
-      previous = cast.getSource();
-    if (!op.getMap().isPermutation() ||
-        op.getMap() != prior.getMap() ||
-        modified.getType() != previous.getType() ||
-        op->getOperands().drop_front(2) != prior->getOperands().drop_front(2))
+    if (!samePermutedRegion(op.getMap(), op->getOperands().drop_front(2),
+                            prior.getMap(), prior->getOperands().drop_front(2)))
       return failure();
     rewriter.updateRootInPlace(op, [&] { op->setOperand(0, prior.getBaseOriginal()); });
     return success();
@@ -1399,6 +1438,10 @@ struct NormalizeLinalgMatchingViewsPass
                        ForwardScalarInsertedView,
                        DropOverwrittenScalarInsert, NormalizeScalarSliceWrite,
                        CaptureScalarTensorInput>(&getContext());
+        // Tiling can leave a private initializer as an unchanged loop iter_arg.
+        // Forward it with upstream SCF canonicalization before slicing the
+        // initializer; its value is independent of the tensor's static size.
+        scf::ForOp::getCanonicalizationPatterns(finalViews, &getContext());
         linalg::populateEraseUnusedOperandsAndResultsPatterns(finalViews);
         if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(finalViews)))) {
           signalPassFailure();

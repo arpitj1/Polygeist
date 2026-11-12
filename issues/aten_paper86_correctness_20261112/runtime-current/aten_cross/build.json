@@ -1,0 +1,149 @@
+{
+  "kernel": "aten_cross",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "N": 1398101
+    },
+    "args": [
+      [
+        "a",
+        "ptr",
+        "(N)*(3)",
+        false,
+        "normal"
+      ],
+      [
+        "b",
+        "ptr",
+        "(N)*(3)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(N)*(3)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_cross",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "a": "((float)(i%101)-50.0f)/37.0f",
+      "b": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_cross=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/aten_cross.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_cross",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_cross/rank1/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_cross/aten_cross.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_cross/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "rank": 1,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "0c7a1fea88ebba96671a6ca90c20fcc78021bab8b1639a1bc78ab64396cae65a",
+  "proof_sha256": "b57d5c19fe32a0331d2e964382ab1f877eb37bb149dc576ae385d3b3d30d89ad",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+  "original_source_sha256": "05e8ea7bb11819d225461ff43b314395b5cf97b07c49c035fafb3e7f4fc76a1b",
+  "shape_record": {
+    "kernel": "aten_cross",
+    "op": "cross",
+    "cat": "native_fixture",
+    "dims": {
+      "N": 1398101
+    },
+    "n": 1398101,
+    "shape": "N=1398101",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "three graph stages",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "b42870c4d04b959c"
+  },
+  "shape_specs_sha256": "ed0e3f0b13efc808c8aba6a12e288e2fb5c0a90fac35ef0be336d0f9911c01f6",
+  "binary_sha256": "ea5492b5507ff64b59c8c970da9e97c01591c3218e0cfb57bd0327877497aec4",
+  "prior_binary_sha256": "03e5d047ef977a3cece06ce5cd35792350c9151ed93d71ce9016fe7ca48310d5",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

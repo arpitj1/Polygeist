@@ -1,0 +1,155 @@
+{
+  "kernel": "aten_sumproduct_pair_cpu",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "B": 70,
+      "M": 141,
+      "K": 282,
+      "N": 211
+    },
+    "args": [
+      [
+        "a",
+        "ptr",
+        "(B)*(M)*(K)",
+        false,
+        "normal"
+      ],
+      [
+        "b",
+        "ptr",
+        "(B)*(K)*(N)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(B)*(M)*(N)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_sumproduct_pair_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "a": "((float)(i%101)-50.0f)/37.0f",
+      "b": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_sumproduct_pair_cpu=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/aten_sumproduct_pair_cpu.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_sumproduct_pair_cpu",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_sumproduct_pair_cpu/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_sumproduct_pair_cpu/aten_sumproduct_pair_cpu.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/work/harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_sumproduct_pair_cpu/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "e8cadcb26af51c68e0c607d62508c612d0c6f930c31f618e17d87632d5db1865",
+  "proof_sha256": "4abbbf58a74811ea78bf8c4b6dace8c5ff2560423749696527b7309b4d17eef6",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+  "original_source_sha256": "fd8864e6bb751e52ff9ddc6110ee82f694b9b34e12e2dbcd85aa97d33ec51290",
+  "shape_record": {
+    "kernel": "aten_sumproduct_pair_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "B": 70,
+      "K": 282,
+      "M": 141,
+      "N": 211
+    },
+    "n": 587284740,
+    "shape": "B=70_K=282_M=141_N=211",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "b1d208ea182a8abc"
+  },
+  "shape_specs_sha256": "ed0e3f0b13efc808c8aba6a12e288e2fb5c0a90fac35ef0be336d0f9911c01f6",
+  "binary_sha256": "5037a5f5e244cb5ca63e63e60f7d0636c4d76a66dc2cdfb71b361fd0ff897598",
+  "prior_binary_sha256": "5037a5f5e244cb5ca63e63e60f7d0636c4d76a66dc2cdfb71b361fd0ff897598",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "arguments": {
+    "worker": null,
+    "output": "/home/arjaiswal/Polygeist/issues/aten_paper115_20261112/ordered-pooling",
+    "checklist": "/home/arjaiswal/Polygeist/issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv",
+    "jobs": 3,
+    "ranks": [
+      2
+    ],
+    "region": false,
+    "region_budget": 30,
+    "split_reduction_inputs": false,
+    "split_pointwise_inputs": false,
+    "numeric_model": "strict",
+    "timeout": 600,
+    "cases": [
+      "aten_avg_pool2d",
+      "aten_avg_pool3d",
+      "aten_adaptive_avg_pool2d",
+      "aten_adaptive_avg_pool3d"
+    ],
+    "summarize": false
+  },
+  "git": "a7deda44966532eec275b5120841c73b04456561",
+  "uptime": "04:52:54 up 448 days,  9:22,  2 users,  load average: 4.01, 4.52, 5.18",
+  "hashes": {
+    "/home/arjaiswal/Polygeist/build/bin/cgeist": "9ab804bd218b0c98830b716a9bc6b011819a51909e6fdb9a824367c9e28df9ae",
+    "/home/arjaiswal/Polygeist/build/bin/polygeist-opt": "7faa615d7e14e144b7a6d708a9cc44448b860bd21c2050e9951b5bd1bbe20775",
+    "/home/arjaiswal/Polygeist/generic_solver/lib_v3/import_manifest.json": "e4aaf1df6299059a3195b861734ace40bd566963ee02862c2b22dfea1ac44ed9",
+    "/home/arjaiswal/Polygeist/generic_solver/kernel_library_v3.mlir": "c47fd7e64518ae5a3096afc78a4228c6457a1ea0748de2eb270c19f46f49076b",
+    "/home/arjaiswal/Polygeist/issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv": "2d7c66473ab20e00a12bbc31bb77fbd92f2525e1934ac0912bd1f5c97a5e684b"
+  },
+  "selected": [
+    "aten_avg_pool2d",
+    "aten_avg_pool3d",
+    "aten_adaptive_avg_pool3d",
+    "aten_adaptive_avg_pool2d"
+  ]
+}

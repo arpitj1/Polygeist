@@ -1,0 +1,155 @@
+{
+  "kernel": "aten_conv2d",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "B": 4,
+      "IC": 16,
+      "OC": 32,
+      "H": 128,
+      "W": 128,
+      "KH": 3,
+      "KW": 3
+    },
+    "args": [
+      [
+        "input",
+        "ptr",
+        "B*IC*H*W",
+        false,
+        "normal"
+      ],
+      [
+        "filter",
+        "ptr",
+        "OC*IC*KH*KW",
+        false,
+        "normal"
+      ],
+      [
+        "output",
+        "ptr",
+        "B*OC*(H-KH+1)*(W-KW+1)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "full valid NCHW 2d convolution through cuDNN",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "input": "((float)(i%101)-50.0f)/37.0f",
+      "filter": "((float)(i%101)-50.0f)/37.0f",
+      "output": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_conv2d=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/aten_conv2d.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_conv2d",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_conv2d/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/aten_conv2d.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_conv2d/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "238dcf75ad1d291ad40bf2177a8addce1107af850656c2bdaad4c0f4d47399b0",
+  "proof_sha256": "94e914dbb689171a566fc166b35ad52fc97084028f06f10f07e2d727c733c3d2",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+  "original_source_sha256": "a9bcc5d8353847acd00b1604d3859d7c36bf897170e3b821cb84c2091a9e468c",
+  "shape_record": {
+    "kernel": "aten_conv2d",
+    "op": "conv2d",
+    "cat": "conv2d",
+    "dims": {
+      "B": 4,
+      "IC": 16,
+      "OC": 32,
+      "H": 128,
+      "W": 128,
+      "KH": 3,
+      "KW": 3
+    },
+    "n": 301989888,
+    "shape": "B=4_IC=16_OC=32_H=128_W=128_KH=3_KW=3",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full valid NCHW 2d convolution through cuDNN",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "3b3bcbef73116a11"
+  },
+  "shape_specs_sha256": "ed0e3f0b13efc808c8aba6a12e288e2fb5c0a90fac35ef0be336d0f9911c01f6",
+  "binary_sha256": "1645477260cf242a4e231d3cbfcb7fb6d68f885e9f56d05845082fc74f94d6ca"
+}

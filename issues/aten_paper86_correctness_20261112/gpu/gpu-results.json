@@ -1,0 +1,3933 @@
+[
+  {
+    "kernel": "aten_adaptive_avg_pool3d",
+    "run_id": "20261112T161046Z",
+    "binary_sha256": "c18d3d2dc2f23cf9b758bf3865ee9fb9476d3a69fe7f09a6ac691f683f7d0e28",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 384.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 384.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_avg_pool2d",
+    "run_id": "20261112T161100Z",
+    "binary_sha256": "754bf188bebf585a5518ea8d729d4936979e923db951d37e379478d3939f2b2c",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 512.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 512.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_avg_pool2d_backward_cpu",
+    "run_id": "20261112T161118Z",
+    "binary_sha256": "e088e61f71f2d76b0ddebe87578f16e7c47a2040623039a6ddffdf79ed154bbe",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 84.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 84.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 74
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_avg_pool3d",
+    "run_id": "20261112T161132Z",
+    "binary_sha256": "08b5aedd97689f02c61d035968ded6de9bcadf1133fcd51c23fd82e29ceeef98",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 384.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 384.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_blas_copy_cpu",
+    "run_id": "20261112T161155Z",
+    "binary_sha256": "976fbe5aa9d9288e0655002e5285532d0780e22cab25e660c3df88478db9e77a",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_clamp_max_scalar_cpu",
+    "run_id": "20261112T161209Z",
+    "binary_sha256": "42f10f4bc18f406f5ef89d9f7935cd8a41c0c8a4d991d5d8e138e1bae3339c86",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_clamp_min_scalar_cpu",
+    "run_id": "20261112T161228Z",
+    "binary_sha256": "f66f7391c266f47021944b1403c42408f7bec6791abfe8e7949ab89dbcfaf105",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_conv_transpose3d_backward_cpu",
+    "run_id": "20261112T161242Z",
+    "binary_sha256": "bfb266d9f60b241f2b44ccbab9b58c62f46c9bb7a59955665a1739cd61816439",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 16384.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.001537323
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 16384.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.001537323
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_copy_cpu",
+    "run_id": "20261112T161306Z",
+    "binary_sha256": "2635f97db15aed1f4d5a762d2be46c4f2023f5defbc32b83cb39de5fae6aa4c7",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_copy_tensor_array_cpu",
+    "run_id": "20261112T161319Z",
+    "binary_sha256": "fd44dfa82135619ae620f7f59818abcecaa208e7329782f01a71966635b09b80",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_dilated_convolution_cpu",
+    "run_id": "20261112T161338Z",
+    "binary_sha256": "845ac505b5c5750c4dbc12fc33dc46d803f1290dba2b0eb099efe62aa6aa0ee9",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 492032.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 5.7220459e-06
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 492032.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 5.7220459e-06
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_int_mm_out_cpu",
+    "run_id": "20261112T161352Z",
+    "binary_sha256": "37f89a366766795bf819781c5402a25f71d9102da276babfb0723095c2a33494",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 262144.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 262144.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_narrow_copy_dense_cpu",
+    "run_id": "20261112T161411Z",
+    "binary_sha256": "01f798aaa3b91b09bbc405f37847a1e1be76bacb6ec05e9f083cf4fcd450e2c4",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1048352.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1048352.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_nested_clone_cpu",
+    "run_id": "20261112T161424Z",
+    "binary_sha256": "7f9d5c107064937d423f65db996b894180e425c58e815cf621bbf4fadf138641",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194132.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194132.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_nested_squeeze_cpu",
+    "run_id": "20261112T161443Z",
+    "binary_sha256": "053ca68a5359e87d943bd41cdcdcc28bc9e2c01054a0a70f035314a4ff1db7c4",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194132.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194132.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_or_reduce_cpu",
+    "run_id": "20261112T161456Z",
+    "binary_sha256": "e0f90521a27ac25ef86b91606290d6dda61ce325096ee41e18addd48b92cbddb",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1448.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1448.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_sparse_norm_cpu",
+    "run_id": "20261112T161510Z",
+    "binary_sha256": "46b7b9e9ae6661e5b158d2ba69f306ccb35bbe4021ca8b5b91669b1d87aea09a",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 3,
+        "passed": false,
+        "raised_passed": false,
+        "native_passed": false,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1.0,
+            "bad": 1.0,
+            "nativebad": 0.0,
+            "nativerefbad": 1.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.286132812
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1.0,
+            "bad": 1.0,
+            "nativebad": 0.0,
+            "nativerefbad": 1.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.286132812
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": false,
+    "raised_validated": false,
+    "raised_matches_native": true,
+    "native_matches_reference": false
+  },
+  {
+    "kernel": "aten_zeros_cpu",
+    "run_id": "20261112T161524Z",
+    "binary_sha256": "86f32bdfdd56775aa901523432b764b833e95a33f86a4394d73e7da08342429d",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_cat_serial_cpu",
+    "run_id": "20261112T161542Z",
+    "binary_sha256": "d34297173022bb8f2862d5f9d4416dd051d5eb3c0465ef80a00d30390a329e11",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4195080.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4195080.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_im2col",
+    "run_id": "20261112T161556Z",
+    "binary_sha256": "1017eb110655f8c41252ea9d359054b67ad8e15a5de4a5c37a0e3a13e7ab59f2",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4572288.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4572288.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_conv2d_columns_cpu",
+    "run_id": "20261112T161615Z",
+    "binary_sha256": "3f81ce5e34ccd1f0171615bf85784631515881b650f348125156e3418bc1cad4",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Corrected invalid paper shape: Keep K=3 required by original H-2/W-2 loops; recorded auto-scaled K=11 is out of bounds. Other recorded dimensions unchanged.",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 321651.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 321651.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_stack_serial_cpu",
+    "run_id": "20261112T161629Z",
+    "binary_sha256": "6faf0d8b1dc2c5cf7188c5d134d921b26e8d19057082bfd15fdd45496c3956b8",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4192965.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4192965.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_angle_complex_scalarized",
+    "run_id": "20261112T161648Z",
+    "binary_sha256": "3ea978f5217fd951508c14ce04cf7c295803e91476e189e570ca1e6cd248ff8c",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_compressed_block_convert_cpu",
+    "run_id": "20261112T161702Z",
+    "binary_sha256": "5802d1522f89d3b7eee31960d5ab801e46f2ed0ed1d2bfe4e6c3e5024aaba45f",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_batch_norm",
+    "run_id": "20261112T161749Z",
+    "binary_sha256": "12065913aed03dbcfd296741e0de7d1dcccb4a6e86c471cf59195a9dfbc4ea93",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4282784.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4282784.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_blas_axpy_cpu",
+    "run_id": "20261112T162121Z",
+    "binary_sha256": "8a98c26022e3f856dc9c75bc653618228190706952623ced5b0d2a42a0e9aced",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_sparse_intersection_apply_cpu",
+    "run_id": "20261112T162135Z",
+    "binary_sha256": "ff7632e1152e1d78f2ce148b28e46341d28a9919fcfeeeae10ecb432af37f35d",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_sparse_mul_cpu",
+    "run_id": "20261112T162149Z",
+    "binary_sha256": "460a0d2e67f968606b01d5a851159dcd712d02cd6f148f010c1d6323559143dd",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_adaptive_avg_pool2d",
+    "run_id": "20261112T162204Z",
+    "binary_sha256": "f591c19e814054605bf3b2eefe29499f1a04b4765f08ba2c30f51bdda5004ece",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 2097152.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 2097152.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_as_complex_cpu",
+    "run_id": "20261112T162306Z",
+    "binary_sha256": "9f1a5f517992f6eb3c1dd8ec35b7f6e03a8c7c268165acdcf1243c84e91f90f5",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194302.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194302.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_blas_scale_cpu",
+    "run_id": "20261112T162320Z",
+    "binary_sha256": "cca8d0eef7f1278c62facbf289b782e6c0cf95f2d3c5471991b9998d5f4c80cb",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_complex_scalarized",
+    "run_id": "20261112T162333Z",
+    "binary_sha256": "386d5acb807518da3462ca162a8b606446fab55eda12875b113e990dc5344ed9",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_conj_complex_scalarized",
+    "run_id": "20261112T162347Z",
+    "binary_sha256": "fd2e6d1f1bdbc917556e6eb027cc0818cec336da5b89249f42c060f4869539bb",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_conv2d",
+    "run_id": "20261112T162402Z",
+    "binary_sha256": "1645477260cf242a4e231d3cbfcb7fb6d68f885e9f56d05845082fc74f94d6ca",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 2032128.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.57356262e-05
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 2032128.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.57356262e-05
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_cross",
+    "run_id": "20261112T162416Z",
+    "binary_sha256": "9e4f1ceb1db0cf4e1ddf6964538ac1e9e721bf82e543c77e20309811ff6afae5",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194303.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194303.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 6
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_cross_cpu_backend",
+    "run_id": "20261112T162431Z",
+    "binary_sha256": "1628b27b36b2385400620daed1acf315328303313628f769db3ecbfe425c2ffb",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194303.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194303.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 6
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_cumprod_cpu",
+    "run_id": "20261112T162445Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_cumprod_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_nansum_cpu",
+    "run_id": "20261112T162456Z",
+    "binary_sha256": "61189af68d18577f5b417ac4cc82697698735bd5ded544e5ec4cbc8e6c5f4eb0",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_nested_sum_backward_cpu",
+    "run_id": "20261112T162510Z",
+    "binary_sha256": "44d19130415216ab818aa6735ad9d4c3b69d91f050217b57153374926ad5b155",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194132.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194132.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_normal_cpu",
+    "run_id": "20261112T162613Z",
+    "binary_sha256": "daeb2bf360b31651404c39a73e147c87c1d231656d5e064b56ca5f6172afcda5",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_repeat_compute_cpu",
+    "run_id": "20261112T162626Z",
+    "binary_sha256": "fb7aa9ad399ff9cab5a3d45982ff51fcbf7bffcd5dc3f69210eb18e085d99c72",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_repeat_tensor_shape_cpu",
+    "run_id": "20261112T162640Z",
+    "binary_sha256": "b34bb127158182ae7876e10a04dc3ca739091daff00365e0dc603df75e0a4ea9",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_sparse_add_values_cpu",
+    "run_id": "20261112T162654Z",
+    "binary_sha256": "788df363cb7c5c0023409b2f3ac31bf4452d8687e595afd7f6024c234db0f89a",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_sparse_intersection_launch_cpu",
+    "run_id": "20261112T162708Z",
+    "binary_sha256": "521a8a35e2ca4dd507d83222ad924d1ca96ba3fb576503135ccb4edc5f5b397e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_uniform_cpu",
+    "run_id": "20261112T162722Z",
+    "binary_sha256": "257db07f3384d41a8dc8ab939ee8bc22b339259eaefbc91699150ea9e3da2138",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_allany_dims_cpu",
+    "run_id": "20261112T162736Z",
+    "binary_sha256": "811bb39e8957a42e1546b5e0448b624311f51748cf06b04bbdbfac9b1d814947",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_and_reduce_cpu",
+    "run_id": "20261112T162750Z",
+    "binary_sha256": "7f49fa598343a83d756bc3879fa520a5286fd5b83e62656a0ffd1ca7916d7369",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_batch_norm_transform_cpu",
+    "run_id": "20261112T162804Z",
+    "binary_sha256": "8d73e9820fd75bdaa96a06261d55969e945ed5128db9d4bce73cb0c22ca3ced4",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_bmm",
+    "run_id": "20261112T163446Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_bmm: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_cauchy_cpu",
+    "run_id": "20261112T163457Z",
+    "binary_sha256": "4b75931558fbe4ca21ee06714a4bcf85c6bea7bcab8dd97ca21dffe200207b4e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.38418579e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.38418579e-07
+          }
+        ],
+        "vendor_calls": 10
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_channel_shuffle",
+    "run_id": "20261112T163511Z",
+    "binary_sha256": "77d2d3f1c5145dd4b60abd847ef5b0741f14b27fbda4560596e4c14da7b7220d",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4302592.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4302592.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_channel_shuffle_cpu",
+    "run_id": "20261112T163525Z",
+    "binary_sha256": "f868daf116859834c34567440449eefce6f443a7b3010c66f00c6d1914fcbcb9",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4147728.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4147728.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_conv_tbc_cpu",
+    "run_id": "20261112T163540Z",
+    "binary_sha256": "eb63664dab001940807c5bf3e57caf0d21f1c3a4db507972f898c7d63fec2411",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 124,
+        "passed": false,
+        "raised_passed": false,
+        "native_passed": false,
+        "raised_matches_native": false,
+        "checks": [],
+        "vendor_calls": 4198400
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": false,
+    "raised_validated": false,
+    "raised_matches_native": false,
+    "native_matches_reference": false
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_batched_cpu",
+    "run_id": "20261112T164558Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_cpu_blas_gemm_batched_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_strided_batched_cpu",
+    "run_id": "20261112T164609Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_cpu_blas_gemm_strided_batched_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_diff_cpu",
+    "run_id": "20261112T164621Z",
+    "binary_sha256": "07c21764dc5a8d39b0507f8abdf2021b856b964de185f1cf3a440fba432b3474",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 16777215.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 16777215.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_dirichlet_grad_cpu",
+    "run_id": "20261112T164635Z",
+    "binary_sha256": "d63bf74fc3f86bf0fee72a6e823848eec80bc5cb5ac9fddc568e891798c510d0",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          }
+        ],
+        "vendor_calls": 10
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_dropout_feature_noise_cpu",
+    "run_id": "20261112T164650Z",
+    "binary_sha256": "f0758d2db223fe5000d53a0ab78c509961c3232f288857007d89f9d1656b880e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_exponential_cpu",
+    "run_id": "20261112T164842Z",
+    "binary_sha256": "8d7c5973bbcaadd0cbe41ac58953b5e3b54af241d4cdbf0f05b74fc04cc4fddc",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 4.76837158e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 4.76837158e-07
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_flatten_nd_linear_cpu",
+    "run_id": "20261112T164856Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_flatten_nd_linear_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_geometric_cpu",
+    "run_id": "20261112T164908Z",
+    "binary_sha256": "9e151b698806118bb89667fd1cc46f2f8c6397da5cece43155eb8b8d766ede9b",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_kron_impl_cpu",
+    "run_id": "20261112T164922Z",
+    "binary_sha256": "3996f71e6b67670feb0d208a6b2010b429ab29a4943b9a45b449127f53d19696",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 33554432.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 33554432.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_log_normal_cpu",
+    "run_id": "20261112T165705Z",
+    "binary_sha256": "3185d0fa42953cee6e9ff9d19240c2626ca34101adc254dc0e6dfd7df426903e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          }
+        ],
+        "vendor_calls": 6
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_nested_bmm_cpu",
+    "run_id": "20261112T165719Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_nested_bmm_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_nested_matmul_broadcast_cpu",
+    "run_id": "20261112T165730Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_nested_matmul_broadcast_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_nested_sum_dim_cpu",
+    "run_id": "20261112T165741Z",
+    "binary_sha256": "a4cc3a329af347b6c4647695cab54948faa5ad3010248c1a80046e405c680a5e",
+    "scope": "ATen CUDA length mask, where and sum composition; preallocated intermediates",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 724.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 724.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_pixel_shuffle",
+    "run_id": "20261112T165755Z",
+    "binary_sha256": "c44df465e163a9f2e5bcc21573d0d915613bc413a67b40fcfc94ff47de15ad84",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 3684366.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 3684366.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_pixel_shuffle_cpu_backend",
+    "run_id": "20261112T170006Z",
+    "binary_sha256": "d490ac1a5c77825bf8d1de1bd7cdf5b9603f513d2b1d5a954311210b6e4420e0",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4869072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4869072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_pixel_unshuffle_cpu_backend",
+    "run_id": "20261112T170136Z",
+    "binary_sha256": "0dd186b1773421fa02b8e623f1ffe26aac98631baa70cdb4aeefd3e748388bcb",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4869072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4869072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_polar_scalarized",
+    "run_id": "20261112T170431Z",
+    "binary_sha256": "c17ce8e1fceddb6b35c7aac6d87a9ba62a6ed5ab24e5b864c03c9578e23875df",
+    "scope": "ATen CUDA polar_out plus real/imaginary copies to the separate fixture outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 5.96046448e-08
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8388608.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 5.96046448e-08
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_sparse_bmm_cpu",
+    "run_id": "20261112T170445Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_sparse_bmm_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_sum",
+    "run_id": "20261112T170456Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_sum: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_sumproduct_pair_cpu",
+    "run_id": "20261112T170507Z",
+    "fully_validated": false,
+    "build_rc": 1,
+    "error": "aten_sumproduct_pair_cpu: no fully matched variant with executable ABI",
+    "correctness": {}
+  },
+  {
+    "kernel": "aten_transpose_copy",
+    "run_id": "20261112T170518Z",
+    "binary_sha256": "0103043363d06ea9f5c3867671c4fe61cce2464d6b5bb7e7b0b438c783f94e9e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4195510.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4195510.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_addmm",
+    "run_id": "20261112T170532Z",
+    "binary_sha256": "335ee9cff44ba59c5e03dddeb1e39e6f748c4651dc8bd88264c144dadf21bfc8",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 262144.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.3500312e-13
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 262144.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.3500312e-13
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_count_nonzero_impl_cpu",
+    "run_id": "20261112T170546Z",
+    "binary_sha256": "3f9ae3d96b45492516758400c15d30e27c13700c36ba6ad7c4c103b943a20816",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 131072.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_cpu_blas_gemm_cpu",
+    "run_id": "20261112T170559Z",
+    "binary_sha256": "182c53c509bdbb18544269f78c0292bb9679967aac309ffbd6a6749d865251bb",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 2517168.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.00048828125
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 2517168.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.00048828125
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_gamma_transform_cpu",
+    "run_id": "20261112T170624Z",
+    "binary_sha256": "57bbd09ed979bf48eebaaf98da2ec55057223ed92804a08d1ec989bde6512e85",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 18
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_kron_out_cpu",
+    "run_id": "20261112T170639Z",
+    "binary_sha256": "9c808d652be7016021e3193d9c34702d4541464d33fb01a4effa79db63e0a647",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 33554432.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 33554432.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_mm",
+    "run_id": "20261112T171414Z",
+    "binary_sha256": "93cabd602cb4202a6ef48ebfae81128e7be311aafa8eb64aea3761f58bdbd337",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 262144.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 6.39488462e-14
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 262144.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 6.39488462e-14
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_quant_col_offsets_cpu",
+    "run_id": "20261112T171428Z",
+    "binary_sha256": "3bd7e94fc3932c05d0e8415b5b73b01f35fc40af781e39cc0b4ac221387cbd6a",
+    "scope": "ATen CUDA sum and subtract composition; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 48.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 48.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_renorm_scale_factor",
+    "run_id": "20261112T171443Z",
+    "binary_sha256": "c3453f4ff1d69392caf3bee91a425c49a86ac2e5ec61aa346640cd4b69bd9f90",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_standard_gamma_grad_cpu",
+    "run_id": "20261112T171457Z",
+    "binary_sha256": "8991bbb5c85f6343d09d622fa000b0396d9bdaf0027836534d22c8c87745760f",
+    "scope": "ATen CUDA arithmetic and log composition for the extracted simplified formula; not the full ATen standard-gamma-gradient operator",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.38418579e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.38418579e-07
+          }
+        ],
+        "vendor_calls": 12
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_transform_bias_rescale_qkv_cpu",
+    "run_id": "20261112T171512Z",
+    "binary_sha256": "76ba960693eb36579c147bbfcbe038d3bb12f9284089f4647e3949e9861c7b03",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 12582912.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 12582912.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_unbind_copy_cpu",
+    "run_id": "20261112T171534Z",
+    "binary_sha256": "eec98bbc29d6ef57e9687c9872ea469b0c12a1d95f9f5544a4f7dba064e6998d",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  },
+  {
+    "kernel": "aten_xor_sum_cpu",
+    "run_id": "20261112T171548Z",
+    "binary_sha256": "99e79fe1a57e699d02ebd76da6378d98d8e5cc300172f5bee39d6b479bd7999b",
+    "scope": "ATen CUDA bitwise_xor tree with preallocated intermediates; installed libtorch lacks hash_tensor; not the newer xor_sum kernel",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "cudnn_plan_cache": false,
+    "correctness": {
+      "paper": {
+        "rc": 0,
+        "passed": true,
+        "raised_passed": true,
+        "native_passed": true,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1448.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1448.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "nativerefbad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "correctness_scope": [
+      "paper"
+    ],
+    "fully_validated": true,
+    "raised_validated": true,
+    "raised_matches_native": true,
+    "native_matches_reference": true
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "kernel": "aten_narrow_copy_dense_cpu",
+  "paper_family": "tensor_permutation",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_narrow_copy_dense_cpu/aten_narrow_copy_dense_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_narrow_copy_dense_cpu.c",
+  "original_source_sha256": "d7de636cc808fb2a3e99417350ac6bdb3c0644bb7ffecafe1d71f58483f51ba0",
+  "shape_record": {
+    "kernel": "aten_narrow_copy_dense_cpu",
+    "op": "narrow_copy_dense",
+    "cat": "native_fixture",
+    "dims": {
+      "C": 2897,
+      "L": 724,
+      "R": 1448
+    },
+    "n": 3037075744,
+    "shape": "C=2897_L=724_R=1448",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "031841e44ca18076"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cudaCopy2D_f32_tensor"
+}

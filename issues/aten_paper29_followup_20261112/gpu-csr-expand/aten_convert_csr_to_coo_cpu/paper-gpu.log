@@ -1,0 +1,3 @@
+Polygeist: this binary was built without the cuSPARSE backend
+timeout: the monitored command dumped core
+bash: line 1: 622120 Aborted                 LD_LIBRARY_PATH=/home/[private]/polygeist_aten_native_24_12:/home/[private]/polygeist_cuda_libs:/home/[private]/jetson-cuda-libs:/home/[private]/cuda-12.6/lib64:/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu POLYGEIST_CUDNN_PLAN_CACHE=1 POLYGEIST_V2_TRACE=1 timeout 180 /tmp/ll-aten-fixture-aten_convert_csr_to_coo_cpu-7973a656b67b paper

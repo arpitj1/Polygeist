@@ -1,0 +1,15 @@
+{
+  "kernel": "aten_cumprod_cpu",
+  "observed_calls": 2,
+  "correctness_modes": [
+    "host",
+    "resident"
+  ],
+  "calls_per_program": 1,
+  "calls": [
+    "DeviceScanInclusiveScanByKey_cub_row_product_scan_f32",
+    "DeviceScanInclusiveScanByKey_cub_row_product_scan_f32"
+  ],
+  "previous_calls_per_program": 1448,
+  "scope": "One backend call in each strict host/resident execution; tracing disabled in timings."
+}

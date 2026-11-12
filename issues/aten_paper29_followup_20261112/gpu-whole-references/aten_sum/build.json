@@ -1,0 +1,139 @@
+{
+  "kernel": "aten_sum",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "M": 65536,
+      "N": 64
+    },
+    "args": [
+      [
+        "x",
+        "ptr",
+        "M*N",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "M",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "full segmented CUB f64 sum reduction",
+    "rtol": 1e-11,
+    "dtype": "double",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "x": "((double)(i%101)-50.0)/37.0",
+      "out": "((double)(i%101)-50.0)/37.0"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_sum=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/aten_sum.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_sum",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/whole-references-paper/aten_sum/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/aten_sum.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/work/cub_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-whole-references/aten_sum/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "77d4319b154c502115825340c7b1b10ed017d92f3ddc5352d0579237cfcff38c",
+  "proof_sha256": "c747e14a5c775c9f7dd0fae4082db4b8a88ae6459559d46635664dfc124c4cd5",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP64 atol=1e-12 rtol=1e-10",
+  "original_source_sha256": "cc6297e8268435d0b714b45906f031081d4ae549ee3494b72a7fb468345233f2",
+  "shape_record": {
+    "kernel": "aten_sum",
+    "op": "sum",
+    "cat": "reduce",
+    "dims": {
+      "M": 65536,
+      "N": 64
+    },
+    "n": 4194304,
+    "shape": "M=65536_N=64",
+    "dtype": "f64",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full segmented CUB f64 sum reduction",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "8323a8b552b16506"
+  },
+  "shape_specs_sha256": "cae3569bf17bf3fe2e27fbad33926ac1743fbc64deba85d3670e2d798bc1534e",
+  "binary_sha256": "628041a4890348ca052a6f251ca00c07d808e4ba6a95d71808fe880e7074b6d3"
+}

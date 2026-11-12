@@ -254,6 +254,7 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
             library = restore_library_metadata(original_library, normalize(original_library))
             normalization = dict(
                 pass_name=option,
+                source='matched_baseline',
                 cleanup=['--cse'],
                 compiler_sha256=PROVENANCE.file_hash(Path(RECIPE.POLYGEIST_OPT)),
                 matched_baseline_sha256=digest(baseline),
@@ -265,8 +266,27 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
                 output, matches, diagnostics = MATCH.run(
                     application, path, region=False, region_budget=region_budget,
                     allowed_specs=allowed)
-            matches = baseline_matches + matches
-            diagnostics['baseline'] = baseline_diagnostics
+                matches = baseline_matches + matches
+                diagnostics['baseline'] = baseline_diagnostics
+                # An eager small match can hide a producer needed by a larger
+                # imported reference. Retain the established candidate and try
+                # normalizing the original program as well when work remains.
+                # Prefer this alternative only for strictly better coverage;
+                # operation counts are not a runtime profitability claim.
+                remaining = len(re.findall(r'\blinalg\.generic\b', output))
+                if fuse_initializers and baseline_matches and remaining:
+                    alternative_application = normalize(text)
+                    alternative, alternative_matches, alternative_diagnostics = MATCH.run(
+                        alternative_application, path, region=region,
+                        region_budget=region_budget, allowed_specs=allowed)
+                    alternative_remaining = len(re.findall(r'\blinalg\.generic\b', alternative))
+                    normalization['candidate_remaining_linalg'] = {
+                        'matched_baseline': remaining, 'original': alternative_remaining}
+                    if alternative_remaining < remaining:
+                        output, matches, diagnostics = (alternative, alternative_matches,
+                                                        alternative_diagnostics)
+                        normalization['source'] = 'original'
+                        normalization['application_sha256'] = digest(alternative_application)
         else:
             output, matches, diagnostics = MATCH.run(
                 text, MATCH.DEFAULT_LIB, region=region,

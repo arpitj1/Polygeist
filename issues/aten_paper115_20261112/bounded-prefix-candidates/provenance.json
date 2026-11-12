@@ -1,0 +1,71 @@
+{
+  "arguments": {
+    "worker": null,
+    "output": "/home/arjaiswal/Polygeist/issues/aten_paper115_20261112/bounded-prefix-candidates",
+    "checklist": "/home/arjaiswal/Polygeist/issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv",
+    "jobs": 4,
+    "ranks": [
+      1
+    ],
+    "region": false,
+    "region_budget": 30,
+    "split_reduction_inputs": true,
+    "split_pointwise_inputs": true,
+    "numeric_model": "strict",
+    "timeout": 600,
+    "cases": [
+      "blas_scale_cpu",
+      "normal_cpu",
+      "uniform_cpu",
+      "log_normal_cpu",
+      "batch_norm_transform_cpu",
+      "renorm_scale_factor",
+      "cross",
+      "cross_cpu_backend",
+      "polar_scalarized",
+      "gamma_transform_cpu",
+      "standard_gamma_grad_cpu",
+      "dirichlet_grad_cpu",
+      "geometric_cpu",
+      "cauchy_cpu",
+      "exponential_cpu",
+      "count_nonzero_impl_cpu",
+      "nansum_cpu",
+      "quant_col_offsets_cpu",
+      "joint_scaling_cpu",
+      "transform_bias_rescale_qkv_cpu"
+    ],
+    "summarize": false
+  },
+  "git": "a7deda44966532eec275b5120841c73b04456561",
+  "uptime": "01:28:31 up 448 days,  5:57,  2 users,  load average: 4.56, 5.67, 6.18",
+  "hashes": {
+    "/home/arjaiswal/Polygeist/build/bin/cgeist": "9ab804bd218b0c98830b716a9bc6b011819a51909e6fdb9a824367c9e28df9ae",
+    "/home/arjaiswal/Polygeist/build/bin/polygeist-opt": "1edc2009c58a7ed2b2407841252fa6b9cefe55ff101911e40afa58b79e26a078",
+    "/home/arjaiswal/Polygeist/generic_solver/lib_v3/import_manifest.json": "53a9f12967caed671ff8777e9133d5479d769e236cda344e8cef4b455173f229",
+    "/home/arjaiswal/Polygeist/generic_solver/kernel_library_v3.mlir": "964eaa5b7bf4f7e7498c29a3d3a2d5c2bbc4bf1645fdea5a7e164afec4b71651",
+    "/home/arjaiswal/Polygeist/issues/aten_remaining_v3_20261111/paper115-reproduction-backlog.csv": "2d7c66473ab20e00a12bbc31bb77fbd92f2525e1934ac0912bd1f5c97a5e684b"
+  },
+  "selected": [
+    "aten_cross_cpu_backend",
+    "aten_cross",
+    "aten_normal_cpu",
+    "aten_uniform_cpu",
+    "aten_blas_scale_cpu",
+    "aten_nansum_cpu",
+    "aten_batch_norm_transform_cpu",
+    "aten_log_normal_cpu",
+    "aten_exponential_cpu",
+    "aten_geometric_cpu",
+    "aten_polar_scalarized",
+    "aten_cauchy_cpu",
+    "aten_dirichlet_grad_cpu",
+    "aten_count_nonzero_impl_cpu",
+    "aten_transform_bias_rescale_qkv_cpu",
+    "aten_gamma_transform_cpu",
+    "aten_renorm_scale_factor",
+    "aten_standard_gamma_grad_cpu",
+    "aten_joint_scaling_cpu",
+    "aten_quant_col_offsets_cpu"
+  ]
+}

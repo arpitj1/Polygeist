@@ -49,7 +49,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "be4710e1a0ab05a79b87609a265d93182e41bd9faf4565a7bf2f4aebbcda62f5"
+   "input_sha256": "ec122a3de1e30e074f05155d75dfd7e62f0d3a2ae7518d773482d1b451c6ecf0"
   }
  },
  {
@@ -104,7 +104,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b83f5a9c7f4ceea9fb47d418df6444f606b1499fa2a5e309f3bb0afe72c316c9"
+   "input_sha256": "d9f16b1c864b4e8fab5da47bba9c4e694d430ab9c3dde48063dbfe2635253700"
   }
  },
  {
@@ -159,7 +159,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2351d1155d01d66a23a5794746fd1218cd5ebcb442c654ac76750a827e02541e"
+   "input_sha256": "f3020708d27a56b8aa4c0634f54343a47de29b79386690b627768a436cd9e731"
   }
  },
  {
@@ -213,7 +213,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "4a882e657edf1d1ff5f38860c0756dcc112ed952c0cd9e1aaef9765e495b5a16"
+   "input_sha256": "7ba0624f75bb1efb96730be01669878a1f6c69063a90d655772873cd835bd18c"
   }
  },
  {
@@ -269,7 +269,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "cceb2e7a9480a3f70fd5ded13928e203cba8f4d75c25ef90ed82f6dbd725805f"
+   "input_sha256": "794b73b7ebffc97ed1a6e04f71c8c5a4090c5aef12873d573f59637ce7464b57"
   }
  },
  {
@@ -325,7 +325,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "6847008c93668a2a2863c7b08f63945e4016e9ee69419a07b2f54371008b87a6"
+   "input_sha256": "1c268d89b81d44a3049abac9ec582bad1766415956555ec1bd940dacd35bb3e1"
   }
  },
  {
@@ -382,7 +382,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c63fa6b5c4729392965daa94f6e15ea4334be44143241aeb3627e143a4534487"
+   "input_sha256": "5e267a7b320ff00111b8c42844e9d121b498e62714ab2d43626e5101385caea7"
   }
  },
  {
@@ -437,7 +437,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "7cde766d16ada340f2ccd5c59c2126a7179273a4c8fef2522ec3efda055f8b48"
+   "input_sha256": "94324f51639db24bd3e3b9682a9262379d8e8729b1b073ccae6a7e912417967f"
   }
  },
  {
@@ -492,7 +492,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "7e96db75917799dd3d8fcb083a4507190cea12f7672415e268b73d06a6bafca8"
+   "input_sha256": "7e6d593c1d4ce0cb517066f4d63c2d34190ff89e70c279ea5db23689ebdfd86f"
   }
  },
  {
@@ -545,7 +545,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b44e053af1c5a93127c2164e6f5b1237cf0896ad418975250ac8f69dcd400c59"
+   "input_sha256": "80c572d7891a5ed6e7970b609c6527852b668744539c0bf856d9776b1a9487a7"
   }
  },
  {
@@ -599,7 +599,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "1b30f7f325a7f89eb44ca4e75b5f3c50b198b16bd2e306ac7d9a4ef024945a92"
+   "input_sha256": "d25e0ff7058d98114eb8b70e9b7399c7aadecbbd4fbbd2bbd35d4c6b268239b8"
   }
  },
  {
@@ -654,7 +654,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "645ea6dba04d67a7dcf9b6757a8c5470ac569591b2b9f082b691650b3b6bd951"
+   "input_sha256": "3a43780829b7f3fa9c9e9bd87c51ccc36b2115c1eed66d3f1c45ae532c77500e"
   }
  },
  {
@@ -707,7 +707,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "47e403cbb5d65e3a8a9c93073ecf99dc3536de2d4a736aa908f0f59a71d15b1b"
+   "input_sha256": "2317cc8f821522d8b21a5c4e34c7dd10ed3d72a7004d5f4665b70943fade2040"
   }
  },
  {
@@ -761,7 +761,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "fabbb8999d640d352a6ead21197e3395796a117cd344ac8bbec3f24e46491c42"
+   "input_sha256": "8d4c91c047d8afa8dedc7a5c735b11a46dde5f0afa52ca03394256c84c103914"
   }
  },
  {
@@ -815,7 +815,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "455f641a35b30fdfa352e9f7f251c82cf0644181d748935058ebb6b93c4caa32"
+   "input_sha256": "6b2604fc83c64ef032f2868f11a29675bed25680eecd8fe0ff5fea332f41dbaf"
   }
  },
  {
@@ -870,7 +870,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "037392cac726ea58168ca49a744ff3e080e6b05c3acb3dc2427e733b24177769"
+   "input_sha256": "a45fd333a9e3f0fc608701b2a95458c72b292d5281007cb05f2c50629a41fdfc"
   }
  },
  {
@@ -923,7 +923,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2eb74f7fc1fbbea02a7446be29e3002f08a41e64874674cdc975b0c8a97f7136"
+   "input_sha256": "49d184da527f7a99b6fa5e44ee6df7798c5383b07c5bfab2f39e3bbfdd309727"
   }
  },
  {
@@ -978,7 +978,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f433ec4267570d733715f321f53cc885e809ec1f6c3d19b75b5a1be6f8e8a11c"
+   "input_sha256": "a281f5aba606d8f7cfc86cedefc752910c2989098d96795b0bfb37eb61481309"
   }
  },
  {
@@ -1034,7 +1034,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c3a048039aa958031a4b3f3034f0cad25c9ba6759a766eef6b5c6aec356e35de"
+   "input_sha256": "3fa5da20e61339cfcca41f02854b9ba640d8a1b296028cb8695de31f25e89729"
   }
  },
  {
@@ -1088,7 +1088,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c670d318aff2b6618b5ac355534cd56b749de56f047a26bb6eaa836882575fc6"
+   "input_sha256": "62c24c09dfd14832b37d6a1ceba45449931b620a9f1affeed2c8a7044cd5651b"
   }
  },
  {
@@ -1142,7 +1142,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "80951b6467bec59a114c756823e906cef591e6da84c72ab58ac0da613056ac9e"
+   "input_sha256": "a785caf00dd20215d1bed0693377b53ffec34672ba7b04cb4fd51d53fb85be6f"
   }
  },
  {
@@ -1195,7 +1195,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "92be4ceff98dcad78cafc95a46842e57713234803dde1b79cbcb74258aa46fab"
+   "input_sha256": "3c6723c3a7105654db5d7f79eb143d3c54c8cdd1f11b7df701b1905ff4b7a7c4"
   }
  },
  {
@@ -1248,7 +1248,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "588ab7c861092f1602afc35d5e21df2e0abad7fc05a8a93a3031a3b81c15b6b8"
+   "input_sha256": "c6d769403778740e280fc0d22366a6a2518c9a53f7e0a4fd9767c95b4252f063"
   }
  },
  {
@@ -1301,7 +1301,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "808ca1c973d6a62c7013855fb342de625ec6a9d843b9661a60aee9074423002b"
+   "input_sha256": "5f06eb1fe34d629a3483ceeb00d137e7835e91ff72390575821a824c5e8ebe7c"
   }
  },
  {
@@ -1354,7 +1354,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "5459fcf0407bf31613cfdb164f1124538c67e8995c4907c5d1870fdb6828f2da"
+   "input_sha256": "d569573c3d7d13374f60664fa858ffbae65f6ec91e368bae11ac76092f107bac"
   }
  },
  {
@@ -1408,7 +1408,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b58ecd12c85d8293963f6dec2b2ca985371399ad5c4b8250d2d8a0011481f2af"
+   "input_sha256": "db21ff30339fac722ee5f39f52ca79fae708563b6acb8b811297cd9e7d7eff00"
   }
  },
  {
@@ -1461,7 +1461,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2fd73bfa8af56c9bf99eecbc7af19a5dc87c4a18821f2eee35091cd5377f125e"
+   "input_sha256": "d1ff2d4038000c0a884056668db00cec9bc4b7302f6996909cbfcba754888b4a"
   }
  },
  {
@@ -1514,7 +1514,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "1b2cffbde0d61d0edb568512f21c06c65e287d43f2fa3a601e609eaf19879bed"
+   "input_sha256": "7b7e95f885a293e70d7307c960283eada4cb9a4ca19bb9d820284a1403233a97"
   }
  },
  {
@@ -1568,7 +1568,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "32d875fb033cf20c590ca07b54951037cb00adb411ef3254a0af4f64a8c94e24"
+   "input_sha256": "56c6b04a0cebbcf2d3a055722c249f7b55d46924e6abfc115c59d8fe8a3ee887"
   }
  },
  {
@@ -1621,7 +1621,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "12da7c1da8feb88ae126086d53e2d3d8e2bfd6a3c9d064b6bb7a744236a8bc68"
+   "input_sha256": "516c49c605faa323d325fc25bb14bb84e2ea41a1a69891242b7a37294681c882"
   }
  },
  {
@@ -1675,7 +1675,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "953a38d43efbc9f78b5439d1aeb8c8246721975e0cf0bac7d10875de60f1d279"
+   "input_sha256": "8389c7546c032bde5ac41502ad493c6a54f08b6837f1a5f8e746bc0d4af53e6f"
   }
  },
  {
@@ -1728,7 +1728,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "af560cae6523b62d26669aae0776243a769b37cb59c31a699bc04cb53d62a2a3"
+   "input_sha256": "424d8f586ad82edcd64c3afc013826efa0231afd04fba119e242168f05b3bad7"
   }
  },
  {
@@ -1782,7 +1782,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "9a3528d22dc1389ec68e35490df0f77f70371d47d0ddf6ef3a7b539b8bff04d7"
+   "input_sha256": "87dcc3ded8ece11704bccdc354510393fe69b57c5654f8293610c5678c6de022"
   }
  },
  {
@@ -1838,7 +1838,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "4b071d61824cf37006cf22c3c96f3bddfd59c5cb0661406ea6dbb66221f36d4b"
+   "input_sha256": "cbb821a005f84ce0f8881d69a538dc3b4a8bc0a6142a27e1082dd540174cad6b"
   }
  },
  {
@@ -1892,7 +1892,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "be992f369e567b5d495ab9b944f117bcd827c1ca499b1b1cc9a4e1c0d7333cb7"
+   "input_sha256": "1d5e0ce8126b0d0e885642a41d79387c24d1df11bb395b9ac3b12bb50f69a4db"
   }
  },
  {
@@ -1946,7 +1946,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "ac07e6862469198b4896330016c20772268c129d751fe4c1393bdbc291d22848"
+   "input_sha256": "95f05fbb4dbb91ba41bfbc04dc47d0e9bca946483e9817f82d576bd330afd317"
   }
  },
  {
@@ -1999,7 +1999,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "004f3c1e1c3b650b466a43676043bc8f47e1b5ca80240a3be6d01cd388839b36"
+   "input_sha256": "79cc241cf65c6d63f3dbc4dfbcdb3a7261563fa363a51ce5fa53ec1321e6ad8b"
   }
  },
  {
@@ -2054,7 +2054,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "6364c97ca0fcb4663c0ab55b949c57b86772fc053084b342e5664c4e9c32918b"
+   "input_sha256": "2dc63d951b7925835da9146495192a2ba8bc6cfa345852c3db96a30fc8f2bd5a"
   }
  },
  {
@@ -2108,7 +2108,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "906f986d9e38054e1ec5e10ad5b169b4c83027a29cf9c0edb0ee6d5860b198f3"
+   "input_sha256": "16ddbae45422ac91283604ace1abd93518ddee268f0f2a7f2ead9599ac0a7c89"
   }
  },
  {
@@ -2161,7 +2161,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "565237085871f30a76c0645ab2612a702d8d5e2ba2a75080a89c6806c4f01a99"
+   "input_sha256": "11a6183d389ed06d96bafb174a84a8c299729365cd3df606ac2a4cd103a3dc2b"
   }
  },
  {
@@ -2215,7 +2215,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "7ae98bc719baf63fec901c92dcdd38417275c240b67dd9eeee528d3a30f3507d"
+   "input_sha256": "98d53fb93620fabc83abf0c46ac47e8e2f178c2d07603131ee9a2aa73fd4e1d7"
   }
  },
  {
@@ -2269,7 +2269,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "45385f039f873afd0cd1325d8f5e0797f4fb48a5efb70bda658283d1961c32e2"
+   "input_sha256": "4f8c27aac7de8d4d3f669cc794043da3680cbb4941b472accfbe635549ef7a7a"
   }
  },
  {
@@ -2323,7 +2323,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "78b7ede6cf618891cd328675fb53520473fcd2042adfaecfc0026bb2abf7fcde"
+   "input_sha256": "e9068c7be6b1712e66ce839467a7aa51a98f529c7bfcf9fe052ffd72480c06d2"
   }
  },
  {
@@ -2377,7 +2377,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "a6f46c58390836230a6f4010dcc7909bb11ca70d2ab8fcc18a620cd7b539d37f"
+   "input_sha256": "889481a91073b7c01570af39df563cff7d9c93af5f88a58b9d3a304c207b54b0"
   }
  },
  {
@@ -2433,7 +2433,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "444633a16c4c7db0abb6d02c53a8f5de70dff4397b6bf1220d442a92e9aefeaf"
+   "input_sha256": "5e2724c778a71f639803db51d31470dc76f7277b752f733088729b1aa5e4c7de"
   }
  },
  {
@@ -2487,7 +2487,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b5848eb9545e11970778ad0b9d3c248b8a641ad1ee22979ca8a6c852c6793569"
+   "input_sha256": "7d5cbe577b84b1909ecef57a023ef2dc0a956ff713362e367b7750c03aa45d33"
   }
  },
  {
@@ -2540,7 +2540,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c78c2514c8255c1b2c47cb44dfbb86e0f7aea44abd21f7a81e9c76709ace0e4e"
+   "input_sha256": "c51157d43502c32c97c0ca9e695af4ce6854e03170b5605f1408d2586cdd780e"
   }
  },
  {
@@ -2594,7 +2594,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "71dc398c442d466d99f90a250d6029cd067ed17a784d450341a38685db56c18c"
+   "input_sha256": "c8c07fe8fd92451559b6feab2bb4a0ffbcb675037e31ea84395f7ad2ac98bc80"
   }
  },
  {
@@ -2648,7 +2648,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "4c75238c3725cd5a8437a26d0b867e40b671fd15dabbf1458c718b6eb292ba17"
+   "input_sha256": "20dba0000eff8bb3d1588f6785f7915dceab1870025dc5dad7b73a04ea3c3ae0"
   }
  },
  {
@@ -2701,7 +2701,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "36bcb369609a4ee0a13b6310d8b53908f2ecd35167dc6f8583ad02434e026a6a"
+   "input_sha256": "3f72a079d5c694071aca047ed7b3899691dd82b7b5535e1d35c482b24db57e3a"
   }
  },
  {
@@ -2755,7 +2755,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "ff8bd2c4e10be3efa23b9228a63ce73a8fe1198b20e23a6baea5a03047db1fc3"
+   "input_sha256": "9f136cb8e97959b22ad06327223ccdb61efbcce6c2863b0208afbd7d08c116e2"
   }
  },
  {
@@ -2808,7 +2808,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "7aad25fe70bf45856db84a115213fb25eb7fcc5cb27377bcd28bfdbec84ebae4"
+   "input_sha256": "21c81f8a457abea2f61e37744019414b15a5ad27362e164536c1d67a84c414fb"
   }
  },
  {
@@ -2863,7 +2863,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b2072df550dc9d5beb6c7b2c5c7e544ae3465f9d6248f1c02517d69111843a01"
+   "input_sha256": "ab2df4bceccf28cbe4e0c06e6bec59215a19951390cc4eed9e5f8949b9fef416"
   }
  },
  {
@@ -2918,7 +2918,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "43c57eb519c247cd247f14ae1283a4d6add4a8e552731a8b1758b79e4b31bad1"
+   "input_sha256": "7fb5e493e901a22c43cf6c5fbaeca49cb83718b58102bd8ced538467ff649fb5"
   }
  },
  {
@@ -2971,7 +2971,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "298418000e67147fb5da089a68b1a9a5fdc108af46e313fa8ebe11492dc03588"
+   "input_sha256": "82ef9b2ab337d7475c64fdf6485784c1e086179f61e4000ca929b08514ed7d3c"
   }
  },
  {
@@ -3025,7 +3025,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "54f844aead237b898aa034ebd3ef2aa4cc8d7df723052c99e0261a27a57fed85"
+   "input_sha256": "24e7f24c8cfa7169cf0dab3a3fa9c515d7cb526f02bb6992816031d32b0df35c"
   }
  },
  {
@@ -3078,7 +3078,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "ec6d0d9cfb1998c2d6876a337e47ea4795716ee45c119ec7b1d74b62b4afe0f8"
+   "input_sha256": "57918cdcdcd53539d42527e192e993db2eb717ac7fe789872611df6ad3a7d681"
   }
  },
  {
@@ -3131,7 +3131,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d9150a63142688321ed45328a85382d4e8e7a140ccff24b748f5310d79b405f8"
+   "input_sha256": "9cdee2fc356cc50e8522adf6c992ae0a422f0cef291594b314966e718c6c95b4"
   }
  },
  {
@@ -3185,7 +3185,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "bf03c4bc332debe744ee7383386f28ed999061693ace23d55175afde31f50935"
+   "input_sha256": "fce41ee3078f66361fda7700374f7c05ad54f2cdf01cd41821a51ffb1bed433e"
   }
  },
  {
@@ -3238,7 +3238,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "407d05532607e89f464818dc3488b99fc0a3b5c87481a9b739b16b65e4f06816"
+   "input_sha256": "74b1d853454147457d6e3de5731337a73d7e78a389b2f5c28bf27cf26f8bdd88"
   }
  },
  {
@@ -3293,7 +3293,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "006ca92236593a4196fa4493409bbb276e1dcfe578243a68a97fe014c92defc5"
+   "input_sha256": "9c0e8383eaf080a504884dcc40225e3bee266c740c41f187607e7c92c5daa3e9"
   }
  },
  {
@@ -3346,7 +3346,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "52861069dc576c6684943daaafcda1ab40f08751db8e91b9a0baea1538103fa5"
+   "input_sha256": "dd5fecdf1683f6b1cae61514ed29123ed828cbbd6364cabe282f925065adffca"
   }
  },
  {
@@ -3400,7 +3400,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d018111841be683897e61b817a720b2db8e91d56d46a4b223db5814eb8ae7f5f"
+   "input_sha256": "2fc87261a6474f3be21eef8dc1611af21dc84bdb2a9ea68404f451ba85b50abf"
   }
  },
  {
@@ -3454,7 +3454,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "485f78d3bc34a76309ee99a79fc5acd697bdbf4175984c903ca9b8ea90eca9a2"
+   "input_sha256": "746e4192d8b0594d72b5654345d8624f4dfb4b01f78393fa0daccecd5acdcde8"
   }
  },
  {
@@ -3507,7 +3507,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "921db6b6c9f148a0947192c61b9563cc041e9181c2a845825fb722eec44d045d"
+   "input_sha256": "afeb32e0ab3ec05ddc6f570627e814754ebaea645caa941e89a30dc148d0cd21"
   }
  },
  {
@@ -3560,7 +3560,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "0747d602c693b0384665bdef1fe900e55199357eeed2d8ab73ae921397e05c5f"
+   "input_sha256": "7e9edda31dd264fa881cfa436291b64715baa7f4ec1449d443223f5eae2f7a7f"
   }
  },
  {
@@ -3613,7 +3613,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "27a0db03bff3c5200f528e3f86846e2cbdc1bc94dd39dcb8bb749f375b8fd7a0"
+   "input_sha256": "b1df3a31a8210631c35483f41934ebde833f89710ab4453f8f2457d4f779caa7"
   }
  },
  {
@@ -3667,7 +3667,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "bb86400523d263c312ad045700f7621e2209ce9d3d15648721028f093693c9a8"
+   "input_sha256": "ce67b7503a0beb8c2107cb3148457cee32ceedbb9eba218399ff108c20947a89"
   }
  },
  {
@@ -3723,7 +3723,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "000664b4e9ceaaeeec89ef714837fb3879b20bd2288c4f22ca4abdb3722ae771"
+   "input_sha256": "858791aca707ffb173f27001aee373005779752f8ce20bb8b729a505e136512f"
   }
  },
  {
@@ -3776,7 +3776,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f910f1e64d57312270ccc05ba0593b5bc214832800de2c4c5d7208284f1a74c6"
+   "input_sha256": "e497a8e8bdf901b9302b08b80549c28eed9f9e6356d55e6a14db8cefa3a9c5a4"
   }
  },
  {
@@ -4278,7 +4278,46 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "59106f9ce90aa7944b76f8a97673a17c8ab4e9b57e209dc20da7a3175e90b9c3"
+   "input_sha256": "10b345e7dc625ca003eb55f7db78b495c5da9df1b387201a99dfb77a6e991e67"
+  }
+ },
+ {
+  "spec": "cub_histogram_even_i32",
+  "routine": "cub_histogram_even",
+  "wrapper": "generic_solver/lib_v3/raised/cub_histogram_even_i32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_histogram_even_i32.c --function=cub_histogram_even_i32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_histogram_even_i32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_histogram_even_i32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_histogram_even_i32.mlir -o generic_solver/lib_v3/raised/cub_histogram_even_i32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_histogram_even_i32_linalg.mlir -o generic_solver/lib_v3/raised/cub_histogram_even_i32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 1,
+   "memref_access": 0,
+   "submaps": 1
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 1,
+   "memref_access": 3,
+   "submaps": 1
+  },
+  "status": "PARTIAL",
+  "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -4332,7 +4371,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "a2e2d3f17d7b5a0b3b623a207fca46a596969e4517a3f29f208d05b5e62d1926"
+   "input_sha256": "20f4580e36f8537e10194f5ca15d710e87753fb7d735c2c63a616e3b4b97ae55"
   }
  },
  {
@@ -4386,7 +4425,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "0e33687d4184589a0f9839d3cd4e43f3f5d596e3e63c2820fdd7ae3a7cff07aa"
+   "input_sha256": "d9b4bcc349166aa913b7552f50ff25c08c049ed47c9daf80d960a1ad73c5bf17"
   }
  },
  {
@@ -4439,7 +4478,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "ea070568271dca5f93038457d0dbfb93dd463b5a6feccdae41c3b1e654c3bbcf"
+   "input_sha256": "674f2e7b9d1027a67c47a6da9e760dd008ebe9acd4045947b50f4b5ef600e186"
   }
  },
  {
@@ -4492,7 +4531,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "43189644c6bc88c32090b78f50501547d3db37389bc5192a253f2bc712927be1"
+   "input_sha256": "cc7aeccd3e3b6e50643e8fd42310e315780b96309b9dc2c1281a20f13007aba1"
   }
  },
  {
@@ -4546,7 +4585,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "5d4050edbbd2079fba484c26bc4d5078d51823eeb626041e4c6c7f10a82b5eb2"
+   "input_sha256": "3a7c407f145e7ee710b262852c50245f3437d66ddefa7de06f1667375821b72f"
   }
  },
  {
@@ -4600,7 +4639,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "25fe47d42afcd5137c6098f89a9866d85187770af6e03e39a32a72f35406d544"
+   "input_sha256": "0e2212c8a0d784fa0aafd11ef19e0aa400f77cb63f6e68a6028dc85867aa8a01"
   }
  },
  {
@@ -4698,7 +4737,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "fb5b5d34d6b609a80eb710e63cf034afbd56c0921ae8be96734e611cb18c881b"
+   "input_sha256": "71e36e03c18f9bf15841886f7b86c070afc33c8b7922b186a01c8939b2559a8a"
   }
  },
  {
@@ -4756,7 +4795,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "89a4b5e9a4e5bb8475b17cacaaf866971438117a2621c7143f4b3269145eef5c"
+   "input_sha256": "2ad9362cb2af71d50ba0245034086d0be996a878736ee20eca7c39598120ab4e"
   }
  },
  {
@@ -4814,7 +4853,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8934e0719814214bd79aef85a03a145f31108553cc096cb0408ad058701169f5"
+   "input_sha256": "452535af7258cf0323ce2be2484fe5c72efca687e7f0886aad6f4adebd7ba9b0"
   }
  },
  {
@@ -4868,7 +4907,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "94024fd4648a2c4f296a2255b11f749177f8cb1fd3e25793c8e9b73c583ffe9d"
+   "input_sha256": "d00b3e21a24fae4c0471fbb3f7d35c901bc3714dadbe493d420e58e49d1360b9"
   }
  },
  {
@@ -4922,7 +4961,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f06891de187df2ab9093e8110fc88e20845c2d45b62d87b0e51fbbb18e7979ef"
+   "input_sha256": "31dd83c7af58170781dda4afff650597e84beb404aa4c8731a244c21326f59f2"
   }
  },
  {
@@ -4976,7 +5015,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "84d6f5986335fdc77d0e8fb69bea2a0bc95c81e8d8abe3fb29a060b8e44b0573"
+   "input_sha256": "31853e9b571a9fed5ff86341f67855545c90f7aad9dd8579bce92589332e610d"
   }
  },
  {
@@ -5029,7 +5068,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f9eb815c946f0dd0d94f76c27f3f6fca50b86a5e4ad6fd1d86a5dc1c458ee680"
+   "input_sha256": "51e3c27ab31999c6c62627afd5633b85320add4fc5399c1858804360db554d36"
   }
  },
  {
@@ -5082,7 +5121,64 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "703cf485938faef0aa2e577a0ebb45296f69b899120d560180c383c58496e3a8"
+   "input_sha256": "0456d130ac05a683f39a0ac85c73b554689267bbf8a1f52d072c627bf6110fd2"
+  }
+ },
+ {
+  "spec": "cub_row_product_scan_f32",
+  "routine": "cub_row_product_scan",
+  "wrapper": "generic_solver/lib_v3/raised/cub_row_product_scan_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_row_product_scan_f32.c --function=cub_row_product_scan_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_row_product_scan_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_row_product_scan_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_row_product_scan_f32.mlir -o generic_solver/lib_v3/raised/cub_row_product_scan_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_row_product_scan_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_row_product_scan_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_row_product_scan_f32",
+   "declarations": [],
+   "params": [
+    "rows",
+    "cols",
+    "seed",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "cols": "output"
+   },
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "dc96d7e510c366ce2b129933c950419dcbd0b07d0e71ead7db2fd294ce0b8449"
   }
  },
  {
@@ -5139,7 +5235,64 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c1003c5c4d750a63ebd950fb28c54b911b8da6e03eaf1f9994709a432505016d"
+   "input_sha256": "52bd858a6442ce323753380b50b77fd3539159073768633962323e989fb7b91e"
+  }
+ },
+ {
+  "spec": "cub_segmented_sum_f64",
+  "routine": "cub_segmented_arithmetic",
+  "wrapper": "generic_solver/lib_v3/raised/cub_segmented_sum_f64.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_segmented_sum_f64.c --function=cub_segmented_sum_f64 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_segmented_sum_f64.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_segmented_sum_f64 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_segmented_sum_f64.mlir -o generic_solver/lib_v3/raised/cub_segmented_sum_f64_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_segmented_sum_f64_linalg.mlir -o generic_solver/lib_v3/raised/cub_segmented_sum_f64_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_segmented_sum_f64",
+   "declarations": [],
+   "params": [
+    "rows",
+    "cols",
+    "seed",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "cols": "input"
+   },
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "46207cf5bb362b44445536e45c71b16ced3023ef7c392bbbbc0d4302664f58e9"
   }
  },
  {
@@ -5196,7 +5349,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "30db2dc5202c307bb718544769ac1799b220a84f00d7da22e92c3b475d1c7c15"
+   "input_sha256": "fcb9a4123701adc2a03305f0bd1f8872ae7c3e2c90595186d14b465802e0a764"
   }
  },
  {
@@ -5252,7 +5405,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "036978484b76984bdcdae935fc251bf57d4accf7472d454a00b66fd1579aed6b"
+   "input_sha256": "ecf607feb0dbd179944bf770ad7ea92fba319659386dd4fb8251bba87046b3f8"
   }
  },
  {
@@ -5309,7 +5462,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "63e71db2a5654f964a7f691b7177aaeb7ab100a59ea771d96d80356edfcf28ba"
+   "input_sha256": "ba0e547d2ca64d796d5270f9e82b82b517d29d47ffbe7f5dcd3db088b17ee60c"
   }
  },
  {
@@ -5366,7 +5519,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "542a0be3b4926d1ceb108a3a8faf89ec246b95572f422ac25ea071239a9a1a49"
+   "input_sha256": "61544f86035872a04c442546af61441ccd70ac06d8bbd7911c3559ec2c521982"
   }
  },
  {
@@ -5423,7 +5576,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "a68aae4df0b088977be590af3dee2807ba2e4f810cb85be541103f61c85515cc"
+   "input_sha256": "87ddc562e1dd5fcc90669075ae49971fa8612a2d3b082837214d86669ff21039"
   }
  },
  {
@@ -5542,7 +5695,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d6bfade74a24108ac312ecc518b064c53f62f3d8b3c97cd5275a484b746e1186"
+   "input_sha256": "ebaf8b9dc494a7b77061e248857988e629110959baec041176442aabe6b5da0c"
   }
  },
  {
@@ -5661,7 +5814,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "6f6b6eff2dcbcaa8ad50b85ab6dc4353cc4dfb08882a56fbfc4b24f93838afcf"
+   "input_sha256": "13dd515ba7a4b031a66f28ba836b2a0199bf6d1abc208b85b555e5553ec430e7"
   }
  },
  {
@@ -5769,7 +5922,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "5736241102436e4bc770cf1777bb4025490dd23bbfd859dc94482c09ae504134"
+   "input_sha256": "166b94c66ae8306066e16de6e267d1e4e4e3d6fdc15512e82c2c574a762956ff"
   }
  },
  {
@@ -5899,7 +6052,506 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d1dacaebc1dea77e04ad366238f84422b56238a7a4cb34fbfe1db151271b159f"
+   "input_sha256": "a819ff444ffe1f594c919a376c117975ae8e97f86234aafe50cc86f42d26118d"
+  }
+ },
+ {
+  "spec": "cudnn_conv2d_backward_data_valid_f32",
+  "routine": "cudnn_conv_backward_data2d",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.c --function=cudnn_conv2d_backward_data_valid_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_conv2d_backward_data_valid_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv2d_backward_data_valid_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 4,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 4,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cudnn_conv3d_backward_data_valid_f32",
+  "routine": "cudnn_conv_backward_data3d",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.c --function=cudnn_conv3d_backward_data_valid_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_conv3d_backward_data_valid_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_data_valid_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 5,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 5,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for (5 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cudnn_conv1d_backward_data_tbc_f32",
+  "routine": "cudnn_conv_backward_data_tbc",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.c --function=cudnn_conv1d_backward_data_tbc_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_backward_data_tbc_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_backward_data_tbc_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 1,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 1,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "LOWER_FAIL",
+   "defn_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cudnn_conv3d_backward_filter_valid_f32",
+  "routine": "cudnn_conv_backward_filter3d",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32.c --function=cudnn_conv3d_backward_filter_valid_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_conv3d_backward_filter_valid_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_backward_filter_valid_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cudnn_conv3d_backward_filter_valid_f32",
+   "declarations": [],
+   "params": [
+    "IC",
+    "OC",
+    "ID",
+    "IH",
+    "IW",
+    "OD",
+    "OH",
+    "OW",
+    "KD",
+    "KH",
+    "KW",
+    "input",
+    "grad_output",
+    "grad_filter"
+   ],
+   "outputs": [
+    "grad_filter"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [
+    "ID",
+    "IH",
+    "IW"
+   ],
+   "array_dimensions": {
+    "ID": [
+     {
+      "array": "input",
+      "axis": 1
+     }
+    ],
+    "IH": [
+     {
+      "array": "input",
+      "axis": 2
+     }
+    ],
+    "IW": [
+     {
+      "array": "input",
+      "axis": 3
+     }
+    ],
+    "OD": [
+     {
+      "array": "grad_output",
+      "axis": 1
+     }
+    ],
+    "OH": [
+     {
+      "array": "grad_output",
+      "axis": 2
+     }
+    ],
+    "OW": [
+     {
+      "array": "grad_output",
+      "axis": 3
+     }
+    ],
+    "IC": [
+     {
+      "array": "grad_filter",
+      "axis": 1
+     }
+    ],
+    "KD": [
+     {
+      "array": "grad_filter",
+      "axis": 2
+     }
+    ],
+    "KH": [
+     {
+      "array": "grad_filter",
+      "axis": 3
+     }
+    ],
+    "KW": [
+     {
+      "array": "grad_filter",
+      "axis": 4
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "b2c40099ffb6c101ef73b7a0fbe35248662353e9244ec226f280688fb2a19237"
+  }
+ },
+ {
+  "spec": "cudnn_conv1d_tbc_f32",
+  "routine": "cudnn_conv_tbc",
+  "wrapper": "generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32.c --function=cudnn_conv1d_tbc_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_tbc_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_tbc_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cudnn_conv1d_tbc_f32",
+   "declarations": [],
+   "params": [
+    "B",
+    "I",
+    "O",
+    "K",
+    "TO",
+    "input",
+    "filter",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [],
+   "array_dimensions": {
+    "B": [
+     {
+      "array": "input",
+      "axis": 1
+     },
+     {
+      "array": "output",
+      "axis": 1
+     }
+    ],
+    "I": [
+     {
+      "array": "input",
+      "axis": 2
+     },
+     {
+      "array": "filter",
+      "axis": 1
+     }
+    ],
+    "O": [
+     {
+      "array": "filter",
+      "axis": 2
+     },
+     {
+      "array": "output",
+      "axis": 2
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "3b4e65cd73287a69070112e69f177f879eb576db4dcfb804842af0afdb1bfdf6"
+  }
+ },
+ {
+  "spec": "cusp_coo_matvecs_beta0_f32",
+  "routine": "cusp_coo_matvecs",
+  "wrapper": "generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.c --function=cusp_coo_matvecs_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cusp_coo_matvecs_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_coo_matvecs_beta0_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 1
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 6,
+   "submaps": 1
+  },
+  "status": "PARTIAL",
+  "reason": "1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cusp_csr_matvec_beta0_f32",
+  "routine": "cusp_csr_matvec",
+  "wrapper": "generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.c --function=cusp_csr_matvec_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cusp_csr_matvec_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvec_beta0_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 0
+  },
+  "linalg_analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 6,
+   "submaps": 0
+  },
+  "status": "NOT_RAISED",
+  "reason": "no linalg.generic after raising; residual affine.for, scf.for",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cusp_csr_matvecs_beta0_f32",
+  "routine": "cusp_csr_matvecs",
+  "wrapper": "generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.c --function=cusp_csr_matvecs_beta0_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cusp_csr_matvecs_beta0_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_csr_matvecs_beta0_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for",
+    "scf.while"
+   ],
+   "loop_count": 2,
+   "memref_access": 5,
+   "submaps": 2
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for",
+    "scf.while"
+   ],
+   "loop_count": 2,
+   "memref_access": 5,
+   "submaps": 2
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses)",
+  "validation": {
+   "defn": "UNSOUND",
+   "defn_maxabs": 0.9794,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cusp_expandptr_i32",
+  "routine": "cusp_expandptr",
+  "wrapper": "generic_solver/lib_v3/raised/cusp_expandptr_i32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cusp_expandptr_i32.c --function=cusp_expandptr_i32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cusp_expandptr_i32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cusp_expandptr_i32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cusp_expandptr_i32.mlir -o generic_solver/lib_v3/raised/cusp_expandptr_i32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cusp_expandptr_i32_linalg.mlir -o generic_solver/lib_v3/raised/cusp_expandptr_i32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.while"
+   ],
+   "loop_count": 2,
+   "memref_access": 3,
+   "submaps": 0
+  },
+  "linalg_analysis": {
+   "generics": 0,
+   "loops": [
+    "affine.for",
+    "scf.while"
+   ],
+   "loop_count": 2,
+   "memref_access": 3,
+   "submaps": 0
+  },
+  "status": "NOT_RAISED",
+  "reason": "no linalg.generic after raising; residual affine.for, scf.while",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
   }
  },
  {
@@ -5958,7 +6610,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "e4053e93485ee02d3e9ed3d1451da1ca15acd69c9b3e9e6261fac72c0373974d"
+   "input_sha256": "797c57f1b76f85d9cb02798ddeec8e892a23a19f591132f0b28b795641550e10"
   }
  },
  {
@@ -6012,7 +6664,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b61c7178df02e7f9537e94994e037220f92d9ba2f06c19e6f007e7dcc05616e9"
+   "input_sha256": "b5b948fd3189ff8b1c03773c1059de1d5736e20a18459b39b20f5a2c55eafe59"
   }
  },
  {
@@ -6067,7 +6719,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "67af58c7437c292fc24487a4bc571bf3b1fb9938449341b41e383e9cbc8754ad"
+   "input_sha256": "f01c5ef66af9c0d09196afa3fc3408a4bd9efaf07d1af3cef7146e804803beeb"
   }
  },
  {
@@ -6627,7 +7279,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f5faac3aedaa843f6e9622be502db694e87dda099e511f2456e7c42893a563ac"
+   "input_sha256": "a7a882acfd93add7c27c0b3a91b7876c2defb3cb58669af1447b6cee68327856"
   }
  },
  {
@@ -6696,7 +7348,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "1c7343c2266a5f251c12e9517f3bbb8f5d2a8c19876800e7f05b4a1628fbecaf"
+   "input_sha256": "73f9d2cf04555d8c62d57f87b9030461fdfbb4b05ff3f00c85382e67aa13e3f2"
   }
  },
  {
@@ -6763,7 +7415,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f1f1455c1bb1b30883017faf66319a63172cbea3380b4554ae2639a6fbaa5f83"
+   "input_sha256": "0c9f97c3828003b422c2c5ba726aa61f792ed0b3c98d7ec766293fa3059d36ba"
   }
  },
  {
@@ -6830,7 +7482,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2e821b13d48d3592d80b5b8a02a0c24dc144a793174e5eb6f4e3189ee42be778"
+   "input_sha256": "cdab4b291cfed00fb56a6ebb9b9d0e3bc5c69ce2ac89765312f40a61d3a8273c"
   }
  },
  {
@@ -6898,7 +7550,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "5eed8525036fb0fc093eb577f83c082a842a7264633546a47e38f91557d2ea09"
+   "input_sha256": "2649a1076de98f458adde2641370c3f6ea27f6562291f92454163bbfc751e50a"
   }
  },
  {
@@ -7316,7 +7968,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "259a210b5ddc0d4096078fe1dddc1cb397c875d6aaff7c5f8823e890ab3d962b"
+   "input_sha256": "aaa2284c8e1f62946ea1eed41934f30fa5eeaa703b888dd0baf40608dc52be4d"
   }
  },
  {
@@ -7386,7 +8038,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "96a2471ba77c62ba4787a720108d0378bdfb92ae79e0d0421a003f8f621dd581"
+   "input_sha256": "83e8b729b55e96dc98d37271c3ad8601aab42bb8f77b56b5aa8bf033fbb68b70"
   }
  },
  {
@@ -7582,7 +8234,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c36cabf6be150899606cb6ff3421a2f29fdce73379de4d05f84c3671052c8f31"
+   "input_sha256": "6ec6c6a688641672f04ff6396ea726d15caacd0ae202b49330461a41ef01a557"
   }
  },
  {
@@ -7645,7 +8297,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c1f69583d74b3751f1c22e7052b6ebc161db1fcb5ecc0b62a3a5eca6516540fb"
+   "input_sha256": "e233a82feb4ca1c48f148c825093aaf748a8aee20c151c703be0a74c9af8300f"
   }
  },
  {
@@ -7709,7 +8361,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "ef356f8fbf91dad5131ebc307c275c3995f24fb8116241990a7a19a78426494f"
+   "input_sha256": "ee90d33358d7203ae47765d32aed4816427d95662c4abc4e1aa7e197df83d4c5"
   }
  },
  {
@@ -7772,7 +8424,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "cbde1b2476b914cad4aad03580161b64ed9b62555b3877ec077e27c38b4dbdbb"
+   "input_sha256": "c408aa21a88aa6aee151234fbc546e6c09273a36f9dea8e024d1c5dc78ccfe28"
   }
  },
  {
@@ -7836,7 +8488,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2a01c6eac5d3b37d5c4281472ee15f49ee3d0cd27f324f7f9c407e86dfffc643"
+   "input_sha256": "879a09a6ad86127ab653793d056532815b846032d724cc2e25b25c1b98725388"
   }
  },
  {
@@ -8202,7 +8854,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "1c5dd899ced787bb424b0f15c16131d90e16ad96ea496ad171d3afc28e4d718a"
+   "input_sha256": "774444f25068d77870425b8ccbdab9af4bbd05e8f51da6e3b4ed3c007f07876e"
   }
  },
  {
@@ -8267,7 +8919,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "635a8e1917b438437f6634bb6c433fca880e48f91373ec19cd33b40bfc5842d5"
+   "input_sha256": "6f95933ae49f92c3610f8561d7ffea8b8efbcf02cd5d2b9005627281094783cd"
   }
  },
  {
@@ -9077,7 +9729,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "51e79316eabcab34c3206cde1b50825e528458a46d2610b01c50add85287869c"
+   "input_sha256": "00b9dad0d78d5a2c8862fdc6234636bf3cc98a42cfd8eebcae50ea713525cdd4"
   }
  },
  {
@@ -9443,7 +10095,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "4c15e9cf150f6b071bb7434e5f49a26ccd19ef9be695a4908357c1ede439abd6"
+   "input_sha256": "fed33169c1e8c91d34421d4ce9ccbe66d9aa09958d9d0f971959f660f801fa67"
   }
  },
  {
@@ -9498,7 +10150,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "3cd73e7188454b36034f6d7955eac9cd726c19f3fba0c82ebad9a73b022edbf8"
+   "input_sha256": "564fa01de18b49dec2720edee9990770d3283829f89a64fabd13654e5a58a58e"
   }
  },
  {
@@ -9552,7 +10204,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "c7d97ea7d257a7572837dee63a484d0b4eeadf8ba3b1e5800265eef625155258"
+   "input_sha256": "56b51f2549101bbeb50f729a5a461d5f5268f2801389b9dbccbf9eb57e062bb3"
   }
  },
  {
@@ -9607,7 +10259,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "f2bdb7af0d5f3f95819260810632e4fdeb82b3692fb8c44c1ea344c61aac5dbb"
+   "input_sha256": "6baa5b7bf779a631b5f15c7765db59ae6df3e83559c5cdb5376b5a06cd3eaabf"
   }
  },
  {
@@ -9661,7 +10313,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "301f91e40a693778670f644b0d0045e331ae7d3dec20d8c01213b1b25256c185"
+   "input_sha256": "6424184e796b9f4e81dc0c06d9e0f44e79eb60449fc220f48882c32cd35e704f"
   }
  },
  {
@@ -9729,7 +10381,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8e4f64a35062075c6167fb27ec4fb481f652f2bf669f32b24afbbaaa6b51d88d"
+   "input_sha256": "8d4e1eb098d87fab6408c29451120f1be8befcd25a2eabcbebc2f03e469391d9"
   }
  },
  {
@@ -9798,7 +10450,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "89c0c40c598be13fa82f3c8b5835a60bf4adb401c935cb658e859aa6229ca768"
+   "input_sha256": "7e35a38a180236d2ffaf887719bb9b0c1d81229b4f5a583b7c75be582dc66a43"
   }
  },
  {
@@ -9866,7 +10518,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "3158b9b05424375c86e91cc8ed9babff2d83d70c56700509627350d671ffbd90"
+   "input_sha256": "c82f90c4ed979b8e31412fd601ccf6821c52c81796803884d6efe67db7f6ff42"
   }
  },
  {
@@ -9935,7 +10587,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "e53b668cf8bc69855f99e34792e5861603ad43584035d85b90702fddd0aac711"
+   "input_sha256": "edf47351af6b4bdf39227b8c1b468cc0a838912a85a4b98575bf52789d00fbb8"
   }
  },
  {
@@ -10003,7 +10655,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "adb399805db1f9bf1e1b5cddfda679f3b83cf7e9b92e918bfdab77c408e23c0e"
+   "input_sha256": "d420b5bd5a3cbef652aaf25169cc7f345dec97b4420b9eaf7d8e9f33944c964a"
   }
  },
  {
@@ -10072,7 +10724,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2f1db452ff1e709b6caed99a1376a76ad7b0c24570ce625417f9b886c3514b49"
+   "input_sha256": "935f43a9fe1f476f4b25d2f3f0c7f4e7ee0faeea4fdc69dc62a5a7bd41cc7ebf"
   }
  },
  {
@@ -10140,7 +10792,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "29e43f7e7acce14a5d56c3f03b56415cc7bd7bf66d980a6eeeb951e900995c18"
+   "input_sha256": "ae8b23163841ec6a13d9b5ef17863a1eb5cee5da5f1bbd5ad414fd6d37a9df5d"
   }
  },
  {
@@ -10209,7 +10861,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "663515b19bb310a3e93884a9f133411a03a45045a8b02e4cfb304443bbd25e7f"
+   "input_sha256": "e23237711b8b3517738763927d662598d1de4433ab0a12cbdaddc9833a22e1fb"
   }
  },
  {
@@ -10276,7 +10928,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "32a3ffe4944e48424975fba323d1b4f7863d802152647d343bd8da196f490970"
+   "input_sha256": "c96161b624cbc00cc019f3be9b916af6051ee4574b7bfeb2d2e3e2b8228a7360"
   }
  },
  {
@@ -10343,7 +10995,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b99d1db744a1a8599e68074586205f9c82c3d12254233394dbc5e61877a44073"
+   "input_sha256": "3e38c19f792ad8ffb17232381a054bea978713e322ed60846f1b434e66ef1974"
   }
  },
  {
@@ -10410,7 +11062,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b01ef48373151de0cbdb64c9af49bc6ef4b60cf3488b9894d64776bae256116f"
+   "input_sha256": "a05f1d6dd0fefb39d0aea9cdf4b37e44b8fb3580c05d09df7169b4654539e528"
   }
  },
  {
@@ -10477,7 +11129,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "07946efdd067e19b5a1f1da3d7e7c1038cd2bc07a041f5a0a3dc6b78e2d7d247"
+   "input_sha256": "f6ebe1b4d437754f610a54565ad49b2add28a535dcc745535ee98a6856c18331"
   }
  },
  {
@@ -10713,7 +11365,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2dbc8c8d9f9cf7e41d6b7041311b2cb111962214341df582ef98a5fdf4706389"
+   "input_sha256": "5ed78603d2bc470e6c9da406336816aaa01224188a050b33b1d8701bf905661d"
   }
  },
  {
@@ -10774,7 +11426,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "e60707bf0c4ead27505f1b1ade3d137330135c0900e343b8034336b06513e3c2"
+   "input_sha256": "277f320a463d1eae50197a4052eab1706d84688b25f6d368d927b794a7fa2385"
   }
  },
  {
@@ -10836,7 +11488,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "64f64760083229a53595598e61fabeb7caac4fed442c7b6002f77850411b287e"
+   "input_sha256": "fdede80ae15f291552918503637ec56b327c02cab6ce781b7e42e6b01c9fa1f8"
   }
  },
  {
@@ -10947,7 +11599,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "6ba89532c7ec36b792ec8d868c307355ba5ebddae45b99d4fbf2e0bad7c5505c"
+   "input_sha256": "3276546b159416543f48ec68b68834b68a000620de3a9bcc22859643baa78778"
   }
  },
  {
@@ -11001,7 +11653,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8f5acb7957e342c55e3baa8f87b767cb74689198d498a31020c654daa5ddc3f0"
+   "input_sha256": "685b40acf132c95380095c3a9eeea1b1f7ee56544608616768b3725bdf078229"
   }
  },
  {
@@ -11055,7 +11707,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "1c97cee0c3ce77f0ff5984a28eb9eafd6d66cc7351e10171d610d8f80752025a"
+   "input_sha256": "7033b05a66515132aa5724b9ab7d0310bcfd80b64c0744b4fba48347215fd981"
   }
  },
  {
@@ -11115,7 +11767,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "0ad3907a518915fc83bc97bfdda9de0bf962ce19aa79e8546cfc838fbb941730"
+   "input_sha256": "65adbedaffdc189a0abe27654373976dbca11f6f5ec88e20d371bfcc3cadb745"
   }
  },
  {
@@ -11175,7 +11827,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8cc1584538e66783efa4a4c1902a32c4db9ed15a2286a14e2f3bdf10d011c5c3"
+   "input_sha256": "f78addeffe3119b9b630364b9b340b04e4670bed15d69e82feaa3665d19d7bf4"
   }
  },
  {
@@ -11242,7 +11894,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "4472329222af4ea4a25bb2612cbd104ea73aee9e5fc6bc767a2732571eb349c1"
+   "input_sha256": "9e67424e0554c132792c08eff41e7045a250808be4a4d444ad5e66523c0ff4b1"
   }
  },
  {
@@ -11309,7 +11961,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8a3f281d877b8158021c2d636c4a645bcaaa1fcba76a693d36001dac6b729d5c"
+   "input_sha256": "bdfd7f3626624b98c10ef04fc221b1ad2603e100ffea91a8a13ef99888c8d192"
   }
  },
  {
@@ -11362,7 +12014,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8e1f052b4a326cb8c72e22d71c47cce64eb3b19b29eddb9cb64eea5e6a5ed1f1"
+   "input_sha256": "d8a8e7d027ae3f120fcf9b0c646ed8debfb207edadd78b9d82a2618c91423962"
   }
  },
  {
@@ -11422,7 +12074,185 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d869674b20a35890576a69305ddea8ace28da3caba05bab1f782d0532c002929"
+   "input_sha256": "412c0c9ff1cb8d5f3230f60185d437e843167109cbe8ce34c87314e5c489b739"
+  }
+ },
+ {
+  "spec": "openblas_sgemm_batched_nn_b0_alpha1",
+  "routine": "openblas_sgemm_batched",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1.c --function=openblas_sgemm_batched_nn_b0_alpha1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_sgemm_batched_nn_b0_alpha1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1.mlir -o generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1_linalg.mlir -o generic_solver/lib_v3/raised/openblas_sgemm_batched_nn_b0_alpha1_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_sgemm_batched_nn_b0_alpha1",
+   "declarations": [],
+   "params": [
+    "batch",
+    "M",
+    "N",
+    "K",
+    "A",
+    "B",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "M": "A"
+   },
+   "unreferenced": [],
+   "array_dimensions": {
+    "K": [
+     {
+      "array": "A",
+      "axis": 1
+     },
+     {
+      "array": "B",
+      "axis": 2
+     }
+    ],
+    "M": [
+     {
+      "array": "A",
+      "axis": 2
+     },
+     {
+      "array": "C",
+      "axis": 2
+     }
+    ],
+    "N": [
+     {
+      "array": "B",
+      "axis": 1
+     },
+     {
+      "array": "C",
+      "axis": 1
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "ca38f8172b016532bac58b0bca8890cc1a1fb9df52f9f9a3795df6b3707cc5fe"
+  }
+ },
+ {
+  "spec": "openblas_sgemm_batched_shared_a_nn_b0_alpha1",
+  "routine": "openblas_sgemm_batched",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1.c --function=openblas_sgemm_batched_shared_a_nn_b0_alpha1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_sgemm_batched_shared_a_nn_b0_alpha1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1.mlir -o generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1_linalg.mlir -o generic_solver/lib_v3/raised/openblas_sgemm_batched_shared_a_nn_b0_alpha1_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_sgemm_batched_shared_a_nn_b0_alpha1",
+   "declarations": [],
+   "params": [
+    "batch",
+    "M",
+    "N",
+    "K",
+    "A",
+    "B",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "M": "A"
+   },
+   "unreferenced": [],
+   "array_dimensions": {
+    "M": [
+     {
+      "array": "A",
+      "axis": 1
+     },
+     {
+      "array": "C",
+      "axis": 2
+     }
+    ],
+    "N": [
+     {
+      "array": "B",
+      "axis": 1
+     },
+     {
+      "array": "C",
+      "axis": 1
+     }
+    ],
+    "K": [
+     {
+      "array": "B",
+      "axis": 2
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "2e042d073a69ed3470fd4391e4ed6e62985adb4187ea989b3e1ef9ee313b59f3"
   }
  },
  {
@@ -11670,7 +12500,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8ccf90a1c3c792f9718c1ec5259fbe62356071bf0ed7079d9ad1fc619369abf0"
+   "input_sha256": "cff61b09c07f4f568785932029356f2eb87af14b931e8440781261fa74eea090"
   }
  },
  {
@@ -11732,7 +12562,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2f964688a0acb69a6a6d88b8eac46a2188d0ed51b5de00e3839e30437d3d4235"
+   "input_sha256": "9788c235c43a9df35e74a53d2078651aba257c7b7e1f081814cd6d2aa23fc6ab"
   }
  },
  {
@@ -11794,7 +12624,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "837e2b5724e0e3e32751b9cea42a9e00893aff3accf5d997064542c1216d90d0"
+   "input_sha256": "be442d0ebbde7731ea914068eed8851eab54eafdc4d7aec9f259bacac19bddcb"
   }
  },
  {
@@ -11850,7 +12680,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "206e29c9ee8a4b3c7fd3b3830f72b5607481f37b0eacfc5c58903eadffb056cb"
+   "input_sha256": "2393f8f4ba4cd6bee84e0c290af5230861ca372f63e22f957c4150860eee020a"
   }
  },
  {
@@ -11906,7 +12736,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "7c4d03a8a4ed7aa7f509ec3968aaaa8af3187c65494253ecd1469d619330897b"
+   "input_sha256": "891ffdea9988e724bc73679dff051f172bf52d0df31248f05460d6b208f66d42"
   }
  },
  {
@@ -11962,7 +12792,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d3cad078678e713e102b4f492f6f0efc040dd96dd620ec101f630ebe057c939e"
+   "input_sha256": "15e4015b3f34ea73a2de4946a63f9c878df541a9ae9ad90a92550b578a49bc49"
   }
  },
  {
@@ -12018,7 +12848,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "a63f05a91e11cfd7f3e21de441edeec0671b9b9e5c45d3d7e2c8a0cc90b498f3"
+   "input_sha256": "21f49ed50ce0d13d28454237f9d3f8b162a622fd9c96030728ba9992b4cbbbd3"
   }
  },
  {
@@ -12152,7 +12982,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "fb108485386c9d5f3665d9b61035a20a42b55b06f057b303d64312551f005cdc"
+   "input_sha256": "6f6dce1c426219058bc6dbca14641d5b3133ef2f66ee7756bd31f9177f9a8fc9"
   }
  },
  {
@@ -12206,7 +13036,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d1d58d9f437d48c9d79645a12555aae1c3fcd4fc9e8ace656404165bba610d70"
+   "input_sha256": "083a84af0fbb2cd99a49f8f3c23c2f282165abd375d5d58165feff2ed36c336a"
   }
  },
  {
@@ -12260,7 +13090,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "3c20f384f7dcff054623f23a03921ee8f76e476082c705ab20d09c116424c0fc"
+   "input_sha256": "69204d3b46b2d611c8beddbc519513e14ab24873d00202369cd0c4e78ff4d36a"
   }
  },
  {
@@ -12314,7 +13144,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "ee29adb4aacd0d336749a7337fd636605822a43da28dbb026cebb824fd16e4f4"
+   "input_sha256": "4e88e111337fc3c50983996352576eca0e557b55da8f3d04a09ae2db72ac5e34"
   }
  },
  {
@@ -12368,7 +13198,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d6d614c48ece4bdbac1be49b2e858ae514f6260588414bdea50426db3273456c"
+   "input_sha256": "f0a2ee5c8bf66829baf7e4c0de71c0ad9313ab01637f810c11dc37d0281b99d9"
   }
  },
  {
@@ -12422,7 +13252,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "658d495d38915f9b8ddbbb80d1fd1f2e81bfdfe5e6e13e9f62c2c99eb762f86e"
+   "input_sha256": "9c9724be846b75578cb74cbef54c14fec327c674b7d6d0495da940e0f2498d59"
   }
  },
  {
@@ -12476,7 +13306,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "b36028d204e0c3c4b1c9750848949462aeffcb3c6fd4708ed3c22d928309feeb"
+   "input_sha256": "b1af4fba40714b56e64e3945db122ac0226684debee9c0f7554ee7ee78d16343"
   }
  },
  {
@@ -12530,7 +13360,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "bff455a54561c4c72ffaf2cbfdca2afbe93cf4a8abf40f9f5d3f7f823a485094"
+   "input_sha256": "bdc2ac0e9e5d270dfb1b452de9e00d4c3352ae23efd72d77ed4522ffa988c9d3"
   }
  },
  {
@@ -12584,7 +13414,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "8480b19a03647f4a1d2b6e9e654d6793aaf7f7dc9a7d6d9a93440d03aae20d02"
+   "input_sha256": "cc8ab001ffd6b100975ee5dcf2dd23722e2c522a3cc23fd9c90914d29bdf6f21"
   }
  },
  {
@@ -12638,7 +13468,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "66e37d5ff0b7fe6611f1f1a3511a9984168e15b8b0b1c58a50f74e3335f870ee"
+   "input_sha256": "bf362da7ba7bc5e9f1bcb8714e5074a257c926880ff0fe394df85dbfe88c80fb"
   }
  },
  {
@@ -12692,7 +13522,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "2dd6af779a840c2c06c122bab45835172b88ba958b6feac5617f028318c39eda"
+   "input_sha256": "4cf32497b239d8e5e10ac6a64556640c2e100f0e634d527e9ace30a1b1116075"
   }
  },
  {
@@ -12746,7 +13576,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "d5e504aa422485ed475a9f29aba62e0f508c285312027ee94d538af2aa8f3057"
+   "input_sha256": "7b942f5c1553f534da3701b097026664a3386c38ce4af0d51cb1a76af8795c59"
   }
  },
  {
@@ -12800,7 +13630,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "bb8823912128310d34b7b4943cca93ab8edb8e2aa74d9ba87efad4217ac20ec4"
+   "input_sha256": "0579c01c540074e1a6a93680815f8b431503d6244d9425341d9457bc3af40315"
   }
  },
  {
@@ -12854,7 +13684,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "753c49b4e728bb91e77f92d6f40584016c29c87a8f2ac94949b4b2f668d2a7eb"
+   "input_sha256": "1fb7e7d0345554e905034a11cf976da42f35f38713c93d7d5c19feb26a39d5eb"
   }
  },
  {
@@ -12908,7 +13738,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "9a0d47fe7b2cb4fec1a6f943d7e3a216093623b87f3745f2af4d69dbe40e4969"
+   "input_sha256": "a3265fa73146b6e12aaf2515f43fd955a8044670dc807c58650da7d757990909"
   }
  },
  {
@@ -12962,7 +13792,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "70f76f1b88f8412b68d5ba5325c6b24bbdf6c7b482071edb6c19651f3551463e"
+   "input_sha256": "1057d323c41ecd0a1a4d9bc747b6ed89963972be19901b7942a9e2b1242071d2"
   }
  },
  {
@@ -13016,7 +13846,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "e97c7590ff072d1d93737811200e48dac207c214110b71b02a98e58172b1faa4"
+   "input_sha256": "eb1b458314d28d06af2145fd51d75fb89668046c6326a7595415fcb9702675a3"
   }
  },
  {
@@ -13069,7 +13899,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "0adde3afd3898eb4e0e34ff2d40c8bcd196d5b3efa4fc04105119ea2b535c467"
+   "input_sha256": "529735fd954a6ad13b60736d289d516b919e29357fa861bebfa8fa54235e7af2"
   }
  },
  {
@@ -13122,7 +13952,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "3a92c69d20cd7e934e311f088cf94c1dd6d5c42b718279748fcc2b065a57dbdb"
+   "input_sha256": "0239671327c8455e2c5095ff49cc13fd98a46864b2d7531abeda55fa93497645"
   }
  },
  {
@@ -13178,7 +14008,7 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "a8c9cbacb42b6cf3325d9637da59f05bb338450742ca4da5001b636ec5e3f6de"
+   "input_sha256": "8ca925d2aa63a5bed7fa1f56fe8006135bc7b9fa2b1aa719772b7d5c67613e7a"
   }
  }
 ]

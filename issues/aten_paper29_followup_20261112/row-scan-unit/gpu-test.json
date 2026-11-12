@@ -1,0 +1,7 @@
+{
+  "rc": 0,
+  "binary_sha256": "72f85d9a23626d4af70b4ea859ec4eee61c58f367ff41f0bf9f987842211314b",
+  "passed": true,
+  "log": "gpu-test.log",
+  "scope": "Direct backend tests before paper correctness; no timing measurements."
+}

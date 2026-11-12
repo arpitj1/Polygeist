@@ -1,0 +1,7 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+CHECK kind=0 parameters=0 resident=0 count=131072 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
+CHECK kind=0 parameters=0 resident=1 count=131072 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
+PASS correctness
+POLYGEIST_V2_CALL backend=cuda call=DeviceSegmentedReduce_cub_segmented_logical_mode_i32 entry=polygeist_cub_segmented_logical_mode_i32 lib_ms=5.719104 h2d_ms=6.571264 d2h_ms=0.129024
+POLYGEIST_V2_CALL backend=cuda call=DeviceSegmentedReduce_cub_segmented_logical_mode_i32 entry=polygeist_cub_segmented_logical_mode_i32 lib_ms=2.493664 h2d_ms=0.014848 d2h_ms=0.004000
+POLYGEIST_V2_STATS backend=cuda call=DeviceSegmentedReduce_cub_segmented_logical_mode_i32 entry=polygeist_cub_segmented_logical_mode_i32 count=2 lib_ms=8.212768 h2d_ms=6.586112 d2h_ms=0.133024 h2d_bytes=34078720 d2h_bytes=524288

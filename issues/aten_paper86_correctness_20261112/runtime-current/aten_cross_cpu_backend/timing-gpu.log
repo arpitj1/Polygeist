@@ -1,0 +1,44 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+SAMPLE path=raised sample=0 ms=49.219537020
+SAMPLE path=native_aten_cuda sample=0 ms=0.415591002
+SAMPLE path=native_aten_cuda sample=1 ms=0.399943113
+SAMPLE path=raised sample=1 ms=49.212080002
+SAMPLE path=raised sample=2 ms=49.211567879
+SAMPLE path=native_aten_cuda sample=2 ms=0.416102886
+SAMPLE path=native_aten_cuda sample=3 ms=0.400550842
+SAMPLE path=raised sample=3 ms=49.240241051
+SAMPLE path=raised sample=4 ms=49.207120895
+SAMPLE path=native_aten_cuda sample=4 ms=0.417990923
+SAMPLE path=native_aten_cuda sample=5 ms=0.388454914
+SAMPLE path=raised sample=5 ms=49.224848986
+SAMPLE path=raised sample=6 ms=49.222960949
+SAMPLE path=native_aten_cuda sample=6 ms=0.405926943
+SAMPLE path=native_aten_cuda sample=7 ms=0.374150038
+SAMPLE path=raised sample=7 ms=49.228368044
+SAMPLE path=raised sample=8 ms=49.202480078
+SAMPLE path=native_aten_cuda sample=8 ms=0.395845890
+SAMPLE path=native_aten_cuda sample=9 ms=0.377286911
+SAMPLE path=raised sample=9 ms=49.211983919
+SAMPLE path=raised sample=10 ms=49.207311869
+SAMPLE path=native_aten_cuda sample=10 ms=0.387623072
+SAMPLE path=native_aten_cuda sample=11 ms=0.375334024
+SAMPLE path=raised sample=11 ms=49.235921144
+SAMPLE path=raised sample=12 ms=49.215376139
+SAMPLE path=native_aten_cuda sample=12 ms=0.390855074
+SAMPLE path=native_aten_cuda sample=13 ms=0.376167059
+SAMPLE path=raised sample=13 ms=49.210704088
+SAMPLE path=raised sample=14 ms=49.208272934
+SAMPLE path=native_aten_cuda sample=14 ms=0.392071009
+SAMPLE path=native_aten_cuda sample=15 ms=0.380038023
+SAMPLE path=raised sample=15 ms=49.208784103
+SAMPLE path=raised sample=16 ms=49.198319912
+SAMPLE path=native_aten_cuda sample=16 ms=0.394567013
+SAMPLE path=native_aten_cuda sample=17 ms=0.388773918
+SAMPLE path=raised sample=17 ms=49.227793217
+SAMPLE path=raised sample=18 ms=49.211312056
+SAMPLE path=native_aten_cuda sample=18 ms=0.388774872
+SAMPLE path=native_aten_cuda sample=19 ms=0.378181934
+SAMPLE path=raised sample=19 ms=49.238929033
+PASS timing
+polygeist runtime: cuDNN pointwise generic graph unavailable at pointwise.generic.plan: CUDNN_STATUS_NOT_SUPPORTED; using host fallback
+polygeist runtime: cuDNN pointwise generic graph unavailable at pointwise.generic.plan: CUDNN_STATUS_NOT_SUPPORTED; using host fallback

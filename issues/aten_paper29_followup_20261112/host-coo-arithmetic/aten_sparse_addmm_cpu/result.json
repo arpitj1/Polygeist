@@ -1,0 +1,43 @@
+{
+  "kernel": "aten_sparse_addmm_cpu",
+  "shape_record": {
+    "kernel": "aten_sparse_addmm_cpu",
+    "op": "addmm",
+    "cat": "sparse_coo_mm",
+    "dims": {
+      "R": 64,
+      "C": 4096,
+      "N": 4096
+    },
+    "n": 1073741824,
+    "shape": "R=64_C=4096_N=4096",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full Linalg-fill plus structured-loop COO SpMM via cuSPARSE",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "af6a5bc645cf7bab"
+  },
+  "command": [
+    "gcc",
+    "-O1",
+    "-g",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-fsanitize=address,undefined",
+    "-fno-sanitize-recover=all",
+    "-fno-omit-frame-pointer",
+    "-Daten_sparse_addmm_cpu=native_reference",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sparse_addmm_cpu/aten_sparse_addmm_cpu.c",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sparse_addmm_cpu/check.c",
+    "-lm",
+    "-o",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sparse_addmm_cpu/check"
+  ],
+  "source_sha256": "e7853dda3fe4d601bf0c84cdfd2baffd4c78298bc645c2e1edab694836dd4e47",
+  "input_scope": "recorded paper recipe",
+  "compile_rc": 0,
+  "run_rc": 0,
+  "passed": true
+}

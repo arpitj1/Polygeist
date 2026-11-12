@@ -1,0 +1,276 @@
+{
+  "schema": 2,
+  "pipeline": "imported-specifications-only",
+  "backend": "cuda",
+  "semantic_inputs": {
+    "scripts/correctness/spec_match.py": "96068cbeded12ea08bf624bd4e8bbf3949d6866b036e3ae4042a404c16273e8d",
+    "scripts/correctness/kernel_match.py": "e67c092e068dea41cb8d699e1e9812fc562919eff77fc0b6ce9b7587017f6e4a",
+    "scripts/correctness/eqsat_ablation.py": "5df46267b8c5e735f29740490a3eed8bc80544a8e1bfe81bfdd0567da12fe932",
+    "scripts/correctness/polygeist_build.sh": "56f0bc7c1e2d34a3697c757a086fff94842adde3f3471896ddda7b14c9113044",
+    "scripts/correctness/build_jetson.sh": "927736338408b816ae0b3a90876dfbff3789a6db752914a4906f68305cfad064",
+    "scripts/correctness/plan_abi_workspace.py": "8973db95eb936378712f50a322f905e3cf441ddbae334a8ebc390490c44a2815",
+    "scripts/correctness/lib_v2/abi_v2.py": "2ef1dd8c285b785945de88476af40ec884aa35d7a04252534311836bc3bc518b",
+    "scripts/correctness/lib_v2/build_lib_v2.py": "f477d018a2e2ec02a495cf3cc276125df29d9d93c671f4b4ec12045586774947",
+    "scripts/correctness/lib_v2/c_types.py": "81bf4d4403c857378829d418cd463c3aca9c278f8d01acbea4ea217e22a7917f",
+    "scripts/correctness/lib_v2/descriptor_abi.py": "dd53631c4a313222e88310ea431a65c208487980c0dba6f3822774cafceaf9c1",
+    "scripts/correctness/lib_v2/e2e_v2.py": "27a64d26d673966ed4bb68057492e1c9df5d937584a95b890e8fba22eec16c10",
+    "scripts/correctness/lib_v2/gen_v2_runtime.py": "bb7b9b49f410620ed54a15569562a4dd60ab2f87244fa55517af36210ac6ed45",
+    "scripts/correctness/lib_v2/import_cache.py": "70d71a6cc7320de24c51dbb2d00064d8a613ad39a8f5c21ec9c572bac2d8c936",
+    "scripts/correctness/lib_v2/legalize_tensor_submaps.py": "8d9f6e0845aecbd84195d67b943fc8a3108570123bf85a0dbb247c8cc2dfc80d",
+    "scripts/correctness/lib_v2/lower_v2.py": "7282f10e91af38e82a832b7d69b83148fdb72603bb948a7018fbfb66b783e347",
+    "scripts/correctness/lib_v2/match_v2.py": "913db237c43c1cfecfdeb6c52bdf214aeaa719d3ad5160c463c3fb9daefb6430",
+    "scripts/correctness/lib_v2/mlir_lite.py": "f449f4ea4e9403cb615b6aad7d474d8a0776093c811608bcb43a72a57be69888",
+    "scripts/correctness/lib_v2/raise_polybench.py": "62414ad82be07c9f59f10a76f532f478c12f65b1fd4bd4f578ee637c337ee1e0",
+    "scripts/correctness/lib_v2/recipe.py": "28d52734541f0f3abe23bbc6075ac5f7518c3cae6da25432753e50d36ea709ea",
+    "scripts/correctness/lib_v2/runtime_adapter.py": "bb8c2d2e5f3bcc7673ebe73c6e16f9d7f724575bfafca32fa8f2161298e970b9",
+    "scripts/correctness/lib_v2/spec_provenance.py": "546d39d752b353367c67318d0168c231bf0b20e134d1a9c1349f801453dcd263",
+    "scripts/correctness/lib_v2/sweep_polybench.py": "a3b16e36ca3a81c8aef84f7fbc385e4d8058805bec797a8453f9a9f694e2002c",
+    "scripts/correctness/lib_v2/typed_wrapper.py": "db8d983d13b4e5836a59c5b2a85822953e305c3d097018b76fb450f80c1f4a2a",
+    "scripts/correctness/lib_v2/validate_specs.py": "7049a9bdc370195c03ad4457cd68149dafffa65aa7017709e9a77ca4442c6c69",
+    "scripts/correctness/lib_v2/validate_v2.py": "be7d524820d17d47a7c3486e07b1d9dfb1df634f849ac7e2685dd3ad05b34ecf",
+    "scripts/correctness/region_match/__init__.py": "d4f5120f4c8f35a38486541308a0f5997db34febf23ec2d4988a06379663bf0c",
+    "scripts/correctness/region_match/affine.py": "1424ca362b80696f3514c2fc2874530a2f8c6148b830807b3e3503156beeb14f",
+    "scripts/correctness/region_match/cli.py": "298a4e9e31f06cc5e1e7cd839277c5ae5d28973fe9302db463b662a23c3f286b",
+    "scripts/correctness/region_match/compose.py": "8a2bc84b399d51d3195f337cf4126b1114075773f068c6cb4b419e428403c7f7",
+    "scripts/correctness/region_match/egg.py": "3393dc86d77773c83b3f788a14da73984518835f31c80adfc8e79dfc1e8c648c",
+    "scripts/correctness/region_match/equations.py": "da9e5fc82f4b7bbd6c9aac1252cfa1d606746892273404440135d03ad2826822",
+    "scripts/correctness/region_match/literal_policy.py": "6688103cc9677f39db33d3cbdf5d8488699d669037e23595b42576f7ea5013c7",
+    "scripts/correctness/region_match/matcher.py": "4080a6774038965560b0dceedfa2895adab3d48d06511c3aa07b3a31ddb7d66d",
+    "scripts/correctness/region_match/mlir_parse.py": "524b9431f5835b62eb796719b2b6c413f403b4690026bce20d7370b740642a1d",
+    "scripts/correctness/region_match/symexec.py": "0523b91a3888b710eb3b269fc1f9b808797262040b5ca05c59c555c7da87a6d6",
+    "scripts/correctness/region_match/translation_validate.py": "d5fb6e8e3ee2ae6ba7e5f0681b517f9c0cf76a353f7cae8ce9bcce817f0702b8",
+    "generic_solver/lib_v3/import_manifest.json": "886cff346a3ec1480948076718f7c9ecff19ed12914c73df657fcf1b45fa5614",
+    "runtime/polygeist_v2_rt.h": "47a3198ee662b5c64a4119767a2b7453ef3234e0d8f61680c3298eb97be12cc8",
+    "runtime/polygeist_v2_rt_cpu.c": "da9421a303941a35ccca85ccdaa01b9bbbe082dae979400ba092fbb8c8bfe7eb",
+    "runtime/polygeist_v2_rt_cuda.c": "3c9d854980a54f14c14f8912323c08c10d4f13a4c678504f6a777cfe170afd33",
+    "runtime/polygeist_cublas_rt.h": "cea91e133b5e87da70f1a6c38309f7813024ec4c9207dcc982d26c25d6664850",
+    "runtime/polygeist_cublas_rt_cuda.c": "4535f5ec05a9415865045f4942959b7f99838e8c360ec14233416dbe04a18aa9",
+    "runtime/polygeist_v2_rt_pva.c": "16d1e88422309ac9add9febe2249108d1f0ddd0b918ecd793647219db838b692",
+    "runtime/polygeist_pva_image_rt.c": "d1ece302137857f7448f54c40ea6d1e2829c7bb77609de39689d2a68430ac735",
+    "runtime/polygeist_cub_scan_rt.cu": "b522f4647dc93fdef277f85a0aeded8c99fd99c174c35d6702b9462a99520502",
+    "runtime/polygeist_cuda_graph_rt.h": "7dbf1b61a26083fbdf38e496c043994e24d47e2470af7aaa55f79ba0e851807b",
+    "runtime/polygeist_v2_matrix_layout.inc": "fbdd52a7e610ce5ee8a74087665829bea2b1ebb7e612002092476526ab2c5749",
+    "runtime/polygeist_v2_memref_copy.inc": "1ba5c24d77340d4e4b8ee26be7a43a0bb6b1f1e6fa08b9505ec4dc9fac5c125b",
+    "runtime/polygeist_pointwise_partition.h": "881642e8d87d84be341b67bc82c49ee54618e255edfd98a91d7d163c7461cca4",
+    "runtime/polygeist_pointwise_rounding.inc": "0e49925ddbcc416e51542f33b43d0efd7be1f2d00df436884432d042a4fd77c5",
+    "runtime/polygeist_pointwise_division.inc": "91eadcb20437f3575ed8500d07d4c0e781231529dcd6adbfc76e2f907ca5d28e",
+    "runtime/polygeist_thrust_rt.cu": "ca4a06d8767d0d27ed9e1638455ff46ea5a666aeec105b18fc94e9537da58166"
+  },
+  "configuration": {
+    "numeric_model": "strict",
+    "eqsat_ablation": "full",
+    "spec_suite": "lib_v3"
+  },
+  "abi_sha256": "9502231ab610c40960f655f8438d84ec36b597c35ae691863c15bf3a3a344090",
+  "input_sha256": "0dd3a37b9231d1a60ca509bc685ac479536eadcd90695c4f7e339da1212c3ca0",
+  "output_sha256": "77bb18294324715d8bb791efb4e48fb16255f85ab7e8f1e21546e6697dc404ed",
+  "library": "generic_solver/kernel_library_v3.mlir",
+  "library_sha256": "0fd6a972d1abe01df92fb7389396aecb16b05f31d7a6d8633ce0bb03dfae7741",
+  "matcher_sha256": "913db237c43c1cfecfdeb6c52bdf214aeaa719d3ad5160c463c3fb9daefb6430",
+  "elapsed_ms": 2614.564,
+  "emitted": [
+    "openblas_sgemm_batched_nn_b0_alpha1"
+  ],
+  "matches": [
+    {
+      "engine": "linalg",
+      "specifications": [
+        "openblas_sgemm_batched_nn_b0_alpha1"
+      ],
+      "binding": {
+        "%batch": "index_cast(%c52)",
+        "%M": "index_cast(%c259)",
+        "%N": "index_cast(%c208)",
+        "%K": "index_cast(%c311)",
+        "%A": "%1",
+        "%B": "%2",
+        "%C": "%0"
+      },
+      "details": {
+        "spec": "openblas_sgemm_batched_nn_b0_alpha1",
+        "root": "%10",
+        "func": "aten_cpu_blas_gemm_batched_cpu",
+        "binding": {
+          "%batch": "index_cast(%c52)",
+          "%M": "index_cast(%c259)",
+          "%N": "index_cast(%c208)",
+          "%K": "index_cast(%c311)",
+          "%A": "%1",
+          "%B": "%2",
+          "%C": "%0"
+        },
+        "generics": {
+          "%13": {
+            "pi": [
+              1,
+              0
+            ],
+            "rho": [
+              0
+            ],
+            "sigma": [
+              0,
+              2,
+              1,
+              3
+            ],
+            "app": "%9"
+          },
+          "%8": {
+            "pi": [],
+            "rho": [
+              0
+            ],
+            "sigma": [
+              0,
+              2,
+              1
+            ],
+            "app": "%4"
+          }
+        },
+        "consumed_ops": 12
+      },
+      "references": [
+        {
+          "manifest": "generic_solver/lib_v3/manifest/openblas_sgemm_batched.json",
+          "manifest_sha256": "9529fbfa27fc3ea1d239ed1f14b6c19365b48cc15329fb706827cce50b2f2cee",
+          "reference": "generic_solver/lib_v3/ref_c/openblas_sgemm_batched.c",
+          "reference_sha256": "123b528996276d93bdfc6d3160db15db91a85ad261e537136c7b0770ca261b07",
+          "origin": "OpenBLAS v0.3.31 GEMM_BATCH driver and portable FP32 NN small-matrix kernel",
+          "import_error": null
+        }
+      ],
+      "targets": [
+        {
+          "library": "cuBLAS",
+          "call": "cublasSgemmStridedBatched",
+          "backends": [
+            "cuda"
+          ],
+          "runtime_adapter": {
+            "schema": 1,
+            "kind": "typed_c_wrapper",
+            "entry": "polygeist_cublas_sgemm_strided_batched",
+            "arguments": [
+              "batch",
+              "N",
+              "M",
+              "K",
+              "B",
+              "A",
+              "C"
+            ],
+            "arrays": {
+              "A": [
+                "batch",
+                "K",
+                "M"
+              ],
+              "B": [
+                "batch",
+                "N",
+                "K"
+              ],
+              "C": [
+                "batch",
+                "N",
+                "M"
+              ]
+            },
+            "bounds": {
+              "batch": {
+                "min": 1,
+                "max": 2147483647
+              },
+              "M": {
+                "min": 1,
+                "max": 2147483647
+              },
+              "N": {
+                "min": 1,
+                "max": 2147483647
+              },
+              "K": {
+                "min": 1,
+                "max": 2147483647
+              }
+            },
+            "alias_policy": "disjoint"
+          }
+        }
+      ]
+    }
+  ],
+  "rejected_specifications": {
+    "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+    "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+    "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+    "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+    "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+    "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+    "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+    "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+    "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+    "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+    "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+    "cudnn_conv2d_valid_d1_f32": "reference has documented deviations; strict matching requires an exact import",
+    "cudnn_conv2d_valid_d2_f32": "reference has documented deviations; strict matching requires an exact import",
+    "cudnn_conv2d_valid_unbatched_d2_f32": "reference has documented deviations; strict matching requires an exact import",
+    "cudnn_conv3d_valid_f32": "reference has documented deviations; strict matching requires an exact import",
+    "cudnn_conv1d_tbc_f32": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+    "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+    "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+    "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+    "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+    "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+    "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+    "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+    "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+    "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+  },
+  "diagnostics": {
+    "literal_policy_rejections": [],
+    "alternatives": [],
+    "rejected": []
+  },
+  "validation_stage": "recognition-and-ABI-binding; vendor execution not yet checked"
+}

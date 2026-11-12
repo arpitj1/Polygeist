@@ -1,0 +1,41 @@
+{
+  "kernel": "aten_adaptive_avg_pool3d",
+  "paper_family": "adaptive_pooling",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_adaptive_avg_pool3d/aten_adaptive_avg_pool3d.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_adaptive_avg_pool3d.c",
+  "original_source_sha256": "715c9a3fc0c5cb214aead945fdf88e56faea940353368535278b6afc3579f8b2",
+  "shape_record": {
+    "kernel": "aten_adaptive_avg_pool3d",
+    "op": "adaptive_avg_pool3d",
+    "cat": "adaptavg3d",
+    "dims": {
+      "B": 2,
+      "C": 3,
+      "D": 8,
+      "H": 8,
+      "W": 8
+    },
+    "n": 3072,
+    "shape": "B=2_C=3_D=8_H=8_W=8",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full regular adaptive average 3d forward",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "b3c8e383067677ef"
+  },
+  "ranks": [
+    2
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnAveragePool_f32_r5"
+}

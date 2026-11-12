@@ -1,0 +1,39 @@
+{
+  "kernel": "aten_clamp_max_scalar_cpu",
+  "paper_family": "reduction",
+  "current_targeted_gpu_validated": "True",
+  "status": "targeted_GPU_correctness_pass",
+  "classification_note": "Pointwise scalar clamp; historical family label is incorrect",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_clamp_max_scalar_cpu/aten_clamp_max_scalar_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_clamp_max_scalar_cpu.c",
+  "original_source_sha256": "6a556ccd59c955fff4a4566c797297a465526bf0c01f817eb423da7ca3d6a852",
+  "shape_record": {
+    "kernel": "aten_clamp_max_scalar_cpu",
+    "op": "clamp_max_scalar",
+    "cat": "native_fixture",
+    "dims": {
+      "N": 4194304
+    },
+    "n": 4194304,
+    "shape": "N=4194304",
+    "dtype": "f32",
+    "scalar_args": {
+      "maxval": "0.5"
+    },
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "20afe51bff9319b3"
+  },
+  "ranks": [
+    0
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnPointwiseGraph_f32"
+}

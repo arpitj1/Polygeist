@@ -1,0 +1,12 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+CHECK kind=0 parameters=0 resident=0 count=48 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
+CHECK kind=0 parameters=0 resident=1 count=48 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=0
+PASS correctness
+POLYGEIST_V2_CALL backend=cuda call=DeviceSegmentedReduce_cub_column_sum_i8_i32 entry=polygeist_cub_column_sum_i8_i32 lib_ms=4.547712 h2d_ms=11.376352 d2h_ms=0.005504
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=minus_i32 n=48
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_minus_scalar_right_i32 entry=polygeist_thrust_minus_scalar_right_i32 lib_ms=1.695232 h2d_ms=0.031648 d2h_ms=0.058816
+POLYGEIST_V2_CALL backend=cuda call=DeviceSegmentedReduce_cub_column_sum_i8_i32 entry=polygeist_cub_column_sum_i8_i32 lib_ms=3.076992 h2d_ms=0.001504 d2h_ms=0.005088
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=minus_i32 n=48
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_minus_scalar_right_i32 entry=polygeist_thrust_minus_scalar_right_i32 lib_ms=0.059712 h2d_ms=0.005888 d2h_ms=0.002528
+POLYGEIST_V2_STATS backend=cuda call=DeviceSegmentedReduce_cub_column_sum_i8_i32 entry=polygeist_cub_column_sum_i8_i32 count=2 lib_ms=7.624704 h2d_ms=11.377856 d2h_ms=0.010592 h2d_bytes=50331648 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=transform_thrust_minus_scalar_right_i32 entry=polygeist_thrust_minus_scalar_right_i32 count=2 lib_ms=1.754944 h2d_ms=0.037536 d2h_ms=0.061344 h2d_bytes=192 d2h_bytes=192

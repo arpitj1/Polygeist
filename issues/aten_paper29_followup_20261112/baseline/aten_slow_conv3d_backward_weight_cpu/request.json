@@ -1,0 +1,19 @@
+{
+  "kernel": "aten_slow_conv3d_backward_weight_cpu",
+  "paper_family": "convolution",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "issues/aten_c_kernels/aten_slow_conv3d_backward_weight_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "ranks": [
+    0,
+    2
+  ],
+  "region": true,
+  "region_budget": 20,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cudnnConvolutionBackwardFilter3D_f32_memref"
+}

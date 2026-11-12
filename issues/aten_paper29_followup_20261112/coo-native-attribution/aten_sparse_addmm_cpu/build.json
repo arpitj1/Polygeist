@@ -1,0 +1,208 @@
+{
+  "kernel": "aten_sparse_addmm_cpu",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "R": 64,
+      "C": 4096,
+      "N": 4096
+    },
+    "args": [
+      [
+        "row",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "col",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "value",
+        "ptr",
+        "(N)",
+        false,
+        "normal"
+      ],
+      [
+        "dense",
+        "ptr",
+        "(64)*(C)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(R)*(C)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_sparse_addmm_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "row": "(int)(i/(N/R))",
+      "col": "(int)(((i*17)+(i/(N/R))*13)%R)",
+      "value": "((float)(i%101)-50.0f)/37.0f",
+      "dense": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_sparse_addmm_cpu=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/aten_sparse_addmm_cpu.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_sparse_addmm_cpu",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-arithmetic/aten_sparse_addmm_cpu/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu/aten_sparse_addmm_cpu.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/native.o"
+    ],
+    [
+      "aarch64-linux-gnu-gcc",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-O3",
+      "-fno-inline",
+      "-fno-inline-functions",
+      "-fsemantic-interposition",
+      "-fno-ipa-cp",
+      "-fno-ipa-cp-clone",
+      "-fno-ipa-sra",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/timing-harness.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-native-attribution/aten_sparse_addmm_cpu/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2",
+      "-lcusparse"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "e7853dda3fe4d601bf0c84cdfd2baffd4c78298bc645c2e1edab694836dd4e47",
+  "proof_sha256": "3a595807a1889907734a027f8a3937676fd8e9dfde77b0542602f543d052bdb5",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+  "original_source_sha256": "399de0dbbe195ceb8c17f4181431a464a29e37f2ad134924ccac35c3982fdcd0",
+  "shape_record": {
+    "kernel": "aten_sparse_addmm_cpu",
+    "op": "addmm",
+    "cat": "sparse_coo_mm",
+    "dims": {
+      "R": 64,
+      "C": 4096,
+      "N": 4096
+    },
+    "n": 1073741824,
+    "shape": "R=64_C=4096_N=4096",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full Linalg-fill plus structured-loop COO SpMM via cuSPARSE",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "af6a5bc645cf7bab"
+  },
+  "shape_specs_sha256": "532e322c1584ad535461c696e9fe8ed06d9ea640a000eaef2f23258898785004",
+  "binary_sha256": "c44afe06fd52157f41cdd8034ca93931b7732f9048411ee0899f40c7107e2e4a",
+  "native_attribution": {
+    "source": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sparse_addmm_cpu",
+    "original_binary_sha256": "fff76acabd55cb42e11e0770c3e9ea1f495fbf58c2f65b5569db2b9453bb20dd",
+    "frozen_compute_object_sha256": {
+      "work/kernel.o": "c54e81e8d838c9662b2480a806cc68ebff3cd0b4fe8b8ace90cb73c54486e84b",
+      "work/wrapper.o": "7363849ce14c0e6428123b0a92a9794e760b3859adb4fade98e66ffaa5bd72c8",
+      "work/rt.o": "faaf3bba6dd4d08c2f856d7f0ab8d4917695d3f5609bed8b9ef7a759f20adbf8",
+      "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+      "work/spec_runtime.o": "f5dd87245c929070beb6a4d9626ddff68b00dbf255c61f99be69d030d514268e",
+      "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+      "objects/reference.o": "c30934268730d769159e64538bbed879c4e3d09f12f0f8015ad22020388e7e44"
+    },
+    "native_source_sha256": "97ba6fb699b7176a112c67c8a25b5083c99d77fe2398f7debaa3e4679e8366ee",
+    "harness_sha256": "ddd6b6f731b4521e97ae0f960b0852637ff44310bccdc17f6c913b8d235864d4",
+    "scope": "Only native baseline and validation-only output materialization changed. Prebuilt/coalesced COO matrix; original raised inputs and compute objects unchanged; five alternating pairs with the original input restoration protocol."
+  }
+}

@@ -5,6 +5,27 @@
 #include "polygeist_v2_matrix_layout.inc"
 #include "polygeist_v2_memref_copy.inc"
 
+static int check_dense_footprints(void) {
+  /* Independently enumerate physical addresses. Any footprint accepted for a
+   * whole-buffer CUDA transfer must have every byte represented by the view. */
+  for (int64_t a=1;a<=4;++a) for (int64_t b=1;b<=4;++b)
+    for (int64_t c=1;c<=4;++c)
+      for (int64_t x=-12;x<=12;++x) for (int64_t y=-12;y<=12;++y)
+        for (int64_t z=-12;z<=12;++z) {
+          int64_t sizes[]={a,b,c}, strides[]={x,y,z};
+          if (!pv2_copy_dense_footprint(3,sizes,strides)) continue;
+          unsigned char seen[256]={0}; int low=128, high=128;
+          for (int i=0;i<a;++i) for (int j=0;j<b;++j) for (int k=0;k<c;++k) {
+            int address=128+i*x+j*y+k*z;
+            seen[address]=1;
+            if (address<low)low=address;
+            if (address>high)high=address;
+          }
+          for (int i=low;i<=high;++i) if (!seen[i]) return 1;
+        }
+  return 0;
+}
+
 int main(int argc, char **argv) {
   int64_t sizes[3] = {3,4,2}, source_strides[3] = {9,2,1};
   int64_t dest_strides[3] = {8,1,1};
@@ -20,6 +41,7 @@ int main(int argc, char **argv) {
     polygeist_v2_memref_copy(2,4,sizes,source_strides,dest_strides,source,dest);
     return 10;
   }
+  if (check_dense_footprints()) return 11;
   for(int r=0;r<3;++r) for(int c=0;c<4;++c)
     expected[3+r*8+c]=source[2+r*9+c*2];
   polygeist_v2_memref_copy(2,4,sizes,source_strides,dest_strides,source+2,dest+3);

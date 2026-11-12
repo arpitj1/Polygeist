@@ -1,0 +1,47 @@
+{
+  "kernel": "aten_conv2d_columns_cpu",
+  "paper_family": "patch_extract_scatter",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_conv2d_columns_cpu/aten_conv2d_columns_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_conv2d_columns_cpu.c",
+  "original_source_sha256": "769c673ca319c1601b44a0727be622f098218c26adf2f14ef5897e27dbd0b7c1",
+  "shape_record": {
+    "kernel": "aten_conv2d_columns_cpu",
+    "op": "conv2d",
+    "cat": "unfold2d",
+    "dims": {
+      "C": 11,
+      "H": 59,
+      "K": 3,
+      "W": 59
+    },
+    "n": 421201,
+    "shape": "C=11_H=59_K=11_W=59",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "8e27c2648231bcd4",
+    "recorded_dims": {
+      "C": 11,
+      "H": 59,
+      "K": 11,
+      "W": 59
+    },
+    "correction": "Keep K=3 required by original H-2/W-2 loops; recorded auto-scaled K=11 is out of bounds. Other recorded dimensions unchanged."
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cutensorPermute_f32_r5_tensor"
+}

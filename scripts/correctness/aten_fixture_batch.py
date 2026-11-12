@@ -28,6 +28,73 @@ TORCH = Path(os.environ.get('ATEN_NATIVE_TORCH_ROOT', '/tmp/aten_native_sysroot_
 # Each expression calls real ATen with preallocated outputs and cached base
 # tensors. Any composition/view construction below is included in its timing.
 NATIVE = {
+    'embedding_bag_counts_cpu': 't[1].copy_(at::bincount(t[0],{},E));',
+    # COO construction/coalescing and index conversion remain in the native
+    # timing, as does its allocation/copy into the extracted stage's output.
+    'sparse_addmm_cpu': '''auto matrix=at::sparse_coo_tensor(
+      at::stack({t[0],t[1]}).to(at::kLong),t[2],{R,64},
+      t[2].options().layout(at::kSparse));
+      t[4].view({R,C}).copy_(at::mm(matrix,t[3].view({64,C})));''',
+    'hspmm_cpu': '''auto matrix=at::sparse_coo_tensor(
+      at::stack({t[0],t[1]}).to(at::kLong),t[2],{R,64},
+      t[2].options().layout(at::kSparse));
+      t[4].view({R,C}).copy_(at::mm(matrix,t[3].view({64,C})));''',
+    'sspaddmm_cpu': '''auto matrix=at::sparse_coo_tensor(
+      at::stack({t[0],t[1]}).to(at::kLong),t[2],{R,K},
+      t[2].options().layout(at::kSparse));
+      t[4].view({R,C}).copy_(at::mm(matrix,t[3].view({K,C})));''',
+    'sparse_addmv_csr_cpu': '''static auto matrix=at::sparse_csr_tensor(
+      t[0],t[1],t[2],{R,C},t[2].options().layout(at::kSparseCsr));
+      at::mv_out(t[4],matrix,t[3]);''',
+    'sparse_csr_addmm_cpu': '''static auto matrix=at::sparse_csr_tensor(
+      t[0],t[1],t[2],{R,K},t[2].options().layout(at::kSparseCsr));
+      auto output=t[4].view({R,C});at::mm_out(output,matrix,t[3].view({K,C}));''',
+    'sparse_matmul_cpu': '''static auto matrix=at::sparse_csr_tensor(
+      t[0],t[1],t[2],{R,R},t[2].options().layout(at::kSparseCsr));
+      auto output=t[4].view({R,C});at::mm_out(output,matrix,t[3].view({R,C}));''',
+    # Real ATen expansion of CSR row counts. Allocation and copying the
+    # returned indices into the fixture's output are included in timing.
+    'convert_csr_to_coo_cpu': '''static auto rows=at::arange(R,t[0].options());
+      auto result=at::repeat_interleave(rows,t[0].slice(0,1,R+1)-t[0].slice(0,0,R),0,N);
+      t[2].copy_(result);''',
+    'sparse_matmul_csr_to_coo_cpu': '''static auto rows=at::arange(R,t[0].options());
+      auto result=at::repeat_interleave(rows,t[0].slice(0,1,R+1)-t[0].slice(0,0,R),0,N);
+      t[1].copy_(result);''',
+    'conv_transpose3d_cpu': '''auto out=t[2].view({1,O,D+2,H+2,W+2});
+      at::convolution_out(out,t[0].view({1,C,D,H,W}),t[1].view({C,O,K,K,K}),
+        std::nullopt,{1,1,1},{0,0,0},{1,1,1},true,{0,0,0},1);''',
+    # Real ATen input gradient; allocation and copy into the fixture output
+    # are timed, as for the weight-gradient API below.
+    'slow_conv3d_backward_input_cpu': '''static auto input=at::zeros({1,C,D+2,H+2,W+2},t[0].options());
+      auto grads=at::convolution_backward(t[0].view({1,O,D,H,W}),input,
+        t[1].view({O,C,K,K,K}),{}, {1,1,1},{0,0,0},{1,1,1},
+        false,{0,0,0},1,{true,false,false});
+      t[2].view({1,C,D+2,H+2,W+2}).copy_(std::get<0>(grads));''',
+    # Real ATen weight gradients; returned gradient allocation and the copy
+    # into the fixture output remain inside the timed native invocation.
+    'slow_conv3d_backward_weight_cpu': '''static auto weight=at::empty({O,C,K,K,K},t[0].options());
+      auto grads=at::convolution_backward(t[1].view({1,O,D,H,W}),
+        t[0].view({1,C,D+2,H+2,W+2}),weight,{}, {1,1,1},{0,0,0},{1,1,1},
+        false,{0,0,0},1,{false,true,false});
+      t[2].view({O,C,K,K,K}).copy_(std::get<1>(grads));''',
+    'conv_transpose3d_grad_weight_cpu': '''static auto weight=at::empty({C,O,K,K,K},t[0].options());
+      auto grads=at::convolution_backward(t[1].view({1,O,D+2,H+2,W+2}),
+        t[0].view({1,C,D,H,W}),weight,{}, {1,1,1},{0,0,0},{1,1,1},
+        true,{0,0,0},1,{false,true,false});
+      t[2].view({C,O,K,K,K}).copy_(std::get<1>(grads));''',
+    'clamp_min_scalar_cpu': 'at::clamp_min_out(t[1],t[0],s[0]);',
+    'clamp_max_scalar_cpu': 'at::clamp_max_out(t[1],t[0],s[0]);',
+    'cumprod_cpu': 'auto out=t[1].view({R,K}); at::cumprod_out(out,t[0].view({R,K}),1);',
+    'transpose_copy': 't[1].view({N,M}).copy_(t[0].view({M,N}).transpose(0,1));',
+    'sum': 'at::sum_out(t[1],t[0].view({M,N}),{1},false);',
+    'mm': 'auto out=t[2].view({M,N}); at::mm_out(out,t[0].view({M,K}),t[1].view({K,N}));',
+    'cpu_blas_gemm_cpu': 'auto out=t[2].view({M,N}); at::mm_out(out,t[0].view({M,K}),t[1].view({K,N}));',
+    'bmm': 'auto out=t[2].view({BATCH,M,N}); at::bmm_out(out,t[0].view({BATCH,M,K}),t[1].view({BATCH,K,N}));',
+    'nested_bmm_cpu': 'auto out=t[2].view({B,M,N}); at::bmm_out(out,t[0].view({B,M,K}),t[1].view({B,K,N}));',
+    'sumproduct_pair_cpu': 'auto out=t[2].view({B,M,N}); at::bmm_out(out,t[0].view({B,M,K}),t[1].view({B,K,N}));',
+    'cpu_blas_gemm_batched_cpu': 'auto out=t[2].view({B,M,N}); at::bmm_out(out,t[0].view({B,M,K}),t[1].view({B,K,N}));',
+    'cpu_blas_gemm_strided_batched_cpu': 'auto out=t[2].view({B,M,N}); at::bmm_out(out,t[0].view({B,M,K}),t[1].view({B,K,N}));',
+    'nested_matmul_broadcast_cpu': 'auto out=t[2].view({B*M,N}); at::mm_out(out,t[0].view({B*M,K}),t[1].view({K,N}));',
     'nested_sum_dim_cpu': '''static auto columns=at::arange(N,t[1].options());
       static auto mask=at::empty({B,N},t[0].options().dtype(at::kBool));
       static auto selected=at::empty({B,N},t[0].options());
@@ -73,6 +140,14 @@ NATIVE = {
     'conv_transpose3d_backward_cpu': 'auto out=t[2].view({1,C,D,H,W}); at::convolution_out(out,t[0].view({1,O,D+2,H+2,W+2}),t[1].view({C,O,K,K,K}),std::nullopt,{1,1,1},{0,0,0},{1,1,1},false,{0,0,0},1);',
     'conv_transpose2d': 'auto out=t[2].view({B,OC,H+K-1,W+K-1}); at::convolution_out(out,t[0].view({B,IC,H,W}),t[1].view({IC,OC,K,K}),std::nullopt,{1,1},{0,0},{1,1},true,{0,0},1);',
     'conv_tbc_cpu': 'static auto bias=at::zeros({O},t[0].options()); auto out=t[2].view({T-K+1,B,O}); at::conv_tbc_out(out,t[0].view({T,B,I}),t[1].view({K,I,O}),bias,0);',
+    # The extracted fixture computes only dInput. Use the real ATen backward
+    # API with that output mask; include layout conversion, allocation and
+    # the copy back into TBC storage in the measured native invocation.
+    'conv_tbc_backward_cpu': '''static auto input=at::zeros({B,I,T+K-1},t[0].options());
+      auto grads=at::convolution_backward(t[0].view({T,B,O}).permute({1,2,0}),input,
+        t[1].view({K,I,O}).permute({2,1,0}),{}, {1},{0},{1},
+        false,{0},1,{true,false,false});
+      t[2].view({T+K-1,B,I}).copy_(std::get<0>(grads).permute({2,0,1}));''',
     'count_nonzero_impl_cpu': 'static auto counts=at::empty({R},t[0].options().dtype(at::kLong)); at::count_nonzero_out(counts,t[0].view({R,C}),std::optional<int64_t>{1}); t[1].copy_(counts);',
     'renorm_scale_factor': 'auto iter=at::TensorIteratorConfig().add_output(t[1]).add_input(t[0]).build(); at::native::renorm_scale_factor_stub(at::kCUDA,iter,(double)s[0]);',
     'blas_copy_cpu': 't[1].copy_(t[0]);',
@@ -145,7 +220,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def configuration(name):
+def configuration(name, shape_record=None):
     cfg = BENCH.auto_spec(name) or BENCH.CASES.get(name)
     if cfg and any(a[1] in ('dptr','dscalar') for a in cfg['args']):
         if any(a[1] not in ('dptr','dscalar') for a in cfg['args']):
@@ -157,6 +232,10 @@ def configuration(name):
     text = (BENCH.ATEN/(name+'.c')).read_text()
     cfg['dims'] = {k: int(v) for k,v in re.findall(r'^\s*#\s*define\s+(\w+)\s+(\d+)\s*$', text, re.M)}
     cfg['dimension_scope'] = 'unchanged C fixture dimensions'
+    if shape_record is not None:
+        from aten_paper_shapes import apply_shape, input_recipe
+        cfg = apply_shape(name, cfg, shape_record)
+        cfg = input_recipe(name, cfg, shape_record, BENCH)
     if name == 'aten_nested_sum_dim_cpu':
         width=cfg['dims']['N']
         cfg['integer_array_values']={'len':[-1,0,1,width,width//2,max(0,width-1),2,width//3]}
@@ -191,6 +270,20 @@ def harness(name, cfg):
 #include <cuda_runtime_api.h>
 '''
     prefix += f'#define NA {len(sizes)}\n#define NS {ns}\n#define ABS_TOL 1e-5\n#define REL_TOL 1e-4\n'
+    samples = cfg.get('timing_samples', 5)
+    if type(samples) is not int or samples < 5:
+        raise ValueError('timing_samples must be an integer of at least five')
+    prefix += f'#define TIMING_SAMPLES {samples}\n'
+    prefix += '#define PAPER_RECIPE '+str(int('paper_initializers' in cfg))+'\n'
+    prefix += 'static double paper_value(int array,size_t i){switch(array){\n'
+    for i,(n,k,_,_,_) in enumerate(a for a in cfg['args'] if a[1] in ('ptr','iptr','bptr')):
+        expression = cfg.get('paper_initializers',{}).get(n)
+        if expression is not None:
+            prefix += f'case {i}:return '+expression+';\n'
+    prefix += '} (void)i;return 0;}\n'
+    paper_parameters = [str(cfg.get('paper_parameters',{}).get(a[0],0))
+                        for a in cfg['args'] if a[1] in ('scalar','iscalar')]
+    prefix += 'static const float paper_parameters[]={'+','.join(paper_parameters or ['0'])+'};\n'
     prefix += 'static float parameters['+str(max(1,ns))+'];\n'
     prefix += 'static const int integer_parameters[]={'+','.join(map(str,integer_parameters or [0]))+'};\n'
     prefix += 'static const size_t sizes[]={'+','.join(sizes)+'};\n'
@@ -246,18 +339,45 @@ extern "C" void native_fixture(float **p,const float *s,const size_t *sizes,int 
 
 def build(name, args):
     dest = args.output/name; dest.mkdir(parents=True, exist_ok=True)
-    src = BENCH.ATEN/(name+'.c'); proofdir = args.campaign/name/('rank'+str(args.rank))
+    src = BENCH.ATEN/(name+'.c')
+    rank = args.rank
+    if rank == -1:
+        result = json.loads((args.campaign/name/'result.json').read_text())
+        variants = [v for v in result['variants'] if v.get('abi_ok') and
+                    v.get('emitted') and not v['counts']['linalg']]
+        if not variants:
+            raise ValueError(name+': no fully matched variant with executable ABI')
+        rank = min(variants, key=lambda v: (v['counts']['loops'], len(v['emitted'])))['rank']
+    proofdir = args.campaign/name/('rank'+str(rank))
     proof = json.loads((proofdir/'proof.json').read_text())
     if not proof['emitted']:
         raise ValueError(name+': no specification proof')
     if re.search(r'\blinalg\.(generic|reduce|map)\b', (proofdir/'matched.mlir').read_text()):
         raise ValueError(name+': residual computation needs investigation before resident execution')
-    cfg = configuration(name)
+    shapes = getattr(args, 'shape_specs', None)
+    record = None
+    if shapes:
+        from aten_paper_shapes import load_shapes, materialize
+        record = load_shapes(shapes)[name]
+    cfg = configuration(name, record)
+    cfg['timing_samples'] = getattr(args, 'timing_samples', 5)
+    original_src = src
+    if record:
+        src = dest / (name+'.c')
+        materialize(original_src, src, record)
+        request = json.loads((proofdir.parent/'request.json').read_text())
+        if sha(src) != sha(ROOT / request['source']):
+            raise ValueError('Benchmark source differs from the source used for the saved match')
     (dest/'harness.c').write_text(harness(name,cfg)); (dest/'native.cpp').write_text(bridge(name,cfg))
     env=dict(os.environ, PYTHON='/usr/bin/python3', POLYGEIST_SPEC_SUITE='lib_v3',
         POLYGEIST_NUMERIC_MODEL=proof['configuration']['numeric_model'],
         POLYGEIST_BUILD_WORK_DIR=str(dest/'work'), POLYGEIST_MATCH_PROOF=str(proofdir/'proof.json'),
         POLYGEIST_CUSTOM_CUDA_OBJ=str(dest/'reference.o'), POLYGEIST_MINIMAL_CUDNN_RUNTIME='1')
+    libraries = {target.get('library') for match in proof['matches']
+                 for target in match.get('targets', [])}
+    if 'cuSPARSE' in libraries:
+        env['POLYGEIST_MINIMAL_CUDNN_RUNTIME'] = '0'
+        env['POLYGEIST_MINIMAL_CUSPARSE_RUNTIME'] = '1'
     # Repeated fixtures share the same runtime translation units. Let ccache
     # validate compiler flags and header dependencies instead of recompiling
     # those units for every case. The resulting binary is still hashed below.
@@ -265,11 +385,12 @@ def build(name, args):
                       Path('/usr/lib/ccache/aarch64-linux-gnu-gcc').is_file() else None)
     if compiler_cache:
         env['PATH'] = str(compiler_cache) + os.pathsep + env.get('PATH', '')
+        env.setdefault('POLYGEIST_NVCC', str(HERE/'cached_nvcc.sh'))
     if args.cutensor_root:
         env['POLYGEIST_CUTENSOR_ROOT']=str(args.cutensor_root)
     if args.persistent_workspace:
         env['POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION']=name
-    commands=[['aarch64-linux-gnu-gcc','-O0','-fno-fast-math','-ffp-contract=off',
+    commands=[['aarch64-linux-gnu-gcc','-O2','-fno-fast-math','-ffp-contract=off',
         '-D'+name+'=native_reference','-c',str(src),'-o',str(dest/'reference.o')],
         ['aarch64-linux-gnu-g++','-O2','-std=c++17','-DHAVE_SVE256_CPU_DEFINITION',
          '-I'+str(TORCH/'include'),'-I'+str(TORCH/'include/torch/csrc/api/include'),
@@ -300,9 +421,11 @@ def build(name, args):
                 '-Wl,--gc-sections','-o',str(dest/'raised-program')]
             if args.cutensor_root:
                 cmd += ['-L'+str(args.cutensor_root/'lib'),'-l:libcutensor.so.2']
+            if 'cuSPARSE' in libraries:
+                cmd += ['-lcusparse']
             commands.append(cmd);log.write(shlex.join(cmd)+'\n');log.flush()
             rc=subprocess.run(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=120).returncode
-    row=dict(kernel=name,rc=rc,configuration=cfg,commands=commands,
+    row=dict(kernel=name,rc=rc,configuration=cfg,commands=commands,rank=rank,
              compiler_cache=str(compiler_cache) if compiler_cache else None,
              persistent_workspace=args.persistent_workspace,
              source_sha256=sha(src),proof_sha256=sha(proofdir/'proof.json'),
@@ -317,6 +440,11 @@ def build(name, args):
         row['baseline']='ATen CUDA length mask, where and sum composition; preallocated intermediates'
     if name == 'aten_polar_scalarized':
         row['baseline']='ATen CUDA polar_out plus real/imaginary copies to the separate fixture outputs'
+    if name == 'aten_standard_gamma_grad_cpu':
+        row['baseline']='ATen CUDA arithmetic and log composition for the extracted simplified formula; not the full ATen standard-gamma-gradient operator'
+    if record:
+        row.update(original_source_sha256=sha(original_src), shape_record=record,
+                   shape_specs_sha256=sha(shapes))
     if not rc:row['binary_sha256']=sha(dest/'raised-program')
     save(dest/'build.json',row);print(name,'build',rc,flush=True)
     return row
@@ -385,10 +513,16 @@ def run_gpu(names, args):
         results.append(row)
         cfg=built['configuration']; expected=sum(eval(a[2],{'__builtins__':{}},cfg['dims']) for a in cfg['args'] if a[1] in ('ptr','iptr','bptr') and a[3])
         modes=2*(2 if any(a[1] in ('scalar','iscalar') for a in cfg['args']) else 1)
-        for kind in ['normal','edge','zeros']:
-            rc,log=board.run(environment+'POLYGEIST_V2_TRACE=1 timeout 60 '+shlex.quote(remote)+' '+kind,timeout=65)
+        run_timeout = getattr(args, 'run_timeout', 60)
+        kinds = args.correctness_kinds or (['normal','edge','zeros']+
+                    (['paper'] if 'paper_initializers' in cfg else []))
+        if 'paper' in kinds and 'paper_initializers' not in cfg:
+            raise ValueError('Paper-input validation requires a recorded input recipe')
+        row['correctness_scope'] = kinds
+        for kind in kinds:
+            rc,log=board.run(environment+'POLYGEIST_V2_TRACE=1 timeout '+str(run_timeout)+' '+shlex.quote(remote)+' '+kind,timeout=run_timeout+5)
             (dest/(kind+'-gpu.log')).write_text(log)
-            row['correctness'][kind]=correctness_summary(rc,log,expected,modes)
+            row['correctness'][kind]=correctness_summary(rc,log,expected,2 if kind=='paper' else modes)
             print(name,kind,row['correctness'][kind]['passed'],flush=True);save(args.output/'gpu-results.json',results)
         row['fully_validated']=all(v['passed'] for v in row['correctness'].values())
         row['raised_validated']=all(v['raised_passed'] for v in row['correctness'].values())
@@ -398,19 +532,23 @@ def run_gpu(names, args):
         # Timings use normal inputs. Require the compiler to pass every input
         # mode and both implementations to agree on the actual timing inputs.
         # A native-only edge disagreement remains explicit and never turns green.
-        if (row['raised_validated'] or args.time_validated_normal_inputs) and row['correctness']['normal']['passed']:
-            rc,log=board.run(environment+'timeout 60 '+shlex.quote(remote)+' timing',timeout=65)
+        timing_input='paper' if 'paper_initializers' in cfg else 'normal'
+        if (not args.skip_timing and (row['raised_validated'] or args.time_validated_normal_inputs)
+                and row['correctness'].get(timing_input,{}).get('passed')):
+            rc,log=board.run(environment+'timeout '+str(run_timeout)+' '+shlex.quote(remote)+' timing',timeout=run_timeout+5)
             (dest/'timing-gpu.log').write_text(log)
             samples=[dict(path=a,sample=int(b),ms=float(c)) for a,b,c in re.findall(r'SAMPLE path=(\w+) sample=(\d+) ms=([\deE.+-]+)',log)]
-            passed=rc==0 and 'PASS timing' in log and len(samples)==10 and all(sum(s['path']==p for s in samples)==5 for p in ('raised','native_aten_cuda'))
-            row['timing']=dict(passed=passed,samples=samples,input_kind='normal',
+            count=cfg.get('timing_samples',5)
+            passed=rc==0 and 'PASS timing' in log and len(samples)==2*count and all(sorted(s['sample'] for s in samples if s['path']==p)==list(range(count)) for p in ('raised','native_aten_cuda'))
+            row['timing']=dict(passed=passed,samples=samples,input_kind=timing_input,
                 all_raised_input_modes_passed=row['raised_validated'],
                 normal_input_only_override=args.time_validated_normal_inputs,
                 native_edge_disagreement=(not row['native_matches_reference']
                     if row['native_matches_reference'] is not None else None),
-                statistic='minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing')
+                statistic=f'minimum of {count} synchronized resident samples after five warmups; alternating order; reset outside timing')
             if passed:
                 row['timing']['minimum_ms']={p:min(s['ms'] for s in samples if s['path']==p) for p in ('raised','native_aten_cuda')}
+                row['timing']['minimum_first_five_ms']={p:min(s['ms'] for s in samples if s['path']==p and s['sample']<5) for p in ('raised','native_aten_cuda')}
                 row['timing']['native_over_raised']=row['timing']['minimum_ms']['native_aten_cuda']/row['timing']['minimum_ms']['raised']
         save(args.output/'gpu-results.json',results)
         save(dest/'gpu-result.json',row)
@@ -429,6 +567,12 @@ def main():
                    help='allow normal-input timings when all three normal comparisons pass; preserve edge failures and failed full validation')
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--rank',type=int,default=0)
+    p.add_argument('--shape-specs',type=Path,help='Pinned benchmark dimensions; separate source copies preserve the original fixtures')
+    p.add_argument('--timing-samples',type=int,default=5)
+    p.add_argument('--run-timeout',type=int,default=60)
+    p.add_argument('--correctness-kinds', nargs='+', choices=['normal','edge','zeros','paper'],
+                   help='Selected input recipes, explicitly recorded in the results')
+    p.add_argument('--skip-timing', action='store_true')
     p.add_argument('--cases',nargs='+',required=True)
     p.add_argument('--jobs',type=int,default=2)
     p.add_argument('--persistent-workspace',action='store_true',

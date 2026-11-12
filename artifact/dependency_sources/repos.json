@@ -28,5 +28,10 @@
     "path": "third_party/cutlass",
     "url": "https://github.com/NVIDIA/cutlass.git",
     "revision": "e406c186f510a15091cce01f782020ceb7ba8eb5"
+  },
+  {
+    "path": "third_party/AMGX",
+    "url": "https://github.com/NVIDIA/AMGX.git",
+    "revision": "3188dce5bdc22e96407d609e398925bed6aa010d"
   }
 ]

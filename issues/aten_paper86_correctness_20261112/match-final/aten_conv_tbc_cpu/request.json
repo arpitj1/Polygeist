@@ -1,0 +1,41 @@
+{
+  "kernel": "aten_conv_tbc_cpu",
+  "paper_family": "convolution",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_conv_tbc_cpu/aten_conv_tbc_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_conv_tbc_cpu.c",
+  "original_source_sha256": "2f52a292ed8689a46de22bf0e25f03cd87d685df31f5555b35db4de2c7a0244f",
+  "shape_record": {
+    "kernel": "aten_conv_tbc_cpu",
+    "op": "conv_tbc",
+    "cat": "native_fixture",
+    "dims": {
+      "T": 4096,
+      "B": 16,
+      "I": 32,
+      "O": 64,
+      "K": 3
+    },
+    "n": 402653184,
+    "shape": "T=4096_B=16_I=32_O=64_K=3",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full TBC convolution through cuDNN transform plus convolution",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "a18bfcf1a32ece09"
+  },
+  "ranks": [
+    0
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cudnnConvolutionTBC_f32_memref"
+}

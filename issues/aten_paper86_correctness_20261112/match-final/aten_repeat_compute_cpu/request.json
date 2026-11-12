@@ -1,0 +1,38 @@
+{
+  "kernel": "aten_repeat_compute_cpu",
+  "paper_family": "tensor_permutation",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_repeat_compute_cpu/aten_repeat_compute_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_repeat_compute_cpu.c",
+  "original_source_sha256": "61ef88d3a960c44fc4b741c2e17842577fe924931aba3595de7e22a0be00ecd2",
+  "shape_record": {
+    "kernel": "aten_repeat_compute_cpu",
+    "op": "repeat_compute",
+    "cat": "native_fixture",
+    "dims": {
+      "N": 8192,
+      "R": 512
+    },
+    "n": 4194304,
+    "shape": "N=8192_R=512",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "8de495d9b009aa55"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cublasBroadcastAxis1_f32"
+}

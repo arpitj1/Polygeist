@@ -1,0 +1,6 @@
+kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
+aten_conv2d_columns_cpu,patch_extract_scatter,recognized,1,0,,1,openblas_scopy_f32,0,0,True,cutensorPermute_f32_r5_tensor,not_run,not_run
+aten_cross,cross_product,recognized,3,0,,1,"aten_cross_component_f32,aten_cross_component_f32,aten_cross_component_f32",0,0,True,cudnnPointwiseGraph_f32,not_run,not_run
+aten_cross_cpu_backend,cross_product,recognized,3,0,,1,"aten_cross_component_f32,aten_cross_component_f32,aten_cross_component_f32",0,0,True,cudnnPointwiseGraph_f32,not_run,not_run
+aten_im2col,patch_extract_scatter,recognized,1,0,,1,openblas_scopy_f32,0,0,True,cutensorPermute_f32_r6_tensor,not_run,not_run
+aten_sparse_norm_cpu,euclidean_norm,recognized,1,0,,1,"aten_mul_f32,cub_reduce_value_sum_f32",0,0,True,cublasSnrm2_f32_memref,not_run,not_run

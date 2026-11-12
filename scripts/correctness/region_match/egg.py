@@ -43,7 +43,7 @@ from egglog import (EGraph, Expr, StringLike, String, i64, i64Like, function, re
                     rewrite, rule, ruleset, union, vars_, var)
 
 from .affine import Aff, atom_info, is_atom  # noqa: E402
-from .equations import F, FBin, FConst, FIndex, FParam, FRead, FSel, FSum, FUn  # noqa: E402
+from .equations import F, FBin, FConst, FIndex, FLast, FParam, FRead, FSel, FSum, FUn  # noqa: E402
 
 Term = km.Term
 
@@ -84,6 +84,11 @@ def rm_ixv(i: RmIx) -> Term: ...
 
 @function
 def rm_sum(v: RmIx, lo: RmIx, hi: RmIx, body: Term) -> Term: ...
+
+
+@function
+def rm_last(v: RmIx, lo: RmIx, hi: RmIx, guard: Term,
+            body: Term, default: Term) -> Term: ...
 
 
 @function
@@ -307,6 +312,13 @@ def encode(f: F, ns: str, arr_name, bound: Optional[str] = None) -> Term:
     if isinstance(f, FSum):
         return rm_sum(RmIx(f.var), enc_ix(f.lo, ns), enc_ix(f.hi, ns),
                       encode(f.body, ns, arr_name, f.var))
+    if isinstance(f, FLast):
+        guard = Term.Lit(1.0)
+        for condition in _cond_terms(f.guard, ns, f.var):
+            guard = Term.Binary('and', guard, condition)
+        return rm_last(RmIx(f.var), enc_ix(f.lo, ns), enc_ix(f.hi, ns), guard,
+                       encode(f.body, ns, arr_name, f.var),
+                       encode(f.default, ns, arr_name, bound))
     raise TypeError(f)
 
 

@@ -1,0 +1,1777 @@
+[
+  {
+    "kernel": "aten_blas_scale_cpu",
+    "run_id": "20261112T093820Z",
+    "binary_sha256": "3ace7a368d217871daa30440d85719f1f8390d4ce8eee0332fb17aa538dfac4e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 4
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.162114859
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.032544851
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.026815891
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.154593945
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.13606596
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.039391994
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.028127909
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.151874065
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.128226042
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.032896996
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.128226042,
+        "native_aten_cuda": 0.026815891
+      },
+      "native_over_raised": 0.20912983495193588
+    }
+  },
+  {
+    "kernel": "aten_normal_cpu",
+    "run_id": "20261112T093820Z",
+    "binary_sha256": "7961fb6f4314d53ae7eaf98608e4baf3930fb31cbb2da95d1405849b783052ff",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.172451019
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.092866182
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.091584921
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.158562899
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.145251036
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.098465204
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.084321976
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.145153999
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.129281998
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.086145878
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.129281998,
+        "native_aten_cuda": 0.084321976
+      },
+      "native_over_raised": 0.6522329272788622
+    }
+  },
+  {
+    "kernel": "aten_uniform_cpu",
+    "run_id": "20261112T093820Z",
+    "binary_sha256": "d25e640fa2e0a7dd950bdd046e616a440792056037eb7174159a2a7c497fdcf4",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.151490927
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.090433121
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.091650009
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.170691013
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.150945902
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.088801861
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.080065012
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.142466784
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.136578083
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.088416815
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.136578083,
+        "native_aten_cuda": 0.080065012
+      },
+      "native_over_raised": 0.5862215242836584
+    }
+  },
+  {
+    "kernel": "aten_log_normal_cpu",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "0d5f08f2ffe1ec3a2f2f83bf557dcc8e0bce4eb8312bd309f9de302747ee484f",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 3.81469727e-06
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 3.81469727e-06
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.38418579e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.38418579e-07
+          }
+        ],
+        "vendor_calls": 12
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 5.96046448e-08
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 5.96046448e-08
+          }
+        ],
+        "vendor_calls": 12
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 1.1920929e-07
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 12
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.235620022
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.093858004
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.091170073
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.214339972
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.222820044
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.087553024
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.075649023
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.240227938
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.227715969
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.082880974
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.214339972,
+        "native_aten_cuda": 0.075649023
+      },
+      "native_over_raised": 0.35293940880051994
+    }
+  },
+  {
+    "kernel": "aten_cauchy_cpu",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "06d13e752c099c37069465031e33a4b97f14ef54916b22eebcaf71a6bd70a485",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 2
+      },
+      "edge": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 2
+      },
+      "zeros": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 2
+      }
+    },
+    "fully_validated": false
+  },
+  {
+    "kernel": "aten_cross",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "5a59d637ac82f7a9f4ff57994a37a7c974beaf77ce43e29939fc9ffe42a6d25e",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 0
+      },
+      "edge": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 0
+      },
+      "zeros": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 0
+      }
+    },
+    "fully_validated": false
+  },
+  {
+    "kernel": "aten_cross_cpu_backend",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "88ea3752639d1e201049f8b17166c15e621d8ca3104c807468c6ca03b8dded91",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 0
+      },
+      "edge": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 0
+      },
+      "zeros": {
+        "rc": 134,
+        "passed": false,
+        "checks": [],
+        "vendor_calls": 0
+      }
+    },
+    "fully_validated": false
+  },
+  {
+    "kernel": "aten_dirichlet_grad_cpu",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "2c633a562aee8df186312b1d313d0ebd39a6bd4e6ec43707f2b3e81125e0df5c",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 9.53674316e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 9.53674316e-07
+          }
+        ],
+        "vendor_calls": 10
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 3.56230885e-08
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 3.56230885e-08
+          }
+        ],
+        "vendor_calls": 10
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 10
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.385926008
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.127330065
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.107041836
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.403782845
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.40397501
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.120097876
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.12499404
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.414632082
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.406054974
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.122626066
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.385926008,
+        "native_aten_cuda": 0.107041836
+      },
+      "native_over_raised": 0.2773636235472371
+    }
+  },
+  {
+    "kernel": "aten_gamma_transform_cpu",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "1df4b4a27a94739d6db97d448e8f441451b49b1c91c3570e2e7c1522f3c8f82b",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 18
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 18
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 18
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.879023075
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.212323904
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.209187984
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.835375071
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.834477901
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.214308023
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.195971012
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.882383108
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.791150093
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.19344306
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.791150093,
+        "native_aten_cuda": 0.19344306
+      },
+      "native_over_raised": 0.24450867377955296
+    }
+  },
+  {
+    "kernel": "aten_geometric_cpu",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "6ead7c6641aabb0e42249e2997049fe013069353e998f2bcc34bf88afe8cc28a",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 16
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 16
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 0.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 1.0,
+            "resident": 1.0,
+            "count": 4096.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 16
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.332134008
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.114114046
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.112225771
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.351942062
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.357478142
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.126242161
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.120834112
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.342246056
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.319941998
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.111138105
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.319941998,
+        "native_aten_cuda": 0.111138105
+      },
+      "native_over_raised": 0.3473695410253705
+    }
+  },
+  {
+    "kernel": "aten_polar_scalarized",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "532251942d2ef264ed046da185b7b4229e676a466ffd9fc9482104456b7dc1b6",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8192.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.2649765e-06
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8192.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 2.2649765e-06
+          }
+        ],
+        "vendor_calls": 8
+      },
+      "edge": {
+        "rc": 3,
+        "passed": false,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8192.0,
+            "bad": 819.0,
+            "nativebad": 819.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 3.99999976
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8192.0,
+            "bad": 819.0,
+            "nativebad": 819.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 3.99999976
+          }
+        ],
+        "vendor_calls": 8
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 8192.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 8192.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 8
+      }
+    },
+    "fully_validated": false
+  },
+  {
+    "kernel": "aten_standard_gamma_grad_cpu",
+    "run_id": "20261112T094115Z",
+    "binary_sha256": "fadee359ac03528e3f5ce5be376ede275ab8a93b05f15b90751fb3dd2b6c176c",
+    "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+    "dimension_scope": "unchanged C fixture dimensions",
+    "correctness": {
+      "normal": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 9.53674316e-07
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 9.53674316e-07
+          }
+        ],
+        "vendor_calls": 12
+      },
+      "edge": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 1.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 12
+      },
+      "zeros": {
+        "rc": 0,
+        "passed": true,
+        "checks": [
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 2.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 1024.0,
+            "bad": 0.0,
+            "nativebad": 0.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 12
+      }
+    },
+    "fully_validated": true,
+    "timing": {
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 0.506024837
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.165666819
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.143810987
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 0.520072937
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 0.495593071
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.131361961
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.132483006
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 0.488329172
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 0.465352058
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.128481865
+        }
+      ],
+      "statistic": "minimum of five synchronized resident samples after five warmups; alternating order; reset outside timing",
+      "minimum_ms": {
+        "raised": 0.465352058,
+        "native_aten_cuda": 0.128481865
+      },
+      "native_over_raised": 0.27609604984276226
+    }
+  }
+]

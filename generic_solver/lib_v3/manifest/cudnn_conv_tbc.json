@@ -1,0 +1,127 @@
+{
+  "routine": "cudnn_conv_tbc",
+  "source": "NVIDIA cuDNN9 public sample CPU reference, specialization described in ref_c",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "adaptation": "Public cuDNN CPU reference specialized to one spatial dimension and TBC/KIO storage; retain channel-before-spatial reduction order and record cross-correlation mode explicitly.",
+  "specs": [
+    {
+      "name": "cudnn_conv1d_tbc_f32",
+      "args": [
+        "B",
+        "I",
+        "O",
+        "K",
+        "TO",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_conv_tbc_f32",
+          "arguments": [
+            "B",
+            "I",
+            "O",
+            "K",
+            "TO",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              {
+                "terms": {
+                  "TO": 1,
+                  "K": 1
+                },
+                "offset": -1
+              },
+              "B",
+              "I"
+            ],
+            "filter": [
+              "K",
+              "I",
+              "O"
+            ],
+            "output": [
+              "TO",
+              "B",
+              "O"
+            ]
+          },
+          "bounds": {
+            "B": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "I": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "O": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "TO": {
+              "min": 1,
+              "max": 1073741824
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Input extent TO+K-1; dense positive-dimension disjoint arrays; K and TO <= 2^30 so the derived int32 input length cannot overflow",
+        "FP32 finite arithmetic; reduction reordering requires relaxed numeric model"
+      ],
+      "deviations": [
+        "Select cross-correlation branch from sample, which hardcodes convolution mode."
+      ],
+      "validation": {
+        "scalars": {
+          "B": 2,
+          "I": 3,
+          "O": 5,
+          "K": 3,
+          "TO": 7
+        },
+        "arrays": {
+          "input": [
+            9,
+            2,
+            3
+          ],
+          "filter": [
+            3,
+            3,
+            5
+          ],
+          "output": [
+            7,
+            2,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,848 @@
+[
+  {
+    "kernel": "aten_outer",
+    "binary_sha256": "b80391fca630ea10f99981a30bf53076f0c7c2fb23d5e0d845d27332c316c1d1",
+    "diagnostic_only": true,
+    "validated": false,
+    "correctness_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_outer/gpu-result.json",
+    "correctness": {
+      "paper": {
+        "rc": 3,
+        "passed": false,
+        "raised_passed": true,
+        "native_passed": false,
+        "raised_matches_native": false,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 41120.0,
+            "nativerefbad": 41120.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 4194304.0,
+            "bad": 0.0,
+            "nativebad": 41120.0,
+            "nativerefbad": 41120.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "timing": {
+      "rc": 0,
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 1.042929888
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.384423018
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.353862047
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 1.054609776
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 1.032369852
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.372903109
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.367717981
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 1.043793917
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 1.037330866
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.373286009
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 5,
+          "ms": 0.354758978
+        },
+        {
+          "path": "raised",
+          "sample": 5,
+          "ms": 1.049714088
+        },
+        {
+          "path": "raised",
+          "sample": 6,
+          "ms": 1.036978006
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 6,
+          "ms": 0.372647047
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 7,
+          "ms": 0.365445852
+        },
+        {
+          "path": "raised",
+          "sample": 7,
+          "ms": 1.046514034
+        },
+        {
+          "path": "raised",
+          "sample": 8,
+          "ms": 1.040593863
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 8,
+          "ms": 0.374181986
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 9,
+          "ms": 0.365797997
+        },
+        {
+          "path": "raised",
+          "sample": 9,
+          "ms": 1.046514034
+        },
+        {
+          "path": "raised",
+          "sample": 10,
+          "ms": 1.041810989
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 10,
+          "ms": 0.375494957
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 11,
+          "ms": 0.359750032
+        },
+        {
+          "path": "raised",
+          "sample": 11,
+          "ms": 1.043761969
+        },
+        {
+          "path": "raised",
+          "sample": 12,
+          "ms": 1.037779093
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 12,
+          "ms": 0.366214991
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 13,
+          "ms": 0.362534046
+        },
+        {
+          "path": "raised",
+          "sample": 13,
+          "ms": 1.044306993
+        },
+        {
+          "path": "raised",
+          "sample": 14,
+          "ms": 1.036051035
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 14,
+          "ms": 0.369606972
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 15,
+          "ms": 0.352646112
+        },
+        {
+          "path": "raised",
+          "sample": 15,
+          "ms": 1.038290977
+        },
+        {
+          "path": "raised",
+          "sample": 16,
+          "ms": 1.032049894
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 16,
+          "ms": 0.361958027
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 17,
+          "ms": 0.341125965
+        },
+        {
+          "path": "raised",
+          "sample": 17,
+          "ms": 1.035315037
+        },
+        {
+          "path": "raised",
+          "sample": 18,
+          "ms": 1.028337955
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 18,
+          "ms": 0.352102041
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 19,
+          "ms": 0.34019804
+        },
+        {
+          "path": "raised",
+          "sample": 19,
+          "ms": 1.028753996
+        }
+      ],
+      "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+      "minimum_ms": {
+        "raised": 1.028337955,
+        "native_aten_cuda": 0.34019804
+      },
+      "minimum_first_five_ms": {
+        "raised": 1.032369852,
+        "native_aten_cuda": 0.353862047
+      }
+    },
+    "paper": {
+      "id": "27",
+      "kernel": "aten_outer",
+      "native_us": "307.264",
+      "raised_us": "1008.032001",
+      "raised_over_native": "3.280670696860029",
+      "speedup_percent": "-69.51842801665182",
+      "semantic_family": "dense_linear_algebra",
+      "raised_library": "cuBLAS",
+      "raised_call": "cublasDgemm_outer_product",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "scope": "Strict correctness gate remains failed. Numerical/signed-zero discrepancy preserved; timing is diagnostic only.",
+    "comparison": {
+      "selected_statistic": "minimum_first_five_ms",
+      "raised_us": 1032.369852,
+      "native_us": 353.862047,
+      "current_native_over_raised": 0.3427667384072351,
+      "paper_raised_us": 1008.032001,
+      "paper_native_us": 307.264,
+      "paper_native_over_raised": 0.30481571983348177,
+      "raised_runtime_over_paper": 1.0241439269545571
+    }
+  },
+  {
+    "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+    "binary_sha256": "39017e8b30c6dcfc22f2ca7812ade9c1aa06c0a407da3437eb86c98f7b2ef2ef",
+    "diagnostic_only": true,
+    "validated": false,
+    "correctness_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_conv_transpose3d_grad_weight_cpu/gpu-result.json",
+    "correctness": {
+      "paper": {
+        "rc": 3,
+        "passed": false,
+        "raised_passed": false,
+        "native_passed": false,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 3456.0,
+            "bad": 94.0,
+            "nativebad": 0.0,
+            "nativerefbad": 94.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0025100708
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 3456.0,
+            "bad": 94.0,
+            "nativebad": 0.0,
+            "nativerefbad": 94.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.0025100708
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "timing": {
+      "rc": 0,
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 3.591230869
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 2.756496906
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 2.750159979
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 3.580190897
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 3.569791079
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 2.753232956
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 2.741295815
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 3.557566166
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 3.546815157
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 2.75355196
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 5,
+          "ms": 2.750735998
+        },
+        {
+          "path": "raised",
+          "sample": 5,
+          "ms": 3.54659009
+        },
+        {
+          "path": "raised",
+          "sample": 6,
+          "ms": 3.58950305
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 6,
+          "ms": 2.753968
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 7,
+          "ms": 2.75383997
+        },
+        {
+          "path": "raised",
+          "sample": 7,
+          "ms": 3.581087112
+        },
+        {
+          "path": "raised",
+          "sample": 8,
+          "ms": 3.5862391
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 8,
+          "ms": 2.747537136
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 9,
+          "ms": 2.746831894
+        },
+        {
+          "path": "raised",
+          "sample": 9,
+          "ms": 3.564254045
+        },
+        {
+          "path": "raised",
+          "sample": 10,
+          "ms": 3.563421965
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 10,
+          "ms": 2.749361038
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 11,
+          "ms": 2.743920088
+        },
+        {
+          "path": "raised",
+          "sample": 11,
+          "ms": 3.93126893
+        },
+        {
+          "path": "raised",
+          "sample": 12,
+          "ms": 3.588702917
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 12,
+          "ms": 2.790160894
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 13,
+          "ms": 2.749455929
+        },
+        {
+          "path": "raised",
+          "sample": 13,
+          "ms": 3.581983089
+        },
+        {
+          "path": "raised",
+          "sample": 14,
+          "ms": 3.572766781
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 14,
+          "ms": 2.747983932
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 15,
+          "ms": 2.747280121
+        },
+        {
+          "path": "raised",
+          "sample": 15,
+          "ms": 3.580574989
+        },
+        {
+          "path": "raised",
+          "sample": 16,
+          "ms": 3.581279039
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 16,
+          "ms": 2.755761147
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 17,
+          "ms": 2.746351957
+        },
+        {
+          "path": "raised",
+          "sample": 17,
+          "ms": 3.573693991
+        },
+        {
+          "path": "raised",
+          "sample": 18,
+          "ms": 3.571423054
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 18,
+          "ms": 2.752527952
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 19,
+          "ms": 2.742703915
+        },
+        {
+          "path": "raised",
+          "sample": 19,
+          "ms": 3.552798033
+        }
+      ],
+      "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+      "minimum_ms": {
+        "raised": 3.54659009,
+        "native_aten_cuda": 2.741295815
+      },
+      "minimum_first_five_ms": {
+        "raised": 3.546815157,
+        "native_aten_cuda": 2.741295815
+      }
+    },
+    "paper": {
+      "id": "105",
+      "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+      "native_us": "2718.496",
+      "raised_us": "3006.496002",
+      "raised_over_native": "1.1059409327804786",
+      "speedup_percent": "-9.579257774113604",
+      "semantic_family": "convolution",
+      "raised_library": "cuDNN",
+      "raised_call": "cudnnConvolutionBackwardFilter3D_f32_memref",
+      "timing_source": "current Section 4.2 campaign",
+      "timing_protocol": "minimum of 5 after 5 warmups"
+    },
+    "scope": "Strict correctness gate remains failed. Numerical/signed-zero discrepancy preserved; timing is diagnostic only.",
+    "comparison": {
+      "selected_statistic": "minimum_first_five_ms",
+      "raised_us": 3546.815157,
+      "native_us": 2741.295815,
+      "current_native_over_raised": 0.7728893933448362,
+      "paper_raised_us": 3006.496002,
+      "paper_native_us": 2718.496,
+      "paper_native_over_raised": 0.904207422258864,
+      "raised_runtime_over_paper": 1.179717237156
+    }
+  },
+  {
+    "kernel": "aten_slow_conv3d_backward_weight_cpu",
+    "binary_sha256": "8c6317bd24bff94a97a0b762c398c9d02d022ec21a1936d1871b99e1539f878d",
+    "diagnostic_only": true,
+    "validated": false,
+    "correctness_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_slow_conv3d_backward_weight_cpu/gpu-result.json",
+    "correctness": {
+      "paper": {
+        "rc": 3,
+        "passed": false,
+        "raised_passed": false,
+        "native_passed": false,
+        "raised_matches_native": true,
+        "checks": [
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 0.0,
+            "count": 3456.0,
+            "bad": 10.0,
+            "nativebad": 0.0,
+            "nativerefbad": 10.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.000274658203
+          },
+          {
+            "kind": 0.0,
+            "parameters": 0.0,
+            "resident": 1.0,
+            "count": 3456.0,
+            "bad": 10.0,
+            "nativebad": 0.0,
+            "nativerefbad": 10.0,
+            "guardbad": 0.0,
+            "inputbad": 0.0,
+            "maxabs": 0.000274658203
+          }
+        ],
+        "vendor_calls": 2
+      }
+    },
+    "timing": {
+      "rc": 0,
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 7.193758011
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 6.319150925
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 6.306830168
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 7.206943035
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 7.142845869
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 6.313615084
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 6.307727098
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 7.206974983
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 7.184189796
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 6.317327023
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 5,
+          "ms": 6.31367898
+        },
+        {
+          "path": "raised",
+          "sample": 5,
+          "ms": 7.178174019
+        },
+        {
+          "path": "raised",
+          "sample": 6,
+          "ms": 7.192605972
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 6,
+          "ms": 6.321295023
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 7,
+          "ms": 6.309806824
+        },
+        {
+          "path": "raised",
+          "sample": 7,
+          "ms": 7.186750174
+        },
+        {
+          "path": "raised",
+          "sample": 8,
+          "ms": 7.202782154
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 8,
+          "ms": 6.31979084
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 9,
+          "ms": 6.310926914
+        },
+        {
+          "path": "raised",
+          "sample": 9,
+          "ms": 7.168158054
+        },
+        {
+          "path": "raised",
+          "sample": 10,
+          "ms": 7.133373976
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 10,
+          "ms": 6.319182873
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 11,
+          "ms": 6.31223917
+        },
+        {
+          "path": "raised",
+          "sample": 11,
+          "ms": 7.183229923
+        },
+        {
+          "path": "raised",
+          "sample": 12,
+          "ms": 7.189119101
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 12,
+          "ms": 6.317007065
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 13,
+          "ms": 6.310799122
+        },
+        {
+          "path": "raised",
+          "sample": 13,
+          "ms": 7.165757895
+        },
+        {
+          "path": "raised",
+          "sample": 14,
+          "ms": 7.17020607
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 14,
+          "ms": 6.315855026
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 15,
+          "ms": 6.317167044
+        },
+        {
+          "path": "raised",
+          "sample": 15,
+          "ms": 7.21993494
+        },
+        {
+          "path": "raised",
+          "sample": 16,
+          "ms": 7.190526009
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 16,
+          "ms": 6.322159052
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 17,
+          "ms": 6.312271118
+        },
+        {
+          "path": "raised",
+          "sample": 17,
+          "ms": 7.205405951
+        },
+        {
+          "path": "raised",
+          "sample": 18,
+          "ms": 7.196030855
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 18,
+          "ms": 6.322094917
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 19,
+          "ms": 6.312463045
+        },
+        {
+          "path": "raised",
+          "sample": 19,
+          "ms": 7.202621937
+        }
+      ],
+      "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+      "minimum_ms": {
+        "raised": 7.133373976,
+        "native_aten_cuda": 6.306830168
+      },
+      "minimum_first_five_ms": {
+        "raised": 7.142845869,
+        "native_aten_cuda": 6.306830168
+      }
+    },
+    "paper": {
+      "id": "106",
+      "kernel": "aten_slow_conv3d_backward_weight_cpu",
+      "native_us": "2781.824",
+      "raised_us": "8587.552246",
+      "raised_over_native": "3.087022128646528",
+      "speedup_percent": "-67.60632226376559",
+      "semantic_family": "convolution",
+      "raised_library": "cuDNN",
+      "raised_call": "cudnnConvolutionBackwardFilter3D_f32_memref",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "scope": "Strict correctness gate remains failed. Numerical/signed-zero discrepancy preserved; timing is diagnostic only.",
+    "comparison": {
+      "selected_statistic": "minimum_ms",
+      "raised_us": 7133.373976,
+      "native_us": 6306.830168,
+      "current_native_over_raised": 0.8841300328875398,
+      "paper_raised_us": 8587.552246,
+      "paper_native_us": 2781.824,
+      "paper_native_over_raised": 0.3239367773623441,
+      "raised_runtime_over_paper": 0.8306644049033481
+    }
+  }
+]

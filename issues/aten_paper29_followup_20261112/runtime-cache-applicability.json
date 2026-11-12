@@ -1,0 +1,55 @@
+{
+  "scope": "Existing generic convolution cache only; no backend changes or unrelated variants.",
+  "cases": [
+    {
+      "kernels": [
+        "aten_conv2d",
+        "aten_dilated_convolution_cpu",
+        "aten_conv_transpose3d_backward_cpu"
+      ],
+      "applicable": true,
+      "reason": "Saved backend wrappers use the existing get_cudnn_conv_fwd_plan cache. All three strict five-pair cached runs completed.",
+      "evidence": "gpu-forward-cache-five/paper-comparisons.json"
+    },
+    {
+      "kernels": [
+        "aten_conv_transpose2d",
+        "aten_conv_transpose3d_cpu"
+      ],
+      "applicable": true,
+      "reason": "Saved backend wrappers use get_cudnn_conv_bwd_data_plan. Previously completed controlled cached/uncached evidence retained; no rerun.",
+      "evidence": "transpose-cache-diagnostic/diagnosis.json"
+    },
+    {
+      "kernels": [
+        "aten_conv_tbc_cpu"
+      ],
+      "applicable": false,
+      "reason": "Current frozen wrapper creates descriptors, packs filters and selects the convolution algorithm directly; it does not call the generic plan cache."
+    },
+    {
+      "kernels": [
+        "aten_conv2d_columns_cpu"
+      ],
+      "applicable": false,
+      "reason": "Current match emits cuBLAS copies, not a cuDNN convolution plan; additionally its K dimension has an explicitly documented correction."
+    },
+    {
+      "kernels": [
+        "aten_adaptive_avg_pool2d",
+        "aten_adaptive_avg_pool3d",
+        "aten_avg_pool2d",
+        "aten_avg_pool3d"
+      ],
+      "applicable": false,
+      "reason": "Current matches use ordered-row reduction backends, not cached cuDNN convolution plans."
+    },
+    {
+      "kernels": [
+        "aten_avg_pool2d_backward_cpu"
+      ],
+      "applicable": false,
+      "reason": "Current composition uses cuDNN pointwise graphs plus Thrust divide/fill. The convolution-plan flag does not apply."
+    }
+  ]
+}

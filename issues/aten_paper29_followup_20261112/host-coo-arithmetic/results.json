@@ -1,0 +1,132 @@
+[
+  {
+    "kernel": "aten_sparse_addmm_cpu",
+    "shape_record": {
+      "kernel": "aten_sparse_addmm_cpu",
+      "op": "addmm",
+      "cat": "sparse_coo_mm",
+      "dims": {
+        "R": 64,
+        "C": 4096,
+        "N": 4096
+      },
+      "n": 1073741824,
+      "shape": "R=64_C=4096_N=4096",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full Linalg-fill plus structured-loop COO SpMM via cuSPARSE",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "af6a5bc645cf7bab"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_sparse_addmm_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sparse_addmm_cpu/aten_sparse_addmm_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sparse_addmm_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sparse_addmm_cpu/check"
+    ],
+    "source_sha256": "e7853dda3fe4d601bf0c84cdfd2baffd4c78298bc645c2e1edab694836dd4e47",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  },
+  {
+    "kernel": "aten_hspmm_cpu",
+    "shape_record": {
+      "kernel": "aten_hspmm_cpu",
+      "op": "hspmm",
+      "cat": "native_fixture",
+      "dims": {
+        "R": 64,
+        "C": 4096,
+        "N": 4096
+      },
+      "n": 1073741824,
+      "shape": "R=64_C=4096_N=4096",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full Linalg-fill plus structured-loop COO SpMM via cuSPARSE",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "259b92fa65811255"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_hspmm_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_hspmm_cpu/aten_hspmm_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_hspmm_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_hspmm_cpu/check"
+    ],
+    "source_sha256": "bf2f0becaf4c3dee4fb7bb618de0bdae8ef4e3d3bd2907bec2b4dd7c24d732b3",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  },
+  {
+    "kernel": "aten_sspaddmm_cpu",
+    "shape_record": {
+      "kernel": "aten_sspaddmm_cpu",
+      "op": "sspaddmm",
+      "cat": "native_fixture",
+      "dims": {
+        "C": 1774,
+        "K": 2365,
+        "N": 18917,
+        "R": 2365
+      },
+      "n": 187701684214550,
+      "shape": "C=1774_K=2365_N=18917_R=2365",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+      "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "68d23c3c19429b5c"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_sspaddmm_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sspaddmm_cpu/aten_sspaddmm_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sspaddmm_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-coo-arithmetic/aten_sspaddmm_cpu/check"
+    ],
+    "source_sha256": "28600d4f2fb4a22dcf2e6b40c5b0a92197b0b7e407421fd63005bc9756999c88",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  }
+]

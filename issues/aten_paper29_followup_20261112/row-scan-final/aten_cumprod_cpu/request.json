@@ -1,0 +1,38 @@
+{
+  "kernel": "aten_cumprod_cpu",
+  "paper_family": "scan",
+  "current_targeted_gpu_validated": "True",
+  "status": "targeted_GPU_correctness_pass",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/row-scan-final/aten_cumprod_cpu/aten_cumprod_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_cumprod_cpu.c",
+  "original_source_sha256": "94ddd95e220654c8b5f1bedfe55d0ba6905ac4162348854386b4f443f6672b15",
+  "shape_record": {
+    "kernel": "aten_cumprod_cpu",
+    "op": "cumprod",
+    "cat": "cum",
+    "dims": {
+      "K": 2897,
+      "R": 1448
+    },
+    "n": 4194856,
+    "shape": "K=2897_R=1448",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "8c78205482ac384d"
+  },
+  "ranks": [
+    0
+  ],
+  "region": true,
+  "region_budget": 45,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cubSegmentedInclusiveProduct2D_f32_tensor"
+}

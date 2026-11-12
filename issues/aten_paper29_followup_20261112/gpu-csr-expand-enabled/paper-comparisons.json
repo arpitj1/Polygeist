@@ -1,0 +1,66 @@
+[
+  {
+    "kernel": "aten_convert_csr_to_coo_cpu",
+    "paper": {
+      "id": "80",
+      "kernel": "aten_convert_csr_to_coo_cpu",
+      "native_us": "943.2",
+      "raised_us": "332.288",
+      "raised_over_native": "0.3522985581000848",
+      "speedup_percent": "183.85015408320493",
+      "semantic_family": "sparse_format",
+      "raised_library": "cuSPARSE",
+      "raised_call": "cusparseXcsr2coo_i32_memref",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "fully_validated": true,
+    "actual_samples": 5,
+    "selected_statistic": "minimum_first_five_ms",
+    "baseline_scope": "Actual ATen repeat_interleave with cached arange row labels; CSR pointer difference computation, output allocation and copy into the fixture output are timed.",
+    "binary_sha256": "eeedbaa6a9f3e1f97d6270697ac831877e8a6dad59eadbcd73ef97570686ec16",
+    "cache_scope": "cuDNN cache enabled globally, unused by this cuSPARSE conversion.",
+    "traced_library_calls": [
+      "cusparseXcsr2coo_cusp_expandptr_i32",
+      "cusparseXcsr2coo_cusp_expandptr_i32"
+    ],
+    "calls_per_program": 1.0,
+    "raised_ms": 0.363590002,
+    "native_ms": 0.992303848,
+    "current_native_over_raised": 2.7291835378905716,
+    "raised_over_paper": 1.0942014216583205,
+    "timing_statistic_matches_paper": false
+  },
+  {
+    "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+    "paper": {
+      "id": "79",
+      "kernel": "aten_sparse_matmul_csr_to_coo_cpu",
+      "native_us": "934.976",
+      "raised_us": "329.983999",
+      "raised_over_native": "0.3529331223475255",
+      "speedup_percent": "183.3397991518977",
+      "semantic_family": "sparse_format",
+      "raised_library": "cuSPARSE",
+      "raised_call": "cusparseXcsr2coo_i32_memref",
+      "timing_source": "historical resident sweep",
+      "timing_protocol": "raised best of 20; retained native baseline"
+    },
+    "fully_validated": true,
+    "actual_samples": 5,
+    "selected_statistic": "minimum_first_five_ms",
+    "baseline_scope": "Actual ATen repeat_interleave with cached arange row labels; CSR pointer difference computation, output allocation and copy into the fixture output are timed.",
+    "binary_sha256": "f789710e650f528074a6fbe2e9b2e4253d501105c3c32d65b23738f35f69fd60",
+    "cache_scope": "cuDNN cache enabled globally, unused by this cuSPARSE conversion.",
+    "traced_library_calls": [
+      "cusparseXcsr2coo_cusp_expandptr_i32",
+      "cusparseXcsr2coo_cusp_expandptr_i32"
+    ],
+    "calls_per_program": 1.0,
+    "raised_ms": 0.358150005,
+    "native_ms": 0.964368105,
+    "current_native_over_raised": 2.6926374187821107,
+    "raised_over_paper": 1.0853556720488136,
+    "timing_statistic_matches_paper": false
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "elements": 576,
+  "input_shape": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "filter_shape": [
+    2,
+    3,
+    2,
+    3,
+    4
+  ],
+  "output_shape": [
+    3,
+    4,
+    6,
+    8
+  ],
+  "oracle": "bounded public dataGrad gather relation, exact integer-valued FP32 input, non-square filters and unequal channels",
+  "GPU_validation": "pending"
+}

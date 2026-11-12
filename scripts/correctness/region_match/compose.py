@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .affine import Aff, Cons
-from .equations import (Equation, F, FBin, FConst, FParam, FRead, FSel, FSum, FUn, Reject,
+from .equations import (Equation, F, FBin, FConst, FIndex, FLast, FParam, FRead, FSel, FSum, FUn, Reject,
                         System, _freshen, canonicalize, fsubst, fwalk)
 
 P1, P2 = "a:", "b:"
@@ -34,6 +34,8 @@ def _pname(prefix: str, p: str) -> str:
 
 
 def sum_depth(f: F) -> int:
+    if isinstance(f, FLast):
+        return max(1 + sum_depth(f.body), sum_depth(f.default))
     if isinstance(f, FSum):
         return 1 + sum_depth(f.body)
     if isinstance(f, FBin):
@@ -178,6 +180,11 @@ class Composite:
                 return FSel(cond, go(x.a), go(x.b))
             if isinstance(x, FSum):
                 return FSum(x.var, x.lo.subst(m), x.hi.subst(m), go(x.body))
+            if isinstance(x, FLast):
+                return FLast(x.var, x.lo.subst(m), x.hi.subst(m),
+                             [c.subst(m) for c in x.guard], go(x.body), go(x.default))
+            if isinstance(x, FIndex):
+                return FIndex(x.value.subst(m))
             raise Reject(f"compose: unexpected formula node {type(x).__name__}")
         return go(f)
 
@@ -225,6 +232,11 @@ class Composite:
                 return FSel(cond, subst_links(x.a), subst_links(x.b))
             if isinstance(x, FSum):
                 return FSum(x.var, x.lo, x.hi, subst_links(x.body))
+            if isinstance(x, FLast):
+                return FLast(x.var, x.lo, x.hi, x.guard,
+                             subst_links(x.body), subst_links(x.default))
+            if isinstance(x, FIndex):
+                return x
             raise Reject("compose: unexpected node")
 
         params = set(self.par1.values()) | set(self.par2.values())

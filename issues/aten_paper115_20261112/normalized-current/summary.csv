@@ -1,0 +1,8 @@
+kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
+aten_blas_axpy_cpu,dense_vector_update,recognized,1,0,,1,aten_scaled_add_f32,0,0,True,cublasSaxpby,not_run,not_run
+aten_cat_serial_cpu,data_movement,recognized,2,0,,1,openblas_somatcopy_f32,0,1,True,cudaCopy2D_f32_tensor,not_run,not_run
+aten_conv2d_columns_cpu,patch_extract_scatter,recognized,1,0,,1,openblas_scopy_f32,0,0,True,cutensorPermute_f32_r5_tensor,not_run,not_run
+aten_flatten_nd_linear_cpu,dense_vector_update,recognized,2,0,,2,openblas_sgemm_nn_b0_alpha1,0,1,True,cublasSgemm_strided_batched_broadcast_rhs,not_run,not_run
+aten_im2col,patch_extract_scatter,recognized,1,0,,1,openblas_scopy_f32,0,0,True,cutensorPermute_f32_r6_tensor,not_run,not_run
+aten_narrow_copy_dense_cpu,tensor_permutation,recognized,1,0,,1,openblas_scopy_f32,0,0,True,cudaCopy2D_f32_tensor,not_run,not_run
+aten_sparse_bmm_cpu,sparse_linear_algebra,recognized,2,0,,2,openblas_sgemm_nn_b0_alpha1,0,1,True,cublasSgemm_strided_batched_nn_zero,not_run,not_run

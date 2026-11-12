@@ -1,0 +1,115 @@
+{
+  "kernel": "aten_conv_transpose3d_cpu",
+  "family": "convolution",
+  "source": "issues/aten_c_kernels/aten_conv_transpose3d_cpu.c",
+  "source_sha256": "e004773f43a3f05bc89b1620e79a2dc227541a68722e9495e9873dd6e53476c7",
+  "legacy_match": "cudnnConvolutionTranspose3D_f32_memref",
+  "variants": [
+    {
+      "rank": 0,
+      "options": {
+        "backend": "cuda",
+        "region": true,
+        "region_budget": 20,
+        "split_reduction_inputs": false,
+        "split_pointwise_inputs": false
+      },
+      "emitted": [],
+      "counts": {
+        "linalg": 1,
+        "loops": 5,
+        "copies": 0,
+        "launches": []
+      },
+      "elapsed_ms": 2153.632,
+      "rejected_specifications": {
+        "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+        "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+        "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+        "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+        "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+        "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+        "cudnn_conv3d_backward_filter_valid_f32": "no recorded import for this specification",
+        "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+        "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+        "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+        "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+        "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+        "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+        "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+      },
+      "abi_ok": false
+    },
+    {
+      "rank": 2,
+      "options": {
+        "backend": "cuda",
+        "region": true,
+        "region_budget": 20,
+        "split_reduction_inputs": false,
+        "split_pointwise_inputs": false,
+        "max_operand_rank": 2,
+        "fuse_initializers": true
+      },
+      "emitted": [],
+      "counts": {
+        "linalg": 1,
+        "loops": 5,
+        "copies": 0,
+        "launches": []
+      },
+      "elapsed_ms": 4773.569,
+      "rejected_specifications": {
+        "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+        "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+        "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+        "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+        "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+        "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+        "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+        "cudnn_conv3d_backward_filter_valid_f32": "no recorded import for this specification",
+        "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+        "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+        "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+        "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+        "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+        "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+        "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+      },
+      "abi_ok": false
+    }
+  ],
+  "correctness": "not_run",
+  "performance": "not_run",
+  "stages": {
+    "cgeist": {
+      "ok": true,
+      "recovery": null
+    },
+    "raise": {
+      "ok": true,
+      "recovery": null
+    },
+    "debuf": {
+      "ok": true,
+      "recovery": null
+    }
+  },
+  "raised_counts": {
+    "linalg": 1,
+    "loops": 5,
+    "copies": 0,
+    "launches": []
+  },
+  "status": "no_proven_match",
+  "seconds": 21.037
+}

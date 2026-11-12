@@ -1,0 +1,42 @@
+{
+  "kernel": "aten_conv_transpose3d_cpu",
+  "paper_family": "convolution",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/whole-references-paper/aten_conv_transpose3d_cpu/aten_conv_transpose3d_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_conv_transpose3d_cpu.c",
+  "original_source_sha256": "e004773f43a3f05bc89b1620e79a2dc227541a68722e9495e9873dd6e53476c7",
+  "shape_record": {
+    "kernel": "aten_conv_transpose3d_cpu",
+    "op": "conv_transpose3d",
+    "cat": "native_fixture",
+    "dims": {
+      "C": 8,
+      "O": 16,
+      "D": 32,
+      "H": 32,
+      "W": 32,
+      "K": 3
+    },
+    "n": 12582912,
+    "shape": "C=8_O=16_D=32_H=32_W=32_K=3",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full 3d transposed convolution through cuDNN backward-data",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "cb3ec4a1c6f08eb8"
+  },
+  "ranks": [
+    0
+  ],
+  "region": true,
+  "region_budget": 45,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cudnnConvolutionTranspose3D_f32_memref"
+}

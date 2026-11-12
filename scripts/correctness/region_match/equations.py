@@ -154,6 +154,24 @@ class FSum(F):
         return f"Sum[{self.var} in [{self.lo}, {self.hi})]({self.body!r})"
 
 
+class FLast(F):
+    """Last qualifying overwrite in an ascending integer loop, else default.
+
+    This preserves store order even when data-dependent ranges overlap. It
+    makes no associativity, disjoint-range, or floating-point assumptions.
+    """
+    def __init__(self, var, lo, hi, guard, body, default):
+        self.var, self.lo, self.hi = var, lo, hi
+        self.guard, self.body, self.default = tuple(guard), body, default
+
+    def key(self):
+        return ('last', self.var, self.lo, self.hi, self.guard,
+                self.body.key(), self.default.key())
+
+    def __repr__(self):
+        return f'Last[{self.var} in [{self.lo}, {self.hi}); {self.guard}]({self.body!r}, else={self.default!r})'
+
+
 class FAcc(F):
     def key(self):
         return ("acc",)
@@ -185,6 +203,10 @@ def fmap_aff(f: F, fn) -> F:
         return FSel(cond, fmap_aff(f.a, fn), fmap_aff(f.b, fn))
     if isinstance(f, FSum):
         return FSum(f.var, fn(f.lo), fn(f.hi), fmap_aff(f.body, fn))
+    if isinstance(f, FLast):
+        return FLast(f.var, fn(f.lo), fn(f.hi),
+                     [Cons(fn(c.aff), c.kind) for c in f.guard],
+                     fmap_aff(f.body, fn), fmap_aff(f.default, fn))
     raise TypeError(f)
 
 
@@ -207,6 +229,9 @@ def fwalk(f: F):
         yield from fwalk(f.b)
     elif isinstance(f, FSum):
         yield from fwalk(f.body)
+    elif isinstance(f, FLast):
+        yield from fwalk(f.body)
+        yield from fwalk(f.default)
 
 
 def has_acc(f: F) -> bool:
@@ -227,6 +252,9 @@ def replace_acc(f: F, v: F) -> F:
         return FSel(cond, replace_acc(f.a, v), replace_acc(f.b, v))
     if isinstance(f, FSum):
         return FSum(f.var, f.lo, f.hi, replace_acc(f.body, v))
+    if isinstance(f, FLast):
+        return FLast(f.var, f.lo, f.hi, f.guard,
+                     replace_acc(f.body, v), replace_acc(f.default, v))
     return f
 
 
@@ -621,6 +649,18 @@ class Builder:
                     raise Reject(f"read of uninitialised scratch {buf}")
                 f = replace_acc(f, prev)
             return f
+        if not has_acc(f) and len(fiber) == 1:
+            if prev is None:
+                raise Reject('conditional overwrite of uninitialised scratch')
+            fv = fiber[0]
+            lows, ups, _ = bounds_of(fv, dom)
+            # Restrict this exact summary to a finite enclosing loop range.
+            # Every data-dependent restriction remains in its predicate.
+            lows = [b for b in lows if fv not in deps(b.vars())]
+            ups = [b for b in ups if fv not in deps(b.vars())]
+            lo = self.pick_bound(lows, R, fv, lower=True)
+            hi = self.pick_bound(ups, R, fv, lower=False) + 1
+            return FLast(fv, lo, hi, dom + grd + residual, f, prev)
         # This summary separates the incoming accumulator from a sum, which
         # permits reassociation. Do not use it in strict scalar-order mode.
         from kernel_match import numeric_model
@@ -639,16 +679,23 @@ class Builder:
         body = h
         outer_ctx = list(R) + [c for c in dom if not (deps(c.vars()) & fset)]
         ranges = []
+        range_guards = []
         for k, fv in enumerate(fiber):
             keep = set(fiber[:k + 1]) | {f"v{i}" for i in range(len(evaff))} | self.all_params(fcons + R)
             proj = project(fcons, keep)
             if proj is None:
                 return prev   # empty fiber everywhere
             lows, ups, rest = bounds_of(fv, proj)
-            lo = self.pick_bound(lows, outer_ctx + rest, fv, lower=True)
-            hi = self.pick_bound(ups, outer_ctx + rest, fv, lower=False)
+            lo, lo_guard = self.guarded_bound(lows, outer_ctx + rest, fv, lower=True)
+            hi, hi_guard = self.guarded_bound(ups, outer_ctx + rest, fv, lower=False)
             ranges.append((fv, lo, hi + 1))
-            outer_ctx = outer_ctx + [ge(Aff.var(fv), lo), le(Aff.var(fv), hi)]
+            range_guards.extend(lo_guard + hi_guard)
+            # Inner bounds may assume all restrictions on an outer variable:
+            # the same restrictions guard the final summand below.
+            outer_ctx += [ge(Aff.var(fv), b) for b in lows]
+            outer_ctx += [le(Aff.var(fv), b) for b in ups]
+        if range_guards:
+            body = FSel(("aff", tuple(range_guards)), body, ZERO)
         for fv, lo, hi in reversed(ranges):
             body = FSum(fv, lo, hi, body)
         if kind == "add":
@@ -685,6 +732,29 @@ class Builder:
         if len(keep) != 1:
             raise Reject(f"reduction bound of {var} is a {'max' if lower else 'min'} of {keep}")
         return keep[0]
+
+    def guarded_bound(self, cands: list[Aff], ctx: list[Cons], var: str,
+                      lower: bool) -> tuple[Aff, list[Cons]]:
+        """Enclose a max/min bound in one finite affine range plus a mask.
+
+        Any candidate lower bound is <= the maximum, and any candidate upper
+        bound is >= the minimum. Keeping every candidate as a predicate makes
+        the enlarged range exact, including empty intersections. This is used
+        only by the relaxed reduction summary; strict folds remain rejected.
+        """
+        if not cands:
+            raise Reject(f"unbounded reduction variable {var}")
+        try:
+            return self.pick_bound(cands, ctx, var, lower), []
+        except Reject:
+            # Prefer constants/parameters to output coordinates so specialized
+            # and symbolic loop domains obtain the same natural enclosing box.
+            def key(a):
+                return (sum(v.startswith("v") for v, _ in a.terms),
+                        len(a.terms), abs(a.const), repr(a))
+            bound = min(cands, key=key)
+            compare = ge if lower else le
+            return bound, [compare(Aff.var(var), b) for b in cands if b != bound]
 
     def decompose_chain(self, f: F):
         if isinstance(f, FBin) and f.op == "sub" and isinstance(f.a, FAcc) and not has_acc(f.b):
@@ -880,6 +950,11 @@ def _freshen(f: F) -> F:
         nv = _fresh()
         body = fsubst(f.body, {f.var: Aff.var(nv)})
         return FSum(nv, f.lo, f.hi, _freshen(body))
+    if isinstance(f, FLast):
+        nv = _fresh()
+        m = {f.var: Aff.var(nv)}
+        return FLast(nv, f.lo, f.hi, [c.subst(m) for c in f.guard],
+                     _freshen(fsubst(f.body, m)), _freshen(f.default))
     if isinstance(f, FBin):
         return FBin(f.op, _freshen(f.a), _freshen(f.b))
     if isinstance(f, FUn):
@@ -964,6 +1039,10 @@ def fold_integer_casts(f: F, bindings=None) -> F:
         return FBin(f.op,fold_integer_casts(f.a,bindings),fold_integer_casts(f.b,bindings))
     if isinstance(f,FSum):
         return FSum(f.var,f.lo,f.hi,fold_integer_casts(f.body,bindings))
+    if isinstance(f, FLast):
+        return FLast(f.var, f.lo, f.hi, f.guard,
+                     fold_integer_casts(f.body, bindings),
+                     fold_integer_casts(f.default, bindings))
     if isinstance(f,FSel):
         cond=f.cond
         if cond[0]=='cmpf':
@@ -973,6 +1052,13 @@ def fold_integer_casts(f: F, bindings=None) -> F:
 
 
 def _simplify_sel(f: F, ctx: list[Cons]) -> F:
+    if isinstance(f, FLast):
+        inner = ctx + [ge(Aff.var(f.var), f.lo), lt(Aff.var(f.var), f.hi)]
+        if not feasible(inner + list(f.guard)):
+            return _simplify_sel(f.default, ctx)
+        return FLast(f.var, f.lo, f.hi, f.guard,
+                     _simplify_sel(f.body, inner + list(f.guard)),
+                     _simplify_sel(f.default, ctx))
     if isinstance(f, FSel) and f.cond[0] == "aff":
         keep = []
         for c in f.cond[1]:
@@ -1013,6 +1099,10 @@ def _occurrences(f: F, var: str):
 
 
 def _orient_sums(f: F, ctx) -> F:
+    if isinstance(f, FLast):
+        inner = ctx + [ge(Aff.var(f.var), f.lo), lt(Aff.var(f.var), f.hi)] + list(f.guard)
+        return FLast(f.var, f.lo, f.hi, f.guard,
+                     _orient_sums(f.body, inner), _orient_sums(f.default, ctx))
     """Change of variables so that the summation variable appears as a pure
     index (natural index), independent of loop direction / offset."""
     if isinstance(f, FSum):
@@ -1049,6 +1139,12 @@ def _orient_sums(f: F, ctx) -> F:
 
 
 def _rename_bound(f: F, depth: int) -> F:
+    if isinstance(f, FLast):
+        nv = f'r{depth}'
+        m = {f.var: Aff.var(nv)}
+        return FLast(nv, f.lo, f.hi, [c.subst(m) for c in f.guard],
+                     _rename_bound(fsubst(f.body, m), depth + 1),
+                     _rename_bound(f.default, depth))
     if isinstance(f, FSum):
         nv = f"r{depth}"
         body = fsubst(f.body, {f.var: Aff.var(nv)})
@@ -1075,8 +1171,13 @@ def _aff_vars(e: "Equation") -> set[str]:
         if isinstance(x, FRead):
             for a in x.idx:
                 out |= a.vars()
-        elif isinstance(x, FSum):
+        elif isinstance(x, (FSum, FLast)):
             out |= x.lo.vars() | x.hi.vars()
+            if isinstance(x, FLast):
+                for c in x.guard:
+                    out |= c.vars()
+        elif isinstance(x, FIndex):
+            out |= x.value.vars()
         elif isinstance(x, FSel) and x.cond[0] == "aff":
             for c in x.cond[1]:
                 out |= c.vars()

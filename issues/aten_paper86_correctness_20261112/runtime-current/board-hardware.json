@@ -1,0 +1,1 @@
+{"model": "NVIDIA Jetson AGX Orin Developer Kit", "uname": {"system": "Linux", "node": "pva-compiler-orin-1.[private].com", "release": "6.8.12-1021-tegra", "version": "#1 SMP PREEMPT Tue Jun  9 09:16:45 PDT 2026", "machine": "aarch64", "processor": "aarch64"}, "uptime": " 17:45:47 up 23 days, 22:43,  4 users,  load average: 1.30, 1.02, 0.77\n"}

@@ -1,0 +1,38 @@
+{
+  "kernel": "aten_nested_clone_cpu",
+  "paper_family": "data_movement",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_nested_clone_cpu/aten_nested_clone_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_nested_clone_cpu.c",
+  "original_source_sha256": "5eb531c89d913520e5412eed8e0992a8474b9ed5a75528099d0da57c2056ae13",
+  "shape_record": {
+    "kernel": "aten_nested_clone_cpu",
+    "op": "nested_clone",
+    "cat": "native_fixture",
+    "dims": {
+      "B": 724,
+      "N": 5793
+    },
+    "n": 4194132,
+    "shape": "B=724_N=5793",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v4",
+    "recipe_fingerprint": "fe71788a5bee6f5d"
+  },
+  "ranks": [
+    0
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "strict",
+  "legacy_match": "cudaCopy2D_f32_tensor"
+}

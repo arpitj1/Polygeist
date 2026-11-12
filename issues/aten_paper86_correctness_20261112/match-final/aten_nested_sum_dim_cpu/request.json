@@ -1,0 +1,38 @@
+{
+  "kernel": "aten_nested_sum_dim_cpu",
+  "paper_family": "reduction",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_nested_sum_dim_cpu/aten_nested_sum_dim_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_nested_sum_dim_cpu.c",
+  "original_source_sha256": "5cc944d926fb566ceeae017348e6a3152ba924de26876011e6e6f6f95618c5b1",
+  "shape_record": {
+    "kernel": "aten_nested_sum_dim_cpu",
+    "op": "nested_sum_dim",
+    "cat": "native_fixture",
+    "dims": {
+      "B": 724,
+      "N": 5793
+    },
+    "n": 4194132,
+    "shape": "B=724_N=5793",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "132e688af89d8697"
+  },
+  "ranks": [
+    0
+  ],
+  "region": true,
+  "region_budget": 30,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cubSegmentedPrefixSum_f32"
+}

@@ -1,0 +1,32 @@
+{
+  "kernel": "aten_sparse_csr_addmm_cpu",
+  "paper": {
+    "id": "114",
+    "kernel": "aten_sparse_csr_addmm_cpu",
+    "native_us": "6758.56",
+    "raised_us": "6848.479996",
+    "raised_over_native": "1.013304608674037",
+    "speedup_percent": "-1.3129920223541425",
+    "semantic_family": "sparse_linear_algebra",
+    "raised_library": "cuSPARSE",
+    "raised_call": "cusparseSpMM_CSR_f32_memref",
+    "timing_source": "current Section 4.2 campaign",
+    "timing_protocol": "minimum of 5 after 5 warmups"
+  },
+  "fully_validated": true,
+  "actual_samples": 5,
+  "selected_statistic": "minimum_first_five_ms",
+  "baseline_scope": "Actual ATen mv_out/mm_out on a cached CSR tensor backed by the fixture arrays; output preallocated. CSR tensor construction is excluded after warmups; any internal ATen workspace is included.",
+  "binary_sha256": "974b5e3a3883bfbd8dcca327fcc826437ddd46e58aa7d93b437498db01e1d719",
+  "cache_scope": "cuDNN cache enabled globally, unused by this cuSPARSE conversion.",
+  "traced_library_calls": [
+    "cusparseSpMM_cusp_csr_matvecs_beta0_f32",
+    "cusparseSpMM_cusp_csr_matvecs_beta0_f32"
+  ],
+  "calls_per_program": 1.0,
+  "raised_ms": 7.110096931,
+  "native_ms": 7.231219053,
+  "current_native_over_raised": 1.0170352279547565,
+  "raised_over_paper": 1.0382007299653067,
+  "timing_statistic_matches_paper": true
+}

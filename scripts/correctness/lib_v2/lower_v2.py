@@ -548,6 +548,17 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
             for actual, dimension in zip(av.sizes, ca.runtime_adapter['arrays'][p.name]):
                 if type(dimension) is int:
                     expected = e.const(dimension, 'index')
+                elif isinstance(dimension, dict) and 'terms' in dimension:
+                    from typed_wrapper import dimension_terms
+                    terms, offset = dimension_terms(dimension)
+                    expected = e.const(offset, 'index')
+                    for name, coefficient in sorted(terms.items()):
+                        value = int_value(sa.binding[name])
+                        term = e.op(f'arith.index_cast {value} : i32 to index', 'extent')
+                        if coefficient != 1:
+                            scale = e.const(coefficient, 'index')
+                            term = e.op(f'arith.muli {term}, {scale} : index', 'extent')
+                        expected = e.op(f'arith.addi {expected}, {term} : index', 'extent')
                 else:
                     name = dimension['dimension'] if isinstance(dimension, dict) else dimension
                     value = int_value(sa.binding[name])

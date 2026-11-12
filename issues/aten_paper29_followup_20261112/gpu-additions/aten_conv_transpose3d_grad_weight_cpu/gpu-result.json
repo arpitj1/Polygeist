@@ -1,0 +1,51 @@
+{
+  "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+  "run_id": "20261112T174555Z",
+  "binary_sha256": "39017e8b30c6dcfc22f2ca7812ade9c1aa06c0a407da3437eb86c98f7b2ef2ef",
+  "scope": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+  "cudnn_plan_cache": false,
+  "correctness": {
+    "paper": {
+      "rc": 3,
+      "passed": false,
+      "raised_passed": false,
+      "native_passed": false,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 3456.0,
+          "bad": 94.0,
+          "nativebad": 0.0,
+          "nativerefbad": 94.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0025100708
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 3456.0,
+          "bad": 94.0,
+          "nativebad": 0.0,
+          "nativerefbad": 94.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0025100708
+        }
+      ],
+      "vendor_calls": 2
+    }
+  },
+  "correctness_scope": [
+    "paper"
+  ],
+  "fully_validated": false,
+  "raised_validated": false,
+  "raised_matches_native": true,
+  "native_matches_reference": false
+}

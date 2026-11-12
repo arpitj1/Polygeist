@@ -1,0 +1,40 @@
+{
+  "kernel": "aten_uniform_cpu",
+  "paper_family": "random_generation",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_uniform_cpu/aten_uniform_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_uniform_cpu.c",
+  "original_source_sha256": "16022bc8ad8fd0f5ab66e86e218d9b88b730b7af1e1c3c42b80e4a42746798b5",
+  "shape_record": {
+    "kernel": "aten_uniform_cpu",
+    "op": "uniform",
+    "cat": "native_fixture",
+    "dims": {
+      "N": 4194304
+    },
+    "n": 4194304,
+    "shape": "N=4194304",
+    "dtype": "f32",
+    "scalar_args": {
+      "from": "-2.0",
+      "to": "3.0"
+    },
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full graph",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "58b2b03dd6dd4cd3"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnPointwiseGraph_f32"
+}

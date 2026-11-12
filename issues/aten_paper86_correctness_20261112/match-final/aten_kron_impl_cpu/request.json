@@ -1,0 +1,40 @@
+{
+  "kernel": "aten_kron_impl_cpu",
+  "paper_family": "tensor_product",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_kron_impl_cpu/aten_kron_impl_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_kron_impl_cpu.c",
+  "original_source_sha256": "caeead682ea8e87097e850c650fb11fb6c7995601804333f2f15974d05d42c7d",
+  "shape_record": {
+    "kernel": "aten_kron_impl_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "A": 256,
+      "B": 128,
+      "C": 32,
+      "D": 32
+    },
+    "n": 33554432,
+    "shape": "A=256_B=128_C=32_D=32",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full Kronecker product through mode-based cuTENSOR multiply",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "71b58bc9f4730368"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cutensorKroneckerProduct2D_f32_memref"
+}

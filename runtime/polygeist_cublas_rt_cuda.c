@@ -2411,6 +2411,17 @@ void polygeist_cusparse_spmv_jds_f32_sized(
 }
 #endif
 
+// Fixed API scalars are part of the imported reference's binding contract.
+void polygeist_cusparse_spmv_csr_beta0_f32_sized(
+    int32_t rows, int32_t row_offset_count, const int32_t *row_offsets,
+    int32_t column_index_count, const int32_t *column_indices,
+    int32_t value_count, const float *values, int32_t x_count, const float *x,
+    int32_t y_count, float *y) {
+  polygeist_cusparse_spmv_csr_f32_sized(
+      rows, row_offset_count, row_offsets, column_index_count, column_indices,
+      value_count, values, x_count, x, y_count, y, 1.0f, 0.0f);
+}
+
 // Capture-safe implementation of the runtime ABI produced by MLIR's
 // --convert-gpu-to-llvm lowering. Unlike the stock wrappers, these functions
 // reuse Polygeist's stream, cache cubin/function handles after warmup, and do
@@ -7737,6 +7748,12 @@ void polygeist_cudnn_conv_backward_filter3d_f32(
     int32_t IC,int32_t OC,int32_t ID,int32_t IH,int32_t IW,
     int32_t OD,int32_t OH,int32_t OW,int32_t KD,int32_t KH,int32_t KW,
     const float *input,const float *grad_output,float *grad_filter) {
+  if (IC <= 0 || OC <= 0 || OD <= 0 || OH <= 0 || OW <= 0 ||
+      KD <= 0 || KH <= 0 || KW <= 0 ||
+      (int64_t)ID != (int64_t)OD + KD - 1 ||
+      (int64_t)IH != (int64_t)OH + KH - 1 ||
+      (int64_t)IW != (int64_t)OW + KW - 1)
+    abort();
   polygeist_cublas_init();ensure_cudnn();double hs=timing_enabled()?wall_time_ms():0.0;
   size_t inputBytes=(size_t)IC*ID*IH*IW*sizeof(float);
   size_t gradBytes=(size_t)OC*OD*OH*OW*sizeof(float);
@@ -7905,6 +7922,18 @@ void polygeist_cudnn_binary_cross_entropy_mean_f32(
   output[0] = 0.0f;
   polygeist_cudnn_reduce_f32(0, N, loss, output);
   free(loss);
+}
+
+void polygeist_reference_conv_tbc_f32(
+    int32_t B, int32_t I, int32_t O, int32_t K, int32_t TO,
+    const float *input, const float *filter, float *output) {
+  int64_t inputLength = (int64_t)TO + K - 1;
+  if (K <= 0 || TO <= 0 || inputLength > INT32_MAX ||
+      B <= 0 || I <= 0 || O <= 0) {
+    fprintf(stderr, "invalid cuDNN convolution extent contract\n");
+    abort();
+  }
+  polygeist_cudnn_conv_tbc_f32((int32_t)inputLength, B, I, O, K, input, filter, output);
 }
 
 void polygeist_cudnn_conv_tbc_f32(

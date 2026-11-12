@@ -1,0 +1,173 @@
+{
+  "routine": "cudnn_conv_backward_filter3d",
+  "source": "NVIDIA public cuDNN sample weightGrad_cpu_ref<float>, adapted to three spatial axes",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "adaptation": "Select existing cross-correlation branch; specialize one batch, unit stride/dilation and no padding; extend the sample from two spatial axes to three, preserving per-output accumulation order.",
+  "specs": [
+    {
+      "name": "cudnn_conv3d_backward_filter_valid_f32",
+      "args": [
+        "IC",
+        "OC",
+        "ID",
+        "IH",
+        "IW",
+        "OD",
+        "OH",
+        "OW",
+        "KD",
+        "KH",
+        "KW",
+        "input",
+        "grad_output",
+        "grad_filter"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionBackwardFilter",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cudnn_conv_backward_filter3d_f32",
+          "arguments": [
+            "IC",
+            "OC",
+            "ID",
+            "IH",
+            "IW",
+            "OD",
+            "OH",
+            "OW",
+            "KD",
+            "KH",
+            "KW",
+            "input",
+            "grad_output",
+            "grad_filter"
+          ],
+          "arrays": {
+            "input": [
+              "IC",
+              "ID",
+              "IH",
+              "IW"
+            ],
+            "grad_output": [
+              "OC",
+              "OD",
+              "OH",
+              "OW"
+            ],
+            "grad_filter": [
+              "OC",
+              "IC",
+              "KD",
+              "KH",
+              "KW"
+            ]
+          },
+          "bounds": {
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ID": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OD": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KD": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KW": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Dense disjoint FP32 arrays, positive dimensions and int32-representable tensor strides",
+        "ID=OD+KD-1, IH=OH+KH-1, IW=OW+KW-1; checked by the runtime wrapper",
+        "Vendor reduction reordering is validated numerically; changed scalar order requires relaxed matching"
+      ],
+      "deviations": [
+        "The public sample is two dimensional; explicitly extend its spatial traversal to three dimensions",
+        "Select the cross-correlation branch; the sample hardcodes convolution mode"
+      ],
+      "validation": {
+        "scalars": {
+          "IC": 2,
+          "OC": 3,
+          "ID": 5,
+          "IH": 7,
+          "IW": 8,
+          "OD": 4,
+          "OH": 5,
+          "OW": 5,
+          "KD": 2,
+          "KH": 3,
+          "KW": 4
+        },
+        "arrays": {
+          "input": [
+            2,
+            5,
+            7,
+            8
+          ],
+          "grad_output": [
+            3,
+            4,
+            5,
+            5
+          ],
+          "grad_filter": [
+            3,
+            2,
+            2,
+            3,
+            4
+          ]
+        }
+      }
+    }
+  ]
+}

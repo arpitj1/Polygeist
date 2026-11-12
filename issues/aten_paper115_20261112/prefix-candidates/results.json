@@ -1,0 +1,2350 @@
+[
+  {
+    "kernel": "aten_batch_norm_transform_cpu",
+    "family": "normalization",
+    "source": "issues/aten_c_kernels/aten_batch_norm_transform_cpu.c",
+    "source_sha256": "4cb56aff0b1e53f5a33960064a29820496b53543c8a9ea0ff05ef4dbed41bbf6",
+    "legacy_match": "cudnnBatchNormalizationForwardInference",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [],
+        "counts": {
+          "linalg": 4,
+          "loops": 12,
+          "copies": 1,
+          "launches": []
+        },
+        "elapsed_ms": 4201.085,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": false
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "no_proven_match",
+    "seconds": 10.453
+  },
+  {
+    "kernel": "aten_blas_scale_cpu",
+    "family": "dense_vector_update",
+    "source": "issues/aten_c_kernels/aten_blas_scale_cpu.c",
+    "source_sha256": "fc90a70b101523401e8d19e34b0c4e7e9b85cd27c5b0b2f1c273ed4eec485503",
+    "legacy_match": "cublasSscal",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_multiplies_scalar_left_f32"
+        ],
+        "counts": {
+          "linalg": 0,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_multiplies_scalar_left_f32"
+          ]
+        },
+        "elapsed_ms": 4251.724,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.017
+  },
+  {
+    "kernel": "aten_cauchy_cpu",
+    "family": "random_distribution",
+    "source": "issues/aten_c_kernels/aten_cauchy_cpu.c",
+    "source_sha256": "1e5fb50404ace7efc6bf2ba027834ffe7b86c322a239e4ff59942baff2e1c84f",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_plus_scalar_left_f32"
+        ],
+        "counts": {
+          "linalg": 4,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_plus_scalar_left_f32"
+          ]
+        },
+        "elapsed_ms": 5145.303,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.861
+  },
+  {
+    "kernel": "aten_count_nonzero_impl_cpu",
+    "family": "histogram_count",
+    "source": "issues/aten_c_kernels/aten_count_nonzero_impl_cpu.c",
+    "source_sha256": "01d4096b2a075d3ff966aa8b424c80178679fc6ed1ca0b9be34986bb1ef8cbe1",
+    "legacy_match": "cubSegmentedCountNonzero2D_f32_tensor",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [],
+        "counts": {
+          "linalg": 1,
+          "loops": 1,
+          "copies": 1,
+          "launches": []
+        },
+        "elapsed_ms": 3729.768,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": false
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 2,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "no_proven_match",
+    "seconds": 9.596
+  },
+  {
+    "kernel": "aten_cross",
+    "family": "cross_product",
+    "source": "issues/aten_c_kernels/aten_cross.c",
+    "source_sha256": "05e8ea7bb11819d225461ff43b314395b5cf97b07c49c035fafb3e7f4fc76a1b",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_minus_f32",
+          "thrust_minus_f32",
+          "thrust_minus_f32"
+        ],
+        "counts": {
+          "linalg": 6,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_minus_f32",
+            "thrust_minus_f32",
+            "thrust_minus_f32"
+          ]
+        },
+        "elapsed_ms": 5250.053,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 3,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 12.47
+  },
+  {
+    "kernel": "aten_cross_cpu_backend",
+    "family": "cross_product",
+    "source": "issues/aten_c_kernels/aten_cross_cpu_backend.c",
+    "source_sha256": "4c42405280c56d3ed34225926d0c1ed81f40462940836a9907133daba5cc4545",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_minus_f32",
+          "thrust_minus_f32",
+          "thrust_minus_f32"
+        ],
+        "counts": {
+          "linalg": 6,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_minus_f32",
+            "thrust_minus_f32",
+            "thrust_minus_f32"
+          ]
+        },
+        "elapsed_ms": 5233.063,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 3,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 12.206
+  },
+  {
+    "kernel": "aten_dirichlet_grad_cpu",
+    "family": "random_distribution",
+    "source": "issues/aten_c_kernels/aten_dirichlet_grad_cpu.c",
+    "source_sha256": "b52ac29385b6a77375e4d009d74beb96b615b7446ec79880ed383924886f65a6",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_mul_f32"
+        ],
+        "counts": {
+          "linalg": 4,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "aten_mul_f32"
+          ]
+        },
+        "elapsed_ms": 5441.338,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 12.249
+  },
+  {
+    "kernel": "aten_exponential_cpu",
+    "family": "random_distribution",
+    "source": "issues/aten_c_kernels/aten_exponential_cpu.c",
+    "source_sha256": "8d809ffd0cdc34b7bf524ab22ae5f8667a36cefcbfc1fd6cab0c609ad0b847bb",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_divide_scalar_right_f32"
+        ],
+        "counts": {
+          "linalg": 3,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_divide_scalar_right_f32"
+          ]
+        },
+        "elapsed_ms": 4924.66,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.47
+  },
+  {
+    "kernel": "aten_gamma_transform_cpu",
+    "family": "random_distribution",
+    "source": "issues/aten_c_kernels/aten_gamma_transform_cpu.c",
+    "source_sha256": "5ee55d947d4db516fc1fd086bd1833c1142fec1d3fecd434ed2ed1dec8a39e50",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_mul_f32"
+        ],
+        "counts": {
+          "linalg": 8,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "aten_mul_f32"
+          ]
+        },
+        "elapsed_ms": 7081.667,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 13.631
+  },
+  {
+    "kernel": "aten_geometric_cpu",
+    "family": "random_distribution",
+    "source": "issues/aten_c_kernels/aten_geometric_cpu.c",
+    "source_sha256": "bc096e09149013f5afb1dd72424ab5836bbcaca5db0e5cd39bf2b61b662274f0",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_ceil_f32"
+        ],
+        "counts": {
+          "linalg": 3,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "aten_ceil_f32"
+          ]
+        },
+        "elapsed_ms": 4862.366,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.298
+  },
+  {
+    "kernel": "aten_joint_scaling_cpu",
+    "family": "joint_maxabs_product",
+    "source": "issues/aten_c_kernels/aten_joint_scaling_cpu.c",
+    "source_sha256": "8f61c8b20f16084c937720935ffef09d2cb7a7835a54551480904c3855d96bc4",
+    "legacy_match": "cublasJointMaxAbsProduct_f32_memref",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [],
+        "counts": {
+          "linalg": 2,
+          "loops": 0,
+          "copies": 1,
+          "launches": []
+        },
+        "elapsed_ms": 4001.568,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": false
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 2,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "no_proven_match",
+    "seconds": 9.905
+  },
+  {
+    "kernel": "aten_log_normal_cpu",
+    "family": "random_generation",
+    "source": "issues/aten_c_kernels/aten_log_normal_cpu.c",
+    "source_sha256": "f82431c3bfec2f321d8194f22122f265bcd5bc6a8406ddfa4361ca3bc1e4be00",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_exp_f32"
+        ],
+        "counts": {
+          "linalg": 2,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "aten_exp_f32"
+          ]
+        },
+        "elapsed_ms": 4784.684,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.64
+  },
+  {
+    "kernel": "aten_nansum_cpu",
+    "family": "nan_ignoring_reduction",
+    "source": "issues/aten_c_kernels/aten_nansum_cpu.c",
+    "source_sha256": "23e4c4dde484f3f862d65a3864c39a2615eccbe7fa92bd50dc1af1974c1805e7",
+    "legacy_match": "cubSegmentedNanSum_f32_memref",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [],
+        "counts": {
+          "linalg": 1,
+          "loops": 1,
+          "copies": 1,
+          "launches": []
+        },
+        "elapsed_ms": 3778.564,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": false
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 2,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "no_proven_match",
+    "seconds": 9.917
+  },
+  {
+    "kernel": "aten_normal_cpu",
+    "family": "random_generation",
+    "source": "issues/aten_c_kernels/aten_normal_cpu.c",
+    "source_sha256": "e4a8dfe1222586cd2da43694bea1461c26953317ea2396d41bfa667b1c481264",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_plus_scalar_left_f32"
+        ],
+        "counts": {
+          "linalg": 1,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_plus_scalar_left_f32"
+          ]
+        },
+        "elapsed_ms": 5140.374,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 12.244
+  },
+  {
+    "kernel": "aten_polar_scalarized",
+    "family": "complex_construction",
+    "source": "issues/aten_c_kernels/aten_polar_scalarized.c",
+    "source_sha256": "bdb3327a48d6e8cc98f7c1e77cd5c5f0d6f37f9b71280391a8d2008a420fe330",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_mul_f32",
+          "aten_mul_f32"
+        ],
+        "counts": {
+          "linalg": 2,
+          "loops": 0,
+          "copies": 2,
+          "launches": [
+            "aten_mul_f32",
+            "aten_mul_f32"
+          ]
+        },
+        "elapsed_ms": 8012.402,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 2,
+      "loops": 0,
+      "copies": 2,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 14.615
+  },
+  {
+    "kernel": "aten_quant_col_offsets_cpu",
+    "family": "column_reduction",
+    "source": "issues/aten_c_kernels/aten_quant_col_offsets_cpu.c",
+    "source_sha256": "6a02669b8d1589204272136cc05ec4646149b47bcc191be671773fb94e15d7b4",
+    "legacy_match": "cubQuantColOffsets_i8_i32_memref",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [],
+        "counts": {
+          "linalg": 2,
+          "loops": 1,
+          "copies": 1,
+          "launches": []
+        },
+        "elapsed_ms": 3685.946,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": false
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 3,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "no_proven_match",
+    "seconds": 9.352
+  },
+  {
+    "kernel": "aten_renorm_scale_factor",
+    "family": "normalization",
+    "source": "issues/aten_c_kernels/aten_renorm_scale_factor.c",
+    "source_sha256": "c2abcd39bcd0bce3ff1379813e9cb31294bb930827918fd7be19203a2274931d",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [],
+        "counts": {
+          "linalg": 1,
+          "loops": 0,
+          "copies": 1,
+          "launches": []
+        },
+        "elapsed_ms": 5306.802,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": false
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "no_proven_match",
+    "seconds": 10.998
+  },
+  {
+    "kernel": "aten_standard_gamma_grad_cpu",
+    "family": "random_distribution",
+    "source": "issues/aten_c_kernels/aten_standard_gamma_grad_cpu.c",
+    "source_sha256": "c48e5885ea06f44149d2f80ab68f34894104cf4072219a5f4c6218459a34c9a8",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_add_f32"
+        ],
+        "counts": {
+          "linalg": 5,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "aten_add_f32"
+          ]
+        },
+        "elapsed_ms": 5373.692,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.831
+  },
+  {
+    "kernel": "aten_transform_bias_rescale_qkv_cpu",
+    "family": "qkv_transform",
+    "source": "issues/aten_c_kernels/aten_transform_bias_rescale_qkv_cpu.c",
+    "source_sha256": "88efba95af926b20b0cdb4c8de2764f5712509dfecb4294ad33898fb135291e7",
+    "legacy_match": "cudnnTransformBiasRescaleQKV_f32_memref",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "aten_add_f32",
+          "aten_add_f32"
+        ],
+        "counts": {
+          "linalg": 2,
+          "loops": 12,
+          "copies": 3,
+          "launches": [
+            "aten_add_f32",
+            "aten_add_f32"
+          ]
+        },
+        "elapsed_ms": 5380.799,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 3,
+      "loops": 0,
+      "copies": 3,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 12.239
+  },
+  {
+    "kernel": "aten_uniform_cpu",
+    "family": "random_generation",
+    "source": "issues/aten_c_kernels/aten_uniform_cpu.c",
+    "source_sha256": "16022bc8ad8fd0f5ab66e86e218d9b88b730b7af1e1c3c42b80e4a42746798b5",
+    "legacy_match": "cudnnPointwiseGraph_f32",
+    "variants": [
+      {
+        "rank": 1,
+        "options": {
+          "backend": "cuda",
+          "region": false,
+          "region_budget": 30,
+          "split_reduction_inputs": true,
+          "split_pointwise_inputs": true,
+          "max_operand_rank": 1,
+          "fuse_initializers": true
+        },
+        "emitted": [
+          "thrust_plus_scalar_left_f32"
+        ],
+        "counts": {
+          "linalg": 1,
+          "loops": 0,
+          "copies": 1,
+          "launches": [
+            "thrust_plus_scalar_left_f32"
+          ]
+        },
+        "elapsed_ms": 4994.163,
+        "rejected_specifications": {
+          "numpy_bincount": "reference import has no validated semantic stage: PARTIAL",
+          "numpy_bincount_accumulate": "reference import has no validated semantic stage: NOT_RAISED",
+          "numpy_bincount_weights": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csc_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csc_matvec_beta0_i64": "reference import has no validated semantic stage: PARTIAL",
+          "scipy_csr_matvec": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "scipy_csr_matvec_beta0_i64": "reference import has no validated semantic stage: NOT_RAISED",
+          "netlib_dpotf2_u": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dpotf2_l": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyr2k_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_un": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln_beta1": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dsyrk_ln": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_llnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_runn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rutn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rlnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_rltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrmm_lunn_alpha0": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_unu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_utu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_lnu": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltn": "reference has documented deviations; strict matching requires an exact import",
+          "netlib_dtrsv_ltu": "reference has documented deviations; strict matching requires an exact import",
+          "openblas_daxpby": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_daxpby_beta0": "no header family for library 'OpenBLAS (CBLAS)'",
+          "openblas_dger": "reference has documented deviations; strict matching requires an exact import",
+          "opencv_morphology_dilate_u8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s8": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_u16": "validated API adapter unavailable for requested backend",
+          "opencv_morphology_dilate_s16": "validated API adapter unavailable for requested backend",
+          "sparskit_amux": "reference import has no validated semantic stage: NOT_RAISED"
+        },
+        "abi_ok": true
+      }
+    ],
+    "correctness": "not_run",
+    "performance": "not_run",
+    "stages": {
+      "cgeist": {
+        "ok": true,
+        "recovery": null
+      },
+      "raise": {
+        "ok": true,
+        "recovery": null
+      },
+      "debuf": {
+        "ok": true,
+        "recovery": null
+      }
+    },
+    "raised_counts": {
+      "linalg": 1,
+      "loops": 0,
+      "copies": 1,
+      "launches": []
+    },
+    "status": "recognized",
+    "seconds": 11.957
+  }
+]

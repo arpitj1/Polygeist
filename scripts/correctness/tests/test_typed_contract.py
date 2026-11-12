@@ -87,6 +87,25 @@ class TypedContracts(unittest.TestCase):
         with self.assertRaises(A.AbiError):
             self.contract(change=lambda c:c['bounds']['n'].update(min=-1))
 
+    def test_affine_extent_from_two_dimensions(self):
+        expression = {'terms': {'d0': 1, 'd1': 1}, 'offset': -1}
+        _, _, cfg = self.contract(rank=3, change=lambda c:
+            c['arrays']['input'].__setitem__(0, expression))
+        self.assertEqual(cfg['arrays']['input'][0], expression)
+        self.assertEqual(T.extent_expression(expression),
+                         '(((int64_t)d0 * (1)) + ((int64_t)d1 * (1)) + -1)')
+
+    def test_affine_extent_unknown_nonpositive_or_overflow_rejected(self):
+        for expression in [
+                {'terms': {'unknown': 1}, 'offset': 0},
+                {'terms': {'d0': 1, 'd1': -1}, 'offset': 0},
+                {'terms': {'d0': 2147483647}, 'offset': 0},
+                {'terms': {'d0': 1.5}, 'offset': 0},
+                {'terms': {}, 'offset': 3}]:
+            with self.subTest(expression=expression), self.assertRaises(A.AbiError):
+                self.contract(rank=3, change=lambda c:
+                    c['arrays']['input'].__setitem__(0, expression))
+
     def test_signed_control_is_not_an_extent(self):
         # The existing positive extent is n; a separate scalar seed may use
         # the whole exact int32 range without allowing negative array sizes.

@@ -1,0 +1,75 @@
+{
+  "launches": [
+    {
+      "spec": "thrust_plus_scalar_right_f32",
+      "call": "polygeist_v2_transform_thrust_plus_scalar_right_f32",
+      "cpu_entry": null,
+      "gpu_entry": "transform",
+      "operand_types": [
+        "i32",
+        "memref<?xf32>",
+        "f32",
+        "memref<?xf32>"
+      ]
+    },
+    {
+      "spec": "aten_log_f32",
+      "call": "polygeist_v2_cudnnBackendExecute_aten_log_f32",
+      "cpu_entry": null,
+      "gpu_entry": "cudnnBackendExecute",
+      "operand_types": [
+        "i32",
+        "memref<?xf32>",
+        "memref<?xf32>"
+      ]
+    },
+    {
+      "spec": "aten_div_f32",
+      "call": "polygeist_v2_cudnnBackendExecute_aten_div_f32",
+      "cpu_entry": null,
+      "gpu_entry": "cudnnBackendExecute",
+      "operand_types": [
+        "i32",
+        "memref<?xf32>",
+        "memref<?xf32>",
+        "memref<?xf32>"
+      ]
+    },
+    {
+      "spec": "thrust_minus_f32",
+      "call": "polygeist_v2_transform_thrust_minus_f32",
+      "cpu_entry": null,
+      "gpu_entry": "transform",
+      "operand_types": [
+        "i32",
+        "memref<?xf32>",
+        "memref<?xf32>",
+        "memref<?xf32>"
+      ]
+    },
+    {
+      "spec": "aten_mul_f32",
+      "call": "polygeist_v2_cudnnBackendExecute_aten_mul_f32",
+      "cpu_entry": null,
+      "gpu_entry": "cudnnBackendExecute",
+      "operand_types": [
+        "i32",
+        "memref<?xf32>",
+        "memref<?xf32>",
+        "memref<?xf32>"
+      ]
+    }
+  ],
+  "opt": [
+    {
+      "cmd": "--lower-polygeist-submap=affine-copy-writeback=true --canonicalize-polygeist",
+      "rc": 0,
+      "stderr": ""
+    },
+    {
+      "cmd": "--lower-affine --empty-tensor-to-alloc-tensor --one-shot-bufferize=allow-unknown-ops bufferize-function-boundaries --canonicalize --cse",
+      "rc": 0,
+      "stderr": ""
+    }
+  ]
+}

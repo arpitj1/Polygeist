@@ -1,0 +1,764 @@
+[
+  {
+    "kernel": "aten_batch_norm",
+    "binary_sha256": "7a258b56ef1f677bb047c2d80c5ca9923e86ea8bcd5c3761d537e7a5d4407f60",
+    "correctness": {
+      "rc": 0,
+      "passed": true,
+      "raised_passed": true,
+      "native_passed": true,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 4282784.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 4282784.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        }
+      ],
+      "vendor_calls": 8
+    },
+    "correctness_wall_seconds": 2.3720359802246094,
+    "timing": {
+      "rc": 0,
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 44.588165998
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.387526989
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.349318027
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 44.614503145
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 44.892138958
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.400487185
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.345445871
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 45.396564007
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 45.697945118
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.393959045
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 5,
+          "ms": 0.349126101
+        },
+        {
+          "path": "raised",
+          "sample": 5,
+          "ms": 45.977535009
+        },
+        {
+          "path": "raised",
+          "sample": 6,
+          "ms": 46.204802036
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 6,
+          "ms": 0.386278868
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 7,
+          "ms": 0.345766068
+        },
+        {
+          "path": "raised",
+          "sample": 7,
+          "ms": 46.273123026
+        },
+        {
+          "path": "raised",
+          "sample": 8,
+          "ms": 46.748972178
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 8,
+          "ms": 0.386950016
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 9,
+          "ms": 0.359847069
+        },
+        {
+          "path": "raised",
+          "sample": 9,
+          "ms": 46.946126938
+        },
+        {
+          "path": "raised",
+          "sample": 10,
+          "ms": 47.061552048
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 10,
+          "ms": 0.384679079
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 11,
+          "ms": 0.34758997
+        },
+        {
+          "path": "raised",
+          "sample": 11,
+          "ms": 47.488920927
+        },
+        {
+          "path": "raised",
+          "sample": 12,
+          "ms": 47.600154877
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 12,
+          "ms": 0.385895014
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 13,
+          "ms": 0.343781948
+        },
+        {
+          "path": "raised",
+          "sample": 13,
+          "ms": 47.874398947
+        },
+        {
+          "path": "raised",
+          "sample": 14,
+          "ms": 47.890527964
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 14,
+          "ms": 0.385318995
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 15,
+          "ms": 0.347366095
+        },
+        {
+          "path": "raised",
+          "sample": 15,
+          "ms": 48.253604889
+        },
+        {
+          "path": "raised",
+          "sample": 16,
+          "ms": 48.077442884
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 16,
+          "ms": 0.386727095
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 17,
+          "ms": 0.351654053
+        },
+        {
+          "path": "raised",
+          "sample": 17,
+          "ms": 48.450824976
+        },
+        {
+          "path": "raised",
+          "sample": 18,
+          "ms": 48.310182095
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 18,
+          "ms": 0.766350031
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 19,
+          "ms": 0.354758024
+        },
+        {
+          "path": "raised",
+          "sample": 19,
+          "ms": 48.674028158
+        }
+      ],
+      "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+      "minimum_ms": {
+        "raised": 44.588165998,
+        "native_aten_cuda": 0.343781948
+      },
+      "minimum_first_five_ms": {
+        "raised": 44.588165998,
+        "native_aten_cuda": 0.345445871
+      }
+    }
+  },
+  {
+    "kernel": "aten_batch_norm_transform_cpu",
+    "binary_sha256": "36d4ea75a352aa2d98912f9da55ee2ad26eacaa0da799d696554d841b95c4a1f",
+    "correctness": {
+      "rc": 0,
+      "passed": true,
+      "raised_passed": true,
+      "native_passed": true,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 8388608.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 8388608.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        }
+      ],
+      "vendor_calls": 8
+    },
+    "correctness_wall_seconds": 2.826186418533325,
+    "timing": {
+      "rc": 0,
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 94.570089102
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 0.600202084
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 0.587145805
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 94.609737873
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 95.394327164
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 0.601482153
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 0.588073969
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 94.609225988
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 94.499176025
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 0.604425907
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 5,
+          "ms": 0.586985826
+        },
+        {
+          "path": "raised",
+          "sample": 5,
+          "ms": 94.355430126
+        },
+        {
+          "path": "raised",
+          "sample": 6,
+          "ms": 94.549833059
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 6,
+          "ms": 0.60314703
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 7,
+          "ms": 0.575946093
+        },
+        {
+          "path": "raised",
+          "sample": 7,
+          "ms": 94.43802309
+        },
+        {
+          "path": "raised",
+          "sample": 8,
+          "ms": 94.277060032
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 8,
+          "ms": 0.603530884
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 9,
+          "ms": 0.580745935
+        },
+        {
+          "path": "raised",
+          "sample": 9,
+          "ms": 94.781517029
+        },
+        {
+          "path": "raised",
+          "sample": 10,
+          "ms": 94.690732002
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 10,
+          "ms": 0.601258039
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 11,
+          "ms": 0.572970152
+        },
+        {
+          "path": "raised",
+          "sample": 11,
+          "ms": 94.782253027
+        },
+        {
+          "path": "raised",
+          "sample": 12,
+          "ms": 95.11867404
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 12,
+          "ms": 0.600937843
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 13,
+          "ms": 0.574666023
+        },
+        {
+          "path": "raised",
+          "sample": 13,
+          "ms": 94.422214985
+        },
+        {
+          "path": "raised",
+          "sample": 14,
+          "ms": 94.801165104
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 14,
+          "ms": 0.599625826
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 15,
+          "ms": 0.578762054
+        },
+        {
+          "path": "raised",
+          "sample": 15,
+          "ms": 94.956655979
+        },
+        {
+          "path": "raised",
+          "sample": 16,
+          "ms": 94.738443851
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 16,
+          "ms": 0.600234032
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 17,
+          "ms": 0.578954935
+        },
+        {
+          "path": "raised",
+          "sample": 17,
+          "ms": 94.876239061
+        },
+        {
+          "path": "raised",
+          "sample": 18,
+          "ms": 95.133618832
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 18,
+          "ms": 0.602730989
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 19,
+          "ms": 0.574217796
+        },
+        {
+          "path": "raised",
+          "sample": 19,
+          "ms": 94.867758989
+        }
+      ],
+      "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+      "minimum_ms": {
+        "raised": 94.277060032,
+        "native_aten_cuda": 0.572970152
+      },
+      "minimum_first_five_ms": {
+        "raised": 94.499176025,
+        "native_aten_cuda": 0.587145805
+      }
+    }
+  },
+  {
+    "kernel": "aten_kron_impl_cpu",
+    "binary_sha256": "d973b6de8d5068b3ac8b8fbfd390acb2e622c4d94fb594c51fbaa054c5291133",
+    "correctness": {
+      "rc": 0,
+      "passed": true,
+      "raised_passed": true,
+      "native_passed": true,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 33554432.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 33554432.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        }
+      ],
+      "vendor_calls": 2
+    },
+    "correctness_wall_seconds": 3.860259532928467,
+    "timing": {
+      "rc": 0,
+      "passed": true,
+      "samples": [
+        {
+          "path": "raised",
+          "sample": 0,
+          "ms": 269.300897121
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 0,
+          "ms": 1.38181591
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 1,
+          "ms": 1.250036955
+        },
+        {
+          "path": "raised",
+          "sample": 1,
+          "ms": 269.524932861
+        },
+        {
+          "path": "raised",
+          "sample": 2,
+          "ms": 269.724840164
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 2,
+          "ms": 1.36293602
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 3,
+          "ms": 1.232501984
+        },
+        {
+          "path": "raised",
+          "sample": 3,
+          "ms": 269.848745823
+        },
+        {
+          "path": "raised",
+          "sample": 4,
+          "ms": 269.745352983
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 4,
+          "ms": 1.751263142
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 5,
+          "ms": 1.222548962
+        },
+        {
+          "path": "raised",
+          "sample": 5,
+          "ms": 269.665863037
+        },
+        {
+          "path": "raised",
+          "sample": 6,
+          "ms": 270.365906954
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 6,
+          "ms": 1.363255024
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 7,
+          "ms": 1.266517878
+        },
+        {
+          "path": "raised",
+          "sample": 7,
+          "ms": 270.113039017
+        },
+        {
+          "path": "raised",
+          "sample": 8,
+          "ms": 270.433717012
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 8,
+          "ms": 1.365655899
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 9,
+          "ms": 1.266517878
+        },
+        {
+          "path": "raised",
+          "sample": 9,
+          "ms": 270.522582054
+        },
+        {
+          "path": "raised",
+          "sample": 10,
+          "ms": 270.55941391
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 10,
+          "ms": 1.380792141
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 11,
+          "ms": 1.251221895
+        },
+        {
+          "path": "raised",
+          "sample": 11,
+          "ms": 271.196354151
+        },
+        {
+          "path": "raised",
+          "sample": 12,
+          "ms": 271.187585115
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 12,
+          "ms": 1.751358032
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 13,
+          "ms": 1.209076881
+        },
+        {
+          "path": "raised",
+          "sample": 13,
+          "ms": 271.511205912
+        },
+        {
+          "path": "raised",
+          "sample": 14,
+          "ms": 271.211458206
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 14,
+          "ms": 1.38239193
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 15,
+          "ms": 1.25058198
+        },
+        {
+          "path": "raised",
+          "sample": 15,
+          "ms": 271.693321943
+        },
+        {
+          "path": "raised",
+          "sample": 16,
+          "ms": 271.665896893
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 16,
+          "ms": 1.372886896
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 17,
+          "ms": 1.252629995
+        },
+        {
+          "path": "raised",
+          "sample": 17,
+          "ms": 271.624648094
+        },
+        {
+          "path": "raised",
+          "sample": 18,
+          "ms": 271.691338062
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 18,
+          "ms": 1.825887203
+        },
+        {
+          "path": "native_aten_cuda",
+          "sample": 19,
+          "ms": 1.247382164
+        },
+        {
+          "path": "raised",
+          "sample": 19,
+          "ms": 271.79761219
+        }
+      ],
+      "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+      "minimum_ms": {
+        "raised": 269.300897121,
+        "native_aten_cuda": 1.209076881
+      },
+      "minimum_first_five_ms": {
+        "raised": 269.300897121,
+        "native_aten_cuda": 1.232501984
+      }
+    }
+  }
+]

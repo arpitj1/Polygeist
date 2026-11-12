@@ -1,0 +1,282 @@
+{
+  "kernel": "aten_slow_conv3d_backward_weight_cpu",
+  "binary_sha256": "8c6317bd24bff94a97a0b762c398c9d02d022ec21a1936d1871b99e1539f878d",
+  "diagnostic_only": true,
+  "validated": false,
+  "correctness_evidence": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-additions/aten_slow_conv3d_backward_weight_cpu/gpu-result.json",
+  "correctness": {
+    "paper": {
+      "rc": 3,
+      "passed": false,
+      "raised_passed": false,
+      "native_passed": false,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 3456.0,
+          "bad": 10.0,
+          "nativebad": 0.0,
+          "nativerefbad": 10.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.000274658203
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 3456.0,
+          "bad": 10.0,
+          "nativebad": 0.0,
+          "nativerefbad": 10.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.000274658203
+        }
+      ],
+      "vendor_calls": 2
+    }
+  },
+  "timing": {
+    "rc": 0,
+    "passed": true,
+    "samples": [
+      {
+        "path": "raised",
+        "sample": 0,
+        "ms": 7.193758011
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 0,
+        "ms": 6.319150925
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 1,
+        "ms": 6.306830168
+      },
+      {
+        "path": "raised",
+        "sample": 1,
+        "ms": 7.206943035
+      },
+      {
+        "path": "raised",
+        "sample": 2,
+        "ms": 7.142845869
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 2,
+        "ms": 6.313615084
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 3,
+        "ms": 6.307727098
+      },
+      {
+        "path": "raised",
+        "sample": 3,
+        "ms": 7.206974983
+      },
+      {
+        "path": "raised",
+        "sample": 4,
+        "ms": 7.184189796
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 4,
+        "ms": 6.317327023
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 5,
+        "ms": 6.31367898
+      },
+      {
+        "path": "raised",
+        "sample": 5,
+        "ms": 7.178174019
+      },
+      {
+        "path": "raised",
+        "sample": 6,
+        "ms": 7.192605972
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 6,
+        "ms": 6.321295023
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 7,
+        "ms": 6.309806824
+      },
+      {
+        "path": "raised",
+        "sample": 7,
+        "ms": 7.186750174
+      },
+      {
+        "path": "raised",
+        "sample": 8,
+        "ms": 7.202782154
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 8,
+        "ms": 6.31979084
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 9,
+        "ms": 6.310926914
+      },
+      {
+        "path": "raised",
+        "sample": 9,
+        "ms": 7.168158054
+      },
+      {
+        "path": "raised",
+        "sample": 10,
+        "ms": 7.133373976
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 10,
+        "ms": 6.319182873
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 11,
+        "ms": 6.31223917
+      },
+      {
+        "path": "raised",
+        "sample": 11,
+        "ms": 7.183229923
+      },
+      {
+        "path": "raised",
+        "sample": 12,
+        "ms": 7.189119101
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 12,
+        "ms": 6.317007065
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 13,
+        "ms": 6.310799122
+      },
+      {
+        "path": "raised",
+        "sample": 13,
+        "ms": 7.165757895
+      },
+      {
+        "path": "raised",
+        "sample": 14,
+        "ms": 7.17020607
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 14,
+        "ms": 6.315855026
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 15,
+        "ms": 6.317167044
+      },
+      {
+        "path": "raised",
+        "sample": 15,
+        "ms": 7.21993494
+      },
+      {
+        "path": "raised",
+        "sample": 16,
+        "ms": 7.190526009
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 16,
+        "ms": 6.322159052
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 17,
+        "ms": 6.312271118
+      },
+      {
+        "path": "raised",
+        "sample": 17,
+        "ms": 7.205405951
+      },
+      {
+        "path": "raised",
+        "sample": 18,
+        "ms": 7.196030855
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 18,
+        "ms": 6.322094917
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 19,
+        "ms": 6.312463045
+      },
+      {
+        "path": "raised",
+        "sample": 19,
+        "ms": 7.202621937
+      }
+    ],
+    "statistic": "20 synchronized alternating samples, five warmups per path; resets outside timing",
+    "minimum_ms": {
+      "raised": 7.133373976,
+      "native_aten_cuda": 6.306830168
+    },
+    "minimum_first_five_ms": {
+      "raised": 7.142845869,
+      "native_aten_cuda": 6.306830168
+    }
+  },
+  "paper": {
+    "id": "106",
+    "kernel": "aten_slow_conv3d_backward_weight_cpu",
+    "native_us": "2781.824",
+    "raised_us": "8587.552246",
+    "raised_over_native": "3.087022128646528",
+    "speedup_percent": "-67.60632226376559",
+    "semantic_family": "convolution",
+    "raised_library": "cuDNN",
+    "raised_call": "cudnnConvolutionBackwardFilter3D_f32_memref",
+    "timing_source": "historical resident sweep",
+    "timing_protocol": "raised best of 20; retained native baseline"
+  },
+  "scope": "Strict correctness gate remains failed. Numerical/signed-zero discrepancy preserved; timing is diagnostic only.",
+  "comparison": {
+    "selected_statistic": "minimum_ms",
+    "raised_us": 7133.373976,
+    "native_us": 6306.830168,
+    "current_native_over_raised": 0.8841300328875398,
+    "paper_raised_us": 8587.552246,
+    "paper_native_us": 2781.824,
+    "paper_native_over_raised": 0.3239367773623441,
+    "raised_runtime_over_paper": 0.8306644049033481
+  }
+}

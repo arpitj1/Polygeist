@@ -1,0 +1,98 @@
+{
+  "kernel": "aten_nested_squeeze_cpu",
+  "original_binary_sha256": "7a6fc14171fd7aa0ee9103371dcd5e68f456c2a30ea316424b0df4bfa8ad2f09",
+  "timing_binary_sha256": "7a6fc14171fd7aa0ee9103371dcd5e68f456c2a30ea316424b0df4bfa8ad2f09",
+  "original_harness_sha256": "945bf6796e747697478c34e655d2ced017f0639312af4b4d266ce242f2338196",
+  "timing_harness_sha256": "ec03d01a7250de3fa8dc1ea7f7f55b97259a63787872c87c3bf8bfad95b00e82",
+  "frozen_object_sha256": {
+    "work/kernel.o": "1bacff724f4c63c8e8d710be7479baa7bf17c59ed4bb179b25a546a5fdbdf6af",
+    "work/wrapper.o": "947ce39e77ebcd7b3769a8292c0fad525c29a62e0737c38bd420bed74991ece1",
+    "work/harness.o": "47c718571094f667c926edb7d88721f0f117a09bda15a52c2c962a6f9a23f7b9",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "work/spec_runtime.o": "04d5607691885a4ec98422d321d213eee849ea9df04bc3dc80308a6709504c8e",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "objects/reference.o": "6ee1cf5752d130de47f30ce374a0e3b0ab27b49355bc5bfcb4115ac6791672cb",
+    "objects/native.o": "fafb19451117f416967332f420e113809a5110a7dbfd007c0447d050f93008f0"
+  },
+  "original_configuration": {
+    "dims": {
+      "B": 724,
+      "N": 5793
+    },
+    "args": [
+      [
+        "x",
+        "ptr",
+        "(B)*(1)*(N)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(B)*(N)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_nested_squeeze_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "x": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "original_proof_sha256": "341cfef8e760e454c9864400f3c0da5df1c7ba3c172ef848bc721de967ad526f",
+  "timing_samples": 20,
+  "adaptation": "Only the generated spec_runtime.o changes to the bit-tested generic copy runtime; all application, native reference and vendor objects remain frozen;20-sample harness retained.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_nested_squeeze_cpu/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "prior_original_binary_sha256": "053ca68a5359e87d943bd41cdcdcc28bc9e2c01054a0a70f035314a4ff1db7c4",
+  "prior_timing_binary_sha256": "7a6fc14171fd7aa0ee9103371dcd5e68f456c2a30ea316424b0df4bfa8ad2f09",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

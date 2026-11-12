@@ -18,7 +18,7 @@
 #include "llvm/Support/Debug.h"
 
 #include <limits>
-#include <set>
+#include "mlir/Analysis/Presburger/IntegerRelation.h"
 
 #define DEBUG_TYPE "lower-polygeist-submap"
 
@@ -162,57 +162,43 @@ static bool accumulateLinearDimCoefficients(
     AffineExpr e, SmallVectorImpl<int64_t> &coeffs, int64_t &constant,
     int64_t scale = 1);
 
-// Prove injectivity by enumerating a bounded static view domain.  This is an
-// exact check for the small fixed-shape tensor-product views produced by the
-// current MFEM corpus.  Large or dynamic domains deliberately return
-// std::nullopt: callers must not turn "unknown" into an ordinary scatter.
+// For a linear map A*x+c on a rectangular integer domain, a collision exists
+// exactly when A*delta=0 has a nonzero integer solution with
+// -(size_i-1) <= delta_i <= size_i-1. Every such difference can be realized by
+// two points in the domain. The difference domain is symmetric, so checking
+// delta_i >= 1 for each dimension covers every nonzero solution. This uses
+// MLIR's exact integer solver without enumerating the tensor's elements.
 static std::optional<bool>
 isInjectiveOnStaticDomain(AffineMap map, ArrayRef<int64_t> sizes) {
   if (map.getNumDims() != sizes.size())
     return std::nullopt;
 
-  constexpr int64_t kEnumerationLimit = 1'000'000;
-  int64_t domainSize = 1;
-  for (int64_t size : sizes) {
-    if (size <= 0 || domainSize > kEnumerationLimit / size)
+  const unsigned rank = sizes.size();
+  presburger::IntegerRelation differences(
+      presburger::PresburgerSpace::getSetSpace(rank));
+  for (auto [dim, size] : llvm::enumerate(sizes)) {
+    if (size <= 0)
       return std::nullopt;
-    domainSize *= size;
+    differences.addBound(presburger::BoundType::LB, dim, -(size - 1));
+    differences.addBound(presburger::BoundType::UB, dim, size - 1);
   }
 
-  SmallVector<SmallVector<int64_t>> resultCoefficients;
-  SmallVector<int64_t> resultConstants;
-  resultCoefficients.reserve(map.getNumResults());
-  resultConstants.reserve(map.getNumResults());
   for (AffineExpr result : map.getResults()) {
-    SmallVector<int64_t> coefficients(map.getNumDims(), 0);
+    SmallVector<int64_t> coefficients(rank, 0);
     int64_t constant = 0;
     if (!accumulateLinearDimCoefficients(result, coefficients, constant))
       return std::nullopt;
-    resultCoefficients.push_back(std::move(coefficients));
-    resultConstants.push_back(constant);
+    // The translation cancels when subtracting the two mapped points.
+    coefficients.push_back(0);
+    differences.addEquality(coefficients);
   }
 
-  std::set<SmallVector<int64_t>> image;
-  SmallVector<int64_t> coordinates(map.getNumDims(), 0);
-  for (int64_t linear = 0; linear < domainSize; ++linear) {
-    int64_t remaining = linear;
-    for (int64_t dim = static_cast<int64_t>(sizes.size()) - 1; dim >= 0;
-         --dim) {
-      coordinates[dim] = remaining % sizes[dim];
-      remaining /= sizes[dim];
-    }
-
-    SmallVector<int64_t> destination;
-    destination.reserve(map.getNumResults());
-    for (auto [coefficients, constant] :
-         llvm::zip(resultCoefficients, resultConstants)) {
-      int64_t value = constant;
-      for (auto [coefficient, coordinate] :
-           llvm::zip(coefficients, coordinates))
-        value += coefficient * coordinate;
-      destination.push_back(value);
-    }
-    if (!image.insert(std::move(destination)).second)
+  for (unsigned dim = 0; dim < rank; ++dim) {
+    if (sizes[dim] == 1)
+      continue;
+    auto collision = differences;
+    collision.addBound(presburger::BoundType::LB, dim, 1);
+    if (!collision.isIntegerEmpty())
       return false;
   }
   return true;

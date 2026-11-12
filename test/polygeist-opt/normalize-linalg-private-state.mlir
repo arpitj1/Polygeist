@@ -18,13 +18,14 @@ func.func @row_state(%x:tensor<2x3xf32>,%out:tensor<2x3xf32>,%base:tensor<2xf32>
  return %values#0:tensor<2x3xf32>
 }
 // CHECK-LABEL: func.func @row_state
-// CHECK: scf.for {{.*}} iter_args({{.*}}, %[[PRIVATE:.*]] = {{.*}})
+// CHECK: scf.for {{.*}} iter_args(%{{.*}} = %{{.*}}) -> (tensor<2x3xf32>)
+// CHECK: tensor.insert %arg3
 // CHECK: linalg.generic
 // CHECK: iterator_types = ["reduction"]
 // CHECK: tensor<f32>
 // CHECK: arith.mulf
 // CHECK: linalg.yield
-// CHECK: scf.yield {{.*}}, %[[PRIVATE]] :
+// CHECK: scf.yield {{.*}} : tensor<2x3xf32>
 // CHECK: return
 
 // A result exposed to the caller has no private-state normalization permission.

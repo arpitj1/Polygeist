@@ -1,0 +1,168 @@
+{
+  "kernel": "aten_addmm",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "M": 512,
+      "N": 512,
+      "K": 512
+    },
+    "args": [
+      [
+        "A",
+        "ptr",
+        "M*K",
+        false,
+        "normal"
+      ],
+      [
+        "B",
+        "ptr",
+        "K*N",
+        false,
+        "normal"
+      ],
+      [
+        "C",
+        "ptr",
+        "M*N",
+        true,
+        "normal"
+      ],
+      [
+        "beta",
+        "scalar",
+        "0.5",
+        false,
+        ""
+      ],
+      [
+        "alpha",
+        "scalar",
+        "0.75",
+        false,
+        ""
+      ]
+    ],
+    "coverage": "full FP64 GEMM with alpha and beta",
+    "rtol": 0.002,
+    "dtype": "double",
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "A": "((double)(i%101)-50.0)/37.0",
+      "B": "((double)(i%101)-50.0)/37.0",
+      "C": "((double)(i%101)-50.0)/37.0"
+    },
+    "paper_parameters": {
+      "beta": "0.5",
+      "alpha": "0.75"
+    },
+    "timing_samples": 20
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_addmm=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/aten_addmm.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_addmm",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_addmm/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/aten_addmm.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/gpu-final/aten_addmm/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "45a6a2495fce6df893eb6bb89d0764fc92e5f1c69b037c0ebf6a3ee776c733bf",
+  "proof_sha256": "4d42e077bb2d68fc4a34d6bec9f601ec2a2fb1a52384555e901d55021b9e2208",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP64 atol=1e-12 rtol=1e-10",
+  "original_source_sha256": "e1b995d81996ed42495e0ef68f00224ea5dcaacf1d82f483d2a29dcfbc790eb1",
+  "shape_record": {
+    "kernel": "aten_addmm",
+    "op": "addmm",
+    "cat": "addmm",
+    "dims": {
+      "M": 512,
+      "N": 512,
+      "K": 512
+    },
+    "n": 134217728,
+    "shape": "M=512_N=512_K=512",
+    "dtype": "f64",
+    "scalar_args": {
+      "beta": "0.5",
+      "alpha": "0.75"
+    },
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full FP64 GEMM with alpha and beta",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "ffd39b2736a01291"
+  },
+  "shape_specs_sha256": "ed0e3f0b13efc808c8aba6a12e288e2fb5c0a90fac35ef0be336d0f9911c01f6",
+  "binary_sha256": "d8b0bf371e6e45a31866afbd7badd964ab80527d8a43fda9f7dd10219c41b56a"
+}

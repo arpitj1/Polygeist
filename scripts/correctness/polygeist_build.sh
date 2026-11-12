@@ -823,7 +823,10 @@ fi
 
 # CUB is a template library; its fixed C ABI is compiled with the pinned public
 # CCCL headers. Generated wrappers call this ABI after proving the reference.
-NEEDS_CUB=$(grep -cE 'call @polygeist_v2_(Device(Reduce|Scan|SegmentedReduce)|ThreadReduce)_' "$WORK/abi_canon.mlir" || true)
+# Imported API names may include the member operation (for example,
+# DeviceScanInclusiveScanInit); all operations in these families need the
+# same CUB companion object.
+NEEDS_CUB=$(grep -cE 'call @polygeist_v2_(Device(Reduce|Scan|SegmentedReduce|Histogram)[[:alnum:]]*|ThreadReduce)_' "$WORK/abi_canon.mlir" || true)
 if [ "${POLYGEIST_ENABLE_CUB:-0}" != "0" ] || [ "$NEEDS_CUB" -gt 0 ]; then
   if [ "$TARGET" != jetson ] || [ "$ABI_BACKEND" != cuda ]; then
     echo "ERROR: CUB runtime requires the Jetson CUDA backend" >&2

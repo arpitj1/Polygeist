@@ -1,0 +1,19 @@
+{
+  "launches": [
+    {
+      "spec": "openblas_dgemm_nn_k1_b0_alpha1",
+      "call": "polygeist_v2_cublasDgemm",
+      "cpu_entry": "dgemm_",
+      "gpu_entry": "cublasDgemm_v2",
+      "operand_types": [
+        "i32",
+        "i32",
+        "memref<?xf64>",
+        "memref<?xf64>",
+        "i32",
+        "memref<?x24xf64>"
+      ]
+    }
+  ],
+  "opt": []
+}

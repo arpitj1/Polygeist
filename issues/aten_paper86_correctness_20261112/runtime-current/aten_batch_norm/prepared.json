@@ -1,0 +1,132 @@
+{
+  "kernel": "aten_batch_norm",
+  "original_binary_sha256": "7a258b56ef1f677bb047c2d80c5ca9923e86ea8bcd5c3761d537e7a5d4407f60",
+  "timing_binary_sha256": "7a258b56ef1f677bb047c2d80c5ca9923e86ea8bcd5c3761d537e7a5d4407f60",
+  "original_harness_sha256": "c5a9c5a1bb413cd6284c96ce29ff1bd915193973334e92dc86fd6cd22cf6e33e",
+  "timing_harness_sha256": "7c67ee84ea9ca79ae5420f2a66c1ba6b4c7336ee254037e67364020db3b3c1ab",
+  "frozen_object_sha256": {
+    "work/kernel.o": "6ee27a98b9b3c2bbb02263d4d9c1f3ef79d3637c752e3136fcc4787c3edea189",
+    "work/wrapper.o": "d7cd2e4d7d0b08af474407e0d4c0d9a2c43102a9c74884ea555fe23d2c77a9c0",
+    "work/harness.o": "47cd23629d3315cbe560a7d424bbab5cffc4f02500e506372e44d0551c0bc7e9",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "work/spec_runtime.o": "04d5607691885a4ec98422d321d213eee849ea9df04bc3dc80308a6709504c8e",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "objects/reference.o": "3f087f180349b4f945db4cc9f456bfe2e28f4334c86be4d76a0ce3d1ca544d19",
+    "objects/native.o": "bd8b2b40738924dadc6249ca09363059954bb1065e9c2431b223e74e9296382f"
+  },
+  "original_configuration": {
+    "dims": {
+      "B": 11,
+      "C": 46,
+      "H": 92,
+      "W": 92
+    },
+    "args": [
+      [
+        "input",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        false,
+        "normal"
+      ],
+      [
+        "weight",
+        "ptr",
+        "(C)",
+        false,
+        "normal"
+      ],
+      [
+        "mean",
+        "ptr",
+        "(C)",
+        false,
+        "normal"
+      ],
+      [
+        "inv_std",
+        "ptr",
+        "(C)",
+        false,
+        "positive"
+      ],
+      [
+        "bias",
+        "ptr",
+        "(C)",
+        false,
+        "normal"
+      ],
+      [
+        "output",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_batch_norm",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "input": "((float)(i%101)-50.0f)/37.0f",
+      "weight": "((float)(i%101)-50.0f)/37.0f",
+      "mean": "((float)(i%101)-50.0f)/37.0f",
+      "inv_std": "0.25f + (float)(i%101)/101.0f",
+      "bias": "((float)(i%101)-50.0f)/37.0f",
+      "output": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 20
+  },
+  "original_proof_sha256": "a4a0139bc3530be1854a184668d15ca1746e2e4301d536a6169e9dabaf00c015",
+  "timing_samples": 20,
+  "adaptation": "Only the generated spec_runtime.o changes to the bit-tested generic copy runtime; all application, native reference and vendor objects remain frozen;20-sample harness retained.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_batch_norm/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "prior_original_binary_sha256": "cb09ca5711146b04d684e5669b58381838f8c7fb24a35f47608a20522d6b41ea",
+  "prior_timing_binary_sha256": "92b3269d249360bd4f22471d2cba09e9ca3fee300fccebcb717d9f2ea899a1e0",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

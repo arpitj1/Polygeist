@@ -1,0 +1,10 @@
+{
+  "cases": 37,
+  "recognized": 14,
+  "abi_ok": 11,
+  "no_proven_match": 23,
+  "raising_recoveries": 0,
+  "error": 0,
+  "GPU_correctness": "not established by this diagnostic",
+  "performance": "not measured"
+}

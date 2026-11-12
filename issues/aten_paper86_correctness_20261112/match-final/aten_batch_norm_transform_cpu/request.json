@@ -1,0 +1,40 @@
+{
+  "kernel": "aten_batch_norm_transform_cpu",
+  "paper_family": "normalization",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_batch_norm_transform_cpu/aten_batch_norm_transform_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_batch_norm_transform_cpu.c",
+  "original_source_sha256": "4cb56aff0b1e53f5a33960064a29820496b53543c8a9ea0ff05ef4dbed41bbf6",
+  "shape_record": {
+    "kernel": "aten_batch_norm_transform_cpu",
+    "op": "batch_norm",
+    "cat": "batchnorm",
+    "dims": {
+      "N": 32,
+      "C": 64,
+      "H": 64,
+      "W": 64
+    },
+    "n": 8388608,
+    "shape": "N=32_C=64_H=64_W=64",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full inference batch normalization through cuDNN",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "eb541b0999f1f551"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnBatchNormalizationForwardInference"
+}

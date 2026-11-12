@@ -10,6 +10,7 @@
 #include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Dialect/SCF/Transforms/Passes.h"
 #include "mlir/Dialect/Tensor/IR/Tensor.h"
+#include "mlir/Dialect/Utils/StaticValueUtils.h"
 #include "mlir/IR/AffineExpr.h"
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/IRMapping.h"
@@ -3135,6 +3136,65 @@ struct LinalgDebufferizationRecursive : public OpRewritePattern<func::FuncOp> {
 };
 
 namespace {
+// Uniform fills do not depend on the logical dimension order. Recover a
+// complete rectangular prefix when memset-like lowering flattened a dense
+// n-D buffer, so the initializer and its consumers share one tracked root.
+// Partial trailing rows, nonzero offsets, and strided sources stay explicit.
+struct PrepareBufferFill : OpRewritePattern<linalg::FillOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(linalg::FillOp fill,
+                                PatternRewriter &rewriter) const override {
+    Value output = fill.getOutputs().front();
+    auto type = dyn_cast<MemRefType>(output.getType());
+    if (!type)
+      return failure();
+    if (auto cast = output.getDefiningOp<memref::ReinterpretCastOp>()) {
+      auto sourceType = cast.getSource().getType().cast<MemRefType>();
+      if (type.getRank() == 1 && type.hasStaticShape() &&
+          sourceType.getRank() > 1 && sourceType.getLayout().isIdentity() &&
+          getConstantIntValue(cast.getMixedOffsets().front()) == 0 &&
+          getConstantIntValue(cast.getMixedStrides().front()) == 1) {
+        int64_t elements = type.getDimSize(0);
+        int64_t trailing = 1;
+        for (int64_t dim : sourceType.getShape().drop_front()) {
+          if (dim <= 0 || trailing > INT64_MAX / dim)
+            return failure();
+          trailing *= dim;
+        }
+        if (elements <= 0 || elements % trailing ||
+            (!sourceType.isDynamicDim(0) &&
+             elements / trailing > sourceType.getDimSize(0)))
+          return failure();
+        SmallVector<int64_t> shape(sourceType.getShape());
+        shape[0] = elements / trailing;
+        SmallVector<Value> bounds;
+        for (int64_t dim : shape)
+          bounds.push_back(rewriter.create<arith::ConstantIndexOp>(fill.getLoc(), dim));
+        auto viewType = MemRefType::get(shape, sourceType.getElementType(),
+                                       MemRefLayoutAttrInterface{},
+                                       sourceType.getMemorySpace());
+        output = rewriter.create<polygeist::SubmapOp>(
+            fill.getLoc(), viewType, cast.getSource(), bounds,
+            rewriter.getMultiDimIdentityMap(shape.size()));
+        type = viewType;
+      }
+    }
+    // Use the same generic representation understood by both debufferizers.
+    auto map = rewriter.getMultiDimIdentityMap(type.getRank());
+    SmallVector<utils::IteratorType> iterators(type.getRank(),
+                                             utils::IteratorType::parallel);
+    Value scalar = fill.getInputs().front();
+    rewriter.create<linalg::GenericOp>(
+        fill.getLoc(), TypeRange{}, ValueRange{}, ValueRange{output},
+        ArrayRef<AffineMap>{map}, iterators,
+        [&](OpBuilder &builder, Location loc, ValueRange) {
+          builder.create<linalg::YieldOp>(loc, scalar);
+        });
+    rewriter.eraseOp(fill);
+    return success();
+  }
+};
+
 struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
   void runOnOperation() override;
 };
@@ -3143,6 +3203,7 @@ struct LinalgDebufferize : public LinalgDebufferizeBase<LinalgDebufferize> {
 void LinalgDebufferize::runOnOperation() {
   auto module = getOperation()->getParentOfType<ModuleOp>();
   RewritePatternSet patterns(&getContext());
+  patterns.insert<PrepareBufferFill>(&getContext());
   if (useMultiRoot) {
     patterns.insert<LinalgDebufferizationMultiRoot>(&getContext());
   } else if (useRecursive) {

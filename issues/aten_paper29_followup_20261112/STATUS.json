@@ -1,0 +1,92 @@
+{
+  "baseline_cohort": 86,
+  "baseline_strict_gpu_correct": 85,
+  "baseline_known_failure": "aten_sparse_norm_cpu: sequential FP32 C vs parallel accumulation",
+  "baseline_runtime_report": "../aten_paper86_correctness_20261112/runtime-current/runtime-comparison.csv",
+  "paper_shape_passing_comparisons": 84,
+  "within_five_percent_or_faster": 36,
+  "runtime_repairs": [
+    "dense-footprint mixed host/device descriptor copies",
+    "CUB scan API companion linkage"
+  ],
+  "new_complete_matches": [
+    "aten_outer",
+    "aten_conv_transpose3d_grad_weight_cpu",
+    "aten_slow_conv3d_backward_weight_cpu",
+    "aten_conv_transpose3d_cpu",
+    "aten_slow_conv3d_backward_input_cpu",
+    "aten_conv_transpose2d",
+    "aten_conv_tbc_backward_cpu",
+    "aten_convert_csr_to_coo_cpu",
+    "aten_sparse_matmul_csr_to_coo_cpu",
+    "aten_sparse_addmv_csr_cpu",
+    "aten_sparse_csr_addmm_cpu",
+    "aten_sparse_matmul_cpu",
+    "aten_sparse_addmm_cpu",
+    "aten_hspmm_cpu",
+    "aten_sspaddmm_cpu",
+    "aten_embedding_bag_counts_cpu"
+  ],
+  "new_gpu_gate_status": "13 new cases strict pass; four earlier comparison failures remain. Current total: 102 complete matches, 98 strict passes.",
+  "in_progress": [
+    "13 remaining matches",
+    "4 earlier strict correctness comparison failures",
+    "Remaining performance gaps and historical baseline differences tracked in runtime-validation-ledger.json"
+  ],
+  "validation": [
+    "4 CPU descriptor-copy tests pass",
+    "19726336 bytes of GPU descriptor-copy checks pass",
+    "298 Python tests pass after clipped-reduction and direct-binding changes",
+    "22 previous PolyBench/ATen/MFEM-PCG matches retained",
+    "2D and TBC backward-data paper-size references pass ASan and UBSan",
+    "4 backward-data cases pass strict GPU correctness and 20 timing pairs each",
+    "299 Python tests pass after 2D/TBC backward-data and whole-row product scan imports",
+    "Whole-row CUB product scan: 26740 exact backend values; all4194856 paper outputs pass C/native checks in host/resident modes; 5 timing pairs",
+    "Both CSR-to-COO fixtures pass 4194304 exact integer outputs in host/resident modes and 5 timing pairs; original cuSPARSE-disabled build evidence preserved",
+    "3 CSR arithmetic fixtures pass paper-size ASan/UBSan and cross-build with one cuSPARSE call each",
+    "302 Python regression tests pass after ordered-overwrite support",
+    "Renamed sparse matvec tests pass across dimensions and reject wrong indices and FP64-to-FP32 mismatches",
+    "3 COO arithmetic fixtures have complete source-derived cuSPARSE matches and paper-size ASan/UBSan passes",
+    "CUB histogram: 7740 exact unit values, guards/input preservation, 65536 paper output bins in host/resident modes, five timing pairs"
+  ],
+  "complete_matches": 102,
+  "strict_gpu_correct": 98,
+  "remaining_matches": 13,
+  "current_exact_paper_shape_comparisons": 97,
+  "current_within_five_percent_or_faster": 44,
+  "current_slower_5_to_20_percent": 16,
+  "current_slower_over_20_percent": 37,
+  "new_backward_data_gpu": "All 4 strict pass at paper shapes; 20 timing pairs and 1 cuDNN backward-data call per application invocation.",
+  "sum_repair": {
+    "old_ms": 1596.109,
+    "current_ms": 3.186,
+    "paper_ms": 3.079,
+    "calls_before": 65536,
+    "calls_after": 1
+  },
+  "new_timing_protocol": "5 warmups, then 5 alternating synchronized raised/native timing pairs (user instruction 2026-11-12); completed 20-pair results preserved.",
+  "transpose_cache_diagnostic": {
+    "report": "transpose-cache-diagnostic/diagnosis.json",
+    "transpose3d_cache_off_ms": 1.701,
+    "transpose3d_cache_on_ms": 1.604,
+    "transpose3d_paper_ms": 1.589,
+    "transpose2d_cache_off_ms": 0.551,
+    "transpose2d_cache_on_ms": 0.268,
+    "transpose2d_paper_ms": 0.232,
+    "strict_correctness": "all four runs pass",
+    "historical_cache_state": "not established",
+    "primary_campaign_counts": "unchanged by diagnostic"
+  },
+  "cumprod_repair": {
+    "old_ms": 43.107961,
+    "current_ms": 0.298852921,
+    "paper_ms": 4.850496,
+    "current_native_ms": 0.379911184,
+    "calls_before": 1448,
+    "calls_after": 1,
+    "strict_gpu_correct": true,
+    "new_pairs": 5,
+    "paper_statistic": "minimum of twenty; new run minimum of five",
+    "report": "gpu-row-scan-final/aten_cumprod_cpu/paper-comparison.json"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "kernel": "aten_sparse_matmul_cpu",
+  "shape_record": {
+    "kernel": "aten_sparse_matmul_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "C": 2047,
+      "N": 16380,
+      "R": 2047
+    },
+    "n": 68635623420,
+    "shape": "C=2047_N=16380_R=2047",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "2d2accc210a10238"
+  },
+  "command": [
+    "gcc",
+    "-O1",
+    "-g",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-fsanitize=address,undefined",
+    "-fno-sanitize-recover=all",
+    "-fno-omit-frame-pointer",
+    "-Daten_sparse_matmul_cpu=native_reference",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-arithmetic/aten_sparse_matmul_cpu/aten_sparse_matmul_cpu.c",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-arithmetic/aten_sparse_matmul_cpu/check.c",
+    "-lm",
+    "-o",
+    "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/host-csr-arithmetic/aten_sparse_matmul_cpu/check"
+  ],
+  "source_sha256": "6de75e5a6f4d8dd451d853342946872b89d1eb899c4e5b40dc7ace17873ad2c9",
+  "input_scope": "recorded paper recipe",
+  "compile_rc": 0,
+  "run_rc": 0,
+  "passed": true
+}

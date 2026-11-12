@@ -1,0 +1,166 @@
+{
+  "kernel": "aten_sspaddmm_cpu",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "R": 2365,
+      "K": 2365,
+      "C": 1774,
+      "N": 18917
+    },
+    "args": [
+      [
+        "row",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "col",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "val",
+        "ptr",
+        "(N)",
+        false,
+        "normal"
+      ],
+      [
+        "b",
+        "ptr",
+        "(K)*(C)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(R)*(C)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_sspaddmm_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "row": "0",
+      "col": "0",
+      "val": "((float)(i%101)-50.0f)/37.0f",
+      "b": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_sspaddmm_cpu=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/aten_sspaddmm_cpu.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_sspaddmm_cpu",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/coo-arithmetic/aten_sspaddmm_cpu/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/aten_sspaddmm_cpu.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-coo-arithmetic/aten_sspaddmm_cpu/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2",
+      "-lcusparse"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "28600d4f2fb4a22dcf2e6b40c5b0a92197b0b7e407421fd63005bc9756999c88",
+  "proof_sha256": "8878a8d362af6c1c97e582e135446fd03503346d3b68a00775f40e218eecdfda",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+  "original_source_sha256": "a2a0a49db5f629aeb2b19fe51275af1f59502d9c4b7f0a006cd16dae1cb23d64",
+  "shape_record": {
+    "kernel": "aten_sspaddmm_cpu",
+    "op": "sspaddmm",
+    "cat": "native_fixture",
+    "dims": {
+      "C": 1774,
+      "K": 2365,
+      "N": 18917,
+      "R": 2365
+    },
+    "n": 187701684214550,
+    "shape": "C=1774_K=2365_N=18917_R=2365",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "68d23c3c19429b5c"
+  },
+  "shape_specs_sha256": "532e322c1584ad535461c696e9fe8ed06d9ea640a000eaef2f23258898785004",
+  "binary_sha256": "978dc39f73f8328de39c3f93b2fa7d1b0818b730615144a7c5d36a63010f6d1d"
+}

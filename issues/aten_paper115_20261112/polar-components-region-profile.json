@@ -1,0 +1,30 @@
+{
+  "windows": [
+    {
+      "window": [
+        8,
+        18
+      ],
+      "matched": "thrust_polar_components_f32",
+      "kind": "single",
+      "also": [],
+      "bindings_tried": 8,
+      "pieces": 2,
+      "egraph_nodes": [
+        40,
+        40
+      ],
+      "egraph_classes": [
+        31,
+        31
+      ],
+      "egg_ms": [
+        159.66,
+        189.82
+      ],
+      "normalise_ms": 0.97,
+      "match_ms": 363.2
+    }
+  ],
+  "rejections": []
+}

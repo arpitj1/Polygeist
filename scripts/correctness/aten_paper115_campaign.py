@@ -150,6 +150,10 @@ def main():
     p.add_argument('--numeric-model', choices=['strict', 'relaxed'], default='strict')
     p.add_argument('--timeout', type=int, default=600)
     p.add_argument('--cases', nargs='+')
+    p.add_argument('--case-options', type=Path,
+                   help='Cohort JSON with previously validated per-case matching options')
+    p.add_argument('--include-validated', action='store_true', help='Also allow earlier validated cases from the checklist')
+    p.add_argument('--shape-specs', type=Path, help='Pinned benchmark dimensions for fresh source copies')
     p.add_argument('--summarize', action='store_true')
     args = p.parse_args()
     if args.worker:
@@ -163,7 +167,7 @@ def main():
         p.error('use a fresh output directory to preserve previous evidence')
     old = {r['kernel']: r for r in csv.DictReader((ROOT / 'issues/aten_c_kernels/cuda_library_audit.csv').open())}
     rows = [r for r in csv.DictReader(args.checklist.open())
-            if r['status'] == 'not_in_current_validated_aggregate']
+            if args.include_validated or r['status'] == 'not_in_current_validated_aggregate']
     if args.cases:
         wanted = {x if x.startswith('aten_') else 'aten_'+x for x in args.cases}
         rows = [r for r in rows if r['kernel'] in wanted]
@@ -172,16 +176,39 @@ def main():
     inputs = [ROOT/'build/bin/cgeist', ROOT/'build/bin/polygeist-opt',
               ROOT/'generic_solver/lib_v3/import_manifest.json',
               ROOT/'generic_solver/kernel_library_v3.mlir', args.checklist]
+    shapes = None
+    if args.shape_specs:
+        from aten_paper_shapes import load_shapes, materialize
+        shapes = load_shapes(args.shape_specs)
+        inputs.append(args.shape_specs)
+        if any(r['kernel'] not in shapes for r in rows):
+            p.error('Shape manifest lacks a selected kernel')
+    case_options = {}
+    if args.case_options:
+        case_options = {r['kernel']: r.get('match_options') or {}
+                        for r in json.loads(args.case_options.read_text())}
+        inputs.append(args.case_options)
+        if any(r['kernel'] not in case_options for r in rows):
+            p.error('Case options lack a selected kernel')
     save(args.output / 'provenance.json', dict(arguments=vars(args),
         git=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         uptime=subprocess.check_output(['uptime'], text=True).strip(),
         hashes={str(x): sha(x) for x in inputs}, selected=[r['kernel'] for r in rows]))
     def one(row):
         dest = args.output / row['kernel']; dest.mkdir()
+        if shapes is not None:
+            original = ROOT / row['source']
+            source = dest / (row['kernel']+'.c')
+            materialize(original, source, shapes[row['kernel']])
+            row.update(original_source=row['source'], original_source_sha256=sha(original),
+                       source=str(source), shape_record=shapes[row['kernel']])
         row.update(ranks=args.ranks, region=args.region, region_budget=args.region_budget,
                    split_reduction_inputs=args.split_reduction_inputs,
                    split_pointwise_inputs=args.split_pointwise_inputs,
                    numeric_model=args.numeric_model, legacy_match=old.get(row['kernel'], {}).get('current_match'))
+        row.update({k: v for k, v in case_options.get(row['kernel'], {}).items()
+                    if k in ('ranks', 'region', 'region_budget', 'numeric_model',
+                             'split_reduction_inputs', 'split_pointwise_inputs')})
         request = dest / 'request.json'; save(request, row)
         with (dest / 'worker.log').open('w') as log:
             try:

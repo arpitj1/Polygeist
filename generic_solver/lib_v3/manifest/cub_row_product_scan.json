@@ -1,0 +1,95 @@
+{
+  "routine": "cub_row_product_scan",
+  "source": "Pinned public CUB seeded ThreadScanInclusive implementation",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_scan.cuh",
+      "sha256": "8a191310fc31d74b567ac900f861da25eae26cf84e51822a69c55e2219a35fc8"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_scan.cuh",
+      "sha256": "8be7c2bfef2a876abe2c7ec7cb00ca9852dbc8a854e8cda633a6f1531b963156"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__functional/operations.h",
+      "sha256": "8b201a02ba305dc0c882cda06680f5dbd77a0b5d65e5c9c7e23e745e78c0da98"
+    }
+  ],
+  "adaptation": "Repeat the pinned seeded ThreadScanInclusive reference independently over contiguous rows. DeviceScan::InclusiveScanByKey receives row-number keys and a lazy value iterator multiplying only each row's first input by its seed. Parallel reassociation is checked separately.",
+  "specs": [
+    {
+      "name": "cub_row_product_scan_f32",
+      "target": {
+        "library": "CUB",
+        "call": "DeviceScanInclusiveScanByKey",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_row_product_scan_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "seed",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "rows",
+              "cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "rows",
+        "cols",
+        "seed",
+        "input",
+        "output"
+      ],
+      "assumptions": [
+        "Positive int32 row and column extents; contiguous disjoint FP32 arrays",
+        "The runtime splits at row boundaries when the flattened item count exceeds the device API int32 limit",
+        "Parallel backend reassociation requires declared numerical tolerance; no strict bitwise backend equivalence claim"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 7,
+          "seed": 0.5
+        },
+        "arrays": {
+          "input": [
+            3,
+            7
+          ],
+          "output": [
+            3,
+            7
+          ]
+        }
+      }
+    }
+  ]
+}

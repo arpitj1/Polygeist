@@ -22,7 +22,7 @@ from typing import Optional
 from .affine import (Aff, Cons, atom_info, atoms_in, bounds_of, deps, eq, feasible, ge, implies,
                      implies_all, is_atom, le, lt, project, register_atoms, simplify, subtract)
 from .egg import RmArr, RmIx, Term, check_equal, enc_ix, encode, rm_param
-from .equations import (Equation, F, FBin, FConst, FIndex, FParam, FRead, FSel, FSum, FUn, Reject, System,
+from .equations import (Equation, F, FBin, FConst, FIndex, FLast, FParam, FRead, FSel, FSum, FUn, Reject, System,
                         ZERO, build_system, canonicalize, fold_integer_casts, fsubst, fwalk, _freshen, _simplify_sel)
 from .mlir_parse import parse_module
 from .literal_policy import candidate_float_literals, literal_ok
@@ -324,10 +324,16 @@ def _used_params(sysm: System) -> set[str]:
             if isinstance(x, FRead):
                 for a in x.idx:
                     out |= {v for v in deps(a.vars()) if v.startswith("p")}
-            if isinstance(x, FSum):
+            if isinstance(x, (FSum, FLast)):
                 out |= {v for v in deps(x.lo.vars() | x.hi.vars()) if v.startswith("p")}
+                if isinstance(x, FLast):
+                    for c in x.guard:
+                        out |= {v for v in deps(c.vars()) if v.startswith('p')}
             if isinstance(x, FIndex):
                 out |= {v for v in deps(x.value.vars()) if v.startswith("p")}
+            if isinstance(x, FSel) and x.cond[0] == "aff":
+                for c in x.cond[1]:
+                    out |= {v for v in deps(c.vars()) if v.startswith("p")}
     return out
 
 
@@ -402,7 +408,13 @@ def _solve_param(sa: Aff, aa: Aff, s_params: list) -> Optional[tuple[str, Aff]]:
 
 
 def _sum_bounds(f: F) -> list[tuple[Aff, Aff]]:
-    return [(x.lo, x.hi) for x in fwalk(f) if isinstance(x, FSum)]
+    return [(x.lo, x.hi) for x in fwalk(f) if isinstance(x, (FSum, FLast))]
+
+
+def _affine_guards(f: F) -> list[Cons]:
+    return [c for x in fwalk(f)
+            for c in (x.guard if isinstance(x, FLast) else
+                      x.cond[1] if isinstance(x, FSel) and x.cond[0] == 'aff' else ())]
 
 
 def _derived_param_values(app: System, spec: System, out_map: dict, s_outs: list, operm,
@@ -431,6 +443,14 @@ def _derived_param_values(app: System, spec: System, out_map: dict, s_outs: list
                 ab = _sum_bounds(ea.formula)
                 pairs += [(x.subst(vren), y) for (sl, sh) in sb for (al, ah) in ab
                           for x, y in ((sl, al), (sh, ah))]
+                # Clipped reductions retain some extents in their masks,
+                # rather than in the enclosing range. These predicates can
+                # propose bindings too; the full domain and value proof below
+                # still decides whether the candidate is valid.
+                pairs += [(cs.aff.subst(vren), ca.aff)
+                          for cs in _affine_guards(es.formula)
+                          for ca in _affine_guards(ea.formula)
+                          if cs.kind == ca.kind]
         for sa, aa in pairs:
             r = _solve_param(sa, aa, s_params)
             if r and r[1] not in plain and r[1] not in out.setdefault(r[0], []):
@@ -455,7 +475,8 @@ def _covers(xs: list[list[Cons]], ys: list[list[Cons]]) -> bool:
 
 
 def enumerate_bindings(app: System, spec: System, cache: Optional[dict] = None, lit_ok=None,
-                       literals: bool = True, alias_guard: bool = True):
+                       literals: bool = True, alias_guard: bool = True,
+                       zero_cost_only: bool = False):
     """Generic search over operand / layout / parameter bindings.
 
     Pruning (affects completeness only, never soundness -- every yielded
@@ -479,13 +500,18 @@ def enumerate_bindings(app: System, spec: System, cache: Optional[dict] = None, 
     if len(s_fp) < len(a_fp) or (not lits and len(s_fp) != len(a_fp)):
         return
     fassigns = list(fparam_assignments(s_fp, a_fp, lits, lit_ok))
+    if zero_cost_only:
+        fassigns = [fa for fa in fassigns
+                    if not any(isinstance(v, float) for v in fa.values())]
     if not fassigns:
         return
     for out_assign in itertools.permutations(a_outs):
         if any(_arr_info(spec, s_) != _arr_info(app, a_) for s_, a_ in zip(s_outs, out_assign)):
             continue
         out_map = dict(zip(s_outs, out_assign))
-        out_perms = [list(itertools.permutations(range(spec.arrays[r].rank))) for r in s_outs]
+        out_perms = [( [tuple(range(spec.arrays[r].rank))] if zero_cost_only else
+                       list(itertools.permutations(range(spec.arrays[r].rank))))
+                     for r in s_outs]
         for operm in itertools.product(*out_perms):
             # non-injective: two spec extents may be the same application
             # extent (e.g. m and n of a square matrix); an extent may also be
@@ -515,12 +541,13 @@ def enumerate_bindings(app: System, spec: System, cache: Optional[dict] = None, 
                     if role in out_map:
                         perm = operm[s_outs.index(role)]
                         ins = [out_map[role]]
-                        if (role, "in") in spec.reads:
+                        if not zero_cost_only and (role, "in") in spec.reads:
                             ins += [a for a in a_read_in if a != out_map[role]
                                     and _arr_info(app, a) == info and a not in app.outputs]
                         role_choices.append([(role, i, out_map[role], perm) for i in ins])
                     else:
-                        perms = list(itertools.permutations(range(rank)))
+                        perms = ([tuple(range(rank))] if zero_cost_only else
+                                 list(itertools.permutations(range(rank))))
                         cands = [a for a in a_read_in if _arr_info(app, a) == info]
                         role_choices.append([(role, i, None, p) for i in cands for p in perms])
                 for combo in itertools.product(*role_choices):
@@ -628,6 +655,9 @@ def _fold_zero(f: F) -> F:
         if body == ZERO:
             return ZERO
         return FSum(f.var, f.lo, f.hi, body)
+    if isinstance(f, FLast):
+        return FLast(f.var, f.lo, f.hi, f.guard,
+                     _fold_zero(f.body), _fold_zero(f.default))
     return f
 
 
@@ -1443,8 +1473,27 @@ def _lit_checker(spec: Spec, rename=None):
     return ok
 
 
-def _single_search(app: System, specs: list[Spec], tried: list):
+def _single_search(app: System, specs: list[Spec], tried: list, can_emit=None):
     found = []
+    if can_emit is not None:
+        # First try bindings attaining the cost model's lower bound: no
+        # layout permutations, input copies, or literal specializations. A
+        # proved, emittable zero-cost candidate cannot be improved by the
+        # exhaustive search. In particular a high-rank direct match must not
+        # be lost while enumerating factorially many more expensive layouts.
+        for spec in specs:
+            if spec.fixed_ints:
+                continue
+            t1 = time.perf_counter()
+            cache: dict = {}
+            for b in enumerate_bindings(app, spec.system, cache,
+                                        lit_ok=_lit_checker(spec), zero_cost_only=True):
+                r = compare_systems(app, spec.system, b, cache=cache)
+                tried.append((spec.name, b, r))
+                if r.ok and can_emit(spec, b):
+                    return [{"cost": (0, 0, 0), "key": spec.name, "kind": "single",
+                             "spec": spec, "b": b, "r": r,
+                             "ms": (time.perf_counter() - t1) * 1000}]
     for spec in specs:
         t1 = time.perf_counter()
         cache: dict = {}
@@ -1656,7 +1705,7 @@ def _bounding_box(pieces: list[list[Cons]], rank: int) -> Optional[list[Cons]]:
 
 def _residual_ok(f: F, arr: str, ev: list[Aff], outputs) -> bool:
     for x in fwalk(f):
-        if isinstance(x, (FSum, FSel)) or type(x).__name__ in ("FAcc", "FAccAt"):
+        if isinstance(x, (FSum, FLast, FSel)) or type(x).__name__ in ("FAcc", "FAccAt"):
             return False
         if isinstance(x, FRead):
             if x.arr == arr:
@@ -1932,7 +1981,18 @@ def match_function(text: str, prog: Program, specs: list[Spec], log=None, stats=
             continue
         tried: list = []
         wstats: dict = {"window": (lo, end)}
-        found = _single_search(app, specs, tried)
+        def can_emit(spec, binding):
+            if _recognition_only(spec):
+                return False
+            probe = _Emit(prog, f"probe{lo}_{end}")
+            probe.allowed_specs = {candidate.name for candidate in specs}
+            try:
+                probe.prepare(plan, _plan_written(app.outputs, [binding]))
+                _emit_one(probe, spec, binding)
+                return True
+            except Reject:
+                return False
+        found = _single_search(app, specs, tried, can_emit)
         if not found and composites_on:
             found = _composite_search(app, specs, tried, comp_budget, wstats)
         if not found and os.environ.get("REGION_MATCH_NO_PARTIAL", "") in ("", "0"):

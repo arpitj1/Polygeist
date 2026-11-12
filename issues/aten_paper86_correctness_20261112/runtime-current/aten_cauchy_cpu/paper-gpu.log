@@ -1,0 +1,26 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+CHECK kind=0 parameters=0 resident=0 count=4194304 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=2.38418579e-07
+CHECK kind=0 parameters=0 resident=1 count=4194304 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=2.38418579e-07
+PASS correctness
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=minus_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_minus_scalar_right_f32 entry=polygeist_thrust_minus_scalar_right_f32 lib_ms=2.100608 h2d_ms=4.516224 d2h_ms=0.005536
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=multiplies_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_multiplies_scalar_left_f32 entry=polygeist_thrust_multiplies_scalar_left_f32 lib_ms=0.240512 h2d_ms=0.009760 d2h_ms=0.003456
+POLYGEIST_V2_CALL backend=cuda call=cutensorPermute_aten_tan_f32 entry=cutensorPermute lib_ms=273.317383 h2d_ms=0.005760 d2h_ms=0.007200
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=multiplies_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_multiplies_scalar_left_f32 entry=polygeist_thrust_multiplies_scalar_left_f32 lib_ms=0.237760 h2d_ms=0.010912 d2h_ms=0.004096
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=plus_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_plus_scalar_left_f32 entry=polygeist_thrust_plus_scalar_left_f32 lib_ms=0.640448 h2d_ms=1.948608 d2h_ms=2.021120
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=minus_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_minus_scalar_right_f32 entry=polygeist_thrust_minus_scalar_right_f32 lib_ms=0.665024 h2d_ms=0.012736 d2h_ms=0.003552
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=multiplies_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_multiplies_scalar_left_f32 entry=polygeist_thrust_multiplies_scalar_left_f32 lib_ms=0.232096 h2d_ms=0.005792 d2h_ms=0.003616
+POLYGEIST_V2_CALL backend=cuda call=cutensorPermute_aten_tan_f32 entry=cutensorPermute lib_ms=0.335104 h2d_ms=0.005120 d2h_ms=0.003872
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=multiplies_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_multiplies_scalar_left_f32 entry=polygeist_thrust_multiplies_scalar_left_f32 lib_ms=0.218048 h2d_ms=0.004000 d2h_ms=0.003296
+POLYGEIST_VENDOR_CALL library=Thrust entry=transform functor=plus_f32 n=4194304
+POLYGEIST_V2_CALL backend=cuda call=transform_thrust_plus_scalar_left_f32 entry=polygeist_thrust_plus_scalar_left_f32 lib_ms=0.220704 h2d_ms=0.006208 d2h_ms=0.003520
+POLYGEIST_V2_STATS backend=cuda call=transform_thrust_minus_scalar_right_f32 entry=polygeist_thrust_minus_scalar_right_f32 count=2 lib_ms=2.765632 h2d_ms=4.528960 d2h_ms=0.009088 h2d_bytes=16777216 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=transform_thrust_multiplies_scalar_left_f32 entry=polygeist_thrust_multiplies_scalar_left_f32 count=4 lib_ms=0.928416 h2d_ms=0.030464 d2h_ms=0.014464 h2d_bytes=0 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=cutensorPermute_aten_tan_f32 entry=cutensorPermute count=2 lib_ms=273.652487 h2d_ms=0.010880 d2h_ms=0.011072 h2d_bytes=0 d2h_bytes=0
+POLYGEIST_V2_STATS backend=cuda call=transform_thrust_plus_scalar_left_f32 entry=polygeist_thrust_plus_scalar_left_f32 count=2 lib_ms=0.861152 h2d_ms=1.954816 d2h_ms=2.024640 h2d_bytes=16777216 d2h_bytes=16777216

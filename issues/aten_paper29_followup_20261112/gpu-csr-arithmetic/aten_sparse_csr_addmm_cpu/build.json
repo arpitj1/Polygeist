@@ -1,0 +1,166 @@
+{
+  "kernel": "aten_sparse_csr_addmm_cpu",
+  "rc": 0,
+  "configuration": {
+    "dims": {
+      "R": 65536,
+      "K": 65536,
+      "C": 64,
+      "N": 4194304
+    },
+    "args": [
+      [
+        "ptr",
+        "iptr",
+        "(R+1)",
+        false,
+        "index"
+      ],
+      [
+        "col",
+        "iptr",
+        "(N)",
+        false,
+        "index"
+      ],
+      [
+        "val",
+        "ptr",
+        "(N)",
+        false,
+        "normal"
+      ],
+      [
+        "b",
+        "ptr",
+        "(K)*(C)",
+        false,
+        "normal"
+      ],
+      [
+        "out",
+        "ptr",
+        "(R)*(C)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_sparse_csr_addmm_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "ptr": "(int)(i*(size_t)N/R)",
+      "col": "(int)(((i*17)+(i/(N/R))*13)%K)",
+      "val": "((float)(i%101)-50.0f)/37.0f",
+      "b": "((float)(i%101)-50.0f)/37.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {},
+    "timing_samples": 5
+  },
+  "commands": [
+    [
+      "aarch64-linux-gnu-gcc",
+      "-O2",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-Daten_sparse_csr_addmm_cpu=native_reference",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/aten_sparse_csr_addmm_cpu.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/reference.o"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "-std=c++17",
+      "-DHAVE_SVE256_CPU_DEFINITION",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include",
+      "-I/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include",
+      "-c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/native.cpp",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/native.o"
+    ],
+    [
+      "/home/arjaiswal/Polygeist/scripts/correctness/polygeist_build.sh",
+      "--target=jetson",
+      "--function=aten_sparse_csr_addmm_cpu",
+      "--semantic-mlir=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/csr-arithmetic/aten_sparse_csr_addmm_cpu/rank0/matched.mlir",
+      "--harness=/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/harness.c",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/raised-program",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/aten_sparse_csr_addmm_cpu.c",
+      "-I/usr/local/cuda-12.6/targets/sbsa-linux/include"
+    ],
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/gpu-csr-arithmetic/aten_sparse_csr_addmm_cpu/raised-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2",
+      "-lcusparse"
+    ]
+  ],
+  "rank": 0,
+  "compiler_cache": "/usr/lib/ccache",
+  "persistent_workspace": true,
+  "source_sha256": "c241b4bb2582e1a9f6521bd415279095f2d4916a50d23786d9075f1290e07ee3",
+  "proof_sha256": "43a4d2e8b1372ecebcf774eb0321a2fd0ccb0369faf3db93ad2a8386afc0a15c",
+  "baseline": "real ATen CUDA calls for the extracted fixture; preallocated outputs",
+  "numerical_policy": "NaN classes, infinity signs, zero signs; FP32 atol=1e-5 rtol=1e-4",
+  "original_source_sha256": "ea055ab554e2f96213ecb279fc65b3c5551b51cebdba358318c5734653c3e21d",
+  "shape_record": {
+    "kernel": "aten_sparse_csr_addmm_cpu",
+    "op": "addmm",
+    "cat": "sparse_csr_mm",
+    "dims": {
+      "R": 65536,
+      "K": 65536,
+      "C": 64,
+      "N": 4194304
+    },
+    "n": 1152921504606846976,
+    "shape": "R=65536_K=65536_C=64_N=4194304",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full structured-loop CSR SpMM via cuSPARSE",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "ceb60fb7c03704d8"
+  },
+  "shape_specs_sha256": "532e322c1584ad535461c696e9fe8ed06d9ea640a000eaef2f23258898785004",
+  "binary_sha256": "974b5e3a3883bfbd8dcca327fcc826437ddd46e58aa7d93b437498db01e1d719"
+}

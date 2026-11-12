@@ -1,0 +1,40 @@
+{
+  "kernel": "aten_avg_pool2d_backward_cpu",
+  "paper_family": "pooling",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_avg_pool2d_backward_cpu/aten_avg_pool2d_backward_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_avg_pool2d_backward_cpu.c",
+  "original_source_sha256": "25c2c9bec5f5bf3d7b0e0b05d7424777f28624fc88bc4b900818618a6728a247",
+  "shape_record": {
+    "kernel": "aten_avg_pool2d_backward_cpu",
+    "op": "avg_pool2d",
+    "cat": "avgpool2d_backward",
+    "dims": {
+      "B": 1,
+      "C": 2,
+      "I0": 6,
+      "I1": 7
+    },
+    "n": 84,
+    "shape": "B=1_C=2_I0=6_I1=7",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "full fixed average pool 2d backward",
+    "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "871518045875f207"
+  },
+  "ranks": [
+    2
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnAveragePool_f32_flat2"
+}

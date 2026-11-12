@@ -1,0 +1,2 @@
+kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
+aten_exponential_cpu,random_distribution,recognized,1,0,,1,"aten_neg_f32,thrust_log1p_f32,aten_neg_f32",1,0,True,cudnnPointwiseGraph_f32,not_run,not_run

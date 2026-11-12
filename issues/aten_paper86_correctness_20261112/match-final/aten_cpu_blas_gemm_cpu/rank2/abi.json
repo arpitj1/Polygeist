@@ -1,0 +1,33 @@
+{
+  "launches": [
+    {
+      "spec": "openblas_sgemm_nn_b0_alpha1",
+      "call": "polygeist_v2_cublasSgemm",
+      "cpu_entry": "sgemm_",
+      "gpu_entry": "cublasSgemm_v2",
+      "operand_types": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "memref<?x?xf32>",
+        "i32",
+        "memref<?x?xf32>",
+        "i32",
+        "memref<?x?xf32>"
+      ]
+    }
+  ],
+  "opt": [
+    {
+      "cmd": "--lower-polygeist-submap=affine-copy-writeback=true --canonicalize-polygeist",
+      "rc": 0,
+      "stderr": ""
+    },
+    {
+      "cmd": "--lower-affine --empty-tensor-to-alloc-tensor --one-shot-bufferize=allow-unknown-ops bufferize-function-boundaries --canonicalize --cse",
+      "rc": 0,
+      "stderr": ""
+    }
+  ]
+}

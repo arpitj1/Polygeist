@@ -27,7 +27,9 @@ timings are not inputs to these drivers.
   LoopLibrarian builds for GEMM, SYR2K, 2mm, and 3mm.
 
 ATen, PVA, compilation-cost measurements, and the 257-specification inventory
-are outside this package's eight evaluation commands.
+are outside this package's eight evaluation commands. The ongoing ATen campaign
+has a separate [checkpoint and evidence index](aten_checkpoint.md); it is not
+yet a completed 115-case reproduction.
 
 ## Machines and dependencies
 

@@ -1,0 +1,9 @@
+{
+  "scope": "direct real cuTENSOR descriptor probe, not compiler coverage",
+  "objects": {
+    "issues/aten_paper115_20261112/permute-probe/check.c": "72e612eeac0e6cc7773ea8b6b8b3bfdb0825a50fe750f4685f9f52af4c911125",
+    "issues/aten_paper115_20261112/permute-probe/check": "6910b06d44261ed4349a9f184e2dfd33b245eb52e9dce3e40f97d09d05ecfe44",
+    "issues/aten_paper115_20261112/gpu-cauchy-linked/aten_cauchy_cpu/work/rt.o": "222d27b1bda92a779dd0802f79fb6abe47bba317856c4485de395eabff6392e4"
+  },
+  "result": "1944 outputs exactly match, overlapping positive input strides accepted"
+}

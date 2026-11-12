@@ -1,0 +1,6 @@
+kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
+aten_adaptive_avg_pool2d,adaptive_pooling,recognized,2,0,,2,"thrust_multiplies_scalar_left_f32,cub_segmented_sum_f32",0,0,True,cudnnAvgPoolWindow_f32,not_run,not_run
+aten_adaptive_avg_pool3d,adaptive_pooling,recognized,2,0,,2,"thrust_divide_scalar_right_f32,cub_segmented_sum_f32",0,0,True,cudnnAveragePool_f32_r5,not_run,not_run
+aten_avg_pool2d,pooling,recognized,2,0,,2,"thrust_multiplies_scalar_left_f32,cub_segmented_sum_f32",0,0,True,cudnnAvgPoolWindow_f32,not_run,not_run
+aten_avg_pool3d,pooling,recognized,2,0,,2,"thrust_divide_scalar_right_f32,cub_segmented_sum_f32",0,0,True,cudnnAveragePool_f32_r5,not_run,not_run
+aten_compressed_block_convert_cpu,tensor_permutation,recognized,1,0,,1,openblas_scopy_f32,0,0,True,cutensorPermute_f32_r4_tensor,not_run,not_run

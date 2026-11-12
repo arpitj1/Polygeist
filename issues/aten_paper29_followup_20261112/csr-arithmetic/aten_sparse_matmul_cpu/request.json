@@ -1,0 +1,39 @@
+{
+  "kernel": "aten_sparse_matmul_cpu",
+  "paper_family": "sparse_indexed_elementwise",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/csr-arithmetic/aten_sparse_matmul_cpu/aten_sparse_matmul_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_sparse_matmul_cpu.c",
+  "original_source_sha256": "984fc13d2b4d2368bbe4f4896e47af5da648051ffbf8de5fc2ff470122681a4c",
+  "shape_record": {
+    "kernel": "aten_sparse_matmul_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "C": 2047,
+      "N": 16380,
+      "R": 2047
+    },
+    "n": 68635623420,
+    "shape": "C=2047_N=16380_R=2047",
+    "dtype": "f32",
+    "scalar_args": {},
+    "shape_selection": "AUTO_SCALE_LARGEST_ARRAY_APPROX_4194304",
+    "shape_selection_note": "uniformly scale extracted dimensions; preserve ratios; minimum dimension 2",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "2d2accc210a10238"
+  },
+  "ranks": [
+    0
+  ],
+  "region": true,
+  "region_budget": 45,
+  "split_reduction_inputs": false,
+  "split_pointwise_inputs": false,
+  "numeric_model": "relaxed",
+  "legacy_match": "cusparseSpMM_CSR_f32_memref"
+}

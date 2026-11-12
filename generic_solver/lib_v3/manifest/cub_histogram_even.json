@@ -1,0 +1,102 @@
+{
+  "routine": "cub_histogram_even",
+  "source": "Pinned public CUB BlockHistogramAtomic and BlockHistogram initialization; DeviceHistogramEven unit-width integer bins",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/block/block_histogram.cuh",
+      "sha256": "ba51f4e60e3d0d9c8fdfebef66d11f56d2a4140ffbd5139cfc883c10488f3ed1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/block/specializations/block_histogram_atomic.cuh",
+      "sha256": "cdf508fa0107875f234bb658d84c68ce1769c1dfd0e91bab45c7369aa5ac033e"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_histogram.cuh",
+      "sha256": "45f10c324dc10921e6d6173d8cb0e5baee50f912931ac275cb8a6739f4f7a2b1"
+    }
+  ],
+  "adaptation": "Sequential C instantiation of BlockHistogram initialization and atomic Composite, replacing atomicAdd with integer +=1; runtime extents replace Bins and ITEMS_PER_THREAD. Map direct integer bins to DeviceHistogramEven with lower=0, upper=bins, levels=bins+1. Valid input indices and count<=INT_MAX ensure no overflow and order-independent exact counts.",
+  "specs": [
+    {
+      "name": "cub_histogram_even_i32",
+      "args": [
+        "count",
+        "samples",
+        "bins",
+        "output"
+      ],
+      "target": {
+        "library": "CUB",
+        "call": "DeviceHistogramEven",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_histogram_even_i32",
+          "arguments": [
+            "count",
+            "samples",
+            "bins",
+            "output"
+          ],
+          "arrays": {
+            "samples": [
+              "count"
+            ],
+            "output": [
+              "bins"
+            ]
+          },
+          "bounds": {
+            "count": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "bins": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "assumptions": [
+        "All input indices are in [0,bins); disjoint int32 input/output",
+        "count<=INT_MAX ensures all int32 counts are representable; bins+1 is int32-representable"
+      ],
+      "deviations": [
+        "Sequential C instantiation of BlockHistogram initialization and atomic Composite, replacing atomicAdd with integer +=1; runtime extents replace Bins and ITEMS_PER_THREAD. Map direct integer bins to DeviceHistogramEven with lower=0, upper=bins, levels=bins+1. Valid input indices and count<=INT_MAX ensure no overflow and order-independent exact counts."
+      ],
+      "validation": {
+        "scalars": {
+          "count": 9,
+          "bins": 6
+        },
+        "arrays": {
+          "samples": [
+            9
+          ],
+          "output": [
+            6
+          ]
+        },
+        "array_values": {
+          "samples": [
+            0,
+            0,
+            5,
+            3,
+            3,
+            3,
+            0,
+            5,
+            2
+          ]
+        }
+      }
+    }
+  ]
+}

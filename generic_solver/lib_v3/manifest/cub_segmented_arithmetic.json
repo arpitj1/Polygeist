@@ -19,7 +19,7 @@
       "sha256": "001d84cdb0741b419c46370e25ea6304fb44aeb1101a4dcfbbf675da1fc59c34"
     }
   ],
-  "adaptation": "Equal-length contiguous segments, seeded sequential reference, public plus/bit_xor operators specialized to float32/int32. The floating-point parallel runtime association requires separate numerical validation.",
+  "adaptation": "Equal-length contiguous segments, seeded sequential reference, public plus/bit_xor operators specialized to float32/float64/int32. The floating-point parallel runtime association requires separate numerical validation.",
   "specs": [
     {
       "name": "cub_segmented_sum_f32",
@@ -79,6 +79,81 @@
         "floating parallel association must satisfy application numerical validation; scalar bitwise equivalence is not implied"
       ],
       "deviations": []
+    },
+    {
+      "name": "cub_segmented_sum_f64",
+      "defines": {
+        "SCALAR": "double",
+        "REDUCE_XOR": 0
+      },
+      "target": {
+        "library": "CUB",
+        "call": "DeviceSegmentedReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_segmented_sum_f64",
+          "arguments": [
+            "rows",
+            "cols",
+            "seed",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "rows"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "rows",
+        "cols",
+        "seed",
+        "input",
+        "output"
+      ],
+      "assumptions": [
+        "positive rows and cols <= INT_MAX; contiguous disjoint input and output",
+        "floating parallel association must satisfy application numerical validation; scalar bitwise equivalence is not implied"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 7,
+          "seed": 0.25
+        },
+        "arrays": {
+          "input": [
+            3,
+            7
+          ],
+          "output": [
+            3
+          ]
+        }
+      }
     },
     {
       "name": "cub_segmented_xor_i32",

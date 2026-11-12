@@ -1,0 +1,170 @@
+{
+  "routine": "cudnn_conv_backward_data3d",
+  "source": "NVIDIA public cuDNN sample dataGrad_cpu_ref<float>, with explicit dimensional and traversal adaptations",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "adaptation": "Derived from public cuDNN dataGrad_cpu_ref<float> in conv_sample.cpp. Select cross-correlation, unit stride/dilation, no padding, alpha=1, beta=0, and one batch. Extend the two spatial axes to three. Invert the gather relation p = h-r, q = w-s into h = p+r, w = q+s; iterate the valid gradient/filter Cartesian product and scatter-add. This is an explicit manual reference adaptation. It changes the floating reduction order and requires the relaxed numeric model; it is not a byte-for-byte extraction of the sample. No input-dependent bounds checks remain because the output extent is gradient extent + filter extent - 1.",
+  "specs": [
+    {
+      "name": "cudnn_conv3d_backward_data_valid_f32",
+      "args": [
+        "IC",
+        "OC",
+        "D",
+        "H",
+        "W",
+        "KD",
+        "KH",
+        "KW",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionBackwardData",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cudnn_conv_transpose3d_f32",
+          "arguments": [
+            "IC",
+            "OC",
+            "D",
+            "H",
+            "W",
+            "KD",
+            "KH",
+            "KW",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "IC",
+              "D",
+              "H",
+              "W"
+            ],
+            "filter": [
+              "IC",
+              "OC",
+              "KD",
+              "KH",
+              "KW"
+            ],
+            "output": [
+              "OC",
+              {
+                "terms": {
+                  "D": 1,
+                  "KD": 1
+                },
+                "offset": -1
+              },
+              {
+                "terms": {
+                  "H": 1,
+                  "KH": 1
+                },
+                "offset": -1
+              },
+              {
+                "terms": {
+                  "W": 1,
+                  "KW": 1
+                },
+                "offset": -1
+              }
+            ]
+          },
+          "bounds": {
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "D": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "H": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "W": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "KD": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "KH": {
+              "min": 1,
+              "max": 1073741824
+            },
+            "KW": {
+              "min": 1,
+              "max": 1073741824
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions and dense disjoint FP32 arrays; int32-representable tensor strides",
+        "Relaxed floating-point model: gather-to-scatter traversal changes summation order",
+        "Output spatial extents are D+KD-1, H+KH-1, W+KW-1; scalar bounds prevent int32 addition overflow"
+      ],
+      "deviations": [
+        "Select the cross-correlation branch and extend the public two-dimensional sample to three dimensions",
+        "Invert the gather index relation into scatter accumulation over valid gradient/filter positions; this changes floating-point reduction order"
+      ],
+      "validation": {
+        "scalars": {
+          "IC": 2,
+          "OC": 3,
+          "D": 3,
+          "H": 4,
+          "W": 5,
+          "KD": 2,
+          "KH": 3,
+          "KW": 4
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "filter": [
+            2,
+            3,
+            2,
+            3,
+            4
+          ],
+          "output": [
+            3,
+            4,
+            6,
+            8
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+[
+  {
+    "kernel": "aten_outer",
+    "shape_record": {
+      "kernel": "aten_outer",
+      "op": "outer",
+      "cat": "outer",
+      "dims": {
+        "M": 2048,
+        "N": 2048
+      },
+      "n": 4194304,
+      "shape": "M=2048_N=2048",
+      "dtype": "f64",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full FP64 outer product",
+      "comparison_scope": "WHOLE_OR_EXPLICITLY_ADJUDICATED",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "090827df12946d14"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_outer=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_outer/aten_outer.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_outer/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_outer/check"
+    ],
+    "source_sha256": "2af5e1d8abe0dcd9d7bdfba16d4bca0ef754f18fd11204a885b26c856196e482",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  },
+  {
+    "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+    "shape_record": {
+      "kernel": "aten_conv_transpose3d_grad_weight_cpu",
+      "op": "conv_transpose3d_grad_weight",
+      "cat": "native_fixture",
+      "dims": {
+        "C": 8,
+        "O": 16,
+        "D": 32,
+        "H": 32,
+        "W": 32,
+        "K": 3
+      },
+      "n": 12582912,
+      "shape": "C=8_O=16_D=32_H=32_W=32_K=3",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full transposed-conv3d filter gradient through cuDNN backward-filter",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "1b77db7d015c2eee"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_conv_transpose3d_grad_weight_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_conv_transpose3d_grad_weight_cpu/aten_conv_transpose3d_grad_weight_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_conv_transpose3d_grad_weight_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_conv_transpose3d_grad_weight_cpu/check"
+    ],
+    "source_sha256": "41828c5ab440af2ca2eae21cff223768ebd84554cde168de65530e8c9a28507c",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  },
+  {
+    "kernel": "aten_slow_conv3d_backward_weight_cpu",
+    "shape_record": {
+      "kernel": "aten_slow_conv3d_backward_weight_cpu",
+      "op": "slow_conv3d_backward_weight",
+      "cat": "native_fixture",
+      "dims": {
+        "C": 8,
+        "O": 16,
+        "D": 32,
+        "H": 32,
+        "W": 32,
+        "K": 3
+      },
+      "n": 12582912,
+      "shape": "C=8_O=16_D=32_H=32_W=32_K=3",
+      "dtype": "f32",
+      "scalar_args": {},
+      "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+      "shape_selection_note": "full slow-conv3d filter gradient through cuDNN backward-filter",
+      "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+      "recipe_version": "2026-09-08-v3",
+      "recipe_fingerprint": "db2258fecb148026"
+    },
+    "command": [
+      "gcc",
+      "-O1",
+      "-g",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-fno-omit-frame-pointer",
+      "-Daten_slow_conv3d_backward_weight_cpu=native_reference",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_slow_conv3d_backward_weight_cpu/aten_slow_conv3d_backward_weight_cpu.c",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_slow_conv3d_backward_weight_cpu/check.c",
+      "-lm",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper29_followup_20261112/sanitized/aten_slow_conv3d_backward_weight_cpu/check"
+    ],
+    "source_sha256": "b8e80c65cae961d07db29baea970e2b0485d08618b7cfa4109074a0fbcd9dbdb",
+    "input_scope": "recorded paper recipe",
+    "compile_rc": 0,
+    "run_rc": 0,
+    "passed": true
+  }
+]

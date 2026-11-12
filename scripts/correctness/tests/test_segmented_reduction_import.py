@@ -13,6 +13,30 @@ import recipe
 
 
 class SegmentedReductionImport(unittest.TestCase):
+    def test_fp64_rows_bind_as_one_call_without_precision_conversion(self):
+        for element, expected in [('double', True), ('float', False)]:
+            with self.subTest(element=element), tempfile.TemporaryDirectory() as tmp:
+                d = Path(tmp)
+                c = d/'reference.c'
+                c.write_text(f'''void unrelated({element} input[3][7], {element} output[3]) {{
+  for (int r=0; r<3; ++r) output[r]=0.25;
+  for (int r=0; r<3; ++r)
+    for (int c=0; c<7; ++c) output[r]+=input[r][c];
+}}
+''')
+                raised = recipe.raise_c(recipe.PRODUCTION, str(c), 'unrelated',
+                                        str(d/'raised'), [], 60)
+                self.assertTrue(all(raised[k].ok for k in ['cgeist','raise','debuf']))
+                with patch.dict(os.environ, POLYGEIST_NUMERIC_MODEL='strict'):
+                    output, matches, _ = M.run(Path(raised['paths']['debuf']).read_text(),
+                        ROOT/'generic_solver/kernel_library_v3.mlir', region=False,
+                        allowed_specs={'cub_segmented_sum_f64'})
+                self.assertEqual(bool(matches), expected)
+                if expected:
+                    self.assertEqual([r['spec'] for r in matches], ['cub_segmented_sum_f64'])
+                    self.assertNotIn('linalg.generic', output)
+                    self.assertNotIn('scf.for', output)
+
     def test_renamed_shapes_and_nonboolean_seed(self):
         for rows, cols, operator, spec in [
             (7, 11, '&&', 'cub_segmented_reduce_and_i32'),

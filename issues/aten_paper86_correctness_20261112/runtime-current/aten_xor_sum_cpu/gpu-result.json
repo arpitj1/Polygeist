@@ -1,0 +1,270 @@
+{
+  "kernel": "aten_xor_sum_cpu",
+  "run_id": "20261112T173643Z",
+  "binary_sha256": "476e32255733ed1ff6205cf373aa840e739150a31a71dabc3dd4e87b80ea378f",
+  "scope": "ATen CUDA bitwise_xor tree with preallocated intermediates; installed libtorch lacks hash_tensor; not the newer xor_sum kernel",
+  "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+  "cudnn_plan_cache": false,
+  "correctness": {
+    "paper": {
+      "rc": 0,
+      "passed": true,
+      "raised_passed": true,
+      "native_passed": true,
+      "raised_matches_native": true,
+      "checks": [
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 0.0,
+          "count": 1448.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        },
+        {
+          "kind": 0.0,
+          "parameters": 0.0,
+          "resident": 1.0,
+          "count": 1448.0,
+          "bad": 0.0,
+          "nativebad": 0.0,
+          "nativerefbad": 0.0,
+          "guardbad": 0.0,
+          "inputbad": 0.0,
+          "maxabs": 0.0
+        }
+      ],
+      "vendor_calls": 2
+    }
+  },
+  "correctness_scope": [
+    "paper"
+  ],
+  "fully_validated": true,
+  "raised_validated": true,
+  "raised_matches_native": true,
+  "native_matches_reference": true,
+  "timing": {
+    "passed": true,
+    "samples": [
+      {
+        "path": "raised",
+        "sample": 0,
+        "ms": 0.147266865
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 0,
+        "ms": 0.68862009
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 1,
+        "ms": 0.637578964
+      },
+      {
+        "path": "raised",
+        "sample": 1,
+        "ms": 0.151106834
+      },
+      {
+        "path": "raised",
+        "sample": 2,
+        "ms": 0.155522823
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 2,
+        "ms": 0.66337204
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 3,
+        "ms": 0.668908119
+      },
+      {
+        "path": "raised",
+        "sample": 3,
+        "ms": 0.152162075
+      },
+      {
+        "path": "raised",
+        "sample": 4,
+        "ms": 0.146851063
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 4,
+        "ms": 0.679852009
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 5,
+        "ms": 0.660138845
+      },
+      {
+        "path": "raised",
+        "sample": 5,
+        "ms": 0.152674913
+      },
+      {
+        "path": "raised",
+        "sample": 6,
+        "ms": 0.153185844
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 6,
+        "ms": 0.691661119
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 7,
+        "ms": 0.601706028
+      },
+      {
+        "path": "raised",
+        "sample": 7,
+        "ms": 0.159907103
+      },
+      {
+        "path": "raised",
+        "sample": 8,
+        "ms": 0.15216279
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 8,
+        "ms": 0.673516035
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 9,
+        "ms": 0.626443148
+      },
+      {
+        "path": "raised",
+        "sample": 9,
+        "ms": 0.151811123
+      },
+      {
+        "path": "raised",
+        "sample": 10,
+        "ms": 0.148257971
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 10,
+        "ms": 0.674923897
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 11,
+        "ms": 0.641386986
+      },
+      {
+        "path": "raised",
+        "sample": 11,
+        "ms": 0.159394979
+      },
+      {
+        "path": "raised",
+        "sample": 12,
+        "ms": 0.14704299
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 12,
+        "ms": 0.681163788
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 13,
+        "ms": 0.632811069
+      },
+      {
+        "path": "raised",
+        "sample": 13,
+        "ms": 0.151683092
+      },
+      {
+        "path": "raised",
+        "sample": 14,
+        "ms": 0.149026871
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 14,
+        "ms": 0.682028055
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 15,
+        "ms": 0.666091919
+      },
+      {
+        "path": "raised",
+        "sample": 15,
+        "ms": 0.155842066
+      },
+      {
+        "path": "raised",
+        "sample": 16,
+        "ms": 0.146593809
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 16,
+        "ms": 0.636043072
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 17,
+        "ms": 0.563401937
+      },
+      {
+        "path": "raised",
+        "sample": 17,
+        "ms": 0.149954081
+      },
+      {
+        "path": "raised",
+        "sample": 18,
+        "ms": 0.146945953
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 18,
+        "ms": 0.569289923
+      },
+      {
+        "path": "native_aten_cuda",
+        "sample": 19,
+        "ms": 0.552489042
+      },
+      {
+        "path": "raised",
+        "sample": 19,
+        "ms": 0.151619196
+      }
+    ],
+    "input_kind": "paper",
+    "all_raised_input_modes_passed": true,
+    "normal_input_only_override": false,
+    "native_edge_disagreement": false,
+    "statistic": "minimum of 20 synchronized resident samples after five warmups; alternating order; reset outside timing",
+    "minimum_ms": {
+      "raised": 0.146593809,
+      "native_aten_cuda": 0.552489042
+    },
+    "minimum_first_five_ms": {
+      "raised": 0.146851063,
+      "native_aten_cuda": 0.637578964
+    },
+    "native_over_raised": 3.768842939335863
+  }
+}

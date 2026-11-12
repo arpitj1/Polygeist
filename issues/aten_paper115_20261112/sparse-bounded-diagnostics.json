@@ -1,0 +1,49 @@
+{
+  "matches": [
+    {
+      "spec": "cub_reduce_value_sum_f32",
+      "root": "%extracted",
+      "func": "aten_sparse_norm_cpu",
+      "binding": {
+        "%n": "literal 1024",
+        "%seed": "%cst",
+        "%input": "%6"
+      },
+      "generics": {
+        "%normalized_3": {
+          "pi": [
+            0
+          ],
+          "rho": [
+            0
+          ],
+          "sigma": [
+            0
+          ],
+          "app": "%7"
+        }
+      },
+      "consumed_ops": 3
+    }
+  ],
+  "diagnostics": {
+    "literal_policy_rejections": [],
+    "alternatives": [],
+    "rejected": [],
+    "residual_generics": [
+      {
+        "app_generic": "%6",
+        "func": "aten_sparse_norm_cpu",
+        "iters": [
+          "parallel"
+        ],
+        "form": "tensor",
+        "body_matches": [
+          "aten_mul_f32#step0"
+        ],
+        "n_body_matches": 1,
+        "furthest_dag_stage": null
+      }
+    ]
+  }
+}

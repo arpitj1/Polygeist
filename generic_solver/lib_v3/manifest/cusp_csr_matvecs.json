@@ -1,0 +1,171 @@
+{
+  "routine": "cusp_csr_matvecs",
+  "source": "NVIDIA AMGX public CUSP csr_matvecs<int,float> with dense.h axpy<int,float>; reference counterpart for the closed-source cuSPARSE API",
+  "upstream_files": [
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/csr.h",
+      "sha256": "549ba93dc87891e3fe862add7c7208f8dc773c1cdd2f8bc35fa8934620cd6fff"
+    },
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/dense.h",
+      "sha256": "8f81a89673b8074efdd6cc71acd8b78fd4b036fb51688999084450b232e07f8a"
+    }
+  ],
+  "adaptation": "Instantiate int32/FP32 and expose buffer capacities as VLA extents. Apply the accumulating public reference to a zero-filled output for beta=0; the public implementation itself accumulates into its incoming output. Inline public axpy and express its row-major pointer arithmetic as VLA subscripts; preserve iteration order.",
+  "specs": [
+    {
+      "name": "cusp_csr_matvecs_beta0_f32",
+      "args": [
+        "rows",
+        "row_offset_count",
+        "row_offsets",
+        "column_index_count",
+        "column_indices",
+        "value_count",
+        "values",
+        "b_rows",
+        "b_cols",
+        "b",
+        "c_rows",
+        "c_cols",
+        "c"
+      ],
+      "target": {
+        "library": "cuSPARSE",
+        "call": "cusparseSpMM",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cusparse_spmm_csr_f32_sized",
+          "arguments": [
+            "rows",
+            "row_offset_count",
+            "row_offsets",
+            "column_index_count",
+            "column_indices",
+            "value_count",
+            "values",
+            "b_rows",
+            "b_cols",
+            "b",
+            "c_rows",
+            "c_cols",
+            "c"
+          ],
+          "arrays": {
+            "row_offsets": [
+              "row_offset_count"
+            ],
+            "column_indices": [
+              "column_index_count"
+            ],
+            "values": [
+              "value_count"
+            ],
+            "b": [
+              "b_rows",
+              "b_cols"
+            ],
+            "c": [
+              "c_rows",
+              "c_cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "row_offset_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "column_index_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "value_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "b_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "b_cols": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "c_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "c_cols": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Valid zero-based CSR with nondecreasing row offsets and in-bounds column indices; all capacities cover the accessed elements",
+        "Disjoint FP32 value arrays and int32 index arrays; alpha=1, beta=0",
+        "Relaxed finite arithmetic permits the vendor reduction order",
+        "c_cols equals b_cols; c_rows is at least rows"
+      ],
+      "deviations": [
+        "Apply the accumulating public reference to a zero-filled output for beta=0; the public implementation itself accumulates into its incoming output."
+      ],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "row_offset_count": 4,
+          "column_index_count": 5,
+          "value_count": 5,
+          "b_rows": 4,
+          "b_cols": 3,
+          "c_rows": 5,
+          "c_cols": 3
+        },
+        "arrays": {
+          "row_offsets": [
+            4
+          ],
+          "column_indices": [
+            5
+          ],
+          "values": [
+            5
+          ],
+          "b": [
+            4,
+            3
+          ],
+          "c": [
+            5,
+            3
+          ]
+        },
+        "array_values": {
+          "row_offsets": [
+            0,
+            2,
+            2,
+            5
+          ],
+          "column_indices": [
+            0,
+            2,
+            3,
+            1,
+            0
+          ]
+        }
+      }
+    }
+  ]
+}

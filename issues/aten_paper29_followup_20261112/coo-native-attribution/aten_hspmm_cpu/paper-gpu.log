@@ -1,0 +1,7 @@
+NATIVE_BACKEND real libtorch CUDA; preallocated extracted-stage outputs
+CHECK kind=0 parameters=0 resident=0 count=262144 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=5.7220459e-06
+CHECK kind=0 parameters=0 resident=1 count=262144 bad=0 nativebad=0 nativerefbad=0 guardbad=0 inputbad=0 maxabs=5.7220459e-06
+PASS correctness
+POLYGEIST_V2_CALL backend=cuda call=cusparseSpMM_cusp_coo_matvecs_beta0_f32 entry=polygeist_cusparse_spmm_coo_f32_sized lib_ms=9.456640 h2d_ms=1.337728 d2h_ms=0.209184
+POLYGEIST_V2_CALL backend=cuda call=cusparseSpMM_cusp_coo_matvecs_beta0_f32 entry=polygeist_cusparse_spmm_coo_f32_sized lib_ms=0.545184 h2d_ms=0.001408 d2h_ms=0.003936
+POLYGEIST_V2_STATS backend=cuda call=cusparseSpMM_cusp_coo_matvecs_beta0_f32 entry=polygeist_cusparse_spmm_coo_f32_sized count=2 lib_ms=10.001824 h2d_ms=1.339136 d2h_ms=0.213120 h2d_bytes=2146304 d2h_bytes=1048576

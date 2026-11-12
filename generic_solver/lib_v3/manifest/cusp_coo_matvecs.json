@@ -1,0 +1,176 @@
+{
+  "routine": "cusp_coo_matvecs",
+  "source": "NVIDIA AMGX public CUSP coo_matvec<int,float>; public reference counterpart for closed-source cuSPARSE SpMM",
+  "upstream_files": [
+    {
+      "path": "third_party/AMGX/include/cusp/detail/host/reference/coo.h",
+      "sha256": "d7ed983f65d67a2efa12e4dc8e9b640709a51c2d880d038ef0e8cf1a88ef7365"
+    }
+  ],
+  "adaptation": "Instantiate public coo_matvec<int,float> independently for each dense column. Interchange the independent column loop with the nonzero loop, preserving accumulation order per output. Zero the output first to specialize beta=0; expose all capacities as VLA extents.",
+  "specs": [
+    {
+      "name": "cusp_coo_matvecs_beta0_f32",
+      "args": [
+        "rows",
+        "nnz",
+        "row_index_count",
+        "row_indices",
+        "column_index_count",
+        "column_indices",
+        "value_count",
+        "values",
+        "b_rows",
+        "b_cols",
+        "b",
+        "c_rows",
+        "c_cols",
+        "c"
+      ],
+      "target": {
+        "library": "cuSPARSE",
+        "call": "cusparseSpMM",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cusparse_spmm_coo_f32_sized",
+          "arguments": [
+            "rows",
+            "nnz",
+            "row_index_count",
+            "row_indices",
+            "column_index_count",
+            "column_indices",
+            "value_count",
+            "values",
+            "b_rows",
+            "b_cols",
+            "b",
+            "c_rows",
+            "c_cols",
+            "c"
+          ],
+          "arrays": {
+            "row_indices": [
+              "row_index_count"
+            ],
+            "column_indices": [
+              "column_index_count"
+            ],
+            "values": [
+              "value_count"
+            ],
+            "b": [
+              "b_rows",
+              "b_cols"
+            ],
+            "c": [
+              "c_rows",
+              "c_cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "nnz": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "row_index_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "column_index_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "value_count": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "b_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "b_cols": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "c_rows": {
+              "min": 1,
+              "max": 2147483646
+            },
+            "c_cols": {
+              "min": 1,
+              "max": 2147483646
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Valid zero-based COO row/column indices; nnz fits all sparse capacities",
+        "Disjoint FP32 values and int32 indices; c_rows >= rows and c_cols == b_cols",
+        "Relaxed finite arithmetic permits vendor reduction ordering"
+      ],
+      "deviations": [
+        "Instantiate public coo_matvec<int,float> independently for each dense column. Interchange the independent column loop with the nonzero loop, preserving accumulation order per output. Zero the output first to specialize beta=0; expose all capacities as VLA extents."
+      ],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "nnz": 5,
+          "row_index_count": 6,
+          "column_index_count": 6,
+          "value_count": 6,
+          "b_rows": 4,
+          "b_cols": 3,
+          "c_rows": 5,
+          "c_cols": 3
+        },
+        "arrays": {
+          "row_indices": [
+            6
+          ],
+          "column_indices": [
+            6
+          ],
+          "values": [
+            6
+          ],
+          "b": [
+            4,
+            3
+          ],
+          "c": [
+            5,
+            3
+          ]
+        },
+        "array_values": {
+          "row_indices": [
+            0,
+            0,
+            2,
+            2,
+            2,
+            0
+          ],
+          "column_indices": [
+            0,
+            2,
+            3,
+            1,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  ]
+}

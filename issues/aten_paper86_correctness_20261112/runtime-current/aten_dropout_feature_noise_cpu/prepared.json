@@ -1,0 +1,117 @@
+{
+  "kernel": "aten_dropout_feature_noise_cpu",
+  "original_binary_sha256": "cc031a0382c81b343e0d04155964f601174fcb3a5e074b447703aa1c06b8509f",
+  "timing_binary_sha256": "cc031a0382c81b343e0d04155964f601174fcb3a5e074b447703aa1c06b8509f",
+  "original_harness_sha256": "3e0334f5b7c876594302601e956c607d6a10e645ab4194937344025c3de48333",
+  "timing_harness_sha256": "87ff07a32be0dea2914abd1266c3702df26fb24edceb43daf2439d08a44c7a07",
+  "frozen_object_sha256": {
+    "work/kernel.o": "6969fcbc516e02ad0033b38a5b8517df7e7ae06b0cd957a4b8c9273eed9c46ec",
+    "work/wrapper.o": "71c6ab1383c9b94590de14c889600d17f7a03d87a41bcf94fd66ceaf37521f74",
+    "work/harness.o": "ed23604276063110cc967d8831907d1a5c07a970a09e84818fd1291ba9827746",
+    "work/rt.o": "2ca4becae969cd22351478e5a46f06ce33a576e3736c8f2bf7850c7436872818",
+    "work/mlir_runner_utils.o": "4864b599b02c4985cbf21c6e0e3151b294fc60575e0e3946473d672e0a2c98d9",
+    "work/spec_runtime.o": "04d5607691885a4ec98422d321d213eee849ea9df04bc3dc80308a6709504c8e",
+    "work/thrust_runtime.o": "e542cfcd68db51d4813bbeaab1ce5ed114e980f7c97421f9eb748850534fefd1",
+    "objects/reference.o": "b06b630df7fe44e58a66a11d939f30e7c97c88a89a589e4f2697f73b120ccdd1",
+    "objects/native.o": "7fb39f8784bac68c7676b2c352314a45e602f759c8f2d8ea2432dd6d2ee06c04"
+  },
+  "original_configuration": {
+    "dims": {
+      "B": 32,
+      "C": 64,
+      "H": 64,
+      "W": 64
+    },
+    "args": [
+      [
+        "x",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        false,
+        "normal"
+      ],
+      [
+        "mask",
+        "ptr",
+        "(B)*(C)",
+        false,
+        "normal"
+      ],
+      [
+        "scale",
+        "scalar",
+        "0.5",
+        false,
+        ""
+      ],
+      [
+        "out",
+        "ptr",
+        "(B)*(C)*(H)*(W)",
+        true,
+        "normal"
+      ]
+    ],
+    "coverage": "auto: aten_dropout_feature_noise_cpu",
+    "rtol": 0.002,
+    "dimension_scope": "Pinned paper benchmark dimensions; separate C copy; original fixture unchanged",
+    "paper_initializers": {
+      "x": "((float)(i%101)-50.0f)/37.0f",
+      "mask": "0.05f + 0.9f*(float)(i%101)/101.0f",
+      "out": "((float)(i%101)-50.0f)/37.0f"
+    },
+    "paper_parameters": {
+      "scale": "1.25"
+    },
+    "timing_samples": 20
+  },
+  "original_proof_sha256": "f0d7ed6da2939dd73c5d6f1d1e2a4605e10862932a978bd7d5eadb62f3adb8d0",
+  "timing_samples": 20,
+  "adaptation": "Only the generated spec_runtime.o changes to the bit-tested generic copy runtime; all application, native reference and vendor objects remain frozen;20-sample harness retained.",
+  "commands": [
+    [
+      "aarch64-linux-gnu-g++",
+      "-O2",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/work/kernel.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/work/wrapper.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/timing-harness.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/work/rt.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/work/mlir_runner_utils.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/shared/spec_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/work/thrust_runtime.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/objects/reference.o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/objects/native.o",
+      "-L/tmp/aten_native_sysroot_24_12/usr/local/lib/python3.12/dist-packages/torch/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib",
+      "-L/usr/local/cuda-12.6/targets/sbsa-linux/lib/stubs",
+      "-L/usr/lib/aarch64-linux-gnu",
+      "-Wl,--allow-shlib-undefined",
+      "-Wl,--no-as-needed",
+      "-ltorch",
+      "-ltorch_cpu",
+      "-ltorch_cuda",
+      "-lc10_cuda",
+      "-lc10",
+      "-lcudnn",
+      "-lcublasLt",
+      "-lcublas",
+      "-lcusolver",
+      "-lcudart",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "-Wl,--gc-sections",
+      "-o",
+      "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/runtime-current/aten_dropout_feature_noise_cpu/timing-program",
+      "-L/home/arjaiswal/cutensor_sbsa/lib",
+      "-l:libcutensor.so.2"
+    ]
+  ],
+  "prior_original_binary_sha256": "41ec563a201d19c02e57f5fe9b83f074e774c20ce0eaf83a40cd46155227020e",
+  "prior_timing_binary_sha256": "6b1688b5afe22342e72cb8282b35b13deed4b4c6d7cff6f76ba88269d9e2ae67",
+  "runtime_replacement": {
+    "object_sha256": "c03883b8e9aaec6a36b38548950ea47ab30f7e32053ed111f7299712e29502bc",
+    "generated_source_sha256": "3fe0d475a8ae6ae70844a209e08affbfcc81bb13d4d300add3632f9b906a2c6f",
+    "copy_helper_sha256": "6a79070a2c5954e1f679d34beab54bbda22ab5209e1e740aa46ca4d11d6c59c6"
+  }
+}

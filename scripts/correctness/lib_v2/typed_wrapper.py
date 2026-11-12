@@ -7,6 +7,27 @@ import subprocess
 from c_types import canonical_type
 
 
+def dimension_terms(dimension):
+    """A checked affine size expression; never evaluate manifest text as code."""
+    if type(dimension) is int:
+        return {}, dimension
+    if isinstance(dimension, str):
+        return {dimension: 1}, 0
+    if isinstance(dimension, dict) and set(dimension) == {'dimension', 'offset'}:
+        terms, offset = {dimension['dimension']: 1}, dimension['offset']
+    elif isinstance(dimension, dict) and set(dimension) == {'terms', 'offset'}:
+        terms, offset = dimension['terms'], dimension['offset']
+    else:
+        raise ValueError('invalid affine extent')
+    if (not isinstance(terms, dict) or not terms or len(terms) > 16 or
+            type(offset) is not int or not -2147483647 <= offset <= 2147483647 or
+            any(not isinstance(name, str) or type(coefficient) is not int or
+                coefficient == 0 or not -2147483647 <= coefficient <= 2147483647
+                for name, coefficient in terms.items())):
+        raise ValueError('invalid affine extent terms')
+    return terms, offset
+
+
 @functools.lru_cache(maxsize=8)
 def _preprocess_header(path, digest, compiler):
     result = subprocess.run([compiler, '-E', '-P', '-x', 'c', path],
@@ -97,15 +118,20 @@ def contract(A, spec, target, ret, args):
     for name, shape in shapes.items():
         arg = arrays[name]
         def valid_dimension(d):
-            if type(d) is int:
-                return 0 < d <= 2147483647
-            if isinstance(d, str):
-                return d in dimensions and bounds[d]['min'] > 0
-            return (isinstance(d, dict) and set(d) == {'dimension', 'offset'}
-                    and isinstance(d['dimension'], str) and d['dimension'] in dimensions
-                    and type(d['offset']) is int and -2147483647 <= d['offset'] <= 2147483647
-                    and 0 < bounds[d['dimension']]['min'] + d['offset']
-                    and bounds[d['dimension']]['max'] + d['offset'] <= 2147483647)
+            try:
+                terms, low = dimension_terms(d)
+            except (ValueError, TypeError):
+                return False
+            high = low
+            for name, coefficient in sorted(terms.items()):
+                if name not in dimensions:
+                    return False
+                limits = [coefficient * bounds[name][k] for k in ('min', 'max')]
+                low += min(limits)
+                high += max(limits)
+                if low < -(1 << 63) or high >= (1 << 63):
+                    return False
+            return 0 < low <= high <= 2147483647
         if (not isinstance(shape, list) or not 1 <= arg.rank <= 16
                 or len(shape) != arg.rank or any(not valid_dimension(d) for d in shape)):
             raise A.AbiError('array extents require positive fixed sizes or bounded dimensions')
@@ -131,6 +157,11 @@ def contract(A, spec, target, ret, args):
 
 
 def extent_expression(dimension):
+    if isinstance(dimension, dict) and 'terms' in dimension:
+        terms, offset = dimension_terms(dimension)
+        return '(' + ' + '.join([f'((int64_t){name} * ({coefficient}))'
+                                  for name, coefficient in sorted(terms.items())]
+                                 + [str(offset)]) + ')'
     if isinstance(dimension, dict):
         return f'((int64_t){dimension["dimension"]} + ({dimension["offset"]}))'
     return f'(int64_t){dimension}'

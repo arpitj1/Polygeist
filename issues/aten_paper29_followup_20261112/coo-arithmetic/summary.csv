@@ -1,0 +1,4 @@
+kernel,family,status,raised_linalg,raised_loops,recovered_stages,best_rank,emitted,remaining_linalg,remaining_loops,abi_ok,legacy_match,correctness,performance
+aten_hspmm_cpu,sparse_linear_algebra,recognized,1,2,,0,cusp_coo_matvecs_beta0_f32,0,0,True,cusparseSpMM_COO_f32_memref,not_run,not_run
+aten_sparse_addmm_cpu,sparse_linear_algebra,recognized,1,2,,0,cusp_coo_matvecs_beta0_f32,0,0,True,cusparseSpMM_COO_f32_memref,not_run,not_run
+aten_sspaddmm_cpu,sparse_linear_algebra,recognized,1,2,,0,cusp_coo_matvecs_beta0_f32,0,0,True,cusparseSpMM_COO_f32_memref,not_run,not_run

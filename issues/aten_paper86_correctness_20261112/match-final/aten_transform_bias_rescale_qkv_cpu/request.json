@@ -1,0 +1,42 @@
+{
+  "kernel": "aten_transform_bias_rescale_qkv_cpu",
+  "paper_family": "qkv_transform",
+  "current_targeted_gpu_validated": "False",
+  "status": "not_in_current_validated_aggregate",
+  "classification_note": "",
+  "source": "/home/arjaiswal/Polygeist/issues/aten_paper86_correctness_20261112/match-final/aten_transform_bias_rescale_qkv_cpu/aten_transform_bias_rescale_qkv_cpu.c",
+  "paper_timing_reproduced": "not_implied_by_targeted_validation",
+  "original_source": "issues/aten_c_kernels/aten_transform_bias_rescale_qkv_cpu.c",
+  "original_source_sha256": "88efba95af926b20b0cdb4c8de2764f5712509dfecb4294ad33898fb135291e7",
+  "shape_record": {
+    "kernel": "aten_transform_bias_rescale_qkv_cpu",
+    "op": null,
+    "cat": "native_fixture",
+    "dims": {
+      "B": 8,
+      "S": 512,
+      "H": 16,
+      "D": 64
+    },
+    "n": 4194304,
+    "shape": "B=8_S=512_H=16_D=64",
+    "dtype": "f32",
+    "scalar_args": {
+      "scale": "0.125"
+    },
+    "shape_selection": "EXPLICIT_STRUCTURED_SHAPE",
+    "shape_selection_note": "three full QKV slice-bias-permute stages through cuDNN OpTensor",
+    "comparison_scope": "REQUIRES_EXPLICIT_NATIVE_FIXTURE_ADAPTER",
+    "recipe_version": "2026-09-08-v3",
+    "recipe_fingerprint": "85dffc2ee1e0bb1f"
+  },
+  "ranks": [
+    1
+  ],
+  "region": false,
+  "region_budget": 30,
+  "split_reduction_inputs": true,
+  "split_pointwise_inputs": true,
+  "numeric_model": "strict",
+  "legacy_match": "cudnnTransformBiasRescaleQKV_f32_memref"
+}
