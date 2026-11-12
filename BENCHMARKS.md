@@ -1,7 +1,7 @@
 # Paper evaluations
 
 The LoopLibrarian benchmark sources, paper cohorts, timing drivers, and retained
-results are maintained in the [LoopLibrarian-Benchmarks repository](https://github.com/arpitj1/LoopLibrarian-Benchmarks).
+results are maintained in the [LoopLibrarian-Benchmarks repository](https://github.com/PRONTOLab/LoopLibrarian-Benchmarks).
 Its `third_party/Polygeist` submodule pins this `artifact-submission` branch.
 
 This branch contains the compiler, runtime adapters, reference specifications,
