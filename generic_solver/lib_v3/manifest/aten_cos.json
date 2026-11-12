@@ -13,21 +13,58 @@
     {
       "path": "third_party/pytorch/aten/src/ATen/cpu/vec/vec_base.h",
       "sha256": "58ec91e4c6782ef7d9c9f90e4177d8bb5fffc24b667891559817eb7a97f4802a"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/UnaryGeometricCosKernel.cu",
+      "sha256": "bfa6f966c733c88d1f13d70386cd25f7750dc8de071916abb5736ef64d78d233"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/sequential/for_each.h",
+      "sha256": "c9206514e44123c02f1f0e2f4231f26a162dab5ffde911d22a22a9d5a408cc82"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
     }
   ],
   "specs": [
     {
       "name": "aten_cos_f32",
       "target": {
-        "library": "cuDNN",
-        "call": "cudnnBackendExecute",
+        "library": "Thrust",
+        "call": "transform",
         "backends": [
           "cuda"
         ],
         "runtime_adapter": {
           "schema": 1,
-          "kind": "pointwise_reference",
-          "extent_arg": "n"
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_cos_f32",
+          "arguments": [
+            "n",
+            "x",
+            "output"
+          ],
+          "arrays": {
+            "x": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
         }
       },
       "args": [
@@ -43,5 +80,6 @@
       ],
       "deviations": []
     }
-  ]
+  ],
+  "adaptation": "Contiguous FP32 traversal of the pinned ATen CPU/CUDA scalar cos function. The target uses Thrust transform and CUDA libdevice cosf, preserving full-range argument reduction; no fast math or FTZ."
 }

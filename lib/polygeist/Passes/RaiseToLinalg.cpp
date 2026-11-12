@@ -5,6 +5,7 @@
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
+#include "mlir/Dialect/Arith/Transforms/Passes.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
@@ -601,175 +602,6 @@ struct RaiseFlattenedPointerFill : public OpRewritePattern<AffineForOp> {
   }
 };
 
-// Raise a padded row-wise reduction whose logical row length is supplied at
-// runtime.  ATen nested tensors use this shape:
-//
-//   for b in [0, B):
-//     acc = identity
-//     for i in [0, lengths[b]): acc = combine(acc, input[b, i])
-//     output[b] = acc
-//
-// The padded input already provides a safe static/dynamic physical width N.
-// Express the logical prefix as a mask inside a BxN linalg.generic. This is
-// equivalent for the nested-tensor invariant 0 <= lengths[b] <= N, and exposes
-// ordinary segmented-reduction semantics to the matcher.
-struct RaiseDynamicPrefixReduction : public OpRewritePattern<AffineForOp> {
-  RaiseDynamicPrefixReduction(MLIRContext *context, PatternBenefit benefit = 1)
-      : OpRewritePattern<AffineForOp>(context, benefit) {}
-
-  LogicalResult matchAndRewrite(AffineForOp outer,
-                                PatternRewriter &rewriter) const final {
-    if (!outer.hasConstantLowerBound() || outer.getConstantLowerBound() != 0 ||
-        !outer.hasConstantUpperBound() || outer.getStep() != 1 ||
-        outer.getNumIterOperands() != 0)
-      return failure();
-
-    scf::ForOp inner;
-    affine::AffineLoadOp lengthLoad;
-    affine::AffineStoreOp outputStore;
-    for (Operation &op : outer.getBody()->without_terminator()) {
-      if (auto candidate = dyn_cast<scf::ForOp>(op)) {
-        if (inner) return failure();
-        inner = candidate;
-      } else if (auto candidate = dyn_cast<affine::AffineLoadOp>(op)) {
-        if (lengthLoad) return failure();
-        lengthLoad = candidate;
-      } else if (auto candidate = dyn_cast<affine::AffineStoreOp>(op)) {
-        if (outputStore) return failure();
-        outputStore = candidate;
-      } else if (!isa<arith::IndexCastOp>(op)) {
-        return failure();
-      }
-    }
-    if (!inner || !lengthLoad || !outputStore ||
-        inner.getInitArgs().size() != 1 || inner.getStep() == Value() ||
-        outputStore.getValue() != inner.getResult(0))
-      return failure();
-
-    auto lowerConst = inner.getLowerBound().getDefiningOp<arith::ConstantIndexOp>();
-    auto stepConst = inner.getStep().getDefiningOp<arith::ConstantIndexOp>();
-    auto upperCast = inner.getUpperBound().getDefiningOp<arith::IndexCastOp>();
-    if (!lowerConst || lowerConst.value() != 0 || !stepConst ||
-        stepConst.value() != 1 || !upperCast ||
-        upperCast.getIn() != lengthLoad.getResult())
-      return failure();
-
-    SmallVector<memref::LoadOp> inputLoads;
-    for (auto load : inner.getBody()->getOps<memref::LoadOp>())
-      inputLoads.push_back(load);
-    if (inputLoads.size() != 1)
-      return failure();
-    memref::LoadOp inputLoad = inputLoads.front();
-    if (inputLoad.getIndices().size() != 2 ||
-        inputLoad.getIndices()[0] != outer.getInductionVar() ||
-        inputLoad.getIndices()[1] != inner.getInductionVar())
-      return failure();
-    auto inputType = dyn_cast<MemRefType>(inputLoad.getMemRefType());
-    auto lengthsType = dyn_cast<MemRefType>(lengthLoad.getMemRefType());
-    auto outputType = dyn_cast<MemRefType>(outputStore.getMemRefType());
-    if (!inputType || !lengthsType || !outputType || inputType.getRank() != 2 ||
-        lengthsType.getRank() != 1 || outputType.getRank() != 1 ||
-        !lengthsType.getElementType().isInteger(32) ||
-        outputType.getElementType() != inputType.getElementType())
-      return failure();
-
-    Value reductionArg = inner.getRegionIterArgs().front();
-    Value yielded = cast<scf::YieldOp>(inner.getBody()->getTerminator())
-                        .getResults().front();
-    enum class Kind { SumF32, LogicalAndI32 } kind;
-    if (auto add = yielded.getDefiningOp<arith::AddFOp>()) {
-      if (!inputType.getElementType().isF32() ||
-          !((add.getLhs() == reductionArg && add.getRhs() == inputLoad) ||
-            (add.getRhs() == reductionArg && add.getLhs() == inputLoad)))
-        return failure();
-      kind = Kind::SumF32;
-    } else if (auto andOp = yielded.getDefiningOp<arith::AndIOp>()) {
-      if (!inputType.getElementType().isInteger(32) ||
-          andOp.getLhs() != reductionArg)
-        return failure();
-      auto ext = andOp.getRhs().getDefiningOp<arith::ExtUIOp>();
-      auto cmp = ext ? ext.getIn().getDefiningOp<arith::CmpIOp>()
-                     : arith::CmpIOp();
-      if (!ext || !cmp || cmp.getPredicate() != arith::CmpIPredicate::ne ||
-          cmp.getLhs() != inputLoad)
-        return failure();
-      kind = Kind::LogicalAndI32;
-    } else {
-      return failure();
-    }
-
-    Location loc = outer.getLoc();
-    MLIRContext *ctx = rewriter.getContext();
-    AffineExpr d0 = rewriter.getAffineDimExpr(0);
-    AffineExpr d1 = rewriter.getAffineDimExpr(1);
-    AffineMap rowMap = AffineMap::get(2, 0, {d0}, ctx);
-    AffineMap matrixMap = AffineMap::get(2, 0, {d0, d1}, ctx);
-    AffineMap vectorIdentity = rewriter.getMultiDimIdentityMap(1);
-    StringAttr empty = StringAttr::get(ctx);
-    Type elementType = inputType.getElementType();
-    Value identity = kind == Kind::SumF32
-                         ? (Value)rewriter.create<arith::ConstantFloatOp>(
-                               loc, APFloat(0.0f), rewriter.getF32Type())
-                         : (Value)rewriter.create<arith::ConstantIntOp>(
-                               loc, 1, 32);
-
-    auto init = rewriter.create<linalg::GenericOp>(
-        loc, TypeRange(), ValueRange(), ValueRange{outputStore.getMemRef()},
-        ArrayRef<AffineMap>{vectorIdentity},
-        ArrayRef<utils::IteratorType>{utils::IteratorType::parallel}, empty,
-        empty);
-    Block *initBody = new Block();
-    init.getRegion().push_back(initBody);
-    initBody->addArgument(elementType, loc);
-    {
-      OpBuilder::InsertionGuard guard(rewriter);
-      rewriter.setInsertionPointToEnd(initBody);
-      rewriter.create<linalg::YieldOp>(loc, identity);
-    }
-
-    SmallVector<Value> reductionInputs{inputLoad.getMemref(),
-                                       lengthLoad.getMemRef()};
-    auto reduction = rewriter.create<linalg::GenericOp>(
-        loc, TypeRange(),
-        reductionInputs,
-        ValueRange{outputStore.getMemRef()},
-        ArrayRef<AffineMap>{matrixMap, rowMap, rowMap},
-        ArrayRef<utils::IteratorType>{utils::IteratorType::parallel,
-                                      utils::IteratorType::reduction},
-        empty, empty);
-    Block *body = new Block();
-    reduction.getRegion().push_back(body);
-    Value input = body->addArgument(elementType, loc);
-    Value length = body->addArgument(lengthsType.getElementType(), loc);
-    Value accumulator = body->addArgument(elementType, loc);
-    {
-      OpBuilder::InsertionGuard guard(rewriter);
-      rewriter.setInsertionPointToEnd(body);
-      Value column = rewriter.create<linalg::IndexOp>(loc, 1);
-      Value lengthIndex =
-          rewriter.create<arith::IndexCastOp>(loc, rewriter.getIndexType(),
-                                               length);
-      Value active = rewriter.create<arith::CmpIOp>(
-          loc, arith::CmpIPredicate::ult, column, lengthIndex);
-      Value combined;
-      if (kind == Kind::SumF32) {
-        combined = rewriter.create<arith::AddFOp>(loc, accumulator, input);
-      } else {
-        Value zero = rewriter.create<arith::ConstantIntOp>(loc, 0, 32);
-        Value nonzero = rewriter.create<arith::CmpIOp>(
-            loc, arith::CmpIPredicate::ne, input, zero);
-        Value asI32 = rewriter.create<arith::ExtUIOp>(
-            loc, rewriter.getI32Type(), nonzero);
-        combined = rewriter.create<arith::AndIOp>(loc, accumulator, asI32);
-      }
-      Value selected =
-          rewriter.create<arith::SelectOp>(loc, active, combined, accumulator);
-      rewriter.create<linalg::YieldOp>(loc, selected);
-    }
-    rewriter.eraseOp(outer);
-    return success();
-  }
-};
 
 // Normalize the side-effect-free C libm calls emitted by Clang/cgeist into
 // MLIR Math operations before analyzing loop purity.  A generic func.call has
@@ -4475,6 +4307,12 @@ void RaiseAffineToLinalgPipeline::runOnOperation() {
   // Create a nested pass manager for function operations
   OpPassManager &funcPM = pm.nest<func::FuncOp>();
 
+  // C signed division/remainder may carry negative-input correction selects.
+  // Upstream range analysis proves when loop indices are nonnegative, making
+  // the original indexing visible to the affine access and band raisers.
+  funcPM.addPass(arith::createIntRangeOptimizationsPass());
+  funcPM.addPass(createCanonicalizerPass());
+
   // Convert if/else scalar choices and matching stores to arith.select before
   // the affine-to-linalg raise. This handles control-flow-shaped expressions
   // that the linalg raiser can represent inside a generic body.
@@ -4579,8 +4417,6 @@ void RaiseAffineToLinalg::runOnOperation() {
                                                         /*benefit=*/8);
     raisingPatterns.add<RaiseFlattenedPointerFill>(&getContext(),
                                                     /*benefit=*/7);
-    raisingPatterns.add<RaiseDynamicPrefixReduction>(&getContext(),
-                                                      /*benefit=*/6);
     raisingPatterns.add<KnownLibmCallToMath>(&getContext(), /*benefit=*/5);
     raisingPatterns.add<FuseScalarAddReductionIntoOutput>(&getContext(),
                                                           /*benefit=*/4);

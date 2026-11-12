@@ -49,6 +49,7 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import Iterator, Optional
 
@@ -526,13 +527,19 @@ class Matcher:
         k, K = len(st.access), len(at.access)
         if K <= k or not isinstance(st.base, str):
             return None
-        fixed = [j for j, pa in enumerate(at.access)
-                 if all(a[0] != "d" for mono in pa for a in mono)]
-        kept = [j for j in range(K) if j not in fixed]
-        if len(kept) != k:
+        invariant = [j for j, pa in enumerate(at.access)
+                     if all(a[0] != "d" for mono in pa for a in mono)]
+        if len(invariant) < K - k:
             return None
-        pairs = self.compare_access(st.access, [at.access[j] for j in kept], sigma)
-        if pairs is None:
+        # A reference may retain invariant axes too (for example its single
+        # output element). Drop exactly the excess rank, preserving all
+        # remaining accesses and fixed coordinates through the existing proof.
+        for fixed in itertools.combinations(invariant, K - k):
+            kept = [j for j in range(K) if j not in fixed]
+            pairs = self.compare_access(st.access, [at.access[j] for j in kept], sigma)
+            if pairs is not None:
+                break
+        else:
             return None
         offs = []
         for j in fixed:
@@ -585,6 +592,22 @@ class Matcher:
             e = self.match_unit(head[1], env)
             if e is not None:
                 yield from self.match_seq(rest, e, ctx)
+        elif kind == "extent":
+            sname, value = head[1:]
+            known = self.bound_integer(sname, env)
+            if known is not None:
+                if known == value:
+                    yield from self.match_seq(rest, env, ctx)
+                return
+            definition = self.sdef(sname)
+            if definition and definition[0].name == 'arith.index_cast':
+                parameter = definition[0].operands[0]
+                ty = self.spec.params.get(parameter)
+                if (ty in ('i32', 'i64') and 0 <= value < (1 << (int(ty[1:])-1))
+                        and self.literal_allowed(parameter, value, 'int')):
+                    e = self.bind(env, parameter, ('int', value, ty))
+                    if e is not None:
+                        yield from self.match_seq(rest, e, ctx)
         elif kind == "cap":
             for e in self.match_cap(head[1], head[2], head[3], env):
                 yield from self.match_seq(rest, e, ctx)
@@ -819,6 +842,26 @@ class Matcher:
                 a, b = vals
                 value = {"arith.addi": lambda: a + b, "arith.subi": lambda: a - b,
                          "arith.muli": lambda: a * b}[op.name]()
+            elif op.name == "affine.apply":
+                # Upstream loop normalization expresses bounds such as n-1
+                # with affine.apply. Fold only an entirely bound polynomial;
+                # opaque division/modulo expressions remain unproved.
+                text = ML.inline_aliases(op.text, self.L.aliases)
+                match = re.search(r"affine_map<.*>", text)
+                if match is None:
+                    return None
+                try:
+                    nd, ns, expressions = ML.parse_affine_map(match[0])
+                    if len(expressions) != 1 or nd + ns != len(vals):
+                        return None
+                    poly = ML.map_apply(match[0],
+                                        [ML.p_const(v) for v in vals[:nd]],
+                                        [ML.p_const(v) for v in vals[nd:]])[0]
+                    if any(key for key in poly):
+                        return None
+                    value = poly.get((), 0)
+                except (ML.AffineParseError, IndexError, ValueError):
+                    return None
             else:
                 return None
         # Use the conservative 32-bit range for target-dependent index values.
@@ -857,14 +900,30 @@ class Matcher:
                     pairs: list = []
                     ok = True
                     amap = list(pi) + [ai + r for r in rho]
+                    app_traces = list(a_tr)
                     slice_base: dict = {}
                     for i in range(ni + no):
-                        st, at = s_tr[i], a_tr[amap[i]]
+                        st, at = s_tr[i], app_traces[amap[i]]
                         r = self.compare_access(st.access, at.access, sigma)
                         if r is None:
                             r = self.compare_reduced(st, at, sigma)
                             if r is not None:
                                 r, slice_base[i] = r
+                        if r is None and i < ni and st.base in self.spec.params:
+                            # A computed tensor view is itself a valid read-only
+                            # library operand. Prove the reference access in its
+                            # logical coordinates, retaining the view as an ABI
+                            # input instead of equating its shifted/strided base
+                            # with a different source array. No output writeback
+                            # or internal reference producer uses this shortcut.
+                            value = aop.ins[amap[i]]
+                            ty = self.A.value_type(value, aop)
+                            if ty and types_compatible(self.spec.params[st.base], ty):
+                                access = ML.map_apply(aop.maps[amap[i]], ML.identity_dims(nd), [])
+                                logical = Trace(self.akey(value, aop), access, at.extents, [])
+                                r = self.compare_access(st.access, logical.access, sigma)
+                                if r is not None:
+                                    app_traces[amap[i]] = logical
                         if r is None:
                             ok = False
                             break
@@ -881,10 +940,27 @@ class Matcher:
                     for i in range(ni + no):
                         for d, v in s_tr[i].extents.items():
                             s_ext.setdefault(d, v)
-                        for d, v in a_tr[amap[i]].extents.items():
+                        for d, v in app_traces[amap[i]].extents.items():
                             a_ext.setdefault(d, v)
                     for d in range(nd):
                         se, ae = s_ext.get(d), a_ext.get(sigma[d])
+                        # A fully shaped intermediate may have no bounded
+                        # submap after a preceding replacement. Its static
+                        # tensor dimensions still prove the loop extent.
+                        if se is not None and ae is None:
+                            static_sizes = set()
+                            for ty, access_map in zip(aop.in_types+aop.out_types, aop.maps):
+                                shape = re.match(r'tensor<((?:\d+x|\?x)*)[^x<>]+>', ty)
+                                if not shape:
+                                    continue
+                                dimensions = shape[1].rstrip('x').split('x') if shape[1] else []
+                                access = ML.map_apply(access_map, ML.identity_dims(nd), [])
+                                for size, expression in zip(dimensions, access):
+                                    if size != '?' and ML.pure_dim(expression) == sigma[d]:
+                                        static_sizes.add(int(size))
+                            if len(static_sizes) == 1:
+                                pairs.append(('extent', se, next(iter(static_sizes))))
+                                continue
                         if (se is None) != (ae is None):
                             ok = False
                             break
@@ -925,12 +1001,12 @@ class Matcher:
                         if i in slice_base:
                             pairs.append(("slice", s_tr[i].base, slice_base[i]))
                         else:
-                            pairs.append(("val", s_tr[i].base, a_tr[amap[i]].base))
+                            pairs.append(("val", s_tr[i].base, app_traces[amap[i]].base))
                     e = env.copy()
                     e.opmap[sop.idx] = aop.idx
                     e.gens[sop.idx] = (pi, rho, sigma, aop.idx)
                     views = set()
-                    for trace in a_tr:
+                    for trace in app_traces:
                         views.update(trace.views)
                     e.consumed = e.consumed | frozenset(views) | {aop.idx}
                     for r in self.match_seq(pairs, e, aop):
@@ -965,9 +1041,32 @@ class Matcher:
             return
         if len(s_sizes) != len(a_sizes):
             return
+        # tensor.cast changes shape knowledge, never element values or order.
+        # Peel only same-rank, same-element casts with compatible static dims.
+        peeled_app = set()
+        def peel(mod, name, context):
+            while True:
+                definition = mod.def_of(name, context)
+                if definition is None or definition[0].name != "tensor.cast":
+                    return name
+                cast = definition[0]
+                source = mod.value_type(cast.operands[0], cast)
+                target = cast.result_types[definition[1]]
+                def shape(ty):
+                    m = re.fullmatch(r"tensor<((?:[?\d]+x)*)([A-Za-z]\w*)>", ty or "")
+                    return (m[1].rstrip("x").split("x") if m[1] else [], m[2]) if m else None
+                lhs, rhs = shape(source), shape(target)
+                if (not lhs or not rhs or lhs[1] != rhs[1] or len(lhs[0]) != len(rhs[0])
+                        or any(x != y and "?" not in (x,y) for x,y in zip(lhs[0],rhs[0]))):
+                    return name
+                if mod is self.A:
+                    peeled_app.add(cast.idx)
+                name, context = cast.operands[0], cast
+        s_res = peel(self.L, s_res, sop)
+        a_res = peel(self.A, a_res, aop)
         e0 = env.copy()
         e0.opmap[sop.idx] = aop.idx
-        e0.consumed = e0.consumed | {aop.idx}
+        e0.consumed = e0.consumed | {aop.idx} | peeled_app
         # Bind a formal destination before examining the producer, so a
         # producer that does not read its initial output need not bind that
         # parameter to an unrelated temporary tensor. Computed bases retain
@@ -1065,6 +1164,25 @@ class Matcher:
         for p, ty in spec.func.args:
             if p in env.vals:
                 binds[p] = env.vals[p]
+            elif ty == 'i32' and p[1:] in spec.meta.get('array_dimensions', {}):
+                # A declared inner C VLA dimension determines physical layout.
+                # Recover an otherwise unused dimension only when every source
+                # declaration agrees on the same static application extent.
+                values = []
+                for location in spec.meta['array_dimensions'][p[1:]]:
+                    binding = env.vals.get('%' + location['array'])
+                    shape = (self.atype(binding[1]) if binding and binding[0] == 'ssa' else '')
+                    match = re.fullmatch(r'tensor<((?:[?\d]+x)+)[A-Za-z]\w*>', shape or '')
+                    dims = match[1].rstrip('x').split('x') if match else []
+                    axis = location['axis']
+                    if axis >= len(dims) or not dims[axis].isdigit():
+                        values = []
+                        break
+                    values.append(int(dims[axis]))
+                if values and len(set(values)) == 1 and 0 < values[0] < (1 << 31):
+                    binds[p] = ('int', values[0])
+                else:
+                    unbound.append(p)
             elif p[1:] in spec.meta.get("leading_dims", {}):
                 arr = "%" + spec.meta["leading_dims"][p[1:]]
                 if arr in env.vals and env.vals[arr][0] == "ssa":
@@ -1463,11 +1581,22 @@ def splice_region_matches(text: str, report: list, budget: int = 600,
                           allowed_specs=None) -> str:
     try:
         sys.path.insert(0, str(HERE.parent))
-        from region_match import match_regions  # type: ignore
+        from region_match import load_specs, match_regions  # type: ignore
     except Exception as e:  # module absent or broken: linalg-level result stands
         report.append({"region_match": f"unavailable ({type(e).__name__})"})
         return text
     import signal
+
+    # Cold catalog loading also validates the imported source stages.  It is
+    # shared setup, not application search: otherwise a cold cache can consume
+    # the entire search budget before any application binding is considered.
+    started = time.perf_counter()
+    try:
+        load_specs(str(SPEC_DIR))
+    except Exception as e:
+        report.append({"region_match": f"catalog error {type(e).__name__}: {e}"})
+        return text
+    report.append({"region_catalog_ms": round((time.perf_counter() - started) * 1000, 3)})
 
     def _alarm(*_):
         raise _RegionTimeout()
@@ -1566,6 +1695,31 @@ def run(text: str, lib_path: Path, region: bool = True, diag: bool = False,
             "consumed_ops": len(m["consumed"])})
     alts = sorted({(m["spec"], app.ops[m["root"]].results[0]) for m in all_matches}
                   - {(m["spec"], app.ops[m["root"]].results[0]) for m in selected})
+    region_alternative = None
+    if region and selected and re.search(r"\blinalg\.generic\b", out):
+        # A small Linalg replacement can hide the complete region from the
+        # memory-equation matcher. Preserve the original program as another
+        # candidate, and compare only independently proved replacements.
+        # This is a conservative coverage/call-count heuristic, not a claim
+        # that either backend is faster without measurement.
+        region_report = []
+        candidate = splice_region_matches(text, region_report, region_budget, allowed_specs)
+        if candidate != text:
+            candidate, candidate_report, candidate_extra = run(
+                candidate, lib_path, region=False, diag=diag,
+                region_budget=region_budget, allowed_specs=allowed_specs)
+            def remaining(source):
+                return len(re.findall(r"\b(?:linalg\.generic|affine\.for|affine\.parallel|scf\.for|scf\.while)\b", source))
+            def calls(source):
+                return len(re.findall(r"\bkernel\.launch\b", source))
+            region_alternative = dict(
+                original_remaining=remaining(out), alternative_remaining=remaining(candidate),
+                original_calls=calls(out), alternative_calls=calls(candidate), selected=False)
+            if (region_alternative['alternative_remaining'] < region_alternative['original_remaining']
+                    and region_alternative['alternative_calls'] <= region_alternative['original_calls']):
+                region_alternative['selected'] = True
+                candidate_extra['region_alternative'] = region_alternative
+                return candidate, region_report + candidate_report, candidate_extra
     if region:
         out = splice_region_matches(out, report, region_budget, allowed_specs)
     syms = re.findall(r"kernel\.launch\s+@([\w$.\-]+)", out)
@@ -1580,6 +1734,8 @@ def run(text: str, lib_path: Path, region: bool = True, diag: bool = False,
              "alternatives": [f"{a}@{b}" for a, b in alts],
              "rejected": [{"spec": r["spec"], "root": app.ops[r["root"]].results[0],
                            "why": r["rejected"]} for r in rejected]}
+    if region_alternative is not None:
+        extra['region_alternative'] = region_alternative
     if diag:
         consumed = set()
         for m in selected:

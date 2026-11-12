@@ -44,12 +44,16 @@ _OPS = {"==": lambda a, b: a == b, "!=": lambda a, b: a != b, ">=": lambda a, b:
 def zero_preserves_reads(operations, ssa_name: str) -> bool:
     """Conservative use proof over the imported body, with no routine names.
 
-    Comparison operands and selected values cannot annihilate tensor reads.
+    Comparison operands, selected values, and direct results cannot annihilate
+    tensor reads. A constant returned or stored by a fill still performs the
+    same assignments; this does not justify a zero multiplying an input read.
     Unknown uses, arithmetic, and forwarding through other operations reject.
     Container free uses are represented by their nested direct users.
     """
     users = [op for op in operations if ssa_name in op.operands]
-    return bool(users) and all(op.name in ("arith.cmpf", "arith.select")
+    return bool(users) and all(op.name in ("arith.cmpf", "arith.select",
+                                         "linalg.yield", "kernel.yield",
+                                         "func.return", "return")
                                for op in users)
 
 

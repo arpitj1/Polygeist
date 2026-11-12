@@ -395,6 +395,76 @@ static void polygeist_v2_check_devinfo(const char *call, int *dev) {
 #undef POLYGEIST_V2_MATRIX_CUDA
 
 /* BEGIN GENERATED WRAPPERS */
+extern __typeof__(polygeist_cub_reduce_and_i32) polygeist_cub_reduce_and_i32 __attribute__((weak));
+void polygeist_v2_DeviceReduce_cub_reduce_and_i32(int32_t n, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_reduce_and_i32)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "optional vendor entry is not linked");
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)n <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)n;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)1 <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)1)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)1;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_and_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceReduce_cub_reduce_and_i32", "polygeist_cub_reduce_and_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_reduce_and_i32(n, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_reduce_or_i32) polygeist_cub_reduce_or_i32 __attribute__((weak));
+void polygeist_v2_DeviceReduce_cub_reduce_or_i32(int32_t n, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_reduce_or_i32)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "optional vendor entry is not linked");
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)n <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)n;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)1 <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)1)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)1;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_or_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceReduce_cub_reduce_or_i32", "polygeist_cub_reduce_or_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_reduce_or_i32(n, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
 extern __typeof__(polygeist_cub_reduce_product_f32) polygeist_cub_reduce_product_f32 __attribute__((weak));
 void polygeist_v2_DeviceReduce_cub_reduce_product_f32(int32_t n, float seed, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (!polygeist_cub_reduce_product_f32)
@@ -492,6 +562,60 @@ void polygeist_v2_DeviceReduce_cub_reduce_sum_f64(int32_t n, double seed, const 
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_reduce_value_and_i32) polygeist_cub_reduce_value_and_i32 __attribute__((weak));
+int polygeist_v2_DeviceReduce_cub_reduce_value_and_i32(int32_t n, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride) {
+  if (!polygeist_cub_reduce_value_and_i32)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_and_i32", "optional vendor entry is not linked");
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_and_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_and_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)n <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_and_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)n;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_and_i32", "array layout or capacity mismatch");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceReduce_cub_reduce_value_and_i32", "polygeist_cub_reduce_value_and_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  int pv2_result = polygeist_cub_reduce_value_and_i32(n, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+  return pv2_result;
+}
+
+extern __typeof__(polygeist_cub_reduce_value_or_i32) polygeist_cub_reduce_value_or_i32 __attribute__((weak));
+int polygeist_v2_DeviceReduce_cub_reduce_value_or_i32(int32_t n, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride) {
+  if (!polygeist_cub_reduce_value_or_i32)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_or_i32", "optional vendor entry is not linked");
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_or_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_or_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)n <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_or_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)n;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceReduce_cub_reduce_value_or_i32", "array layout or capacity mismatch");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceReduce_cub_reduce_value_or_i32", "polygeist_cub_reduce_value_or_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  int pv2_result = polygeist_cub_reduce_value_or_i32(n, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+  return pv2_result;
 }
 
 extern __typeof__(polygeist_cub_reduce_value_sum_f32) polygeist_cub_reduce_value_sum_f32 __attribute__((weak));
@@ -605,6 +729,481 @@ void polygeist_v2_DeviceScanInclusiveScanInit_cub_inclusive_scan_f32(int32_t n, 
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
   polygeist_cub_scan_inclusive_seed_f32(n, inclusive, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_column_sum_i8_i32) polygeist_cub_column_sum_i8_i32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_column_sum_i8_i32(int32_t rows, int32_t cols, int32_t seed, const signed char *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_column_sum_i8_i32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 8388607)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "integer outside wrapper bounds");
+  if (seed < -1073741824 || seed > 1073741824)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(signed char);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)cols <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)cols;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_column_sum_i8_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_column_sum_i8_i32", "polygeist_cub_column_sum_i8_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_column_sum_i8_i32(rows, cols, seed, (const signed char *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_segmented_count_nonzero_f32) polygeist_cub_segmented_count_nonzero_f32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_segmented_count_nonzero_f32(int32_t rows, int32_t cols, const float *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_segmented_count_nonzero_f32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_segmented_count_nonzero_f32", "polygeist_cub_segmented_count_nonzero_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_segmented_count_nonzero_f32(rows, cols, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_segmented_logical_mode_i32) polygeist_cub_segmented_logical_mode_i32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_segmented_logical_mode_i32(int32_t rows, int32_t cols, int32_t all, const int *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_segmented_logical_mode_i32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "integer outside wrapper bounds");
+  if (all < -2147483648 || all > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_segmented_logical_mode_i32", "polygeist_cub_segmented_logical_mode_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_segmented_logical_mode_i32(rows, cols, all, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_segmented_reduce_and_i32) polygeist_cub_segmented_reduce_and_i32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_segmented_reduce_and_i32(int32_t rows, int32_t cols, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_segmented_reduce_and_i32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_segmented_reduce_and_i32", "polygeist_cub_segmented_reduce_and_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_segmented_reduce_and_i32(rows, cols, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_segmented_reduce_or_i32) polygeist_cub_segmented_reduce_or_i32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_segmented_reduce_or_i32(int32_t rows, int32_t cols, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_segmented_reduce_or_i32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_segmented_reduce_or_i32", "polygeist_cub_segmented_reduce_or_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_segmented_reduce_or_i32(rows, cols, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_segmented_sum_f32) polygeist_cub_segmented_sum_f32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_segmented_sum_f32(int32_t rows, int32_t cols, float seed, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_segmented_sum_f32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_sum_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_segmented_sum_f32", "polygeist_cub_segmented_sum_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_segmented_sum_f32(rows, cols, seed, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_cub_segmented_xor_i32) polygeist_cub_segmented_xor_i32 __attribute__((weak));
+void polygeist_v2_DeviceSegmentedReduce_cub_segmented_xor_i32(int32_t rows, int32_t cols, int32_t seed, const int *input, int64_t input_bytes, int32_t input_stride, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_cub_segmented_xor_i32)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "integer outside wrapper bounds");
+  if (seed < -2147483648 || seed > 2147483647)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("DeviceSegmentedReduce_cub_segmented_xor_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "DeviceSegmentedReduce_cub_segmented_xor_i32", "polygeist_cub_segmented_xor_i32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cub_segmented_xor_i32(rows, cols, seed, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_ordered_rows_nansum_f32) polygeist_ordered_rows_nansum_f32 __attribute__((weak));
+void polygeist_v2_ThreadReduce_aten_nansum_ordered_f32(int32_t rows, int32_t cols, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_ordered_rows_nansum_f32)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("ThreadReduce_aten_nansum_ordered_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "ThreadReduce_aten_nansum_ordered_f32", "polygeist_ordered_rows_nansum_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_ordered_rows_nansum_f32(rows, cols, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_ordered_row_prefix_sum_f32) polygeist_ordered_row_prefix_sum_f32 __attribute__((weak));
+void polygeist_v2_ThreadReduce_cub_ordered_row_prefix_sum_f32(int32_t rows, int32_t cols, const float *input, int64_t input_bytes, int32_t input_stride, const int *length, int64_t length_bytes, int32_t length_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_ordered_row_prefix_sum_f32)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_length = sizeof(int);
+  if ((int64_t)rows <= 0 || pv2_bytes_length > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array extent overflow");
+  pv2_bytes_length *= (int64_t)rows;
+  if (length_stride != 1 || !length || length_bytes < pv2_bytes_length)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(length, length_bytes, output, output_bytes))
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_row_prefix_sum_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "ThreadReduce_cub_ordered_row_prefix_sum_f32", "polygeist_ordered_row_prefix_sum_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_length = polygeist_v2_map_add(&pv2_map, length, length_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_ordered_row_prefix_sum_f32(rows, cols, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_length), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_ordered_rows_divided_sum_f32) polygeist_ordered_rows_divided_sum_f32 __attribute__((weak));
+void polygeist_v2_ThreadReduce_cub_ordered_rows_divided_sum_f32(int32_t rows, int32_t cols, float seed, float factor, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_ordered_rows_divided_sum_f32)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_divided_sum_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "ThreadReduce_cub_ordered_rows_divided_sum_f32", "polygeist_ordered_rows_divided_sum_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_ordered_rows_divided_sum_f32(rows, cols, seed, factor, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_ordered_rows_scaled_sum_f32) polygeist_ordered_rows_scaled_sum_f32 __attribute__((weak));
+void polygeist_v2_ThreadReduce_cub_ordered_rows_scaled_sum_f32(int32_t rows, int32_t cols, float seed, float factor, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_ordered_rows_scaled_sum_f32)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_scaled_sum_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "ThreadReduce_cub_ordered_rows_scaled_sum_f32", "polygeist_ordered_rows_scaled_sum_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_ordered_rows_scaled_sum_f32(rows, cols, seed, factor, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_ordered_rows_sum_f32) polygeist_ordered_rows_sum_f32 __attribute__((weak));
+void polygeist_v2_ThreadReduce_cub_ordered_rows_sum_f32(int32_t rows, int32_t cols, float seed, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_ordered_rows_sum_f32)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "optional vendor entry is not linked");
+  if (rows < 1 || rows > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "integer outside wrapper bounds");
+  if (cols < 1 || cols > 2147483647)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)rows;
+  if ((int64_t)cols <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)cols)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)cols;
+  if (input_stride != (int64_t)cols || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)rows <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)rows)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)rows;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("ThreadReduce_cub_ordered_rows_sum_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "ThreadReduce_cub_ordered_rows_sum_f32", "polygeist_ordered_rows_sum_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_ordered_rows_sum_f32(rows, cols, seed, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -745,6 +1344,62 @@ void polygeist_v2_cublasDtrsv(int32_t uplo, int32_t trans, int32_t diag, int32_t
   polygeist_v2_map_to_host(&pv2_map);
 }
 
+void polygeist_v2_cublasGemmEx_cutlass_gemm_i8_i32(int32_t m, int32_t n, int32_t k, const signed char *a, int64_t a_bytes, int32_t a_stride, const signed char *b, int64_t b_bytes, int32_t b_stride, int *out, int64_t out_bytes, int32_t out_stride) {
+  if (m < 1 || m > 2147483647)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "integer outside wrapper bounds");
+  if (n < 4 || n > 2147483644)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "integer outside wrapper bounds");
+  if (n % 4 != 0)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "integer violates wrapper divisibility");
+  if (k < 4 || k > 131068)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "integer outside wrapper bounds");
+  if (k % 4 != 0)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "integer violates wrapper divisibility");
+  int64_t pv2_bytes_a = sizeof(signed char);
+  if ((int64_t)m <= 0 || pv2_bytes_a > INT64_MAX / (int64_t)m)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array extent overflow");
+  pv2_bytes_a *= (int64_t)m;
+  if ((int64_t)k <= 0 || pv2_bytes_a > INT64_MAX / (int64_t)k)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array extent overflow");
+  pv2_bytes_a *= (int64_t)k;
+  if (a_stride != (int64_t)k || !a || a_bytes < pv2_bytes_a)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_b = sizeof(signed char);
+  if ((int64_t)k <= 0 || pv2_bytes_b > INT64_MAX / (int64_t)k)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array extent overflow");
+  pv2_bytes_b *= (int64_t)k;
+  if ((int64_t)n <= 0 || pv2_bytes_b > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array extent overflow");
+  pv2_bytes_b *= (int64_t)n;
+  if (b_stride != (int64_t)n || !b || b_bytes < pv2_bytes_b)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_out = sizeof(int);
+  if ((int64_t)m <= 0 || pv2_bytes_out > INT64_MAX / (int64_t)m)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array extent overflow");
+  pv2_bytes_out *= (int64_t)m;
+  if ((int64_t)n <= 0 || pv2_bytes_out > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array extent overflow");
+  pv2_bytes_out *= (int64_t)n;
+  if (out_stride != (int64_t)n || !out || out_bytes < pv2_bytes_out)
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(a, a_bytes, out, out_bytes))
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(b, b_bytes, out, out_bytes))
+    polygeist_v2_fatal("cublasGemmEx_cutlass_gemm_i8_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "cublasGemmEx_cutlass_gemm_i8_i32", "polygeist_cublas_gemmex_i8_i32");
+  int pv2_k_a = polygeist_v2_map_add(&pv2_map, a, a_bytes, 0);
+  int pv2_k_b = polygeist_v2_map_add(&pv2_map, b, b_bytes, 0);
+  int pv2_k_out = polygeist_v2_map_add(&pv2_map, out, out_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cublas_gemmex_i8_i32(m, n, k, (const signed char *)polygeist_v2_map_dev(&pv2_map, pv2_k_a), (const signed char *)polygeist_v2_map_dev(&pv2_map, pv2_k_b), (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_out));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
 void polygeist_v2_cublasScopy(int32_t n, const float *x, int64_t x_bytes, int32_t incx, float *y, int64_t y_bytes, int32_t incy) {
   polygeist_v2_map_t pv2_map;
   polygeist_v2_map_init(&pv2_map, "cublasScopy", "cublasScopy_v2");
@@ -801,10 +1456,10 @@ void polygeist_v2_cublasSsyr2k(int32_t uplo, int32_t trans, int32_t n, int32_t k
 
 void polygeist_v2_cudnnBackendExecute_aten_abs_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_abs_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_abs_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_abs_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_abs_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_abs_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_abs_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -814,7 +1469,7 @@ void polygeist_v2_cudnnBackendExecute_aten_abs_f32(int32_t n, const float *x, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 150994944LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 150994944LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -822,12 +1477,12 @@ void polygeist_v2_cudnnBackendExecute_aten_abs_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_add_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "runtime adapter requires a contiguous FP32 row");
-  if (y_stride != 1 || !y || y_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "invalid strided FP32 row");
+  if (y_stride <= 0 || !y || y_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * y_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes) && !(x == output && x_bytes == output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_add_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes) && !(y == output && y_bytes == output_bytes))
@@ -840,7 +1495,7 @@ void polygeist_v2_cudnnBackendExecute_aten_add_f32(int32_t n, const float *x, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 16777472LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_y), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 16777472LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, y_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_y), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -848,14 +1503,14 @@ void polygeist_v2_cudnnBackendExecute_aten_add_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_addcdiv_f32(int32_t n, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, const float *t1_val, int64_t t1_val_bytes, int32_t t1_val_stride, const float *t2_val, int64_t t2_val_bytes, int32_t t2_val_stride, float *output, int64_t output_bytes, int32_t output_stride, float scalar_val) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "nonpositive dimension");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "runtime adapter requires a contiguous FP32 row");
-  if (t1_val_stride != 1 || !t1_val || t1_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "runtime adapter requires a contiguous FP32 row");
-  if (t2_val_stride != 1 || !t2_val || t2_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "runtime adapter requires a contiguous FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "invalid strided FP32 row");
+  if (t1_val_stride <= 0 || !t1_val || t1_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * t1_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "invalid strided FP32 row");
+  if (t2_val_stride <= 0 || !t2_val || t2_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * t2_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_addcdiv_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(t1_val, t1_val_bytes, output, output_bytes))
@@ -871,7 +1526,7 @@ void polygeist_v2_cudnnBackendExecute_aten_addcdiv_f32(int32_t n, const float *s
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 291610274929312000LL, 16780544LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, scalar_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t1_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t2_val), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 291610274929312000LL, 16780544LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, scalar_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, t1_val_stride, t2_val_stride, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t1_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t2_val), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -879,14 +1534,14 @@ void polygeist_v2_cudnnBackendExecute_aten_addcdiv_f32(int32_t n, const float *s
 
 void polygeist_v2_cudnnBackendExecute_aten_addcmul_f32(int32_t n, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, const float *t1_val, int64_t t1_val_bytes, int32_t t1_val_stride, const float *t2_val, int64_t t2_val_bytes, int32_t t2_val_stride, float *output, int64_t output_bytes, int32_t output_stride, float scalar_val) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "nonpositive dimension");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "runtime adapter requires a contiguous FP32 row");
-  if (t1_val_stride != 1 || !t1_val || t1_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "runtime adapter requires a contiguous FP32 row");
-  if (t2_val_stride != 1 || !t2_val || t2_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "runtime adapter requires a contiguous FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "invalid strided FP32 row");
+  if (t1_val_stride <= 0 || !t1_val || t1_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * t1_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "invalid strided FP32 row");
+  if (t2_val_stride <= 0 || !t2_val || t2_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * t2_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_addcmul_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(t1_val, t1_val_bytes, output, output_bytes))
@@ -902,7 +1557,7 @@ void polygeist_v2_cudnnBackendExecute_aten_addcmul_f32(int32_t n, const float *s
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 147495086853456128LL, 16780544LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, scalar_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t1_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t2_val), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 147495086853456128LL, 16780544LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, scalar_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, t1_val_stride, t2_val_stride, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t1_val), polygeist_v2_map_dev(&pv2_map, pv2_k_t2_val), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -910,14 +1565,14 @@ void polygeist_v2_cudnnBackendExecute_aten_addcmul_f32(int32_t n, const float *s
 
 void polygeist_v2_cudnnBackendExecute_aten_addr_elementwise_f32(int32_t n, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, const float *vec1_val, int64_t vec1_val_bytes, int32_t vec1_val_stride, const float *vec2_val, int64_t vec2_val_bytes, int32_t vec2_val_stride, float beta_val, float alpha_val, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "nonpositive dimension");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "runtime adapter requires a contiguous FP32 row");
-  if (vec1_val_stride != 1 || !vec1_val || vec1_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "runtime adapter requires a contiguous FP32 row");
-  if (vec2_val_stride != 1 || !vec2_val || vec2_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "runtime adapter requires a contiguous FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "invalid strided FP32 row");
+  if (vec1_val_stride <= 0 || !vec1_val || vec1_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * vec1_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "invalid strided FP32 row");
+  if (vec2_val_stride <= 0 || !vec2_val || vec2_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * vec2_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_addr_elementwise_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(vec1_val, vec1_val_bytes, output, output_bytes))
@@ -933,7 +1588,7 @@ void polygeist_v2_cudnnBackendExecute_aten_addr_elementwise_f32(int32_t n, const
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 147493987341893632LL, 145522562993226240LL, 76015835932459264LL, 2094751143732446720LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, beta_val, alpha_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_vec1_val), polygeist_v2_map_dev(&pv2_map, pv2_k_vec2_val), polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 147493987341893632LL, 145522562993226240LL, 76015835932459264LL, 2094751143732446720LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, beta_val, alpha_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, vec1_val_stride, vec2_val_stride, self_val_stride, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_vec1_val), polygeist_v2_map_dev(&pv2_map, pv2_k_vec2_val), polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -941,12 +1596,12 @@ void polygeist_v2_cudnnBackendExecute_aten_addr_elementwise_f32(int32_t n, const
 
 void polygeist_v2_cudnnBackendExecute_aten_atan2_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_atan2_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -959,7 +1614,7 @@ void polygeist_v2_cudnnBackendExecute_aten_atan2_f32(int32_t n, const float *a, 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 570425600LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 570425600LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -967,10 +1622,10 @@ void polygeist_v2_cudnnBackendExecute_aten_atan2_f32(int32_t n, const float *a, 
 
 void polygeist_v2_cudnnBackendExecute_aten_ceil_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_ceil_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ceil_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ceil_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ceil_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ceil_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_ceil_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -980,7 +1635,7 @@ void polygeist_v2_cudnnBackendExecute_aten_ceil_f32(int32_t n, const float *a, i
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 285212672LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 285212672LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -988,10 +1643,10 @@ void polygeist_v2_cudnnBackendExecute_aten_ceil_f32(int32_t n, const float *a, i
 
 void polygeist_v2_cudnnBackendExecute_aten_clamp_max_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride, float max) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_max_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_max_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_max_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_max_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_max_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_max_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1001,7 +1656,7 @@ void polygeist_v2_cudnnBackendExecute_aten_clamp_max_f32(int32_t n, const float 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052325320196096LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, max, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052325320196096LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, max, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1009,10 +1664,10 @@ void polygeist_v2_cudnnBackendExecute_aten_clamp_max_f32(int32_t n, const float 
 
 void polygeist_v2_cudnnBackendExecute_aten_clamp_min_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride, float min) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_min_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_min_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_min_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_min_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_min_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_min_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1022,7 +1677,7 @@ void polygeist_v2_cudnnBackendExecute_aten_clamp_min_f32(int32_t n, const float 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052325319934976LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, min, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052325319934976LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, min, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1030,10 +1685,10 @@ void polygeist_v2_cudnnBackendExecute_aten_clamp_min_f32(int32_t n, const float 
 
 void polygeist_v2_cudnnBackendExecute_aten_clamp_scalar_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride, float min, float max) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_scalar_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_scalar_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_scalar_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_scalar_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_scalar_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_clamp_scalar_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1043,28 +1698,43 @@ void polygeist_v2_cudnnBackendExecute_aten_clamp_scalar_f32(int32_t n, const flo
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052325319934976LL, 2093616430619888896LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, min, max, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052325319934976LL, 2093616430619888896LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, min, max, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
 }
 
-void polygeist_v2_cudnnBackendExecute_aten_cos_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
-  if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_cos_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_cos_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_cos_f32", "runtime adapter requires a contiguous FP32 row");
-  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_cos_f32", "unsupported output overlap");
+void polygeist_v2_cudnnBackendExecute_aten_cross_component_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, const float *c, int64_t c_bytes, int32_t c_stride, const float *d, int64_t d_bytes, int32_t d_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "nonpositive dimension");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "invalid strided FP32 row");
+  if (c_stride <= 0 || !c || c_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * c_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "invalid strided FP32 row");
+  if (d_stride <= 0 || !d || d_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * d_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "invalid strided FP32 row");
+  if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(c, c_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(d, d_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnBackendExecute_aten_cross_component_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
-  polygeist_v2_map_init(&pv2_map, "cudnnBackendExecute_aten_cos_f32", "cudnnBackendExecute");
-  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  polygeist_v2_map_init(&pv2_map, "cudnnBackendExecute_aten_cross_component_f32", "cudnnBackendExecute");
+  int pv2_k_a = polygeist_v2_map_add(&pv2_map, a, a_bytes, 0);
+  int pv2_k_b = polygeist_v2_map_add(&pv2_map, b, b_bytes, 0);
+  int pv2_k_c = polygeist_v2_map_add(&pv2_map, c, c_bytes, 0);
+  int pv2_k_d = polygeist_v2_map_add(&pv2_map, d, d_bytes, 0);
   int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 234881024LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 144681436597715200LL, 51121408LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, c_stride, d_stride, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), polygeist_v2_map_dev(&pv2_map, pv2_k_c), polygeist_v2_map_dev(&pv2_map, pv2_k_d), polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1072,12 +1742,12 @@ void polygeist_v2_cudnnBackendExecute_aten_cos_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_div_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_div_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1090,7 +1760,7 @@ void polygeist_v2_cudnnBackendExecute_aten_div_f32(int32_t n, const float *a, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 67109120LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 67109120LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1098,12 +1768,12 @@ void polygeist_v2_cudnnBackendExecute_aten_div_f32(int32_t n, const float *a, in
 
 void polygeist_v2_cudnnBackendExecute_aten_eq_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_eq_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1116,7 +1786,7 @@ void polygeist_v2_cudnnBackendExecute_aten_eq_f32(int32_t n, const float *a, int
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052346727661824LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052346727661824LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1124,10 +1794,10 @@ void polygeist_v2_cudnnBackendExecute_aten_eq_f32(int32_t n, const float *a, int
 
 void polygeist_v2_cudnnBackendExecute_aten_erf_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_erf_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_erf_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_erf_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_erf_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_erf_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_erf_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1137,7 +1807,7 @@ void polygeist_v2_cudnnBackendExecute_aten_erf_f32(int32_t n, const float *a, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 301989888LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 301989888LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1145,10 +1815,10 @@ void polygeist_v2_cudnnBackendExecute_aten_erf_f32(int32_t n, const float *a, in
 
 void polygeist_v2_cudnnBackendExecute_aten_exp_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_exp_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_exp_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_exp_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_exp_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_exp_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_exp_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1158,7 +1828,7 @@ void polygeist_v2_cudnnBackendExecute_aten_exp_f32(int32_t n, const float *x, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 117440512LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 117440512LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1166,10 +1836,10 @@ void polygeist_v2_cudnnBackendExecute_aten_exp_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_floor_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_floor_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_floor_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_floor_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_floor_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_floor_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_floor_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1179,7 +1849,7 @@ void polygeist_v2_cudnnBackendExecute_aten_floor_f32(int32_t n, const float *a, 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 268435456LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 268435456LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1187,10 +1857,10 @@ void polygeist_v2_cudnnBackendExecute_aten_floor_f32(int32_t n, const float *a, 
 
 void polygeist_v2_cudnnBackendExecute_aten_frac_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_frac_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_frac_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_frac_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_frac_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_frac_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_frac_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1200,7 +1870,7 @@ void polygeist_v2_cudnnBackendExecute_aten_frac_f32(int32_t n, const float *a, i
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1224979099097760768LL, 2093062280869576704LL, 50335488LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1224979099097760768LL, 2093062280869576704LL, 50335488LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1208,12 +1878,12 @@ void polygeist_v2_cudnnBackendExecute_aten_frac_f32(int32_t n, const float *a, i
 
 void polygeist_v2_cudnnBackendExecute_aten_ge_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_ge_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1226,7 +1896,7 @@ void polygeist_v2_cudnnBackendExecute_aten_ge_f32(int32_t n, const float *a, int
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052346777993472LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052346777993472LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1234,10 +1904,10 @@ void polygeist_v2_cudnnBackendExecute_aten_ge_f32(int32_t n, const float *a, int
 
 void polygeist_v2_cudnnBackendExecute_aten_gelu_exact_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_exact_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_exact_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_exact_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_exact_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_exact_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_exact_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1247,7 +1917,7 @@ void polygeist_v2_cudnnBackendExecute_aten_gelu_exact_f32(int32_t n, const float
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 144120685667550208LL, 76004841084485632LL, 34344704LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.5f, 0.707106769f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 144120685667550208LL, 76004841084485632LL, 34344704LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.5f, 0.707106769f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1255,10 +1925,10 @@ void polygeist_v2_cudnnBackendExecute_aten_gelu_exact_f32(int32_t n, const float
 
 void polygeist_v2_cudnnBackendExecute_aten_gelu_tanh_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_tanh_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_tanh_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_tanh_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_tanh_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_tanh_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_gelu_tanh_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1268,7 +1938,7 @@ void polygeist_v2_cudnnBackendExecute_aten_gelu_tanh_f32(int32_t n, const float 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 147492887829938176LL, 72072987235124224LL, 144120685668011776LL, 77130740790198272LL, 34673408LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 9, 0.044715f, 0.5f, 1.0f, 0.7978845834732056f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 147492887829938176LL, 72072987235124224LL, 144120685668011776LL, 77130740790198272LL, 34673408LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 9, 0.044715f, 0.5f, 1.0f, 0.7978845834732056f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1276,12 +1946,12 @@ void polygeist_v2_cudnnBackendExecute_aten_gelu_tanh_f32(int32_t n, const float 
 
 void polygeist_v2_cudnnBackendExecute_aten_gt_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_gt_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1294,7 +1964,7 @@ void polygeist_v2_cudnnBackendExecute_aten_gt_f32(int32_t n, const float *a, int
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052346761216256LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052346761216256LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1302,12 +1972,12 @@ void polygeist_v2_cudnnBackendExecute_aten_gt_f32(int32_t n, const float *a, int
 
 void polygeist_v2_cudnnBackendExecute_aten_hardsigmoid_backward_f32(int32_t n, const float *grad_val, int64_t grad_val_bytes, int32_t grad_val_stride, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "nonpositive dimension");
-  if (grad_val_stride != 1 || !grad_val || grad_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (grad_val_stride <= 0 || !grad_val || grad_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * grad_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "invalid strided FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(grad_val, grad_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
@@ -1320,7 +1990,7 @@ void polygeist_v2_cudnnBackendExecute_aten_hardsigmoid_backward_f32(int32_t n, c
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1945560537001624576LL, 144403260626439424LL, 487460615LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, -3.0f, 3.0f, 0.166666672f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1945560537001624576LL, 144403260626439424LL, 487460615LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, -3.0f, 3.0f, 0.166666672f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, grad_val_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1328,10 +1998,10 @@ void polygeist_v2_cudnnBackendExecute_aten_hardsigmoid_backward_f32(int32_t n, c
 
 void polygeist_v2_cudnnBackendExecute_aten_hardsigmoid_f32(int32_t n, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_f32", "nonpositive dimension");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_f32", "runtime adapter requires a contiguous FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_hardsigmoid_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1341,7 +2011,7 @@ void polygeist_v2_cudnnBackendExecute_aten_hardsigmoid_f32(int32_t n, const floa
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1948938236319499264LL, 1947259282534499596LL, 292740573336372750LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 6, 3.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1948938236319499264LL, 1947259282534499596LL, 292740573336372750LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 6, 3.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1349,12 +2019,12 @@ void polygeist_v2_cudnnBackendExecute_aten_hardsigmoid_f32(int32_t n, const floa
 
 void polygeist_v2_cudnnBackendExecute_aten_hardswish_backward_f32(int32_t n, const float *grad_val, int64_t grad_val_bytes, int32_t grad_val_stride, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "nonpositive dimension");
-  if (grad_val_stride != 1 || !grad_val || grad_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (grad_val_stride <= 0 || !grad_val || grad_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * grad_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "invalid strided FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(grad_val, grad_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
@@ -1367,7 +2037,7 @@ void polygeist_v2_cudnnBackendExecute_aten_hardswish_backward_f32(int32_t n, con
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1945560537051956224LL, 76004840848753920LL, 2093346998311784192LL, 487327505LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 7, -3.0f, 3.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1945560537051956224LL, 76004840848753920LL, 2093346998311784192LL, 487327505LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 7, -3.0f, 3.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, grad_val_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1375,10 +2045,10 @@ void polygeist_v2_cudnnBackendExecute_aten_hardswish_backward_f32(int32_t n, con
 
 void polygeist_v2_cudnnBackendExecute_aten_hardswish_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_hardswish_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1388,7 +2058,7 @@ void polygeist_v2_cudnnBackendExecute_aten_hardswish_f32(int32_t n, const float 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1948938236319499264LL, 1947259282534499596LL, 144132780749424142LL, 68224512LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 7, 3.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1948938236319499264LL, 1947259282534499596LL, 144132780749424142LL, 68224512LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 7, 3.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1396,12 +2066,12 @@ void polygeist_v2_cudnnBackendExecute_aten_hardswish_f32(int32_t n, const float 
 
 void polygeist_v2_cudnnBackendExecute_aten_hardtanh_backward_f32(int32_t n, const float *grad_val, int64_t grad_val_bytes, int32_t grad_val_stride, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, float *output, int64_t output_bytes, int32_t output_stride, float min_val, float max_val) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "nonpositive dimension");
-  if (grad_val_stride != 1 || !grad_val || grad_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (grad_val_stride <= 0 || !grad_val || grad_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * grad_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "invalid strided FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(grad_val, grad_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_hardtanh_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
@@ -1414,7 +2084,7 @@ void polygeist_v2_cudnnBackendExecute_aten_hardtanh_backward_f32(int32_t n, cons
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1873504042525656320LL, 2093615279636221184LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, min_val, max_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1873504042525656320LL, 2093615279636221184LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, min_val, max_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, grad_val_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1422,12 +2092,12 @@ void polygeist_v2_cudnnBackendExecute_aten_hardtanh_backward_f32(int32_t n, cons
 
 void polygeist_v2_cudnnBackendExecute_aten_le_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_le_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1440,7 +2110,7 @@ void polygeist_v2_cudnnBackendExecute_aten_le_f32(int32_t n, const float *a, int
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052346811547904LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052346811547904LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1448,10 +2118,10 @@ void polygeist_v2_cudnnBackendExecute_aten_le_f32(int32_t n, const float *a, int
 
 void polygeist_v2_cudnnBackendExecute_aten_leaky_relu_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride, float negval) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_leaky_relu_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_leaky_relu_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_leaky_relu_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_leaky_relu_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_leaky_relu_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_leaky_relu_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1461,7 +2131,7 @@ void polygeist_v2_cudnnBackendExecute_aten_leaky_relu_f32(int32_t n, const float
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 144120686053426176LL, 487325709LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 0.0f, negval, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 144120686053426176LL, 487325709LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 0.0f, negval, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1469,10 +2139,10 @@ void polygeist_v2_cudnnBackendExecute_aten_leaky_relu_f32(int32_t n, const float
 
 void polygeist_v2_cudnnBackendExecute_aten_log_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_log_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_log_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_log_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_log_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_log_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_log_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1482,7 +2152,7 @@ void polygeist_v2_cudnnBackendExecute_aten_log_f32(int32_t n, const float *x, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 201326592LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 201326592LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1490,14 +2160,14 @@ void polygeist_v2_cudnnBackendExecute_aten_log_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_log_sigmoid_backward_f32(int32_t n, const float *input, int64_t input_bytes, int32_t input_stride, const float *buffer, int64_t buffer_bytes, int32_t buffer_stride, const float *grad, int64_t grad_bytes, int32_t grad_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "nonpositive dimension");
-  if (input_stride != 1 || !input || input_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (buffer_stride != 1 || !buffer || buffer_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (grad_stride != 1 || !grad || grad_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (input_stride <= 0 || !input || input_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * input_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "invalid strided FP32 row");
+  if (buffer_stride <= 0 || !buffer || buffer_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * buffer_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "invalid strided FP32 row");
+  if (grad_stride <= 0 || !grad || grad_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * grad_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_log_sigmoid_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(buffer, buffer_bytes, output, output_bytes))
@@ -1513,7 +2183,7 @@ void polygeist_v2_cudnnBackendExecute_aten_log_sigmoid_backward_f32(int32_t n, c
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093053442011431936LL, 72344567060104454LL, 148073430003027712LL, 149183936731091200LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_input), polygeist_v2_map_dev(&pv2_map, pv2_k_buffer), polygeist_v2_map_dev(&pv2_map, pv2_k_grad), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093053442011431936LL, 72344567060104454LL, 148073430003027712LL, 149183936731091200LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, input_stride, buffer_stride, grad_stride, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_input), polygeist_v2_map_dev(&pv2_map, pv2_k_buffer), polygeist_v2_map_dev(&pv2_map, pv2_k_grad), NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1521,12 +2191,12 @@ void polygeist_v2_cudnnBackendExecute_aten_log_sigmoid_backward_f32(int32_t n, c
 
 void polygeist_v2_cudnnBackendExecute_aten_logical_and_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_logical_and_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1539,7 +2209,7 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_and_f32(int32_t n, const floa
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1729668130336146432LL, 2093616392015973632LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1729668130336146432LL, 2093616392015973632LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1547,10 +2217,10 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_and_f32(int32_t n, const floa
 
 void polygeist_v2_cudnnBackendExecute_aten_logical_not_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_logical_not_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_not_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_not_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_not_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_not_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_logical_not_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1560,7 +2230,7 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_not_f32(int32_t n, const floa
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2309220709336876032LL, 487392516LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2309220709336876032LL, 487392516LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1568,12 +2238,12 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_not_f32(int32_t n, const floa
 
 void polygeist_v2_cudnnBackendExecute_aten_logical_or_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_logical_or_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1586,7 +2256,7 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_or_f32(int32_t n, const float
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1729668130336146432LL, 2093616392032750848LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1729668130336146432LL, 2093616392032750848LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1594,12 +2264,12 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_or_f32(int32_t n, const float
 
 void polygeist_v2_cudnnBackendExecute_aten_logical_xor_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_logical_xor_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1612,7 +2282,7 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_xor_f32(int32_t n, const floa
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1729668130336146432LL, 2309220709471944704LL, 2165964239943765504LL, 2094742291939856640LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1729668130336146432LL, 2309220709471944704LL, 2165964239943765504LL, 2094742291939856640LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1620,12 +2290,12 @@ void polygeist_v2_cudnnBackendExecute_aten_logical_xor_f32(int32_t n, const floa
 
 void polygeist_v2_cudnnBackendExecute_aten_lt_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_lt_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1638,7 +2308,7 @@ void polygeist_v2_cudnnBackendExecute_aten_lt_f32(int32_t n, const float *a, int
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052346794770688LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052346794770688LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1646,12 +2316,12 @@ void polygeist_v2_cudnnBackendExecute_aten_lt_f32(int32_t n, const float *a, int
 
 void polygeist_v2_cudnnBackendExecute_aten_mul_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_mul_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1664,7 +2334,7 @@ void polygeist_v2_cudnnBackendExecute_aten_mul_f32(int32_t n, const float *a, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 33554688LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 33554688LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1672,12 +2342,12 @@ void polygeist_v2_cudnnBackendExecute_aten_mul_f32(int32_t n, const float *a, in
 
 void polygeist_v2_cudnnBackendExecute_aten_ne_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_ne_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1690,7 +2360,7 @@ void polygeist_v2_cudnnBackendExecute_aten_ne_f32(int32_t n, const float *a, int
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093052346744439040LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093052346744439040LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1698,10 +2368,10 @@ void polygeist_v2_cudnnBackendExecute_aten_ne_f32(int32_t n, const float *a, int
 
 void polygeist_v2_cudnnBackendExecute_aten_neg_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_neg_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_neg_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_neg_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_neg_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_neg_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_neg_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1711,7 +2381,7 @@ void polygeist_v2_cudnnBackendExecute_aten_neg_f32(int32_t n, const float *x, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 352321536LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 352321536LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1719,12 +2389,12 @@ void polygeist_v2_cudnnBackendExecute_aten_neg_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_pow_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_pow_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1737,7 +2407,7 @@ void polygeist_v2_cudnnBackendExecute_aten_pow_f32(int32_t n, const float *a, in
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 318767360LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 318767360LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1745,10 +2415,10 @@ void polygeist_v2_cudnnBackendExecute_aten_pow_f32(int32_t n, const float *a, in
 
 void polygeist_v2_cudnnBackendExecute_aten_pow_uniform_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float exponent, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_pow_uniform_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_uniform_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_uniform_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_uniform_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_pow_uniform_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_pow_uniform_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1758,7 +2428,7 @@ void polygeist_v2_cudnnBackendExecute_aten_pow_uniform_f32(int32_t n, const floa
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 318768128LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, exponent, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 318768128LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, exponent, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1766,10 +2436,10 @@ void polygeist_v2_cudnnBackendExecute_aten_pow_uniform_f32(int32_t n, const floa
 
 void polygeist_v2_cudnnBackendExecute_aten_reciprocal_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_reciprocal_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_reciprocal_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_reciprocal_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_reciprocal_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_reciprocal_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_reciprocal_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1779,7 +2449,28 @@ void polygeist_v2_cudnnBackendExecute_aten_reciprocal_f32(int32_t n, const float
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 67371008LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 67371008LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_cudnnBackendExecute_aten_renorm_scale_f32(int32_t n, const float *norm, int64_t norm_bytes, int32_t norm_stride, float maxnorm, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_renorm_scale_f32", "nonpositive dimension");
+  if (norm_stride <= 0 || !norm || norm_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * norm_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_renorm_scale_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_renorm_scale_f32", "invalid strided FP32 row");
+  if (polygeist_v2_overlaps(norm, norm_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnBackendExecute_aten_renorm_scale_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "cudnnBackendExecute_aten_renorm_scale_f32", "cudnnBackendExecute");
+  int pv2_k_norm = polygeist_v2_map_add(&pv2_map, norm, norm_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_cudnn_pointwise_graph_f32(n, 72061992503870976LL, 2093063341525568768LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 1e-07f, 1.0f, maxnorm, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, norm_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_norm), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1787,10 +2478,10 @@ void polygeist_v2_cudnnBackendExecute_aten_reciprocal_f32(int32_t n, const float
 
 void polygeist_v2_cudnnBackendExecute_aten_rsqrt_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_rsqrt_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_rsqrt_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_rsqrt_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_rsqrt_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_rsqrt_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_rsqrt_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1800,7 +2491,7 @@ void polygeist_v2_cudnnBackendExecute_aten_rsqrt_f32(int32_t n, const float *a, 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 289369470332305408LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 289369470332305408LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1808,12 +2499,12 @@ void polygeist_v2_cudnnBackendExecute_aten_rsqrt_f32(int32_t n, const float *a, 
 
 void polygeist_v2_cudnnBackendExecute_aten_scaled_add_f32(int32_t n, const float *self, int64_t self_bytes, int32_t self_stride, const float *other, int64_t other_bytes, int32_t other_stride, float *output, int64_t output_bytes, int32_t output_stride, float alpha) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "nonpositive dimension");
-  if (self_stride != 1 || !self || self_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "runtime adapter requires a contiguous FP32 row");
-  if (other_stride != 1 || !other || other_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "runtime adapter requires a contiguous FP32 row");
+  if (self_stride <= 0 || !self || self_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "invalid strided FP32 row");
+  if (other_stride <= 0 || !other || other_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * other_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(self, self_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_scaled_add_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(other, other_bytes, output, output_bytes))
@@ -1826,7 +2517,7 @@ void polygeist_v2_cudnnBackendExecute_aten_scaled_add_f32(int32_t n, const float
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 72070788211278080LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, alpha, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self), polygeist_v2_map_dev(&pv2_map, pv2_k_other), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 72070788211278080LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, alpha, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_stride, other_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self), polygeist_v2_map_dev(&pv2_map, pv2_k_other), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1834,12 +2525,12 @@ void polygeist_v2_cudnnBackendExecute_aten_scaled_add_f32(int32_t n, const float
 
 void polygeist_v2_cudnnBackendExecute_aten_shrink_backward_f32(int32_t n, const float *grad_val, int64_t grad_val_bytes, int32_t grad_val_stride, const float *self_val, int64_t self_val_bytes, int32_t self_val_stride, float *output, int64_t output_bytes, int32_t output_stride, float lambd_val) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "nonpositive dimension");
-  if (grad_val_stride != 1 || !grad_val || grad_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (self_val_stride != 1 || !self_val || self_val_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (grad_val_stride <= 0 || !grad_val || grad_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * grad_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "invalid strided FP32 row");
+  if (self_val_stride <= 0 || !self_val || self_val_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * self_val_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(grad_val, grad_val_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_shrink_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(self_val, self_val_bytes, output, output_bytes))
@@ -1852,7 +2543,7 @@ void polygeist_v2_cudnnBackendExecute_aten_shrink_backward_f32(int32_t n, const 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1873510639478308864LL, 2165402389467628800LL, 487523329LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.0f, lambd_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1873510639478308864LL, 2165402389467628800LL, 487523329LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.0f, lambd_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self_val_stride, grad_val_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_self_val), polygeist_v2_map_dev(&pv2_map, pv2_k_grad_val), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1860,12 +2551,12 @@ void polygeist_v2_cudnnBackendExecute_aten_shrink_backward_f32(int32_t n, const 
 
 void polygeist_v2_cudnnBackendExecute_aten_sigmoid_backward_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -1878,7 +2569,7 @@ void polygeist_v2_cudnnBackendExecute_aten_sigmoid_backward_f32(int32_t n, const
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 144128382265983232LL, 34406656LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 144128382265983232LL, 34406656LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1886,10 +2577,10 @@ void polygeist_v2_cudnnBackendExecute_aten_sigmoid_backward_f32(int32_t n, const
 
 void polygeist_v2_cudnnBackendExecute_aten_sigmoid_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_sigmoid_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1899,7 +2590,7 @@ void polygeist_v2_cudnnBackendExecute_aten_sigmoid_f32(int32_t n, const float *x
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 289371669238973440LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 289371669238973440LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1907,10 +2598,10 @@ void polygeist_v2_cudnnBackendExecute_aten_sigmoid_f32(int32_t n, const float *x
 
 void polygeist_v2_cudnnBackendExecute_aten_sign_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_sign_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sign_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sign_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sign_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sign_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_sign_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1920,7 +2611,7 @@ void polygeist_v2_cudnnBackendExecute_aten_sign_f32(int32_t n, const float *a, i
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1945559437523812352LL, 2093334917022483716LL, 51252992LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1945559437523812352LL, 2093334917022483716LL, 51252992LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1928,12 +2619,12 @@ void polygeist_v2_cudnnBackendExecute_aten_sign_f32(int32_t n, const float *a, i
 
 void polygeist_v2_cudnnBackendExecute_aten_silu_backward_f32(int32_t n, const float *dy, int64_t dy_bytes, int32_t dy_stride, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "nonpositive dimension");
-  if (dy_stride != 1 || !dy || dy_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (dy_stride <= 0 || !dy || dy_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * dy_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "invalid strided FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(dy, dy_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_silu_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
@@ -1946,7 +2637,7 @@ void polygeist_v2_cudnnBackendExecute_aten_silu_backward_f32(int32_t n, const fl
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 289371669238973440LL, 217315174728666880LL, 77128541698789632LL, 34607872LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 9, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_dy), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 289371669238973440LL, 217315174728666880LL, 77128541698789632LL, 34607872LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 9, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, dy_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_dy), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1954,10 +2645,10 @@ void polygeist_v2_cudnnBackendExecute_aten_silu_backward_f32(int32_t n, const fl
 
 void polygeist_v2_cudnnBackendExecute_aten_silu_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_silu_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_silu_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_silu_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -1967,28 +2658,7 @@ void polygeist_v2_cudnnBackendExecute_aten_silu_f32(int32_t n, const float *x, i
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 288245769332130816LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
-  polygeist_cublas_pipeline_end();
-  polygeist_require_gpu_libraries_end();
-  polygeist_v2_map_to_host(&pv2_map);
-}
-
-void polygeist_v2_cudnnBackendExecute_aten_sin_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
-  if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_sin_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sin_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sin_f32", "runtime adapter requires a contiguous FP32 row");
-  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sin_f32", "unsupported output overlap");
-  polygeist_v2_map_t pv2_map;
-  polygeist_v2_map_init(&pv2_map, "cudnnBackendExecute_aten_sin_f32", "cudnnBackendExecute");
-  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
-  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
-  polygeist_v2_map_to_device(&pv2_map);
-  polygeist_require_gpu_libraries_begin();
-  polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 218103808LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 288245769332130816LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -1996,10 +2666,10 @@ void polygeist_v2_cudnnBackendExecute_aten_sin_f32(int32_t n, const float *x, in
 
 void polygeist_v2_cudnnBackendExecute_aten_softshrink_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride, float lambd_val) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_softshrink_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_softshrink_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_softshrink_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_softshrink_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_softshrink_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_softshrink_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -2009,7 +2679,7 @@ void polygeist_v2_cudnnBackendExecute_aten_softshrink_f32(int32_t n, const float
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 216178280091354368LL, 1945570432539492352LL, 144119586139145472LL, 2093062298268536849LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, 0.0f, lambd_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 216178280091354368LL, 1945570432539492352LL, 144119586139145472LL, 2093062298268536849LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 8, 0.0f, lambd_val, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2017,10 +2687,10 @@ void polygeist_v2_cudnnBackendExecute_aten_softshrink_f32(int32_t n, const float
 
 void polygeist_v2_cudnnBackendExecute_aten_sqrt_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_sqrt_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sqrt_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_sqrt_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sqrt_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_sqrt_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_sqrt_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -2030,7 +2700,7 @@ void polygeist_v2_cudnnBackendExecute_aten_sqrt_f32(int32_t n, const float *x, i
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 134217728LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 134217728LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2038,12 +2708,12 @@ void polygeist_v2_cudnnBackendExecute_aten_sqrt_f32(int32_t n, const float *x, i
 
 void polygeist_v2_cudnnBackendExecute_aten_tanh_backward_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, const float *b, int64_t b_bytes, int32_t b_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (b_stride != 1 || !b || b_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "invalid strided FP32 row");
+  if (b_stride <= 0 || !b || b_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * b_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_backward_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(b, b_bytes, output, output_bytes))
@@ -2056,7 +2726,7 @@ void polygeist_v2_cudnnBackendExecute_aten_tanh_backward_f32(int32_t n, const fl
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 217311876193779968LL, 33557760LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 217311876193779968LL, 33557760LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 3, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, b_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), polygeist_v2_map_dev(&pv2_map, pv2_k_b), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2064,10 +2734,10 @@ void polygeist_v2_cudnnBackendExecute_aten_tanh_backward_f32(int32_t n, const fl
 
 void polygeist_v2_cudnnBackendExecute_aten_tanh_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_tanh_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -2077,7 +2747,7 @@ void polygeist_v2_cudnnBackendExecute_aten_tanh_f32(int32_t n, const float *x, i
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 100663296LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 100663296LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2085,12 +2755,12 @@ void polygeist_v2_cudnnBackendExecute_aten_tanh_f32(int32_t n, const float *x, i
 
 void polygeist_v2_cudnnBackendExecute_aten_threshold_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *other, int64_t other_bytes, int32_t other_stride, float *output, int64_t output_bytes, int32_t output_stride, float threshold, float value) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "runtime adapter requires a contiguous FP32 row");
-  if (other_stride != 1 || !other || other_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "invalid strided FP32 row");
+  if (other_stride <= 0 || !other || other_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * other_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_threshold_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(other, other_bytes, output, output_bytes))
@@ -2103,7 +2773,7 @@ void polygeist_v2_cudnnBackendExecute_aten_threshold_f32(int32_t n, const float 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 2093053429143307264LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, threshold, value, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_other), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 2093053429143307264LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 2, threshold, value, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, other_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_other), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2111,10 +2781,10 @@ void polygeist_v2_cudnnBackendExecute_aten_threshold_f32(int32_t n, const float 
 
 void polygeist_v2_cudnnBackendExecute_aten_trunc_f32(int32_t n, const float *a, int64_t a_bytes, int32_t a_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_aten_trunc_f32", "nonpositive dimension");
-  if (a_stride != 1 || !a || a_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_trunc_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_aten_trunc_f32", "runtime adapter requires a contiguous FP32 row");
+  if (a_stride <= 0 || !a || a_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * a_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_trunc_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_aten_trunc_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(a, a_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_aten_trunc_f32", "unsupported output overlap");
   polygeist_v2_map_t pv2_map;
@@ -2124,7 +2794,7 @@ void polygeist_v2_cudnnBackendExecute_aten_trunc_f32(int32_t n, const float *a, 
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 1224979099097760768LL, 2093062280869576704LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 1224979099097760768LL, 2093062280869576704LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 4, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, a_stride, 1, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_a), NULL, NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2184,12 +2854,12 @@ void polygeist_v2_cudnnBackendExecute_cutlass_rmsnorm_parameterized_f32(int32_t 
 
 void polygeist_v2_cudnnBackendExecute_ggml_swiglu_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *gate, int64_t gate_bytes, int32_t gate_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n <= 0) polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "nonpositive dimension");
-  if (x_stride != 1 || !x || x_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "runtime adapter requires a contiguous FP32 row");
-  if (gate_stride != 1 || !gate || gate_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "runtime adapter requires a contiguous FP32 row");
-  if (output_stride != 1 || !output || output_bytes < (int64_t)n * sizeof(float))
-    polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "runtime adapter requires a contiguous FP32 row");
+  if (x_stride <= 0 || !x || x_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * x_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "invalid strided FP32 row");
+  if (gate_stride <= 0 || !gate || gate_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * gate_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "invalid strided FP32 row");
+  if (output_stride <= 0 || !output || output_bytes / (int64_t)sizeof(float) < ((int64_t)n-1) * output_stride + 1)
+    polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "invalid strided FP32 row");
   if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
     polygeist_v2_fatal("cudnnBackendExecute_ggml_swiglu_f32", "unsupported output overlap");
   if (polygeist_v2_overlaps(gate, gate_bytes, output, output_bytes))
@@ -2202,7 +2872,334 @@ void polygeist_v2_cudnnBackendExecute_ggml_swiglu_f32(int32_t n, const float *x,
   polygeist_v2_map_to_device(&pv2_map);
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
-  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 288245769332130816LL, 34537728LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, 1, 1, 1, 1, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_gate), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cudnn_pointwise_graph_f32(n, 507780858338344960LL, 288245769332130816LL, 34537728LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 5, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, x_stride, gate_stride, 1, 1, output_stride, polygeist_v2_map_dev(&pv2_map, pv2_k_x), polygeist_v2_map_dev(&pv2_map, pv2_k_gate), NULL, NULL, polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32(int32_t N, int32_t IC, int32_t IH, int32_t IW, int32_t OC, int32_t KH, int32_t KW, int32_t OH, int32_t OW, const float *input, int64_t input_bytes, int32_t input_stride, const float *filter, int64_t filter_bytes, int32_t filter_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (N < 1 || N > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (IC < 1 || IC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (IH < 1 || IH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (IW < 1 || IW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (OC < 1 || OC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (KH < 1 || KH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (KW < 1 || KW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (OH < 1 || OH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  if (OW < 1 || OW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)N <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)N)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)N;
+  if ((int64_t)IC <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IC;
+  if ((int64_t)IH <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IH;
+  if ((int64_t)IW <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IW;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_filter = sizeof(float);
+  if ((int64_t)OC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)OC;
+  if ((int64_t)IC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)IC;
+  if ((int64_t)KH <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KH;
+  if ((int64_t)KW <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KW;
+  if (filter_stride != 1 || !filter || filter_bytes < pv2_bytes_filter)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)N <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)N)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)N;
+  if ((int64_t)OC <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OC;
+  if ((int64_t)OH <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OH;
+  if ((int64_t)OW <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OW;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(filter, filter_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "cudnnConvolutionForward_cudnn_conv2d_valid_d1_f32", "polygeist_reference_conv2d_d1_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_filter = polygeist_v2_map_add(&pv2_map, filter, filter_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_reference_conv2d_d1_f32(N, IC, IH, IW, OC, KH, KW, OH, OW, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_filter), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32(int32_t N, int32_t IC, int32_t IH, int32_t IW, int32_t OC, int32_t KH, int32_t KW, int32_t OH, int32_t OW, const float *input, int64_t input_bytes, int32_t input_stride, const float *filter, int64_t filter_bytes, int32_t filter_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (N < 1 || N > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (IC < 1 || IC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (IH < 1 || IH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (IW < 1 || IW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (OC < 1 || OC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (KH < 1 || KH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (KW < 1 || KW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (OH < 1 || OH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  if (OW < 1 || OW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)N <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)N)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)N;
+  if ((int64_t)IC <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IC;
+  if ((int64_t)IH <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IH;
+  if ((int64_t)IW <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IW;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_filter = sizeof(float);
+  if ((int64_t)OC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)OC;
+  if ((int64_t)IC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)IC;
+  if ((int64_t)KH <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KH;
+  if ((int64_t)KW <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KW;
+  if (filter_stride != 1 || !filter || filter_bytes < pv2_bytes_filter)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)N <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)N)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)N;
+  if ((int64_t)OC <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OC;
+  if ((int64_t)OH <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OH;
+  if ((int64_t)OW <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OW;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(filter, filter_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "cudnnConvolutionForward_cudnn_conv2d_valid_d2_f32", "polygeist_reference_conv2d_d2_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_filter = polygeist_v2_map_add(&pv2_map, filter, filter_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_reference_conv2d_d2_f32(N, IC, IH, IW, OC, KH, KW, OH, OW, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_filter), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32(int32_t IC, int32_t IH, int32_t IW, int32_t OC, int32_t KH, int32_t KW, int32_t OH, int32_t OW, const float *input, int64_t input_bytes, int32_t input_stride, const float *filter, int64_t filter_bytes, int32_t filter_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (IC < 1 || IC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (IH < 1 || IH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (IW < 1 || IW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (OC < 1 || OC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (KH < 1 || KH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (KW < 1 || KW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (OH < 1 || OH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  if (OW < 1 || OW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)IC <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IC;
+  if ((int64_t)IH <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IH;
+  if ((int64_t)IW <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IW;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_filter = sizeof(float);
+  if ((int64_t)OC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)OC;
+  if ((int64_t)IC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)IC;
+  if ((int64_t)KH <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KH;
+  if ((int64_t)KW <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KW;
+  if (filter_stride != 1 || !filter || filter_bytes < pv2_bytes_filter)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)OC <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OC;
+  if ((int64_t)OH <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OH;
+  if ((int64_t)OW <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OW;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(filter, filter_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "cudnnConvolutionForward_cudnn_conv2d_valid_unbatched_d2_f32", "polygeist_reference_conv2d_unbatched_d2_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_filter = polygeist_v2_map_add(&pv2_map, filter, filter_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_reference_conv2d_unbatched_d2_f32(IC, IH, IW, OC, KH, KW, OH, OW, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_filter), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_cudnnConvolutionForward_cudnn_conv3d_valid_f32(int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC, int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW, const float *input, int64_t input_bytes, int32_t input_stride, const float *filter, int64_t filter_bytes, int32_t filter_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (IC < 1 || IC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (ID < 1 || ID > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (IH < 1 || IH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (IW < 1 || IW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (OC < 1 || OC > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (KD < 1 || KD > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (KH < 1 || KH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (KW < 1 || KW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (OD < 1 || OD > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (OH < 1 || OH > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  if (OW < 1 || OW > 2147483647)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)IC <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IC;
+  if ((int64_t)ID <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)ID)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)ID;
+  if ((int64_t)IH <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IH;
+  if ((int64_t)IW <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)IW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)IW;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_filter = sizeof(float);
+  if ((int64_t)OC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)OC;
+  if ((int64_t)IC <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)IC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)IC;
+  if ((int64_t)KD <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KD)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KD;
+  if ((int64_t)KH <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KH;
+  if ((int64_t)KW <= 0 || pv2_bytes_filter > INT64_MAX / (int64_t)KW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_filter *= (int64_t)KW;
+  if (filter_stride != 1 || !filter || filter_bytes < pv2_bytes_filter)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)OC <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OC)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OC;
+  if ((int64_t)OD <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OD)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OD;
+  if ((int64_t)OH <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OH)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OH;
+  if ((int64_t)OW <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)OW)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)OW;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(filter, filter_bytes, output, output_bytes))
+    polygeist_v2_fatal("cudnnConvolutionForward_cudnn_conv3d_valid_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "cudnnConvolutionForward_cudnn_conv3d_valid_f32", "polygeist_reference_conv3d_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_filter = polygeist_v2_map_add(&pv2_map, filter, filter_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_reference_conv3d_f32(IC, ID, IH, IW, OC, KD, KH, KW, OD, OH, OW, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_filter), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);
@@ -2461,6 +3458,93 @@ void polygeist_v2_cutensorPermute_aten_tan_f32(int32_t n, const float *a, int64_
   polygeist_v2_map_to_host(&pv2_map);
 }
 
+void polygeist_v2_fill_n_thrust_fill_f32(int32_t n, float value, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("fill_n_thrust_fill_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("fill_n_thrust_fill_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("fill_n_thrust_fill_f32", "array layout or capacity mismatch");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "fill_n_thrust_fill_f32", "polygeist_thrust_fill_f32");
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_fill_f32(n, value, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_thrust_cos_f32) polygeist_thrust_cos_f32 __attribute__((weak));
+void polygeist_v2_transform_aten_cos_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_thrust_cos_f32)
+    polygeist_v2_fatal("transform_aten_cos_f32", "optional vendor entry is not linked");
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_aten_cos_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_aten_cos_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_aten_cos_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_aten_cos_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_aten_cos_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_aten_cos_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_aten_cos_f32", "polygeist_thrust_cos_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_cos_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+extern __typeof__(polygeist_thrust_sin_f32) polygeist_thrust_sin_f32 __attribute__((weak));
+void polygeist_v2_transform_aten_sin_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (!polygeist_thrust_sin_f32)
+    polygeist_v2_fatal("transform_aten_sin_f32", "optional vendor entry is not linked");
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_aten_sin_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_aten_sin_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_aten_sin_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_aten_sin_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_aten_sin_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_aten_sin_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_aten_sin_f32", "polygeist_thrust_sin_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_sin_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
 void polygeist_v2_transform_thrust_divide_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
   if (n < 1 || n > 2147483647)
     polygeist_v2_fatal("transform_thrust_divide_f32", "integer outside wrapper bounds");
@@ -2576,6 +3660,480 @@ void polygeist_v2_transform_thrust_divide_scalars_f32(int32_t n, float x, float 
   polygeist_require_gpu_libraries_begin();
   polygeist_cublas_pipeline_begin();
   polygeist_thrust_divide_scalars_f32(n, x, y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_log1p_f32(int32_t n, const float *input, int64_t input_bytes, int32_t input_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_log1p_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_input = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_input > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_log1p_f32", "array extent overflow");
+  pv2_bytes_input *= (int64_t)n;
+  if (input_stride != 1 || !input || input_bytes < pv2_bytes_input)
+    polygeist_v2_fatal("transform_thrust_log1p_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_log1p_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_log1p_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(input, input_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_log1p_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_log1p_f32", "polygeist_thrust_log1p_f32");
+  int pv2_k_input = polygeist_v2_map_add(&pv2_map, input, input_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_log1p_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_input), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_minus_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_y = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_y > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "array extent overflow");
+  pv2_bytes_y *= (int64_t)n;
+  if (y_stride != 1 || !y || y_bytes < pv2_bytes_y)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_minus_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_minus_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_minus_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_minus_f32", "polygeist_thrust_minus_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_y = polygeist_v2_map_add(&pv2_map, y, y_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_minus_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_y), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_minus_scalar_left_f32(int32_t n, float x, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_left_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_y = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_y > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_left_f32", "array extent overflow");
+  pv2_bytes_y *= (int64_t)n;
+  if (y_stride != 1 || !y || y_bytes < pv2_bytes_y)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_left_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_left_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_left_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_minus_scalar_left_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_minus_scalar_left_f32", "polygeist_thrust_minus_scalar_left_f32");
+  int pv2_k_y = polygeist_v2_map_add(&pv2_map, y, y_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_minus_scalar_left_f32(n, x, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_y), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_minus_scalar_right_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float y, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_minus_scalar_right_f32", "polygeist_thrust_minus_scalar_right_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_minus_scalar_right_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_minus_scalar_right_i32(int32_t n, const int *x, int64_t x_bytes, int32_t x_stride, int32_t y, int *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "integer outside wrapper bounds");
+  if (y < -2147483648 || y > 2147483647)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(int);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(int);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_minus_scalar_right_i32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_minus_scalar_right_i32", "polygeist_thrust_minus_scalar_right_i32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_minus_scalar_right_i32(n, (const int *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), y, (int *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_minus_scalars_f32(int32_t n, float x, float y, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_minus_scalars_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_minus_scalars_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_minus_scalars_f32", "array layout or capacity mismatch");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_minus_scalars_f32", "polygeist_thrust_minus_scalars_f32");
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_minus_scalars_f32(n, x, y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_multiplies_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_y = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_y > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "array extent overflow");
+  pv2_bytes_y *= (int64_t)n;
+  if (y_stride != 1 || !y || y_bytes < pv2_bytes_y)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_multiplies_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_multiplies_f32", "polygeist_thrust_multiplies_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_y = polygeist_v2_map_add(&pv2_map, y, y_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_multiplies_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_y), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_multiplies_scalar_left_f32(int32_t n, float x, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_left_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_y = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_y > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_left_f32", "array extent overflow");
+  pv2_bytes_y *= (int64_t)n;
+  if (y_stride != 1 || !y || y_bytes < pv2_bytes_y)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_left_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_left_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_left_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_left_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_multiplies_scalar_left_f32", "polygeist_thrust_multiplies_scalar_left_f32");
+  int pv2_k_y = polygeist_v2_map_add(&pv2_map, y, y_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_multiplies_scalar_left_f32(n, x, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_y), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_multiplies_scalar_right_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float y, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_right_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_right_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_right_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_right_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_right_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_multiplies_scalar_right_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_multiplies_scalar_right_f32", "polygeist_thrust_multiplies_scalar_right_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_multiplies_scalar_right_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_multiplies_scalars_f32(int32_t n, float x, float y, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalars_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalars_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_multiplies_scalars_f32", "array layout or capacity mismatch");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_multiplies_scalars_f32", "polygeist_thrust_multiplies_scalars_f32");
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_multiplies_scalars_f32(n, x, y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_plus_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_y = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_y > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "array extent overflow");
+  pv2_bytes_y *= (int64_t)n;
+  if (y_stride != 1 || !y || y_bytes < pv2_bytes_y)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_plus_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_plus_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_plus_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_plus_f32", "polygeist_thrust_plus_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_y = polygeist_v2_map_add(&pv2_map, y, y_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_plus_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_y), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_plus_scalar_left_f32(int32_t n, float x, const float *y, int64_t y_bytes, int32_t y_stride, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_left_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_y = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_y > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_left_f32", "array extent overflow");
+  pv2_bytes_y *= (int64_t)n;
+  if (y_stride != 1 || !y || y_bytes < pv2_bytes_y)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_left_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_left_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_left_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(y, y_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_plus_scalar_left_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_plus_scalar_left_f32", "polygeist_thrust_plus_scalar_left_f32");
+  int pv2_k_y = polygeist_v2_map_add(&pv2_map, y, y_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_plus_scalar_left_f32(n, x, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_y), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_plus_scalar_right_f32(int32_t n, const float *x, int64_t x_bytes, int32_t x_stride, float y, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_right_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_x = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_x > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_right_f32", "array extent overflow");
+  pv2_bytes_x *= (int64_t)n;
+  if (x_stride != 1 || !x || x_bytes < pv2_bytes_x)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_right_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_right_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_plus_scalar_right_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(x, x_bytes, output, output_bytes))
+    polygeist_v2_fatal("transform_thrust_plus_scalar_right_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_plus_scalar_right_f32", "polygeist_thrust_plus_scalar_right_f32");
+  int pv2_k_x = polygeist_v2_map_add(&pv2_map, x, x_bytes, 0);
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_plus_scalar_right_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_x), y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_plus_scalars_f32(int32_t n, float x, float y, float *output, int64_t output_bytes, int32_t output_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_plus_scalars_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_output = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_output > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_plus_scalars_f32", "array extent overflow");
+  pv2_bytes_output *= (int64_t)n;
+  if (output_stride != 1 || !output || output_bytes < pv2_bytes_output)
+    polygeist_v2_fatal("transform_thrust_plus_scalars_f32", "array layout or capacity mismatch");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_plus_scalars_f32", "polygeist_thrust_plus_scalars_f32");
+  int pv2_k_output = polygeist_v2_map_add(&pv2_map, output, output_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_plus_scalars_f32(n, x, y, (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_output));
+  polygeist_cublas_pipeline_end();
+  polygeist_require_gpu_libraries_end();
+  polygeist_v2_map_to_host(&pv2_map);
+}
+
+void polygeist_v2_transform_thrust_polar_components_f32(int32_t n, const float *magnitude, int64_t magnitude_bytes, int32_t magnitude_stride, const float *angle, int64_t angle_bytes, int32_t angle_stride, float *real, int64_t real_bytes, int32_t real_stride, float *imag, int64_t imag_bytes, int32_t imag_stride) {
+  if (n < 1 || n > 2147483647)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "integer outside wrapper bounds");
+  int64_t pv2_bytes_magnitude = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_magnitude > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array extent overflow");
+  pv2_bytes_magnitude *= (int64_t)n;
+  if (magnitude_stride != 1 || !magnitude || magnitude_bytes < pv2_bytes_magnitude)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_angle = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_angle > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array extent overflow");
+  pv2_bytes_angle *= (int64_t)n;
+  if (angle_stride != 1 || !angle || angle_bytes < pv2_bytes_angle)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_real = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_real > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array extent overflow");
+  pv2_bytes_real *= (int64_t)n;
+  if (real_stride != 1 || !real || real_bytes < pv2_bytes_real)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array layout or capacity mismatch");
+  int64_t pv2_bytes_imag = sizeof(float);
+  if ((int64_t)n <= 0 || pv2_bytes_imag > INT64_MAX / (int64_t)n)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array extent overflow");
+  pv2_bytes_imag *= (int64_t)n;
+  if (imag_stride != 1 || !imag || imag_bytes < pv2_bytes_imag)
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "array layout or capacity mismatch");
+  if (polygeist_v2_overlaps(magnitude, magnitude_bytes, real, real_bytes))
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(magnitude, magnitude_bytes, imag, imag_bytes))
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(angle, angle_bytes, real, real_bytes))
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(angle, angle_bytes, imag, imag_bytes))
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "unsupported output overlap");
+  if (polygeist_v2_overlaps(real, real_bytes, imag, imag_bytes))
+    polygeist_v2_fatal("transform_thrust_polar_components_f32", "unsupported output overlap");
+  polygeist_v2_map_t pv2_map;
+  polygeist_v2_map_init(&pv2_map, "transform_thrust_polar_components_f32", "polygeist_thrust_polar_components_f32");
+  int pv2_k_magnitude = polygeist_v2_map_add(&pv2_map, magnitude, magnitude_bytes, 0);
+  int pv2_k_angle = polygeist_v2_map_add(&pv2_map, angle, angle_bytes, 0);
+  int pv2_k_real = polygeist_v2_map_add(&pv2_map, real, real_bytes, 1);
+  int pv2_k_imag = polygeist_v2_map_add(&pv2_map, imag, imag_bytes, 1);
+  polygeist_v2_map_to_device(&pv2_map);
+  polygeist_require_gpu_libraries_begin();
+  polygeist_cublas_pipeline_begin();
+  polygeist_thrust_polar_components_f32(n, (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_magnitude), (const float *)polygeist_v2_map_dev(&pv2_map, pv2_k_angle), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_real), (float *)polygeist_v2_map_dev(&pv2_map, pv2_k_imag));
   polygeist_cublas_pipeline_end();
   polygeist_require_gpu_libraries_end();
   polygeist_v2_map_to_host(&pv2_map);

@@ -7369,6 +7369,120 @@ void polygeist_cudnn_conv2d_dilated_f32(
   }
 }
 
+// Typed adapters for imported public cuDNN reference specializations.
+static void polygeist_reference_conv2d_impl(
+    int32_t B, int32_t IC, int32_t H, int32_t W, int32_t OC,
+    int32_t KH, int32_t KW, int32_t OH, int32_t OW, int32_t dilation,
+    const float *input, const float *filter, float *output) {
+  polygeist_cublas_init();
+  ensure_cudnn();
+  if (B <= 0 || IC <= 0 || H <= 0 || W <= 0 || OC <= 0 || KH <= 0 || KW <= 0 ||
+      OH <= 0 || OW <= 0 || OH != (int64_t)H - (int64_t)(KH - 1) * dilation ||
+      OW != (int64_t)W - (int64_t)(KW - 1) * dilation) abort();
+  int dims[3][4] = {{B, IC, H, W}, {OC, IC, KH, KW}, {B, OC, OH, OW}};
+  for (int a = 0; a < 3; ++a) {
+    int64_t count = 1;
+    for (int d = 0; d < 4; ++d) {
+      if (count > INT32_MAX / dims[a][d]) abort();
+      count *= dims[a][d];
+    }
+  }
+  size_t inBytes = (size_t)B * IC * H * W * sizeof(float);
+  size_t filterBytes = (size_t)OC * IC * KH * KW * sizeof(float);
+  size_t outBytes = (size_t)B * OC * OH * OW * sizeof(float);
+  float *dIn = (float *)register_host_safe((void *)input, inBytes);
+  float *dFilter = (float *)register_host_safe((void *)filter, filterBytes);
+  float *dOut = (float *)register_host_safe(output, outBytes);
+  int inputDims[4] = {B, IC, H, W};
+  int inputStrides[4] = {IC * H * W, H * W, W, 1};
+  int outputDims[4] = {B, OC, OH, OW};
+  int outputStrides[4] = {OC * OH * OW, OH * OW, OW, 1};
+  int filterDims[4] = {OC, IC, KH, KW};
+  int padding[2] = {0, 0};
+  int convolutionStrides[2] = {1, 1};
+  int dilations[2] = {dilation, dilation};
+  PolygeistCudnnConvFwdPlan *cachedPlan = get_cudnn_conv_fwd_plan(
+      4, inputDims, inputStrides, filterDims, outputDims, outputStrides, 2,
+      padding, convolutionStrides, dilations, CUDNN_DATA_FLOAT,
+      CUDNN_TENSOR_NCHW, CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, 1,
+      CUDNN_DEFAULT_MATH);
+  cudnnTensorDescriptor_t inDesc = NULL, outDesc = NULL;
+  cudnnFilterDescriptor_t filterDesc = NULL;
+  cudnnConvolutionDescriptor_t convDesc = NULL;
+  cudnnConvolutionFwdAlgo_t algorithm;
+  size_t workspaceBytes = 0;
+  void *workspace = NULL;
+  if (cachedPlan) {
+    inDesc = cachedPlan->input_desc;
+    outDesc = cachedPlan->output_desc;
+    filterDesc = cachedPlan->filter_desc;
+    convDesc = cachedPlan->convolution_desc;
+    algorithm = cachedPlan->algorithm;
+    workspaceBytes = cachedPlan->workspace_bytes;
+    workspace = cachedPlan->workspace;
+  } else {
+    CUDNN_CHECK(cudnnCreateTensorDescriptor(&inDesc));
+    CUDNN_CHECK(cudnnCreateTensorDescriptor(&outDesc));
+    CUDNN_CHECK(cudnnCreateFilterDescriptor(&filterDesc));
+    CUDNN_CHECK(cudnnCreateConvolutionDescriptor(&convDesc));
+    CUDNN_CHECK(cudnnSetTensor4dDescriptor(
+        inDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, IC, H, W));
+    CUDNN_CHECK(cudnnSetTensor4dDescriptor(
+        outDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, B, OC, OH, OW));
+    CUDNN_CHECK(cudnnSetFilter4dDescriptor(
+        filterDesc, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, OC, IC, KH, KW));
+    CUDNN_CHECK(cudnnSetConvolution2dDescriptor(
+        convDesc, 0, 0, 1, 1, dilation, dilation,
+        CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
+    cudnnConvolutionFwdAlgoPerf_t algorithmPerformance;
+    int returned = 0;
+    CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(
+        g_cudnn, inDesc, filterDesc, convDesc, outDesc, 1, &returned,
+        &algorithmPerformance));
+    if (returned < 1)
+      abort();
+    algorithm = algorithmPerformance.algo;
+    CUDNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
+        g_cudnn, inDesc, filterDesc, convDesc, outDesc, algorithm,
+        &workspaceBytes));
+    if (workspaceBytes)
+      DEVICE_MALLOC(&workspace, workspaceBytes);
+  }
+  float one = 1.0f, zero = 0.0f;
+  CUDNN_CHECK(cudnnConvolutionForward(
+      g_cudnn, &one, inDesc, dIn, filterDesc, dFilter, convDesc, algorithm,
+      workspace, workspaceBytes, &zero, outDesc, dOut));
+  sync_stream_if_outside_pipeline();
+  if (!cachedPlan && workspace) DEVICE_FREE(workspace);
+  if (!cachedPlan) {
+    cudnnDestroyTensorDescriptor(inDesc);
+    cudnnDestroyTensorDescriptor(outDesc);
+    cudnnDestroyFilterDescriptor(filterDesc);
+    cudnnDestroyConvolutionDescriptor(convDesc);
+  }
+}
+
+void polygeist_reference_conv2d_d1_f32(
+    int32_t N, int32_t IC, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KH, int32_t KW, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output) {
+  polygeist_reference_conv2d_impl(N, IC, IH, IW, OC, KH, KW, OH, OW, 1, input, filter, output);
+}
+
+void polygeist_reference_conv2d_d2_f32(
+    int32_t N, int32_t IC, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KH, int32_t KW, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output) {
+  polygeist_reference_conv2d_impl(N, IC, IH, IW, OC, KH, KW, OH, OW, 2, input, filter, output);
+}
+
+void polygeist_reference_conv2d_unbatched_d2_f32(
+    int32_t IC, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KH, int32_t KW, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output) {
+  polygeist_reference_conv2d_impl(1, IC, IH, IW, OC, KH, KW, OH, OW, 2, input, filter, output);
+}
+
 void polygeist_cublas_gemmex_i8_i32(
     int32_t M, int32_t N, int32_t K, const int8_t *A, const int8_t *B,
     int32_t *C) {
@@ -7379,6 +7493,11 @@ void polygeist_cublas_gemmex_i8_i32(
   int8_t *dA = (int8_t *)register_host_safe((void *)A, aBytes);
   int8_t *dB = (int8_t *)register_host_safe((void *)B, bBytes);
   int32_t *dC = (int32_t *)register_host_safe(C, cBytes);
+  /* Integer GemmEx requires aligned operands and leading dimensions. */
+  if (N % 4 || K % 4 || ((uintptr_t)dA % 4) || ((uintptr_t)dB % 4)) {
+    fprintf(stderr, "cuBLAS integer GEMM: input alignment and strides must be multiples of four\n");
+    abort();
+  }
   int32_t alpha = 1, beta = 0;
   CUBLAS_CHECK(cublasGemmEx(
       g_handle, CUBLAS_OP_N, CUBLAS_OP_N, N, M, K, &alpha,
@@ -9525,6 +9644,7 @@ struct pointwise_graph_plan {
   int32_t N;
   int32_t num_nodes;
   uint64_t words[12];
+  int32_t layout_strides[5];
   size_t bytes;
   bool used_inputs[4];
   bool used_scalars[8];
@@ -9658,18 +9778,21 @@ static void release_pointwise_graph_plan(struct pointwise_graph_plan *p) {
 }
 
 static struct pointwise_graph_plan *find_pointwise_graph_plan(
-    int32_t N, const uint64_t words[12], int32_t num_nodes) {
+    int32_t N, const uint64_t words[12], int32_t num_nodes,
+    const int32_t layout_strides[5]) {
   for (int i = 0; i < POINTWISE_GRAPH_CACHE_CAP; ++i) {
     struct pointwise_graph_plan *p = &g_pointwise_graph_cache[i];
     if (p->in_use && p->N == N && p->num_nodes == num_nodes &&
-        memcmp(p->words, words, sizeof(p->words)) == 0)
+        memcmp(p->words, words, sizeof(p->words)) == 0 &&
+        memcmp(p->layout_strides, layout_strides, sizeof(p->layout_strides)) == 0)
       return p;
   }
   return NULL;
 }
 
 static struct pointwise_graph_plan *alloc_pointwise_graph_plan(
-    int32_t N, const uint64_t words[12], int32_t num_nodes) {
+    int32_t N, const uint64_t words[12], int32_t num_nodes,
+    const int32_t layout_strides[5]) {
   for (int i = 0; i < POINTWISE_GRAPH_CACHE_CAP; ++i) {
     struct pointwise_graph_plan *p = &g_pointwise_graph_cache[i];
     if (!p->in_use) {
@@ -9678,6 +9801,7 @@ static struct pointwise_graph_plan *alloc_pointwise_graph_plan(
       p->N = N;
       p->num_nodes = num_nodes;
       memcpy(p->words, words, sizeof(p->words));
+      memcpy(p->layout_strides, layout_strides, sizeof(p->layout_strides));
       return p;
     }
   }
@@ -9709,6 +9833,10 @@ static int build_pointwise_graph_plan(struct pointwise_graph_plan *p) {
 
   int64_t channels = p->N < 65536 ? p->N : 65536;
   while (channels > 1 && p->N % channels != 0) --channels;
+  // Put padded vector coordinates in the batch dimension, preserving unit
+  // channel stride for engines that require a packed channel dimension.
+  for (int i = 0; i < 5; ++i)
+    if (p->layout_strides[i] != 1) channels = 1;
   int64_t batches = p->N / channels;
   int64_t dims[4] = {batches, channels, 1, 1};
   int64_t strides[4] = {channels, 1, 1, 1};
@@ -9718,9 +9846,11 @@ static int build_pointwise_graph_plan(struct pointwise_graph_plan *p) {
   for (int i = 0; i < 8; ++i) {
     if (i < 4 && p->used_inputs[i]) {
       // Cached variant packs outlive the pipeline's reusable temporary pool.
-      CUDA_CHECK(cudaMalloc((void **)&p->d_inputs[i], p->bytes));
+      size_t footprint = ((size_t)(p->N - 1) * p->layout_strides[i] + 1) * sizeof(float);
+      CUDA_CHECK(cudaMalloc((void **)&p->d_inputs[i], footprint));
+      int64_t input_strides[4] = {channels * p->layout_strides[i], p->layout_strides[i], 1, 1};
       if (!make_f32_backend_tensor_ex(
-              &p->input_descs[i], 100 + i, dims, strides, 4, false, false,
+              &p->input_descs[i], 100 + i, dims, input_strides, 4, false, false,
               "pointwise.generic.input", &status))
         return 0;
     }
@@ -9730,9 +9860,11 @@ static int build_pointwise_graph_plan(struct pointwise_graph_plan *p) {
             true, false, "pointwise.generic.scalar", &status))
       return 0;
   }
-  CUDA_CHECK(cudaMalloc((void **)&p->d_out, p->bytes));
+  size_t output_footprint = ((size_t)(p->N - 1) * p->layout_strides[4] + 1) * sizeof(float);
+  CUDA_CHECK(cudaMalloc((void **)&p->d_out, output_footprint));
+  int64_t output_strides[4] = {channels * p->layout_strides[4], p->layout_strides[4], 1, 1};
   if (!make_f32_backend_tensor_ex(
-          &p->out_desc, 400, dims, strides, 4, false, false,
+          &p->out_desc, 400, dims, output_strides, 4, false, false,
           "pointwise.generic.output", &status))
     return 0;
 
@@ -10010,14 +10142,16 @@ static cudnnBackendDescriptor_t
 pointwise_direct_pack(struct pointwise_graph_plan *p, void *ptrs[5],
                       const int32_t strides[4], int32_t out_stride,
                       int graph_is_capturing) {
-  if (out_stride != 1 || (uintptr_t)ptrs[4] % 4)
+  if (out_stride != p->layout_strides[4] || (uintptr_t)ptrs[4] % 4)
     return NULL;
   for (int i = 0; i < 4; ++i)
     if (p->used_inputs[i]) {
-      if (strides[i] != 1 || (uintptr_t)ptrs[i] % 4)
+      if (strides[i] != p->layout_strides[i] || (uintptr_t)ptrs[i] % 4)
         return NULL;
       uintptr_t a = (uintptr_t)ptrs[i], b = (uintptr_t)ptrs[4];
-      if (a <= b ? b - a < p->bytes : a - b < p->bytes)
+      size_t input_bytes = ((size_t)(p->N - 1) * strides[i] + 1) * sizeof(float);
+      size_t output_bytes = ((size_t)(p->N - 1) * out_stride + 1) * sizeof(float);
+      if (a <= b ? b - a < input_bytes : a - b < output_bytes)
         return NULL;
     }
   if (p->direct_variant_pack &&
@@ -10119,12 +10253,35 @@ void polygeist_cudnn_pointwise_graph_f32(
   if (pointwise_rounding_execute(N, words, num_nodes, scalars, inputs, strides,
                                  out_stride, Out, graph_is_capturing)) return;
   struct pointwise_graph_plan *p =
-      find_pointwise_graph_plan(N, words, num_nodes);
+      NULL;
+  int32_t layout_strides[5] = {stride0, stride1, stride2, stride3, out_stride};
+  for (int i = 0; i < 5; ++i) {
+    if (layout_strides[i] <= 0 || (size_t)(N - 1) >
+        (SIZE_MAX / sizeof(float) - 1) / (size_t)layout_strides[i]) {
+      fprintf(stderr, "polygeist runtime: invalid pointwise tensor footprint\n");
+      abort();
+    }
+  }
+  p = find_pointwise_graph_plan(N, words, num_nodes, layout_strides);
   if (!p) {
-    p = alloc_pointwise_graph_plan(N, words, num_nodes);
+    p = alloc_pointwise_graph_plan(N, words, num_nodes, layout_strides);
     if (!build_pointwise_graph_plan(p)) {
       release_pointwise_graph_plan(p);
       p->unsupported = 1;
+    }
+  }
+  // Some engines require packed tensors. Retain the exact staged CUDA path
+  // when the direct strided descriptor has no supported engine.
+  if (p->unsupported && (stride0 != 1 || stride1 != 1 || stride2 != 1 ||
+                         stride3 != 1 || out_stride != 1)) {
+    const int32_t packed[5] = {1, 1, 1, 1, 1};
+    p = find_pointwise_graph_plan(N, words, num_nodes, packed);
+    if (!p) {
+      p = alloc_pointwise_graph_plan(N, words, num_nodes, packed);
+      if (!build_pointwise_graph_plan(p)) {
+        release_pointwise_graph_plan(p);
+        p->unsupported = 1;
+      }
     }
   }
   if (!p || p->unsupported) {
@@ -10187,11 +10344,11 @@ void polygeist_cudnn_pointwise_graph_f32(
                 (void *)p->d_inputs[i], cudaGetErrorString(dst_status),
                 p->bytes, strides[i]);
       }
-      if (strides[i] == 1)
+      if (strides[i] == 1 && p->layout_strides[i] == 1)
         CUDA_CHECK(cudaMemcpyAsync(p->d_inputs[i], device_ptrs[i], p->bytes,
                                    cudaMemcpyDeviceToDevice, g_stream));
       else
-        CUDA_CHECK(cudaMemcpy2DAsync(p->d_inputs[i], sizeof(float),
+        CUDA_CHECK(cudaMemcpy2DAsync(p->d_inputs[i], (size_t)p->layout_strides[i] * sizeof(float),
                                      device_ptrs[i],
                                      (size_t)strides[i] * sizeof(float),
                                      sizeof(float), N, cudaMemcpyDeviceToDevice,
@@ -10205,13 +10362,13 @@ void polygeist_cudnn_pointwise_graph_f32(
     reported = 1;
   }
   CUDNN_CHECK(cudnnBackendExecute(g_cudnn, p->plan, p->variant_pack));
-  if (out_stride == 1)
+  if (out_stride == 1 && p->layout_strides[4] == 1)
     CUDA_CHECK(cudaMemcpyAsync(device_ptrs[4], p->d_out, p->bytes,
                                cudaMemcpyDeviceToDevice, g_stream));
   else
     CUDA_CHECK(cudaMemcpy2DAsync(device_ptrs[4],
                                  (size_t)out_stride * sizeof(float), p->d_out,
-                                 sizeof(float), sizeof(float), N,
+                                 (size_t)p->layout_strides[4] * sizeof(float), sizeof(float), N,
                                  cudaMemcpyDeviceToDevice, g_stream));
   timing_gpu_end("cudnnPointwiseGraph_f32", 1, N, num_nodes, host_start_ms);
 }
@@ -11270,4 +11427,23 @@ void polygeist_cublas_geam_vector_f64(int32_t n, double alpha,
   CUBLAS_CHECK(cublasDgeam(g_handle, CUBLAS_OP_N, CUBLAS_OP_N, n, 1,
                          &alpha, x, n, &beta, y, n, y, n));
   timing_gpu_end("cublasDgeam", n, 1, 0, host_start_ms);
+}
+
+// Mechanical typed adapter for the imported public NCDHW reference.
+void polygeist_reference_conv3d_f32(
+    int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output) {
+  if (IC <= 0 || ID <= 0 || IH <= 0 || IW <= 0 || OC <= 0 || KD <= 0 || KH <= 0 || KW <= 0 ||
+      OD <= 0 || OH <= 0 || OW <= 0 || OD != (int64_t)ID-KD+1 ||
+      OH != (int64_t)IH-KH+1 || OW != (int64_t)IW-KW+1) abort();
+  int dims[3][5] = {{1,IC,ID,IH,IW},{OC,IC,KD,KH,KW},{1,OC,OD,OH,OW}};
+  for (int a=0;a<3;++a) {
+    int64_t count=1;
+    for (int d=0;d<5;++d) {
+      if (count > INT32_MAX/dims[a][d]) abort();
+      count *= dims[a][d];
+    }
+  }
+  polygeist_cudnn_conv3d_channels_f32(IC,ID,IH,IW,OC,KD,KH,KW,input,filter,NULL,output);
 }

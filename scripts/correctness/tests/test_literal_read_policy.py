@@ -36,6 +36,20 @@ class LiteralReadPolicy(unittest.TestCase):
         self.assertFalse(P.literal_ok({}, '%parameter', 0.0,
                                      zero_read_preserving=safe)[0])
 
+    def test_direct_scalar_result_does_not_annihilate_a_read(self):
+        ops = self.uses('  return %parameter : f32')
+        self.assertTrue(P.zero_preserves_reads(ops, '%parameter'))
+        text = '''module {
+ func.func @fill(%a: tensor<17xf32>, %parameter: f32) -> tensor<17xf32> {
+  %r = linalg.generic {indexing_maps=[affine_map<(i)->(i)>], iterator_types=["parallel"]} outs(%a:tensor<17xf32>) {
+  ^bb0(%old:f32):
+   linalg.yield %parameter : f32
+  } -> tensor<17xf32>
+  return %r : tensor<17xf32>
+ }
+}'''
+        self.assertTrue(P.zero_preserves_reads(ML.Module(text).funcs[0].ops, '%parameter'))
+
     def test_unknown_and_unused_parameters_fail_closed(self):
         ops = self.uses('''  %r = func.call @unknown(%parameter) : (f32) -> f32
   return %r : f32''')

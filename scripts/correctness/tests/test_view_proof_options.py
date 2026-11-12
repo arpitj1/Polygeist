@@ -39,7 +39,9 @@ class ViewProofOptions(unittest.TestCase):
         for suffix in ('', '=max-parallel-dims=2', '=max-operand-rank=2',
                        '=max-parallel-dims=2 max-operand-rank=2',
                        '=max-operand-rank=2 fuse-initializers=true',
-                       '=max-parallel-dims=2 max-operand-rank=2 fuse-initializers=true'):
+                       '=max-parallel-dims=2 max-operand-rank=2 fuse-initializers=true',
+                       '=split-reduction-inputs=true', '=split-pointwise-inputs=true',
+                       '=max-operand-rank=1 fuse-initializers=true split-reduction-inputs=true split-pointwise-inputs=true'):
             with self.subTest(suffix=suffix):
                 self.proof['view_normalization']['pass_name'] = '--normalize-linalg-matching-views' + suffix
                 SM.verify('module {}', self.proof, backend='cuda')
@@ -49,6 +51,8 @@ class ViewProofOptions(unittest.TestCase):
             SM.match('module {}', fuse_initializers=True)
         with self.assertRaisesRegex(SM.SpecificationError, 'boolean'):
             SM.match('module {}', max_operand_rank=2, fuse_initializers='yes')
+        with self.assertRaisesRegex(SM.SpecificationError, 'boolean'):
+            SM.match('module {}', split_pointwise_inputs='yes')
 
     def test_unsupported_options_and_changed_compiler_fail(self):
         for suffix in ('=max-parallel-dims=-1', '=max-operand-rank=0',
@@ -56,7 +60,9 @@ class ViewProofOptions(unittest.TestCase):
                        '=max-operand-rank=2 max-parallel-dims=2',
                        '=unknown=2', '=max-parallel-dims=2 --canonicalize',
                        '=fuse-initializers=true', '=max-operand-rank=2 fuse-initializers=false',
-                       '=fuse-initializers=true max-operand-rank=2'):
+                       '=fuse-initializers=true max-operand-rank=2', '=',
+                       '=split-pointwise-inputs=false', '=split-reduction-inputs=true ',
+                       '=split-pointwise-inputs=true split-reduction-inputs=true'):
             proof = copy.deepcopy(self.proof)
             proof['view_normalization']['pass_name'] += suffix
             with self.subTest(suffix=suffix), self.assertRaises(SM.SpecificationError):

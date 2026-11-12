@@ -1130,15 +1130,18 @@ class _Emit:
         return self.md[a], r
 
     def leading_dim(self, a: str, k: int, ty: str) -> tuple[str, str]:
-        """Extent of C dimension k (k >= 1) of array `a` as laid out in memory:
+        """Extent of C dimension k of array `a` as laid out in memory:
+        dimension zero is its descriptor capacity; inner dimensions use
         stride[k-1] / stride[k] (= stride[k-1] for a unit innermost stride),
         read with memref.extract_strided_metadata.  Returns (operand, text)."""
         md, r = self.metadata(a)
-        if not (1 <= k < r):
+        if not (0 <= k < r):
             raise Reject(f"leading dimension {k} of a rank-{r} array")
         strides = static_strides(self.app_args[a])
         s_hi = f"{md}#{2 + r + k - 1}"
-        if k == r - 1 and strides and strides[-1] == 1:
+        if k == 0:
+            val, desc = f"{md}#2", f"size0({a})"
+        elif k == r - 1 and strides and strides[-1] == 1:
             val, desc = s_hi, f"stride{k - 1}({a})"
         else:
             q = self.fresh("ldq")

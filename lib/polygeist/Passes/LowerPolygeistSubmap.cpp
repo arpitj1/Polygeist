@@ -17,6 +17,7 @@
 #include "polygeist/Passes/Passes.h"
 #include "llvm/Support/Debug.h"
 
+#include <limits>
 #include <set>
 
 #define DEBUG_TYPE "lower-polygeist-submap"
@@ -1049,7 +1050,7 @@ struct ComposeTensorInputSubmapIntoLinalgGeneric
   }
 };
 
-// Preserve a tensor submap of a flat ABI memref as a zero-copy strided memref
+// Preserve a tensor submap of an ABI memref as a zero-copy strided memref
 // view before one-shot bufferization.  This is the tensor analogue of
 // LowerRowMajorFlatMemrefSubmap, but it deliberately accepts broadcasts and
 // non-contiguous positive affine strides: cuTENSOR/cuTensorNet consume those
@@ -1076,17 +1077,44 @@ struct LowerFlatTensorSubmapToMemrefView
      * tensor materialization/write-back path below; this zero-copy bridge is
      * safe only for read-only ABI views. */
     if (!resultType || !baseTensor || baseTensor.getWritable() || !baseType ||
-        baseType.getRank() != 1 ||
-        map.getNumSymbols() != 0 || map.getNumResults() != 1 ||
+        !baseTensor.getResult().hasOneUse() ||
+        map.getNumSymbols() != 0 ||
+        map.getNumResults() != (unsigned)baseType.getRank() ||
         map.getNumDims() != (unsigned)resultType.getRank() ||
         submap.getSizes().size() != (unsigned)resultType.getRank())
       return failure();
 
+    // Compose each logical index with the source's physical layout. This
+    // also represents overlapping read-only windows: repeated coordinates
+    // are aliases of the same element, not a host-side gather computation.
+    SmallVector<int64_t> baseStrides;
+    int64_t offset;
+    if (failed(getStridesAndOffset(baseType, baseStrides, offset)) ||
+        ShapedType::isDynamic(offset) || offset < 0 ||
+        llvm::any_of(baseStrides, [](int64_t stride) {
+          return ShapedType::isDynamic(stride) || stride <= 0;
+        }))
+      return failure();
     SmallVector<int64_t> strides(map.getNumDims(), 0);
-    int64_t offset = 0;
-    if (!accumulateLinearDimCoefficients(map.getResult(0), strides, offset) ||
-        offset < 0 ||
-        llvm::any_of(strides, [](int64_t stride) { return stride <= 0; }))
+    auto accumulate = [](int64_t &target, int64_t coefficient, int64_t scale) {
+      __int128 value = (__int128)target + (__int128)coefficient * scale;
+      if (value < 0 || value > std::numeric_limits<int64_t>::max())
+        return false;
+      target = static_cast<int64_t>(value);
+      return true;
+    };
+    for (auto [axis, expression] : llvm::enumerate(map.getResults())) {
+      SmallVector<int64_t> coefficients(map.getNumDims(), 0);
+      int64_t translation = 0;
+      if (!accumulateLinearDimCoefficients(expression, coefficients,
+                                            translation) ||
+          !accumulate(offset, translation, baseStrides[axis]))
+        return failure();
+      for (auto [dimension, coefficient] : llvm::enumerate(coefficients))
+        if (!accumulate(strides[dimension], coefficient, baseStrides[axis]))
+          return failure();
+    }
+    if (llvm::any_of(strides, [](int64_t stride) { return stride <= 0; }))
       return failure();
 
     auto layout = StridedLayoutAttr::get(getContext(), offset, strides);
@@ -1106,8 +1134,10 @@ struct LowerFlatTensorSubmapToMemrefView
         rewriter.getIndexAttr(offset), sizes, mixedStrides);
     auto tensor = rewriter.create<bufferization::ToTensorOp>(
         submap.getLoc(), resultType, view.getResult(),
-        /*restrict=*/false, /*writable=*/baseTensor.getWritable());
+        /*restrict=*/baseTensor.getRestrict(), /*writable=*/false);
     rewriter.replaceOp(submap, tensor.getResult());
+    if (baseTensor->use_empty())
+      rewriter.eraseOp(baseTensor);
     return success();
   }
 };
@@ -1874,7 +1904,9 @@ struct LowerSymbolBearingSubmapToExtractSlice
 // For memref form, submapInverse is conceptually a no-op (modifications are
 // already in place via the view) — we replace it with its base operand.
 struct LowerSubmapInverse : public OpRewritePattern<SubmapInverseOp> {
-  using OpRewritePattern<SubmapInverseOp>::OpRewritePattern;
+  bool affineCopyWriteback;
+  LowerSubmapInverse(MLIRContext *context, bool affineCopyWriteback = false)
+      : OpRewritePattern(context), affineCopyWriteback(affineCopyWriteback) {}
 
   LogicalResult matchAndRewrite(SubmapInverseOp inv,
                                 PatternRewriter &rewriter) const final {
@@ -2057,6 +2089,37 @@ struct LowerSubmapInverse : public OpRewritePattern<SubmapInverseOp> {
       if (!isInjective || !*isInjective)
         return rewriter.notifyMatchFailure(
             inv, "affine write-back map is not proven injective");
+
+      if (affineCopyWriteback && !m.getNumSymbols() &&
+          !sourceToMapDim.empty()) {
+        // The writeback domain may be a prefix of a larger source tensor.
+        // Preserve the explicit bounds instead of letting Linalg infer a
+        // larger iteration domain from that tensor's complete shape.
+        Value boundedView = view;
+        if (viewTy.getShape() != ArrayRef<int64_t>(compactSizes)) {
+          SmallVector<OpFoldResult> offsets(compactSizes.size(),
+                                           rewriter.getIndexAttr(0));
+          SmallVector<OpFoldResult> strides(compactSizes.size(),
+                                           rewriter.getIndexAttr(1));
+          SmallVector<OpFoldResult> bounds;
+          for (int64_t size : compactSizes)
+            bounds.push_back(rewriter.getIndexAttr(size));
+          boundedView = rewriter.create<tensor::ExtractSliceOp>(
+              loc, RankedTensorType::get(compactSizes, viewTy.getElementType()),
+              view, offsets, bounds, strides);
+        }
+        SmallVector<AffineMap> maps{
+            rewriter.getMultiDimIdentityMap(sourceToMapDim.size()), compactMap};
+        SmallVector<utils::IteratorType> iterators(
+            sourceToMapDim.size(), utils::IteratorType::parallel);
+        auto copy = rewriter.create<linalg::GenericOp>(
+            loc, TypeRange{baseTy}, ValueRange{boundedView}, ValueRange{base}, maps,
+            iterators, [&](OpBuilder &builder, Location nested, ValueRange args) {
+              builder.create<linalg::YieldOp>(nested, args.front());
+            });
+        rewriter.replaceOp(inv, copy.getResults());
+        return success();
+      }
 
       Value zero = rewriter.create<arith::ConstantIndexOp>(loc, 0);
       Value one = rewriter.create<arith::ConstantIndexOp>(loc, 1);
@@ -2350,8 +2413,8 @@ struct LowerPolygeistSubmapPass
                  LowerDynamicIdentityMemrefSubmap,
                  LowerRowMajorFlatMemrefSubmap,
                  LowerSymbolBearingSubmapToSubview,
-                 LowerSymbolBearingSubmapToExtractSlice,
-                 LowerSubmapInverse>(&getContext());
+                 LowerSymbolBearingSubmapToExtractSlice>(&getContext());
+    patterns.add<LowerSubmapInverse>(&getContext(), affineCopyWriteback);
     if (failed(applyPatternsAndFoldGreedily(getOperation(),
                                              std::move(patterns)))) {
       // Some submaps remain — caller may want to know but it's not fatal.

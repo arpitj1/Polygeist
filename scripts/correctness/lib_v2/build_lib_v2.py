@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import time
@@ -176,7 +177,12 @@ def inline_aliases(module_text: str, body: str) -> str:
 
 def vla_leading_dims(ref_c: Path, fn_hint: str | None = None) -> dict[str, str]:
     """Leading-dimension parameters declared by C99 VLA parameters
-    `double X[][ld]`: returns {ld: X}."""
+    `double X[][ld]` or `double X[rows][ld]`: returns {ld: X}.
+
+    Inspect parameter lists and declaration macros, not accesses or local
+    arrays. Some imported references put their parameter declarations in
+    macros so ordinary dimension specializations share the same source.
+    """
     try:
         src = ref_c.read_text()
     except OSError:
@@ -184,12 +190,62 @@ def vla_leading_dims(ref_c: Path, fn_hint: str | None = None) -> dict[str, str]:
     # The array declarator supplies layout independently of its element type
     # (which may also be a source macro). Comments are not declarations.
     src = re.sub(r"/\*.*?\*/|//[^\n]*", "", src, flags=re.S)
-    return {m.group(2): m.group(1)
-            for m in re.finditer(r"\b(\w+)\s*\[\s*\]\s*\[\s*(\w+)\s*\]", src)}
+    src = src.replace("\\\n", " ")
+    macros = re.findall(r"^\s*#\s*define\s+\w+[ \t]+([^\n]*)", src, re.M)
+    src = re.sub(r"^\s*#[^\n]*", "", src, flags=re.M)
+    # Keep top-level declarations while masking function bodies. Keeping the
+    # opening brace lets the same signature search handle definitions and
+    # prototypes without interpreting any expressions inside their bodies.
+    depth = 0
+    top = []
+    for char in src:
+        if char == "{":
+            top.append(char if depth == 0 else " ")
+            depth += 1
+        elif char == "}":
+            depth = max(0, depth - 1)
+            top.append(" ")
+        else:
+            top.append(char if depth == 0 else " ")
+    parameters = re.findall(r"\b\w+\s*\(([^{};]*)\)\s*[{;]", "".join(top))
+    declarations = parameters + macros
+    # A preceding type distinguishes an array declaration from an indexing
+    # macro such as '#define ELEMENT X[row][column]'.
+    pattern = r"(?:^|,)\s*(?:[A-Za-z_]\w*\s+)+([A-Za-z_]\w*)\s*\[[^\]]*\]\s*\[\s*([A-Za-z_]\w*)\s*\](?!\s*\[)"
+    return {m.group(2): m.group(1) for declaration in declarations
+            for m in re.finditer(pattern, declaration)}
 
 
 class DefnError(Exception):
     pass
+
+
+def declared_inner_dimensions(spec, params, names, pname):
+    """Recover C VLA layout dimensions erased from dynamic MLIR types.
+
+    Only inner array dimensions affect C pointer arithmetic. The first array
+    extent is a caller annotation, so it cannot supply a missing argument.
+    """
+    if not any(ty.startswith('memref<') and ty.split(',')[0].count('x') > 2
+               for _, ty in params):
+        return {}
+    from c_types import parse_parameter
+    wrapper = RAISED / (spec.name + '.c')
+    result = subprocess.run([str(REPO/'llvm-project/build/bin/clang'), '-E', '-P', str(wrapper)],
+                            text=True, capture_output=True, timeout=30)
+    signature = re.search(r'\b' + re.escape(spec.name) + r'\s*\((.*?)\)\s*\{', result.stdout, re.S)
+    if result.returncode or not signature:
+        raise DefnError('cannot recover declared VLA dimensions')
+    renamed = {name: pname[old][1:] for (old, _), name in zip(params, names)}
+    integer = {name for (_, ty), name in zip(params, names) if ty == 'i32'}
+    dimensions = {}
+    for declaration in signature[1].split(','):
+        name, _, shape = parse_parameter(declaration, result.stdout)
+        for axis, dim in enumerate(shape):
+            if axis and dim in integer:
+                dimensions.setdefault(renamed[dim], []).append(
+                    {'array': renamed[name], 'axis': axis})
+    return dimensions
 
 
 def scalar_call_declarations(module_text: str, body: str) -> list[str]:
@@ -350,6 +406,9 @@ def to_defn(debuf_text: str, spec: Spec) -> tuple[str, dict]:
                          if f"%{ld}" in [pname[o] for o, _ in params]},
         "unreferenced": [pname[o][1:] for o, _ in params if pname[o] not in used],
     }
+    array_dimensions = declared_inner_dimensions(spec, params, names, pname)
+    if array_dimensions:
+        meta['array_dimensions'] = array_dimensions
     return defn, meta
 
 

@@ -1,0 +1,72 @@
+{
+  "routine": "thrust_fill",
+  "source": "Pinned public Thrust fill_n, generate_n, fill_functor<float>, and sequential for_each_n",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/fill.h",
+      "sha256": "0477183a53dbd4c75ac4a1fd3f51dbf981acb59d3718a7683ed54d84e63866ed"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/generate.inl",
+      "sha256": "4292e1602d2d400b78dae9f8f19bbb3300ab452da451f0972dc49be916c550d3"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/sequential/for_each.h",
+      "sha256": "c9206514e44123c02f1f0e2f4231f26a162dab5ffde911d22a22a9d5a408cc82"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/cuda/detail/fill.h",
+      "sha256": "1122706ba5714288c7b6e78bc3dd27143c8e2d1f4a67fe2c9b4eacd88fddb564"
+    }
+  ],
+  "adaptation": "Inline constant generation and assignment into the sequential traversal; specialize to float pointer storage and express pointer increments as subscripts. Runtime invokes actual Thrust CUDA fill_n.",
+  "specs": [
+    {
+      "name": "thrust_fill_f32",
+      "args": [
+        "n",
+        "value",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "fill_n",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_fill_f32",
+          "arguments": [
+            "n",
+            "value",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 output; scalar passed by value"
+      ],
+      "deviations": []
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "routine": "cutlass_gemm_i8",
+  "source": "Public CUTLASS host GEMM reference, specialized to int8 inputs and int32 accumulator/output; corresponding cuBLAS GemmEx integer API",
+  "upstream_files": [
+    {
+      "path": "third_party/cutlass/tools/util/include/cutlass/util/reference/host/gemm.h",
+      "sha256": "7f390fe40fa0592b2894fdba8c2191bc45714c0e7d4228b3625624b59f5ae623"
+    }
+  ],
+  "adaptation": "RowMajor layouts, int8 input, int32 ComputeType/ScalarType/ElementC, alpha=1, beta=0, initial_accum=0. Remove output tile blocking while preserving increasing-k accumulation for each output.",
+  "specs": [
+    {
+      "name": "cutlass_gemm_i8_i32",
+      "args": [
+        "m",
+        "n",
+        "k",
+        "a",
+        "b",
+        "out"
+      ],
+      "target": {
+        "library": "cuBLAS",
+        "call": "cublasGemmEx",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cublas_gemmex_i8_i32",
+          "arguments": [
+            "m",
+            "n",
+            "k",
+            "a",
+            "b",
+            "out"
+          ],
+          "arrays": {
+            "a": [
+              "m",
+              "k"
+            ],
+            "b": [
+              "k",
+              "n"
+            ],
+            "out": [
+              "m",
+              "n"
+            ]
+          },
+          "bounds": {
+            "m": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "n": {
+              "min": 4,
+              "max": 2147483644,
+              "multiple_of": 4
+            },
+            "k": {
+              "min": 4,
+              "max": 131068,
+              "multiple_of": 4
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive extents; disjoint contiguous row-major arrays",
+        "K <= 131071, so all signed-int8 dot-product partial sums fit int32",
+        "cuBLAS integer ABI: N and K divisible by four, device A/B four-byte aligned; checked before vendor execution"
+      ],
+      "deviations": []
+    }
+  ],
+  "api_documentation": "https://docs.nvidia.com/cuda/archive/12.6.0/cublas/index.html#cublasgemmex"
+}

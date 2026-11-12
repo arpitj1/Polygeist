@@ -167,6 +167,25 @@ def exact_integer_selection_rules():
     return rules
 
 
+def exact_boolean_comparison_rules():
+    """Absorb complementary integer predicates after i1 select lowering.
+
+    Restrict both leaves to comparisons, whose results are exactly 0/1.
+    Treating an arbitrary integer as a Boolean here would change its high bits.
+    """
+    rules = []
+    for predicate, complement in (("eq", "ne"), ("ne", "eq")):
+        p = Term.Cmp(predicate, a, b)
+        opposite = Term.Cmp(complement, a, b)
+        for other in ("eq", "ne"):
+            q = Term.Cmp(other, c, d)
+            rules.append(rewrite(Term.Binary("or", p, Term.Binary("and", opposite, q)))
+                         .to(Term.Binary("or", p, q)))
+            rules.append(rewrite(Term.Binary("and", p, Term.Binary("or", opposite, q)))
+                         .to(Term.Binary("and", p, q)))
+    return rules
+
+
 def exact_conditional_selection_rules():
     """Move a known-false comparison through a selected literal arm.
 
@@ -196,6 +215,19 @@ def exact_conditional_selection_rules():
     return rules
 
 
+def exact_float_select_complements():
+    """Swap selected arms with the exact IEEE complement, including NaNs."""
+    left, right, yes, no = vars_("left right yes no", Term)
+    rules = []
+    for unordered, ordered in (("une", "oeq"), ("ueq", "one"),
+                               ("uge", "olt"), ("ugt", "ole"),
+                               ("ule", "ogt"), ("ult", "oge"),
+                               ("uno", "ord")):
+        rules.append(rewrite(Term.Select(Term.Cmp(unordered, left, right), yes, no))
+                     .to(Term.Select(Term.Cmp(ordered, left, right), no, yes)))
+    return rules
+
+
 def algebra_rules(include_distributivity: bool = True):
     # Strict mode admits exact selection identities and multiplication operand
     # exchange, matching upstream arith.mulf/muli's Commutative trait. This does
@@ -204,7 +236,9 @@ def algebra_rules(include_distributivity: bool = True):
     # Relaxed mode also permits real-arithmetic identities; runtime error still
     # needs validation.
     integer_rules = (exact_integer_selection_rules() +
-                     exact_conditional_selection_rules())
+                     exact_conditional_selection_rules() +
+                     exact_boolean_comparison_rules() +
+                     exact_float_select_complements())
     if numeric_model() == "strict":
         return ruleset(*integer_rules, rewrite(a * b).to(b * a),
                        name="strict_scalar_operations")
@@ -215,6 +249,7 @@ def algebra_rules(include_distributivity: bool = True):
     # arithmetic on the captured constants. `vars_` returns a generator, so
     # single-name calls need tuple-unpack syntax.
     (x,) = vars_("x", Term)
+    (condition,) = vars_("condition", Term)
     c1, c2 = vars_("c1 c2", f64)
     rules = [
         *integer_rules,
@@ -231,6 +266,13 @@ def algebra_rules(include_distributivity: bool = True):
         rewrite(one * a).to(a),
         rewrite(a + zero).to(a),
         rewrite(zero + a).to(a),
+        # A masked update and addition of a masked value have the same
+        # real-arithmetic meaning. Restrict this identity to relaxed mode:
+        # adding +0 can change the sign of an existing -0 accumulator.
+        # Only factor an already-selected update; do not expand arbitrary
+        # arithmetic over conditionals, which grows negative proofs rapidly.
+        rewrite(Term.Select(condition, a + b, a))
+        .to(a + Term.Select(condition, b, zero)),
         # Annihilator (mul by zero) — useful for trmm-style masks where
         # the kernel computes `mask * value + (1 - mask) * orig`.
         rewrite(a * zero).to(zero),
@@ -1489,21 +1531,28 @@ def _conditional_proof_candidate(left, right) -> bool:
     """
     def summary(node):
         nodes, leaves = set(), set()
-        has_select = False
+        has_conditional = False
         def visit(current):
-            nonlocal has_select
+            nonlocal has_conditional
             if not isinstance(current, tuple) or current in nodes:
                 return
             nodes.add(current)
-            has_select |= current[0] == "Select"
+            has_conditional |= (current[0] == "Select" or
+                                current[:2] in {("Binary", "and"),
+                                                ("Binary", "or")})
             if current[0] in {"In", "Out", "Cap", "Lit", "Access"}:
                 leaves.add(current)
             for child in current[1:]:
                 visit(child)
         visit(node)
-        return nodes, leaves, has_select
+        return nodes, leaves, has_conditional
     ln, ll, ls = summary(left)
     rn, rl, rs = summary(right)
+    if numeric_model() != "strict":
+        # Relaxed masked-add factoring may introduce the additive identity.
+        # This only opens the bounded EqSat attempt; it is not a proof.
+        ll.discard(("Lit", 0.0))
+        rl.discard(("Lit", 0.0))
     return ls and rs and ll == rl and max(len(ln), len(rn)) <= 32
 
 

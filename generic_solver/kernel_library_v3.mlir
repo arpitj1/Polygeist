@@ -292,6 +292,25 @@ module {
     kernel.yield %6 : tensor<?xf32>
   }
 
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "a", "b", "c", "d", "output"], "returns": [], "spec": "aten_cross_component_f32", "unreferenced": []}
+  kernel.defn @aten_cross_component_f32(%n: i32, %a: tensor<?xf32>, %b: tensor<?xf32>, %c: tensor<?xf32>, %d: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %5 = arith.index_cast %n : i32 to index
+    %6 = polygeist.submap(%a, %5) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%b, %5) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %8 = polygeist.submap(%c, %5) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %9 = polygeist.submap(%d, %5) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %10 = polygeist.submap(%output, %5) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%6, %7, %8, %9 : tensor<?xf32>, tensor<?xf32>, tensor<?xf32>, tensor<?xf32>) outs(%10 : tensor<?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %in_1: f32, %in_2: f32, %out: f32):
+      %14 = arith.mulf %in, %in_0 : f32
+      %15 = arith.mulf %in_1, %in_2 : f32
+      %16 = arith.subf %14, %15 : f32
+      linalg.yield %16 : f32
+    } -> tensor<?xf32>
+    %12 = polygeist.submapInverse(%output, %11, %5) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %12 : tensor<?xf32>
+  }
+
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "a", "b", "output"], "returns": [], "spec": "aten_div_f32", "unreferenced": []}
   kernel.defn @aten_div_f32(%n: i32, %a: tensor<?xf32>, %b: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
     %3 = arith.index_cast %n : i32 to index
@@ -763,6 +782,30 @@ module {
     kernel.yield %8 : tensor<?xf32>
   }
 
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "input", "output"], "returns": [], "spec": "aten_nansum_ordered_f32", "unreferenced": []}
+  kernel.defn @aten_nansum_ordered_f32(%rows: i32, %cols: i32, %input: tensor<?x?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %cst = arith.constant 0.000000e+00 : f32
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %cst : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf32>, index, index) -> tensor<?x?xf32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, index, index) -> tensor<?x?xf32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xf32>) outs(%8 : tensor<?x?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %12 = arith.cmpf une, %in, %in : f32
+      %13 = arith.select %12, %cst, %in : f32
+      %14 = arith.addf %out, %13 : f32
+      linalg.yield %14 : f32
+    } -> tensor<?x?xf32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, tensor<?x?xf32>, index, index) -> tensor<?xf32>
+    kernel.yield %10 : tensor<?xf32>
+  }
+
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "a", "b", "output"], "returns": [], "spec": "aten_ne_f32", "unreferenced": []}
   kernel.defn @aten_ne_f32(%n: i32, %a: tensor<?xf32>, %b: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
     %3 = arith.index_cast %n : i32 to index
@@ -833,6 +876,25 @@ module {
     ^bb0(%in: f32, %out: f32):
       %8 = arith.divf %cst, %in : f32
       linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "norm", "maxnorm", "output"], "returns": [], "spec": "aten_renorm_scale_f32", "unreferenced": []}
+  kernel.defn @aten_renorm_scale_f32(%n: i32, %norm: tensor<?xf32>, %maxnorm: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %cst = arith.constant 1.000000e-07 : f32
+    %cst_0 = arith.constant 1.000000e+00 : f32
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%norm, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.cmpf ogt, %in, %maxnorm : f32
+      %9 = arith.addf %in, %cst : f32
+      %10 = arith.divf %maxnorm, %9 : f32
+      %11 = arith.select %8, %10, %cst_0 : f32
+      linalg.yield %11 : f32
     } -> tensor<?xf32>
     %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
     kernel.yield %6 : tensor<?xf32>
@@ -1020,13 +1082,12 @@ module {
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "input", "output"], "returns": [], "spec": "aten_softmax_f32", "unreferenced": []}
   kernel.defn @aten_softmax_f32(%n: i32, %input: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
     %cst = arith.constant 0.000000e+00 : f32
-    %c1 = arith.constant 1 : index
     %c0 = arith.constant 0 : index
     %extracted = tensor.extract %input[%c0] : tensor<?xf32>
     %2 = arith.index_cast %n : i32 to index
     %3 = tensor.empty() : tensor<f32>
     %inserted = tensor.insert %extracted into %3[] : tensor<f32>
-    %4 = arith.subi %2, %c1 : index
+    %4 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
     %5 = polygeist.submap(%input, %4) {map = affine_map<(d0) -> (d0 + 1)>} : (tensor<?xf32>, index) -> tensor<?xf32>
     %6 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> ()>], iterator_types = ["reduction"], library_call = ""} ins(%5 : tensor<?xf32>) outs(%inserted : tensor<f32>) {
     ^bb0(%in: f32, %out: f32):
@@ -1198,6 +1259,28 @@ module {
     kernel.yield %6 : tensor<?xf32>
   }
 
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_column_sum_i8_i32", "unreferenced": []}
+  kernel.defn @cub_column_sum_i8_i32(%rows: i32, %cols: i32, %seed: i32, %input: tensor<?x?xi8>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %2 = arith.index_cast %cols : i32 to index
+    %3 = arith.index_cast %rows : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %seed : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d1, d0)>} : (tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xi8>) outs(%8 : tensor<?x?xi32>) {
+    ^bb0(%in: i8, %out: i32):
+      %12 = arith.extsi %in : i8 to i32
+      %13 = arith.addi %out, %12 : i32
+      linalg.yield %13 : i32
+    } -> tensor<?x?xi32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
+    kernel.yield %10 : tensor<?xi32>
+  }
+
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "inclusive", "input", "output"], "returns": [], "spec": "cub_inclusive_product_f32", "unreferenced": []}
   kernel.defn @cub_inclusive_product_f32(%n: i32, %inclusive: f32, %input: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
     %2 = arith.index_cast %n : i32 to index
@@ -1228,6 +1311,153 @@ module {
     } -> (tensor<?xf32>, tensor<f32>)
     %7 = polygeist.submapInverse(%output, %6#0, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
     kernel.yield %7 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": [], "params": ["n", "seed", "input"], "returns": ["i32"], "spec": "cub_reduce_value_and_i32", "unreferenced": []}
+  kernel.defn @cub_reduce_value_and_i32(%n: i32, %seed: i32, %input: tensor<?xi32>) -> i32 {
+    %c0_i32 = arith.constant 0 : i32
+    %false = arith.constant false
+    %1 = arith.index_cast %n : i32 to index
+    %2 = tensor.empty() : tensor<i32>
+    %inserted = tensor.insert %seed into %2[] : tensor<i32>
+    %3 = polygeist.submap(%input, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %4 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> ()>], iterator_types = ["reduction"], library_call = ""} ins(%3 : tensor<?xi32>) outs(%inserted : tensor<i32>) {
+    ^bb0(%in: i32, %out: i32):
+      %5 = arith.cmpi ne, %out, %c0_i32 : i32
+      %6 = arith.cmpi ne, %in, %c0_i32 : i32
+      %7 = arith.select %5, %6, %false : i1
+      %8 = arith.extui %7 : i1 to i32
+      linalg.yield %8 : i32
+    } -> tensor<i32>
+    %extracted = tensor.extract %4[] : tensor<i32>
+    kernel.yield %extracted : i32
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": [], "params": ["n", "seed", "input"], "returns": ["i32"], "spec": "cub_reduce_value_or_i32", "unreferenced": []}
+  kernel.defn @cub_reduce_value_or_i32(%n: i32, %seed: i32, %input: tensor<?xi32>) -> i32 {
+    %c0_i32 = arith.constant 0 : i32
+    %true = arith.constant true
+    %1 = arith.index_cast %n : i32 to index
+    %2 = tensor.empty() : tensor<i32>
+    %inserted = tensor.insert %seed into %2[] : tensor<i32>
+    %3 = polygeist.submap(%input, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %4 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> ()>], iterator_types = ["reduction"], library_call = ""} ins(%3 : tensor<?xi32>) outs(%inserted : tensor<i32>) {
+    ^bb0(%in: i32, %out: i32):
+      %5 = arith.cmpi ne, %out, %c0_i32 : i32
+      %6 = arith.cmpi ne, %in, %c0_i32 : i32
+      %7 = arith.select %5, %true, %6 : i1
+      %8 = arith.extui %7 : i1 to i32
+      linalg.yield %8 : i32
+    } -> tensor<i32>
+    %extracted = tensor.extract %4[] : tensor<i32>
+    kernel.yield %extracted : i32
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "seed", "input", "output"], "returns": [], "spec": "cub_reduce_and_i32", "unreferenced": []}
+  kernel.defn @cub_reduce_and_i32(%n: i32, %seed: i32, %input: tensor<?xi32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %false = arith.constant false
+    %c0 = arith.constant 0 : index
+    %2 = arith.index_cast %n : i32 to index
+    %inserted = tensor.insert %seed into %output[%c0] : tensor<?xi32>
+    %3 = polygeist.submap(%input, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %4 = polygeist.submap(%inserted, %2) {map = affine_map<(d0) -> (0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["reduction"], library_call = ""} ins(%3 : tensor<?xi32>) outs(%4 : tensor<?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %8 = arith.cmpi ne, %out, %c0_i32 : i32
+      %9 = arith.cmpi ne, %in, %c0_i32 : i32
+      %10 = arith.select %8, %9, %false : i1
+      %11 = arith.extui %10 : i1 to i32
+      linalg.yield %11 : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%inserted, %5, %2) {map = affine_map<(d0) -> (0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    kernel.yield %6 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "seed", "input", "output"], "returns": [], "spec": "cub_reduce_or_i32", "unreferenced": []}
+  kernel.defn @cub_reduce_or_i32(%n: i32, %seed: i32, %input: tensor<?xi32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %true = arith.constant true
+    %c0 = arith.constant 0 : index
+    %2 = arith.index_cast %n : i32 to index
+    %inserted = tensor.insert %seed into %output[%c0] : tensor<?xi32>
+    %3 = polygeist.submap(%input, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %4 = polygeist.submap(%inserted, %2) {map = affine_map<(d0) -> (0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["reduction"], library_call = ""} ins(%3 : tensor<?xi32>) outs(%4 : tensor<?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %8 = arith.cmpi ne, %out, %c0_i32 : i32
+      %9 = arith.cmpi ne, %in, %c0_i32 : i32
+      %10 = arith.select %8, %true, %9 : i1
+      %11 = arith.extui %10 : i1 to i32
+      linalg.yield %11 : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%inserted, %5, %2) {map = affine_map<(d0) -> (0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    kernel.yield %6 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_ordered_rows_sum_f32", "unreferenced": []}
+  kernel.defn @cub_ordered_rows_sum_f32(%rows: i32, %cols: i32, %seed: f32, %input: tensor<?x?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %seed : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf32>, index, index) -> tensor<?x?xf32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, index, index) -> tensor<?x?xf32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xf32>) outs(%8 : tensor<?x?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %12 = arith.addf %out, %in : f32
+      linalg.yield %12 : f32
+    } -> tensor<?x?xf32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, tensor<?x?xf32>, index, index) -> tensor<?xf32>
+    kernel.yield %10 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "factor", "input", "output"], "returns": [], "spec": "cub_ordered_rows_scaled_sum_f32", "unreferenced": []}
+  kernel.defn @cub_ordered_rows_scaled_sum_f32(%rows: i32, %cols: i32, %seed: f32, %factor: f32, %input: tensor<?x?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %seed : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf32>, index, index) -> tensor<?x?xf32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, index, index) -> tensor<?x?xf32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xf32>) outs(%8 : tensor<?x?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %12 = arith.mulf %factor, %in : f32
+      %13 = arith.addf %out, %12 : f32
+      linalg.yield %13 : f32
+    } -> tensor<?x?xf32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, tensor<?x?xf32>, index, index) -> tensor<?xf32>
+    kernel.yield %10 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "factor", "input", "output"], "returns": [], "spec": "cub_ordered_rows_divided_sum_f32", "unreferenced": []}
+  kernel.defn @cub_ordered_rows_divided_sum_f32(%rows: i32, %cols: i32, %seed: f32, %factor: f32, %input: tensor<?x?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %seed : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf32>, index, index) -> tensor<?x?xf32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, index, index) -> tensor<?x?xf32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xf32>) outs(%8 : tensor<?x?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %12 = arith.divf %in, %factor : f32
+      %13 = arith.addf %out, %12 : f32
+      linalg.yield %13 : f32
+    } -> tensor<?x?xf32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, tensor<?x?xf32>, index, index) -> tensor<?xf32>
+    kernel.yield %10 : tensor<?xf32>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "seed", "input", "output"], "returns": [], "spec": "cub_reduce_sum_f32", "unreferenced": []}
@@ -1306,6 +1536,301 @@ module {
     } -> tensor<f64>
     %extracted = tensor.extract %4[] : tensor<f64>
     kernel.yield %extracted : f64
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_segmented_sum_f32", "unreferenced": []}
+  kernel.defn @cub_segmented_sum_f32(%rows: i32, %cols: i32, %seed: f32, %input: tensor<?x?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %seed : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf32>, index, index) -> tensor<?x?xf32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, index, index) -> tensor<?x?xf32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xf32>) outs(%8 : tensor<?x?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %12 = arith.addf %out, %in : f32
+      linalg.yield %12 : f32
+    } -> tensor<?x?xf32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf32>, tensor<?x?xf32>, index, index) -> tensor<?xf32>
+    kernel.yield %10 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_segmented_xor_i32", "unreferenced": []}
+  kernel.defn @cub_segmented_xor_i32(%rows: i32, %cols: i32, %seed: i32, %input: tensor<?x?xi32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %seed : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xi32>, index, index) -> tensor<?x?xi32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xi32>) outs(%8 : tensor<?x?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %12 = arith.xori %out, %in : i32
+      linalg.yield %12 : i32
+    } -> tensor<?x?xi32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
+    kernel.yield %10 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "input", "output"], "returns": [], "spec": "cub_segmented_count_nonzero_f32", "unreferenced": []}
+  kernel.defn @cub_segmented_count_nonzero_f32(%rows: i32, %cols: i32, %input: tensor<?x?xf32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %cst = arith.constant 0.000000e+00 : f32
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %c0_i32 : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf32>, index, index) -> tensor<?x?xf32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xf32>) outs(%8 : tensor<?x?xi32>) {
+    ^bb0(%in: f32, %out: i32):
+      %12 = arith.cmpf une, %in, %cst : f32
+      %13 = arith.extui %12 : i1 to i32
+      %14 = arith.addi %out, %13 : i32
+      linalg.yield %14 : i32
+    } -> tensor<?x?xi32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
+    kernel.yield %10 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_segmented_reduce_and_i32", "unreferenced": []}
+  kernel.defn @cub_segmented_reduce_and_i32(%rows: i32, %cols: i32, %seed: i32, %input: tensor<?x?xi32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %false = arith.constant false
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %seed : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xi32>, index, index) -> tensor<?x?xi32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xi32>) outs(%8 : tensor<?x?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %12 = arith.cmpi ne, %out, %c0_i32 : i32
+      %13 = arith.cmpi ne, %in, %c0_i32 : i32
+      %14 = arith.select %12, %13, %false : i1
+      %15 = arith.extui %14 : i1 to i32
+      linalg.yield %15 : i32
+    } -> tensor<?x?xi32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
+    kernel.yield %10 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_segmented_reduce_or_i32", "unreferenced": []}
+  kernel.defn @cub_segmented_reduce_or_i32(%rows: i32, %cols: i32, %seed: i32, %input: tensor<?x?xi32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %true = arith.constant true
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%4 : tensor<?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %seed : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    %7 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xi32>, index, index) -> tensor<?x?xi32>
+    %8 = polygeist.submap(%6, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%7 : tensor<?x?xi32>) outs(%8 : tensor<?x?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %12 = arith.cmpi ne, %out, %c0_i32 : i32
+      %13 = arith.cmpi ne, %in, %c0_i32 : i32
+      %14 = arith.select %12, %true, %13 : i1
+      %15 = arith.extui %14 : i1 to i32
+      linalg.yield %15 : i32
+    } -> tensor<?x?xi32>
+    %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
+    kernel.yield %10 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "all", "input", "output"], "returns": [], "spec": "cub_segmented_logical_mode_i32", "unreferenced": []}
+  kernel.defn @cub_segmented_logical_mode_i32(%rows: i32, %cols: i32, %all: i32, %input: tensor<?x?xi32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %false = arith.constant false
+    %true = arith.constant true
+    %2 = arith.index_cast %rows : i32 to index
+    %3 = arith.index_cast %cols : i32 to index
+    %4 = arith.cmpi ne, %all, %c0_i32 : i32
+    %5 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %6 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%5 : tensor<?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %all : i32
+    } -> tensor<?xi32>
+    %7 = polygeist.submapInverse(%output, %6, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    %8 = polygeist.submap(%input, %2, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = polygeist.submap(%7, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, index, index) -> tensor<?x?xi32>
+    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "reduction"], library_call = ""} ins(%8 : tensor<?x?xi32>) outs(%9 : tensor<?x?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %13 = arith.cmpi ne, %out, %c0_i32 : i32
+      %14 = arith.cmpi ne, %in, %c0_i32 : i32
+      %15 = arith.select %13, %14, %false : i1
+      %16 = arith.extui %15 : i1 to i32
+      %17 = arith.cmpi ne, %out, %c0_i32 : i32
+      %18 = arith.cmpi ne, %in, %c0_i32 : i32
+      %19 = arith.select %17, %true, %18 : i1
+      %20 = arith.extui %19 : i1 to i32
+      %21 = arith.select %4, %16, %20 : i32
+      linalg.yield %21 : i32
+    } -> tensor<?x?xi32>
+    %11 = polygeist.submapInverse(%7, %10, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
+    kernel.yield %11 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"array_dimensions": {"IC": [{"array": "input", "axis": 1}, {"array": "filter", "axis": 1}], "IH": [{"array": "input", "axis": 2}], "IW": [{"array": "input", "axis": 3}], "KH": [{"array": "filter", "axis": 2}], "KW": [{"array": "filter", "axis": 3}], "OC": [{"array": "output", "axis": 1}], "OH": [{"array": "output", "axis": 2}], "OW": [{"array": "output", "axis": 3}]}, "declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["N", "IC", "IH", "IW", "OC", "KH", "KW", "OH", "OW", "input", "filter", "output"], "returns": [], "spec": "cudnn_conv2d_valid_d1_f32", "unreferenced": ["IH", "IW"]}
+  kernel.defn @cudnn_conv2d_valid_d1_f32(%N: i32, %IC: i32, %IH: i32, %IW: i32, %OC: i32, %KH: i32, %KW: i32, %OH: i32, %OW: i32, %input: tensor<?x?x?x?xf32>, %filter: tensor<?x?x?x?xf32>, %output: tensor<?x?x?x?xf32>) -> tensor<?x?x?x?xf32> {
+    %cst = arith.constant 0.000000e+00 : f32
+    %3 = arith.index_cast %N : i32 to index
+    %4 = arith.index_cast %OC : i32 to index
+    %5 = arith.index_cast %OH : i32 to index
+    %6 = arith.index_cast %OW : i32 to index
+    %7 = arith.index_cast %IC : i32 to index
+    %8 = arith.index_cast %KH : i32 to index
+    %9 = arith.index_cast %KW : i32 to index
+    %10 = polygeist.submap(%output, %3, %4, %5, %6) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "parallel", "parallel"], library_call = ""} outs(%10 : tensor<?x?x?x?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %cst : f32
+    } -> tensor<?x?x?x?xf32>
+    %12 = polygeist.submapInverse(%output, %11, %3, %4, %5, %6) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %13 = polygeist.submap(%filter, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d1, d4, d5, d6)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %14 = polygeist.submap(%input, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d4, d5 + d2, d6 + d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %15 = polygeist.submap(%12, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %16 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>, affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>, affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>], iterator_types = ["parallel", "parallel", "parallel", "parallel", "reduction", "reduction", "reduction"], library_call = ""} ins(%13, %14 : tensor<?x?x?x?x?x?x?xf32>, tensor<?x?x?x?x?x?x?xf32>) outs(%15 : tensor<?x?x?x?x?x?x?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %19 = arith.mulf %in, %in_0 : f32
+      %20 = arith.addf %19, %out : f32
+      linalg.yield %20 : f32
+    } -> tensor<?x?x?x?x?x?x?xf32>
+    %17 = polygeist.submapInverse(%12, %16, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?xf32>
+    kernel.yield %17 : tensor<?x?x?x?xf32>
+  }
+
+  // lib_v2-meta: {"array_dimensions": {"IC": [{"array": "input", "axis": 1}, {"array": "filter", "axis": 1}], "IH": [{"array": "input", "axis": 2}], "IW": [{"array": "input", "axis": 3}], "KH": [{"array": "filter", "axis": 2}], "KW": [{"array": "filter", "axis": 3}], "OC": [{"array": "output", "axis": 1}], "OH": [{"array": "output", "axis": 2}], "OW": [{"array": "output", "axis": 3}]}, "declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["N", "IC", "IH", "IW", "OC", "KH", "KW", "OH", "OW", "input", "filter", "output"], "returns": [], "spec": "cudnn_conv2d_valid_d2_f32", "unreferenced": ["IH", "IW"]}
+  kernel.defn @cudnn_conv2d_valid_d2_f32(%N: i32, %IC: i32, %IH: i32, %IW: i32, %OC: i32, %KH: i32, %KW: i32, %OH: i32, %OW: i32, %input: tensor<?x?x?x?xf32>, %filter: tensor<?x?x?x?xf32>, %output: tensor<?x?x?x?xf32>) -> tensor<?x?x?x?xf32> {
+    %cst = arith.constant 0.000000e+00 : f32
+    %3 = arith.index_cast %N : i32 to index
+    %4 = arith.index_cast %OC : i32 to index
+    %5 = arith.index_cast %OH : i32 to index
+    %6 = arith.index_cast %OW : i32 to index
+    %7 = arith.index_cast %IC : i32 to index
+    %8 = arith.index_cast %KH : i32 to index
+    %9 = arith.index_cast %KW : i32 to index
+    %10 = polygeist.submap(%output, %3, %4, %5, %6) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "parallel", "parallel"], library_call = ""} outs(%10 : tensor<?x?x?x?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %cst : f32
+    } -> tensor<?x?x?x?xf32>
+    %12 = polygeist.submapInverse(%output, %11, %3, %4, %5, %6) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %13 = polygeist.submap(%filter, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d1, d4, d5, d6)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %14 = polygeist.submap(%input, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d4, d5 * 2 + d2, d6 * 2 + d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %15 = polygeist.submap(%12, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?xf32>
+    %16 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>, affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>, affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3, d4, d5, d6)>], iterator_types = ["parallel", "parallel", "parallel", "parallel", "reduction", "reduction", "reduction"], library_call = ""} ins(%13, %14 : tensor<?x?x?x?x?x?x?xf32>, tensor<?x?x?x?x?x?x?xf32>) outs(%15 : tensor<?x?x?x?x?x?x?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %19 = arith.mulf %in, %in_0 : f32
+      %20 = arith.addf %19, %out : f32
+      linalg.yield %20 : f32
+    } -> tensor<?x?x?x?x?x?x?xf32>
+    %17 = polygeist.submapInverse(%12, %16, %3, %4, %5, %6, %7, %8, %9) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?x?x?x?xf32>, index, index, index, index, index, index, index) -> tensor<?x?x?x?xf32>
+    kernel.yield %17 : tensor<?x?x?x?xf32>
+  }
+
+  // lib_v2-meta: {"array_dimensions": {"IC": [{"array": "filter", "axis": 1}], "IH": [{"array": "input", "axis": 1}], "IW": [{"array": "input", "axis": 2}], "KH": [{"array": "filter", "axis": 2}], "KW": [{"array": "filter", "axis": 3}], "OH": [{"array": "output", "axis": 1}], "OW": [{"array": "output", "axis": 2}]}, "declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["IC", "IH", "IW", "OC", "KH", "KW", "OH", "OW", "input", "filter", "output"], "returns": [], "spec": "cudnn_conv2d_valid_unbatched_d2_f32", "unreferenced": ["IH", "IW"]}
+  kernel.defn @cudnn_conv2d_valid_unbatched_d2_f32(%IC: i32, %IH: i32, %IW: i32, %OC: i32, %KH: i32, %KW: i32, %OH: i32, %OW: i32, %input: tensor<?x?x?xf32>, %filter: tensor<?x?x?x?xf32>, %output: tensor<?x?x?xf32>) -> tensor<?x?x?xf32> {
+    %cst = arith.constant 0.000000e+00 : f32
+    %3 = arith.index_cast %OC : i32 to index
+    %4 = arith.index_cast %OH : i32 to index
+    %5 = arith.index_cast %OW : i32 to index
+    %6 = arith.index_cast %IC : i32 to index
+    %7 = arith.index_cast %KH : i32 to index
+    %8 = arith.index_cast %KW : i32 to index
+    %9 = polygeist.submap(%output, %3, %4, %5) {map = affine_map<(d0, d1, d2) -> (d0, d1, d2)>} : (tensor<?x?x?xf32>, index, index, index) -> tensor<?x?x?xf32>
+    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "parallel", "parallel"], library_call = ""} outs(%9 : tensor<?x?x?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %cst : f32
+    } -> tensor<?x?x?xf32>
+    %11 = polygeist.submapInverse(%output, %10, %3, %4, %5) {map = affine_map<(d0, d1, d2) -> (d0, d1, d2)>} : (tensor<?x?x?xf32>, tensor<?x?x?xf32>, index, index, index) -> tensor<?x?x?xf32>
+    %12 = polygeist.submap(%filter, %3, %4, %5, %6, %7, %8) {map = affine_map<(d0, d1, d2, d3, d4, d5) -> (d0, d3, d4, d5)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?xf32>
+    %13 = polygeist.submap(%input, %3, %4, %5, %6, %7, %8) {map = affine_map<(d0, d1, d2, d3, d4, d5) -> (d3, d4 * 2 + d1, d5 * 2 + d2)>} : (tensor<?x?x?xf32>, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?xf32>
+    %14 = polygeist.submap(%11, %3, %4, %5, %6, %7, %8) {map = affine_map<(d0, d1, d2, d3, d4, d5) -> (d0, d1, d2)>} : (tensor<?x?x?xf32>, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?xf32>
+    %15 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3, d4, d5) -> (d0, d1, d2, d3, d4, d5)>, affine_map<(d0, d1, d2, d3, d4, d5) -> (d0, d1, d2, d3, d4, d5)>, affine_map<(d0, d1, d2, d3, d4, d5) -> (d0, d1, d2, d3, d4, d5)>], iterator_types = ["parallel", "parallel", "parallel", "reduction", "reduction", "reduction"], library_call = ""} ins(%12, %13 : tensor<?x?x?x?x?x?xf32>, tensor<?x?x?x?x?x?xf32>) outs(%14 : tensor<?x?x?x?x?x?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %18 = arith.mulf %in, %in_0 : f32
+      %19 = arith.addf %18, %out : f32
+      linalg.yield %19 : f32
+    } -> tensor<?x?x?x?x?x?xf32>
+    %16 = polygeist.submapInverse(%11, %15, %3, %4, %5, %6, %7, %8) {map = affine_map<(d0, d1, d2, d3, d4, d5) -> (d0, d1, d2)>} : (tensor<?x?x?xf32>, tensor<?x?x?x?x?x?xf32>, index, index, index, index, index, index) -> tensor<?x?x?xf32>
+    kernel.yield %16 : tensor<?x?x?xf32>
+  }
+
+  // lib_v2-meta: {"array_dimensions": {"IC": [{"array": "filter", "axis": 1}], "ID": [{"array": "input", "axis": 1}], "IH": [{"array": "input", "axis": 2}], "IW": [{"array": "input", "axis": 3}], "KD": [{"array": "filter", "axis": 2}], "KH": [{"array": "filter", "axis": 3}], "KW": [{"array": "filter", "axis": 4}], "OD": [{"array": "output", "axis": 1}], "OH": [{"array": "output", "axis": 2}], "OW": [{"array": "output", "axis": 3}]}, "declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["IC", "ID", "IH", "IW", "OC", "KD", "KH", "KW", "OD", "OH", "OW", "input", "filter", "output"], "returns": [], "spec": "cudnn_conv3d_valid_f32", "unreferenced": ["ID", "IH", "IW"]}
+  kernel.defn @cudnn_conv3d_valid_f32(%IC: i32, %ID: i32, %IH: i32, %IW: i32, %OC: i32, %KD: i32, %KH: i32, %KW: i32, %OD: i32, %OH: i32, %OW: i32, %input: tensor<?x?x?x?xf32>, %filter: tensor<?x?x?x?x?xf32>, %output: tensor<?x?x?x?xf32>) -> tensor<?x?x?x?xf32> {
+    %cst = arith.constant 0.000000e+00 : f32
+    %3 = arith.index_cast %OC : i32 to index
+    %4 = arith.index_cast %OD : i32 to index
+    %5 = arith.index_cast %OH : i32 to index
+    %6 = arith.index_cast %OW : i32 to index
+    %7 = arith.index_cast %IC : i32 to index
+    %8 = arith.index_cast %KD : i32 to index
+    %9 = arith.index_cast %KH : i32 to index
+    %10 = arith.index_cast %KW : i32 to index
+    %11 = polygeist.submap(%output, %3, %4, %5, %6) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %12 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "parallel", "parallel"], library_call = ""} outs(%11 : tensor<?x?x?x?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %cst : f32
+    } -> tensor<?x?x?x?xf32>
+    %13 = polygeist.submapInverse(%output, %12, %3, %4, %5, %6) {map = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?xf32>, index, index, index, index) -> tensor<?x?x?x?xf32>
+    %14 = polygeist.submap(%filter, %3, %4, %5, %6, %7, %8, %9, %10) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d0, d4, d5, d6, d7)>} : (tensor<?x?x?x?x?xf32>, index, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?x?xf32>
+    %15 = polygeist.submap(%input, %3, %4, %5, %6, %7, %8, %9, %10) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d4, d5 + d1, d6 + d2, d7 + d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?x?xf32>
+    %16 = polygeist.submap(%13, %3, %4, %5, %6, %7, %8, %9, %10) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, index, index, index, index, index, index, index, index) -> tensor<?x?x?x?x?x?x?x?xf32>
+    %17 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d0, d1, d2, d3, d4, d5, d6, d7)>, affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d0, d1, d2, d3, d4, d5, d6, d7)>, affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d0, d1, d2, d3, d4, d5, d6, d7)>], iterator_types = ["parallel", "parallel", "parallel", "parallel", "reduction", "reduction", "reduction", "reduction"], library_call = ""} ins(%14, %15 : tensor<?x?x?x?x?x?x?x?xf32>, tensor<?x?x?x?x?x?x?x?xf32>) outs(%16 : tensor<?x?x?x?x?x?x?x?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %20 = arith.mulf %in, %in_0 : f32
+      %21 = arith.addf %20, %out : f32
+      linalg.yield %21 : f32
+    } -> tensor<?x?x?x?x?x?x?x?xf32>
+    %18 = polygeist.submapInverse(%13, %17, %3, %4, %5, %6, %7, %8, %9, %10) {map = affine_map<(d0, d1, d2, d3, d4, d5, d6, d7) -> (d0, d1, d2, d3)>} : (tensor<?x?x?x?xf32>, tensor<?x?x?x?x?x?x?x?xf32>, index, index, index, index, index, index, index, index) -> tensor<?x?x?x?xf32>
+    kernel.yield %18 : tensor<?x?x?x?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {"k": "a", "n": "out"}, "outputs": ["p_out"], "params": ["m", "n", "k", "a", "b", "p_out"], "returns": [], "spec": "cutlass_gemm_i8_i32", "unreferenced": []}
+  kernel.defn @cutlass_gemm_i8_i32(%m: i32, %n: i32, %k: i32, %a: tensor<?x?xi8>, %b: tensor<?x?xi8>, %p_out: tensor<?x?xi32>) -> tensor<?x?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %3 = arith.index_cast %m : i32 to index
+    %4 = arith.index_cast %n : i32 to index
+    %5 = arith.index_cast %k : i32 to index
+    %6 = polygeist.submap(%p_out, %3, %4) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xi32>, index, index) -> tensor<?x?xi32>
+    %7 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%6 : tensor<?x?xi32>) {
+    ^bb0(%out: i32):
+      linalg.yield %c0_i32 : i32
+    } -> tensor<?x?xi32>
+    %8 = polygeist.submapInverse(%p_out, %7, %3, %4) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xi32>, tensor<?x?xi32>, index, index) -> tensor<?x?xi32>
+    %9 = polygeist.submap(%a, %3, %4, %5) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xi8>, index, index, index) -> tensor<?x?x?xi8>
+    %10 = polygeist.submap(%b, %3, %4, %5) {map = affine_map<(d0, d1, d2) -> (d2, d1)>} : (tensor<?x?xi8>, index, index, index) -> tensor<?x?x?xi8>
+    %11 = polygeist.submap(%8, %3, %4, %5) {map = affine_map<(d0, d1, d2) -> (d0, d1)>} : (tensor<?x?xi32>, index, index, index) -> tensor<?x?x?xi32>
+    %12 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "parallel", "reduction"], library_call = ""} ins(%9, %10 : tensor<?x?x?xi8>, tensor<?x?x?xi8>) outs(%11 : tensor<?x?x?xi32>) {
+    ^bb0(%in: i8, %in_0: i8, %out: i32):
+      %15 = arith.extsi %in : i8 to i32
+      %16 = arith.extsi %in_0 : i8 to i32
+      %17 = arith.muli %15, %16 : i32
+      %18 = arith.addi %out, %17 : i32
+      linalg.yield %18 : i32
+    } -> tensor<?x?x?xi32>
+    %13 = polygeist.submapInverse(%8, %12, %3, %4, %5) {map = affine_map<(d0, d1, d2) -> (d0, d1)>} : (tensor<?x?xi32>, tensor<?x?x?xi32>, index, index, index) -> tensor<?x?xi32>
+    kernel.yield %13 : tensor<?x?xi32>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "input", "weight", "output"], "returns": [], "spec": "cutlass_rmsnorm_f32", "unreferenced": []}
@@ -1520,109 +2045,6 @@ module {
     kernel.yield %18 : tensor<?x?xf64>
   }
 
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldb", "B", "ldc", "C"], "returns": [], "spec": "netlib_dsyr2k_ln_beta0", "unreferenced": ["lda", "ldb", "ldc"]}
-  kernel.defn @netlib_dsyr2k_ln_beta0(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %ldb: i32, %B: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %cst = arith.constant 0.000000e+00 : f64
-    %3 = arith.index_cast %n : i32 to index
-    %4 = arith.index_cast %k : i32 to index
-    %5 = polygeist.submap(%C, %3, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %6 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%5 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %16 = linalg.index 0 : index
-      %17 = linalg.index 1 : index
-      %18 = arith.cmpi sge, %17, %16 : index
-      %19 = arith.select %18, %cst, %out : f64
-      linalg.yield %19 : f64
-    } -> tensor<?x?xf64>
-    %7 = polygeist.submapInverse(%C, %6, %3, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %8 = polygeist.submap(%B, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%A, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = polygeist.submap(%A, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %11 = polygeist.submap(%B, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %12 = polygeist.submap(%7, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %13 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "reduction", "parallel"], library_call = ""} ins(%8, %9, %10, %11 : tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%12 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %in_1: f64, %in_2: f64, %out: f64):
-      %16 = linalg.index 0 : index
-      %17 = arith.mulf %alpha, %in : f64
-      %18 = arith.mulf %alpha, %in_0 : f64
-      %19 = arith.mulf %in_1, %17 : f64
-      %20 = arith.addf %out, %19 : f64
-      %21 = arith.mulf %in_2, %18 : f64
-      %22 = arith.addf %20, %21 : f64
-      %23 = linalg.index 2 : index
-      %24 = arith.cmpi sge, %23, %16 : index
-      %25 = arith.select %24, %22, %out : f64
-      linalg.yield %25 : f64
-    } -> tensor<?x?x?xf64>
-    %14 = polygeist.submapInverse(%7, %13, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %14 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldb", "B", "ldc", "C"], "returns": [], "spec": "netlib_dsyr2k_ln_beta1", "unreferenced": ["lda", "ldb", "ldc"]}
-  kernel.defn @netlib_dsyr2k_ln_beta1(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %ldb: i32, %B: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %3 = arith.index_cast %n : i32 to index
-    %4 = arith.index_cast %k : i32 to index
-    %5 = polygeist.submap(%B, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %6 = polygeist.submap(%A, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %7 = polygeist.submap(%A, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %8 = polygeist.submap(%B, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%C, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "reduction", "parallel"], library_call = ""} ins(%5, %6, %7, %8 : tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%9 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %in_1: f64, %in_2: f64, %out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %alpha, %in : f64
-      %15 = arith.mulf %alpha, %in_0 : f64
-      %16 = arith.mulf %in_1, %14 : f64
-      %17 = arith.addf %out, %16 : f64
-      %18 = arith.mulf %in_2, %15 : f64
-      %19 = arith.addf %17, %18 : f64
-      %20 = linalg.index 2 : index
-      %21 = arith.cmpi sge, %20, %13 : index
-      %22 = arith.select %21, %19, %out : f64
-      linalg.yield %22 : f64
-    } -> tensor<?x?x?xf64>
-    %11 = polygeist.submapInverse(%C, %10, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %11 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldb", "B", "beta", "ldc", "C"], "returns": [], "spec": "netlib_dsyr2k_ln", "unreferenced": ["lda", "ldb", "ldc"]}
-  kernel.defn @netlib_dsyr2k_ln(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %ldb: i32, %B: tensor<?x?xf64>, %beta: f64, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %3 = arith.index_cast %n : i32 to index
-    %4 = arith.index_cast %k : i32 to index
-    %5 = polygeist.submap(%C, %3, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %6 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%5 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %16 = linalg.index 0 : index
-      %17 = arith.mulf %beta, %out : f64
-      %18 = linalg.index 1 : index
-      %19 = arith.cmpi sge, %18, %16 : index
-      %20 = arith.select %19, %17, %out : f64
-      linalg.yield %20 : f64
-    } -> tensor<?x?xf64>
-    %7 = polygeist.submapInverse(%C, %6, %3, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %8 = polygeist.submap(%B, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%A, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = polygeist.submap(%A, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %11 = polygeist.submap(%B, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %12 = polygeist.submap(%7, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %13 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "reduction", "parallel"], library_call = ""} ins(%8, %9, %10, %11 : tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%12 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %in_1: f64, %in_2: f64, %out: f64):
-      %16 = linalg.index 0 : index
-      %17 = arith.mulf %alpha, %in : f64
-      %18 = arith.mulf %alpha, %in_0 : f64
-      %19 = arith.mulf %in_1, %17 : f64
-      %20 = arith.addf %out, %19 : f64
-      %21 = arith.mulf %in_2, %18 : f64
-      %22 = arith.addf %20, %21 : f64
-      %23 = linalg.index 2 : index
-      %24 = arith.cmpi sge, %23, %16 : index
-      %25 = arith.select %24, %22, %out : f64
-      linalg.yield %25 : f64
-    } -> tensor<?x?x?xf64>
-    %14 = polygeist.submapInverse(%7, %13, %3, %4, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %14 : tensor<?x?xf64>
-  }
-
   // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "lda", "A", "ldb", "B", "ldc", "C"], "returns": [], "spec": "netlib_dsyr2k_un_alpha0_beta0", "unreferenced": ["k", "lda", "A", "ldb", "B", "ldc"]}
   kernel.defn @netlib_dsyr2k_un_alpha0_beta0(%n: i32, %k: i32, %lda: i32, %A: tensor<?x?xf64>, %ldb: i32, %B: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
     %cst = arith.constant 0.000000e+00 : f64
@@ -1663,40 +2085,6 @@ module {
     } -> tensor<?x?xf64>
     %6 = polygeist.submapInverse(%C, %5, %1, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
     kernel.yield %6 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "lda", "A", "ldb", "B", "ldc", "C"], "returns": [], "spec": "netlib_dsyr2k_ln_alpha0_beta0", "unreferenced": ["k", "lda", "A", "ldb", "B", "ldc"]}
-  kernel.defn @netlib_dsyr2k_ln_alpha0_beta0(%n: i32, %k: i32, %lda: i32, %A: tensor<?x?xf64>, %ldb: i32, %B: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %cst = arith.constant 0.000000e+00 : f64
-    %1 = arith.index_cast %n : i32 to index
-    %2 = polygeist.submap(%C, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %3 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%2 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %6 = linalg.index 0 : index
-      %7 = linalg.index 1 : index
-      %8 = arith.cmpi sge, %7, %6 : index
-      %9 = arith.select %8, %cst, %out : f64
-      linalg.yield %9 : f64
-    } -> tensor<?x?xf64>
-    %4 = polygeist.submapInverse(%C, %3, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    kernel.yield %4 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "lda", "A", "ldb", "B", "beta", "ldc", "C"], "returns": [], "spec": "netlib_dsyr2k_ln_alpha0", "unreferenced": ["k", "lda", "A", "ldb", "B", "ldc"]}
-  kernel.defn @netlib_dsyr2k_ln_alpha0(%n: i32, %k: i32, %lda: i32, %A: tensor<?x?xf64>, %ldb: i32, %B: tensor<?x?xf64>, %beta: f64, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %1 = arith.index_cast %n : i32 to index
-    %2 = polygeist.submap(%C, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %3 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%2 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %6 = linalg.index 0 : index
-      %7 = arith.mulf %beta, %out : f64
-      %8 = linalg.index 1 : index
-      %9 = arith.cmpi sge, %8, %6 : index
-      %10 = arith.select %9, %7, %out : f64
-      linalg.yield %10 : f64
-    } -> tensor<?x?xf64>
-    %4 = polygeist.submapInverse(%C, %3, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    kernel.yield %4 : tensor<?x?xf64>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_un_beta0", "unreferenced": ["lda", "ldc"]}
@@ -1886,161 +2274,6 @@ module {
     kernel.yield %15 : tensor<?x?xf64>
   }
 
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_ln_beta0", "unreferenced": ["lda", "ldc"]}
-  kernel.defn @netlib_dsyrk_ln_beta0(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %cst = arith.constant 0.000000e+00 : f64
-    %2 = arith.index_cast %n : i32 to index
-    %3 = arith.index_cast %k : i32 to index
-    %4 = polygeist.submap(%C, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%4 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %13 = linalg.index 0 : index
-      %14 = linalg.index 1 : index
-      %15 = arith.cmpi sge, %14, %13 : index
-      %16 = arith.select %15, %cst, %out : f64
-      linalg.yield %16 : f64
-    } -> tensor<?x?xf64>
-    %6 = polygeist.submapInverse(%C, %5, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %7 = polygeist.submap(%A, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %8 = polygeist.submap(%A, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%6, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "reduction", "parallel"], library_call = ""} ins(%7, %8 : tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%9 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %alpha, %in : f64
-      %15 = arith.mulf %14, %in_0 : f64
-      %16 = arith.addf %out, %15 : f64
-      %17 = linalg.index 2 : index
-      %18 = arith.cmpi sge, %17, %13 : index
-      %19 = arith.select %18, %16, %out : f64
-      linalg.yield %19 : f64
-    } -> tensor<?x?x?xf64>
-    %11 = polygeist.submapInverse(%6, %10, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %11 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_ln_beta1", "unreferenced": ["lda", "ldc"]}
-  kernel.defn @netlib_dsyrk_ln_beta1(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %2 = arith.index_cast %n : i32 to index
-    %3 = arith.index_cast %k : i32 to index
-    %4 = polygeist.submap(%A, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %5 = polygeist.submap(%A, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %6 = polygeist.submap(%C, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %7 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "reduction", "parallel"], library_call = ""} ins(%4, %5 : tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%6 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %out: f64):
-      %10 = linalg.index 0 : index
-      %11 = arith.mulf %alpha, %in : f64
-      %12 = arith.mulf %11, %in_0 : f64
-      %13 = arith.addf %out, %12 : f64
-      %14 = linalg.index 2 : index
-      %15 = arith.cmpi sge, %14, %10 : index
-      %16 = arith.select %15, %13, %out : f64
-      linalg.yield %16 : f64
-    } -> tensor<?x?x?xf64>
-    %8 = polygeist.submapInverse(%C, %7, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %8 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "beta", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_ln", "unreferenced": ["lda", "ldc"]}
-  kernel.defn @netlib_dsyrk_ln(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %beta: f64, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %2 = arith.index_cast %n : i32 to index
-    %3 = arith.index_cast %k : i32 to index
-    %4 = polygeist.submap(%C, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%4 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %beta, %out : f64
-      %15 = linalg.index 1 : index
-      %16 = arith.cmpi sge, %15, %13 : index
-      %17 = arith.select %16, %14, %out : f64
-      linalg.yield %17 : f64
-    } -> tensor<?x?xf64>
-    %6 = polygeist.submapInverse(%C, %5, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %7 = polygeist.submap(%A, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d1, d0)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %8 = polygeist.submap(%A, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%6, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "reduction", "parallel"], library_call = ""} ins(%7, %8 : tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%9 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %alpha, %in : f64
-      %15 = arith.mulf %14, %in_0 : f64
-      %16 = arith.addf %out, %15 : f64
-      %17 = linalg.index 2 : index
-      %18 = arith.cmpi sge, %17, %13 : index
-      %19 = arith.select %18, %16, %out : f64
-      linalg.yield %19 : f64
-    } -> tensor<?x?x?xf64>
-    %11 = polygeist.submapInverse(%6, %10, %2, %3, %2) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %11 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_lt_beta0", "unreferenced": ["lda", "ldc"]}
-  kernel.defn @netlib_dsyrk_lt_beta0(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %cst = arith.constant 0.000000e+00 : f64
-    %2 = arith.index_cast %n : i32 to index
-    %3 = arith.index_cast %k : i32 to index
-    %4 = polygeist.submap(%C, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%4 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %alpha, %cst : f64
-      %15 = linalg.index 1 : index
-      %16 = arith.cmpi sge, %15, %13 : index
-      %17 = arith.select %16, %14, %out : f64
-      linalg.yield %17 : f64
-    } -> tensor<?x?xf64>
-    %6 = polygeist.submapInverse(%C, %5, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %7 = polygeist.submap(%A, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %8 = polygeist.submap(%A, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%6, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d0, d1)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "parallel", "reduction"], library_call = ""} ins(%7, %8 : tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%9 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %in, %in_0 : f64
-      %15 = arith.mulf %alpha, %14 : f64
-      %16 = arith.addf %out, %15 : f64
-      %17 = linalg.index 1 : index
-      %18 = arith.cmpi sge, %17, %13 : index
-      %19 = arith.select %18, %16, %out : f64
-      linalg.yield %19 : f64
-    } -> tensor<?x?x?xf64>
-    %11 = polygeist.submapInverse(%6, %10, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %11 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "alpha", "lda", "A", "beta", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_lt", "unreferenced": ["lda", "ldc"]}
-  kernel.defn @netlib_dsyrk_lt(%n: i32, %k: i32, %alpha: f64, %lda: i32, %A: tensor<?x?xf64>, %beta: f64, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %2 = arith.index_cast %n : i32 to index
-    %3 = arith.index_cast %k : i32 to index
-    %4 = polygeist.submap(%C, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%4 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %beta, %out : f64
-      %15 = linalg.index 1 : index
-      %16 = arith.cmpi sge, %15, %13 : index
-      %17 = arith.select %16, %14, %out : f64
-      linalg.yield %17 : f64
-    } -> tensor<?x?xf64>
-    %6 = polygeist.submapInverse(%C, %5, %2, %2) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %7 = polygeist.submap(%A, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d1, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %8 = polygeist.submap(%A, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d0, d2)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %9 = polygeist.submap(%6, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d0, d1)>} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?x?xf64>
-    %10 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>, affine_map<(d0, d1, d2) -> (d0, d1, d2)>], iterator_types = ["parallel", "parallel", "reduction"], library_call = ""} ins(%7, %8 : tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%9 : tensor<?x?x?xf64>) {
-    ^bb0(%in: f64, %in_0: f64, %out: f64):
-      %13 = linalg.index 0 : index
-      %14 = arith.mulf %in, %in_0 : f64
-      %15 = arith.mulf %alpha, %14 : f64
-      %16 = arith.addf %out, %15 : f64
-      %17 = linalg.index 1 : index
-      %18 = arith.cmpi sge, %17, %13 : index
-      %19 = arith.select %18, %16, %out : f64
-      linalg.yield %19 : f64
-    } -> tensor<?x?x?xf64>
-    %11 = polygeist.submapInverse(%6, %10, %2, %2, %3) {map = affine_map<(d0, d1, d2) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?x?xf64>, index, index, index) -> tensor<?x?xf64>
-    kernel.yield %11 : tensor<?x?xf64>
-  }
-
   // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "lda", "A", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_un_alpha0_beta0", "unreferenced": ["k", "lda", "A", "ldc"]}
   kernel.defn @netlib_dsyrk_un_alpha0_beta0(%n: i32, %k: i32, %lda: i32, %A: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
     %cst = arith.constant 0.000000e+00 : f64
@@ -2081,40 +2314,6 @@ module {
     } -> tensor<?x?xf64>
     %6 = polygeist.submapInverse(%C, %5, %1, %3) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
     kernel.yield %6 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "lda", "A", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_ln_alpha0_beta0", "unreferenced": ["k", "lda", "A", "ldc"]}
-  kernel.defn @netlib_dsyrk_ln_alpha0_beta0(%n: i32, %k: i32, %lda: i32, %A: tensor<?x?xf64>, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %cst = arith.constant 0.000000e+00 : f64
-    %1 = arith.index_cast %n : i32 to index
-    %2 = polygeist.submap(%C, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %3 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%2 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %6 = linalg.index 0 : index
-      %7 = linalg.index 1 : index
-      %8 = arith.cmpi sge, %7, %6 : index
-      %9 = arith.select %8, %cst, %out : f64
-      linalg.yield %9 : f64
-    } -> tensor<?x?xf64>
-    %4 = polygeist.submapInverse(%C, %3, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    kernel.yield %4 : tensor<?x?xf64>
-  }
-
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldc": "C"}, "outputs": ["C"], "params": ["n", "k", "lda", "A", "beta", "ldc", "C"], "returns": [], "spec": "netlib_dsyrk_ln_alpha0", "unreferenced": ["k", "lda", "A", "ldc"]}
-  kernel.defn @netlib_dsyrk_ln_alpha0(%n: i32, %k: i32, %lda: i32, %A: tensor<?x?xf64>, %beta: f64, %ldc: i32, %C: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %1 = arith.index_cast %n : i32 to index
-    %2 = polygeist.submap(%C, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %3 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%2 : tensor<?x?xf64>) {
-    ^bb0(%out: f64):
-      %6 = linalg.index 0 : index
-      %7 = arith.mulf %beta, %out : f64
-      %8 = linalg.index 1 : index
-      %9 = arith.cmpi sge, %8, %6 : index
-      %10 = arith.select %9, %7, %out : f64
-      linalg.yield %10 : f64
-    } -> tensor<?x?xf64>
-    %4 = polygeist.submapInverse(%C, %3, %1, %1) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    kernel.yield %4 : tensor<?x?xf64>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A", "ldb": "B"}, "outputs": ["B"], "params": ["m", "n", "lda", "A", "ldb", "B"], "returns": [], "spec": "netlib_dtrmm_lunn_alpha0", "unreferenced": ["lda", "A", "ldb"]}
@@ -2637,24 +2836,21 @@ module {
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"lda": "A"}, "outputs": ["A"], "params": ["m", "n", "alpha", "x", "y", "lda", "A"], "returns": [], "spec": "openblas_dger", "unreferenced": ["lda"]}
   kernel.defn @openblas_dger(%m: i32, %n: i32, %alpha: f64, %x: tensor<?xf64>, %y: tensor<?xf64>, %lda: i32, %A: tensor<?x?xf64>) -> tensor<?x?xf64> {
-    %c1 = arith.constant 1 : index
     %3 = arith.index_cast %n : i32 to index
     %4 = arith.index_cast %m : i32 to index
-    %5 = affine.apply affine_map<()[s0] -> (s0 + 1)>()[%3]
-    %6 = arith.subi %5, %c1 : index
-    %7 = polygeist.submap(%y, %6) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf64>, index) -> tensor<?xf64>
-    %8 = polygeist.submap(%7, %6, %4) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf64>, index, index) -> tensor<?x?xf64>
-    %9 = polygeist.submap(%x, %6, %4) {map = affine_map<(d0, d1) -> (d1)>} : (tensor<?xf64>, index, index) -> tensor<?x?xf64>
-    %10 = polygeist.submap(%A, %6, %4) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} ins(%8, %9 : tensor<?x?xf64>, tensor<?x?xf64>) outs(%10 : tensor<?x?xf64>) {
+    %5 = polygeist.submap(%y, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf64>, index) -> tensor<?xf64>
+    %6 = polygeist.submap(%5, %3, %4) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xf64>, index, index) -> tensor<?x?xf64>
+    %7 = polygeist.submap(%x, %3, %4) {map = affine_map<(d0, d1) -> (d1)>} : (tensor<?xf64>, index, index) -> tensor<?x?xf64>
+    %8 = polygeist.submap(%A, %3, %4) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
+    %9 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>, affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} ins(%6, %7 : tensor<?x?xf64>, tensor<?x?xf64>) outs(%8 : tensor<?x?xf64>) {
     ^bb0(%in: f64, %in_0: f64, %out: f64):
-      %14 = arith.mulf %alpha, %in : f64
-      %15 = arith.mulf %14, %in_0 : f64
-      %16 = arith.addf %out, %15 : f64
-      linalg.yield %16 : f64
+      %12 = arith.mulf %alpha, %in : f64
+      %13 = arith.mulf %12, %in_0 : f64
+      %14 = arith.addf %out, %13 : f64
+      linalg.yield %14 : f64
     } -> tensor<?x?xf64>
-    %12 = polygeist.submapInverse(%A, %11, %6, %4) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
-    kernel.yield %12 : tensor<?x?xf64>
+    %10 = polygeist.submapInverse(%A, %9, %3, %4) {map = affine_map<(d0, d1) -> (d0, d1)>} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index) -> tensor<?x?xf64>
+    kernel.yield %10 : tensor<?x?xf64>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["x"], "params": ["n", "alpha", "x"], "returns": [], "spec": "openblas_dscal", "unreferenced": []}
@@ -2912,142 +3108,304 @@ module {
   kernel.defn @opencv_morphology_dilate_u8(%h: i32, %w: i32, %input: tensor<?x?xi8>, %output: tensor<?x?xi8>) -> tensor<?x?xi8> {
     %c0_i8 = arith.constant 0 : i8
     %c3 = arith.constant 3 : index
-    %c1 = arith.constant 1 : index
     %2 = arith.index_cast %h : i32 to index
     %3 = arith.index_cast %w : i32 to index
-    %4 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %5 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %6 = arith.subi %5, %c1 : index
-    %7 = arith.subi %4, %c1 : index
-    %8 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %9 = arith.subi %8, %c1 : index
-    %10 = polygeist.submap(%output, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
-    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%10 : tensor<?x?xi8>) {
+    %4 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %5 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %6 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %7 = polygeist.submap(%output, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
+    %8 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%7 : tensor<?x?xi8>) {
     ^bb0(%out: i8):
       linalg.yield %c0_i8 : i8
     } -> tensor<?x?xi8>
-    %12 = polygeist.submapInverse(%output, %11, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
-    %13 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %14 = arith.subi %13, %c1 : index
-    %15 = polygeist.submap(%input, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
-    %16 = polygeist.submap(%12, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
-    %17 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%15 : tensor<?x?x?x?xi8>) outs(%16 : tensor<?x?x?x?xi8>) {
+    %9 = polygeist.submapInverse(%output, %8, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
+    %10 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %11 = polygeist.submap(%input, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
+    %12 = polygeist.submap(%9, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
+    %13 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%11 : tensor<?x?x?x?xi8>) outs(%12 : tensor<?x?x?x?xi8>) {
     ^bb0(%in: i8, %out: i8):
-      %20 = arith.extui %out : i8 to i32
-      %21 = arith.extui %in : i8 to i32
-      %22 = arith.cmpi sgt, %20, %21 : i32
-      %23 = arith.select %22, %out, %in : i8
-      linalg.yield %23 : i8
+      %16 = arith.extui %out : i8 to i32
+      %17 = arith.extui %in : i8 to i32
+      %18 = arith.cmpi sgt, %16, %17 : i32
+      %19 = arith.select %18, %out, %in : i8
+      linalg.yield %19 : i8
     } -> tensor<?x?x?x?xi8>
-    %18 = polygeist.submapInverse(%12, %17, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?x?x?xi8>, index, index, index, index) -> tensor<?x?xi8>
-    kernel.yield %18 : tensor<?x?xi8>
+    %14 = polygeist.submapInverse(%9, %13, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?x?x?xi8>, index, index, index, index) -> tensor<?x?xi8>
+    kernel.yield %14 : tensor<?x?xi8>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"w": "output"}, "outputs": ["output"], "params": ["h", "w", "input", "output"], "returns": [], "spec": "opencv_morphology_dilate_s8", "unreferenced": []}
   kernel.defn @opencv_morphology_dilate_s8(%h: i32, %w: i32, %input: tensor<?x?xi8>, %output: tensor<?x?xi8>) -> tensor<?x?xi8> {
     %c-128_i8 = arith.constant -128 : i8
     %c3 = arith.constant 3 : index
-    %c1 = arith.constant 1 : index
     %2 = arith.index_cast %h : i32 to index
     %3 = arith.index_cast %w : i32 to index
-    %4 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %5 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %6 = arith.subi %5, %c1 : index
-    %7 = arith.subi %4, %c1 : index
-    %8 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %9 = arith.subi %8, %c1 : index
-    %10 = polygeist.submap(%output, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
-    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%10 : tensor<?x?xi8>) {
+    %4 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %5 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %6 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %7 = polygeist.submap(%output, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
+    %8 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%7 : tensor<?x?xi8>) {
     ^bb0(%out: i8):
       linalg.yield %c-128_i8 : i8
     } -> tensor<?x?xi8>
-    %12 = polygeist.submapInverse(%output, %11, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
-    %13 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %14 = arith.subi %13, %c1 : index
-    %15 = polygeist.submap(%input, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
-    %16 = polygeist.submap(%12, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
-    %17 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%15 : tensor<?x?x?x?xi8>) outs(%16 : tensor<?x?x?x?xi8>) {
+    %9 = polygeist.submapInverse(%output, %8, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?xi8>, index, index) -> tensor<?x?xi8>
+    %10 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %11 = polygeist.submap(%input, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
+    %12 = polygeist.submap(%9, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, index, index, index, index) -> tensor<?x?x?x?xi8>
+    %13 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%11 : tensor<?x?x?x?xi8>) outs(%12 : tensor<?x?x?x?xi8>) {
     ^bb0(%in: i8, %out: i8):
-      %20 = arith.extsi %out : i8 to i32
-      %21 = arith.extsi %in : i8 to i32
-      %22 = arith.cmpi sgt, %20, %21 : i32
-      %23 = arith.select %22, %20, %21 : i32
-      %24 = arith.trunci %23 : i32 to i8
-      linalg.yield %24 : i8
+      %16 = arith.extsi %out : i8 to i32
+      %17 = arith.extsi %in : i8 to i32
+      %18 = arith.cmpi sgt, %16, %17 : i32
+      %19 = arith.select %18, %16, %17 : i32
+      %20 = arith.trunci %19 : i32 to i8
+      linalg.yield %20 : i8
     } -> tensor<?x?x?x?xi8>
-    %18 = polygeist.submapInverse(%12, %17, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?x?x?xi8>, index, index, index, index) -> tensor<?x?xi8>
-    kernel.yield %18 : tensor<?x?xi8>
+    %14 = polygeist.submapInverse(%9, %13, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi8>, tensor<?x?x?x?xi8>, index, index, index, index) -> tensor<?x?xi8>
+    kernel.yield %14 : tensor<?x?xi8>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"w": "output"}, "outputs": ["output"], "params": ["h", "w", "input", "output"], "returns": [], "spec": "opencv_morphology_dilate_u16", "unreferenced": []}
   kernel.defn @opencv_morphology_dilate_u16(%h: i32, %w: i32, %input: tensor<?x?xi16>, %output: tensor<?x?xi16>) -> tensor<?x?xi16> {
     %c0_i16 = arith.constant 0 : i16
     %c3 = arith.constant 3 : index
-    %c1 = arith.constant 1 : index
     %2 = arith.index_cast %h : i32 to index
     %3 = arith.index_cast %w : i32 to index
-    %4 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %5 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %6 = arith.subi %5, %c1 : index
-    %7 = arith.subi %4, %c1 : index
-    %8 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %9 = arith.subi %8, %c1 : index
-    %10 = polygeist.submap(%output, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
-    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%10 : tensor<?x?xi16>) {
+    %4 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %5 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %6 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %7 = polygeist.submap(%output, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
+    %8 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%7 : tensor<?x?xi16>) {
     ^bb0(%out: i16):
       linalg.yield %c0_i16 : i16
     } -> tensor<?x?xi16>
-    %12 = polygeist.submapInverse(%output, %11, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
-    %13 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %14 = arith.subi %13, %c1 : index
-    %15 = polygeist.submap(%input, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
-    %16 = polygeist.submap(%12, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
-    %17 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%15 : tensor<?x?x?x?xi16>) outs(%16 : tensor<?x?x?x?xi16>) {
+    %9 = polygeist.submapInverse(%output, %8, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
+    %10 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %11 = polygeist.submap(%input, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
+    %12 = polygeist.submap(%9, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
+    %13 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%11 : tensor<?x?x?x?xi16>) outs(%12 : tensor<?x?x?x?xi16>) {
     ^bb0(%in: i16, %out: i16):
-      %20 = arith.extui %out : i16 to i32
-      %21 = arith.extui %in : i16 to i32
-      %22 = arith.cmpi sgt, %20, %21 : i32
-      %23 = arith.select %22, %out, %in : i16
-      linalg.yield %23 : i16
+      %16 = arith.extui %out : i16 to i32
+      %17 = arith.extui %in : i16 to i32
+      %18 = arith.cmpi sgt, %16, %17 : i32
+      %19 = arith.select %18, %out, %in : i16
+      linalg.yield %19 : i16
     } -> tensor<?x?x?x?xi16>
-    %18 = polygeist.submapInverse(%12, %17, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?x?x?xi16>, index, index, index, index) -> tensor<?x?xi16>
-    kernel.yield %18 : tensor<?x?xi16>
+    %14 = polygeist.submapInverse(%9, %13, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?x?x?xi16>, index, index, index, index) -> tensor<?x?xi16>
+    kernel.yield %14 : tensor<?x?xi16>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"w": "output"}, "outputs": ["output"], "params": ["h", "w", "input", "output"], "returns": [], "spec": "opencv_morphology_dilate_s16", "unreferenced": []}
   kernel.defn @opencv_morphology_dilate_s16(%h: i32, %w: i32, %input: tensor<?x?xi16>, %output: tensor<?x?xi16>) -> tensor<?x?xi16> {
     %c-32768_i16 = arith.constant -32768 : i16
     %c3 = arith.constant 3 : index
-    %c1 = arith.constant 1 : index
     %2 = arith.index_cast %h : i32 to index
     %3 = arith.index_cast %w : i32 to index
-    %4 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %5 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%3]
-    %6 = arith.subi %5, %c1 : index
-    %7 = arith.subi %4, %c1 : index
-    %8 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %9 = arith.subi %8, %c1 : index
-    %10 = polygeist.submap(%output, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
-    %11 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%10 : tensor<?x?xi16>) {
+    %4 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %5 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%3]
+    %6 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %7 = polygeist.submap(%output, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
+    %8 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1) -> (d0, d1)>], iterator_types = ["parallel", "parallel"], library_call = ""} outs(%7 : tensor<?x?xi16>) {
     ^bb0(%out: i16):
       linalg.yield %c-32768_i16 : i16
     } -> tensor<?x?xi16>
-    %12 = polygeist.submapInverse(%output, %11, %9, %6) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
-    %13 = affine.apply affine_map<()[s0] -> (s0 - 1)>()[%2]
-    %14 = arith.subi %13, %c1 : index
-    %15 = polygeist.submap(%input, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
-    %16 = polygeist.submap(%12, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
-    %17 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%15 : tensor<?x?x?x?xi16>) outs(%16 : tensor<?x?x?x?xi16>) {
+    %9 = polygeist.submapInverse(%output, %8, %6, %5) {map = affine_map<(d0, d1) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?xi16>, index, index) -> tensor<?x?xi16>
+    %10 = affine.apply affine_map<()[s0] -> (s0 - 2)>()[%2]
+    %11 = polygeist.submap(%input, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d2 + d0, d3 + d1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
+    %12 = polygeist.submap(%9, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, index, index, index, index) -> tensor<?x?x?x?xi16>
+    %13 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>, affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>], iterator_types = ["parallel", "parallel", "reduction", "reduction"], library_call = ""} ins(%11 : tensor<?x?x?x?xi16>) outs(%12 : tensor<?x?x?x?xi16>) {
     ^bb0(%in: i16, %out: i16):
-      %20 = arith.extsi %out : i16 to i32
-      %21 = arith.extsi %in : i16 to i32
-      %22 = arith.cmpi sgt, %20, %21 : i32
-      %23 = arith.select %22, %20, %21 : i32
-      %24 = arith.trunci %23 : i32 to i16
-      linalg.yield %24 : i16
+      %16 = arith.extsi %out : i16 to i32
+      %17 = arith.extsi %in : i16 to i32
+      %18 = arith.cmpi sgt, %16, %17 : i32
+      %19 = arith.select %18, %16, %17 : i32
+      %20 = arith.trunci %19 : i32 to i16
+      linalg.yield %20 : i16
     } -> tensor<?x?x?x?xi16>
-    %18 = polygeist.submapInverse(%12, %17, %14, %7, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?x?x?xi16>, index, index, index, index) -> tensor<?x?xi16>
-    kernel.yield %18 : tensor<?x?xi16>
+    %14 = polygeist.submapInverse(%9, %13, %10, %4, %c3, %c3) {map = affine_map<(d0, d1, d2, d3) -> (d0 + 1, d1 + 1)>} : (tensor<?x?xi16>, tensor<?x?x?x?xi16>, index, index, index, index) -> tensor<?x?xi16>
+    kernel.yield %14 : tensor<?x?xi16>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_plus_f32", "unreferenced": []}
+  kernel.defn @thrust_plus_f32(%n: i32, %x: tensor<?xf32>, %y: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %3 = arith.index_cast %n : i32 to index
+    %4 = polygeist.submap(%x, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = polygeist.submap(%y, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %6 = polygeist.submap(%output, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%4, %5 : tensor<?xf32>, tensor<?xf32>) outs(%6 : tensor<?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %10 = arith.addf %in, %in_0 : f32
+      linalg.yield %10 : f32
+    } -> tensor<?xf32>
+    %8 = polygeist.submapInverse(%output, %7, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %8 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_plus_scalar_left_f32", "unreferenced": []}
+  kernel.defn @thrust_plus_scalar_left_f32(%n: i32, %x: f32, %y: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%y, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.addf %x, %in : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_plus_scalar_right_f32", "unreferenced": []}
+  kernel.defn @thrust_plus_scalar_right_f32(%n: i32, %x: tensor<?xf32>, %y: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%x, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.addf %in, %y : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_plus_scalars_f32", "unreferenced": []}
+  kernel.defn @thrust_plus_scalars_f32(%n: i32, %x: f32, %y: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %1 = arith.index_cast %n : i32 to index
+    %2 = arith.addf %x, %y : f32
+    %3 = polygeist.submap(%output, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%3 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %2 : f32
+    } -> tensor<?xf32>
+    %5 = polygeist.submapInverse(%output, %4, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %5 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_minus_f32", "unreferenced": []}
+  kernel.defn @thrust_minus_f32(%n: i32, %x: tensor<?xf32>, %y: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %3 = arith.index_cast %n : i32 to index
+    %4 = polygeist.submap(%x, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = polygeist.submap(%y, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %6 = polygeist.submap(%output, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%4, %5 : tensor<?xf32>, tensor<?xf32>) outs(%6 : tensor<?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %10 = arith.subf %in, %in_0 : f32
+      linalg.yield %10 : f32
+    } -> tensor<?xf32>
+    %8 = polygeist.submapInverse(%output, %7, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %8 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_minus_scalar_left_f32", "unreferenced": []}
+  kernel.defn @thrust_minus_scalar_left_f32(%n: i32, %x: f32, %y: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%y, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.subf %x, %in : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_minus_scalar_right_f32", "unreferenced": []}
+  kernel.defn @thrust_minus_scalar_right_f32(%n: i32, %x: tensor<?xf32>, %y: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%x, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.subf %in, %y : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_minus_scalars_f32", "unreferenced": []}
+  kernel.defn @thrust_minus_scalars_f32(%n: i32, %x: f32, %y: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %1 = arith.index_cast %n : i32 to index
+    %2 = arith.subf %x, %y : f32
+    %3 = polygeist.submap(%output, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%3 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %2 : f32
+    } -> tensor<?xf32>
+    %5 = polygeist.submapInverse(%output, %4, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %5 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_multiplies_f32", "unreferenced": []}
+  kernel.defn @thrust_multiplies_f32(%n: i32, %x: tensor<?xf32>, %y: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %3 = arith.index_cast %n : i32 to index
+    %4 = polygeist.submap(%x, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = polygeist.submap(%y, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %6 = polygeist.submap(%output, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%4, %5 : tensor<?xf32>, tensor<?xf32>) outs(%6 : tensor<?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %10 = arith.mulf %in, %in_0 : f32
+      linalg.yield %10 : f32
+    } -> tensor<?xf32>
+    %8 = polygeist.submapInverse(%output, %7, %3) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %8 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_multiplies_scalar_left_f32", "unreferenced": []}
+  kernel.defn @thrust_multiplies_scalar_left_f32(%n: i32, %x: f32, %y: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%y, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.mulf %x, %in : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_multiplies_scalar_right_f32", "unreferenced": []}
+  kernel.defn @thrust_multiplies_scalar_right_f32(%n: i32, %x: tensor<?xf32>, %y: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%x, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = arith.mulf %in, %y : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_multiplies_scalars_f32", "unreferenced": []}
+  kernel.defn @thrust_multiplies_scalars_f32(%n: i32, %x: f32, %y: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %1 = arith.index_cast %n : i32 to index
+    %2 = arith.mulf %x, %y : f32
+    %3 = polygeist.submap(%output, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%3 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %2 : f32
+    } -> tensor<?xf32>
+    %5 = polygeist.submapInverse(%output, %4, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %5 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_minus_scalar_right_i32", "unreferenced": []}
+  kernel.defn @thrust_minus_scalar_right_i32(%n: i32, %x: tensor<?xi32>, %y: i32, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%x, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xi32>) outs(%4 : tensor<?xi32>) {
+    ^bb0(%in: i32, %out: i32):
+      %8 = arith.subi %in, %y : i32
+      linalg.yield %8 : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    kernel.yield %6 : tensor<?xi32>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "x", "y", "output"], "returns": [], "spec": "thrust_divide_f32", "unreferenced": []}
@@ -3104,6 +3462,58 @@ module {
     } -> tensor<?xf32>
     %5 = polygeist.submapInverse(%output, %4, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
     kernel.yield %5 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "value", "output"], "returns": [], "spec": "thrust_fill_f32", "unreferenced": []}
+  kernel.defn @thrust_fill_f32(%n: i32, %value: f32, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %1 = arith.index_cast %n : i32 to index
+    %2 = polygeist.submap(%output, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %3 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} outs(%2 : tensor<?xf32>) {
+    ^bb0(%out: f32):
+      linalg.yield %value : f32
+    } -> tensor<?xf32>
+    %4 = polygeist.submapInverse(%output, %3, %1) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %4 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["n", "input", "output"], "returns": [], "spec": "thrust_log1p_f32", "unreferenced": []}
+  kernel.defn @thrust_log1p_f32(%n: i32, %input: tensor<?xf32>, %output: tensor<?xf32>) -> tensor<?xf32> {
+    %2 = arith.index_cast %n : i32 to index
+    %3 = polygeist.submap(%input, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%output, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xf32>) {
+    ^bb0(%in: f32, %out: f32):
+      %8 = math.log1p %in : f32
+      linalg.yield %8 : f32
+    } -> tensor<?xf32>
+    %6 = polygeist.submapInverse(%output, %5, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %6 : tensor<?xf32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["real", "imag"], "params": ["n", "magnitude", "angle", "real", "imag"], "returns": [], "spec": "thrust_polar_components_f32", "unreferenced": []}
+  kernel.defn @thrust_polar_components_f32(%n: i32, %magnitude: tensor<?xf32>, %angle: tensor<?xf32>, %real: tensor<?xf32>, %imag: tensor<?xf32>) -> (tensor<?xf32>, tensor<?xf32>) {
+    %4 = arith.index_cast %n : i32 to index
+    %5 = polygeist.submap(%magnitude, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %6 = polygeist.submap(%angle, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %7 = polygeist.submap(%real, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %8 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%5, %6 : tensor<?xf32>, tensor<?xf32>) outs(%7 : tensor<?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %17 = math.cos %in_0 : f32
+      %18 = arith.mulf %in, %17 : f32
+      linalg.yield %18 : f32
+    } -> tensor<?xf32>
+    %9 = polygeist.submapInverse(%real, %8, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    %11 = polygeist.submap(%magnitude, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %12 = polygeist.submap(%angle, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %13 = polygeist.submap(%imag, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %14 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["parallel"], library_call = ""} ins(%11, %12 : tensor<?xf32>, tensor<?xf32>) outs(%13 : tensor<?xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %17 = math.sin %in_0 : f32
+      %18 = arith.mulf %in, %17 : f32
+      linalg.yield %18 : f32
+    } -> tensor<?xf32>
+    %15 = polygeist.submapInverse(%imag, %14, %4) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, tensor<?xf32>, index) -> tensor<?xf32>
+    kernel.yield %9, %15 : tensor<?xf32>, tensor<?xf32>
   }
 
 }

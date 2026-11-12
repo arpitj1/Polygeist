@@ -227,8 +227,13 @@ def gen_runtime_adapter_cuda(ca) -> str:
     b = [f"{proto(ca)} {{\n",
          f'  if ({extent} <= 0) polygeist_v2_fatal("{ca.call}", "nonpositive dimension");\n']
     for p in arrays:
-        b.append(f'  if ({p.layout} != 1 || !{p.name} || {p.name}_bytes < (int64_t){extent} * sizeof(float))\n'
-                 f'    polygeist_v2_fatal("{ca.call}", "runtime adapter requires a contiguous FP32 row");\n')
+        if cfg['kind']=='pointwise_reference':
+            b.append(f'  if ({p.layout} <= 0 || !{p.name} || {p.name}_bytes / (int64_t)sizeof(float) < '
+                     f'((int64_t){extent}-1) * {p.layout} + 1)\n'
+                     f'    polygeist_v2_fatal("{ca.call}", "invalid strided FP32 row");\n')
+        else:
+            b.append(f'  if ({p.layout} != 1 || !{p.name} || {p.name}_bytes < (int64_t){extent} * sizeof(float))\n'
+                     f'    polygeist_v2_fatal("{ca.call}", "runtime adapter requires a contiguous FP32 row");\n')
     for i,p in enumerate(arrays):
         for q in arrays[i+1:]:
             if p.written or q.written:
@@ -254,7 +259,9 @@ def gen_runtime_adapter_cuda(ca) -> str:
         scalar_arguments={index:name for name,index in graph.get('scalar_arguments',{}).items()}
         args += [scalar_arguments.get(i,repr(float(v))+'f')
                  for i,v in enumerate(graph['scalars']+[0.0]*(8-len(graph['scalars'])))]
-        args += ['1']*5
+        layouts={p.name:p.layout for p in arrays}
+        args += [layouts[v] for v in graph['inputs']]+['1']*(4-len(graph['inputs']))
+        args += [layouts[graph['output']]]
         args += [f'polygeist_v2_map_dev(&pv2_map, pv2_k_{v})' for v in graph['inputs']]+['NULL']*(4-len(graph['inputs']))
         args += [f'polygeist_v2_map_dev(&pv2_map, pv2_k_{graph["output"]})']
     elif cfg['kind']=='unary_reference':

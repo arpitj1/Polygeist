@@ -90,10 +90,10 @@
 #                       matched/ABI MLIR into this directory for a larger
 #                       application link.
 #   POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION=name
-#                       Materialize scratch owned by this compiler-visible
-#                       repeated function before ABI lowering and normalize
-#                       ABI-created loop-carried tensor results again before
-#                       final bufferization.
+#                       After verified ABI lowering, place private scratch in
+#                       device storage when all uses permit it. Record the
+#                       transformation chain in workspace.json. This opt-in
+#                       requires serial calls to the selected function.
 #   POLYGEIST_PERSISTENT_WORKSPACE_LOWER_SUBMAPS=auto|0|1
 #                       Control tensor-view lowering before ABI lowering.
 #                       `auto` (the default) enables it for tensor iter_args;
@@ -392,6 +392,12 @@ fi
 if [ "${POLYGEIST_MATCH_FUSE_INITIALIZERS:-0}" != 0 ]; then
   MATCHER_ARGS+=(--fuse-initializers)
 fi
+if [ "${POLYGEIST_MATCH_SPLIT_REDUCTION_INPUTS:-0}" != 0 ]; then
+  MATCHER_ARGS+=(--split-reduction-inputs)
+fi
+if [ "${POLYGEIST_MATCH_SPLIT_POINTWISE_INPUTS:-0}" != 0 ]; then
+  MATCHER_ARGS+=(--split-pointwise-inputs)
+fi
 if [ "${POLYGEIST_DISABLE_LIBRARY_MATCHING:-0}" != 0 ]; then
   MATCHER_ARGS+=(--max-launches 0)
 fi
@@ -409,9 +415,12 @@ fi
 # Only specification-proven launches reach target lowering. Legacy graph
 # composition/backend-selection passes may not introduce unproved replacements.
 $PYTHON "$SCRIPTS/spec_match.py" "$SEMANTIC_INPUT" --verify-report "$WORK/match.json" --backend "$ABI_BACKEND"
-if [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ] || \
-   [ "${POLYGEIST_ALLOW_TF32:-0}" != 0 ]; then
-  echo "ERROR: workspace/precision transformations require specification evidence integration" >&2
+if [ "${POLYGEIST_ALLOW_TF32:-0}" != 0 ]; then
+  echo "ERROR: precision transformations require specification evidence integration" >&2
+  exit 1
+fi
+if [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ] && [ "$TARGET" != jetson ]; then
+  echo "ERROR: device workspace planning requires --target=jetson" >&2
   exit 1
 fi
 
@@ -490,12 +499,6 @@ fi
 # carried by a repeated loop. Re-run the idempotent workspace planner so it can
 # express the copy-back with materialize_in_destination before the final
 # One-Shot Bufferize invocation checks iter_arg/yield equivalence.
-if [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ]; then
-  polygeist-opt \
-    "--plan-persistent-gpu-workspace=function=${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION}" \
-    $WORK/abi_canon.mlir -o $WORK/abi_persistent_workspace.mlir
-  mv $WORK/abi_persistent_workspace.mlir $WORK/abi_canon.mlir
-fi
 # Persistent scratch begins as private host storage because its lifetime is
 # established before library ABI lowering.  Now that runtime calls are visible,
 # move only workspaces with a completely device/descriptor-only use graph into
@@ -503,10 +506,13 @@ fi
 DEVICE_WORKSPACE_PLANNED=0
 if [ "$TARGET" = jetson ] && \
    [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ]; then
-  polygeist-opt \
-    "--plan-gpu-data-residency=function=${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION} promote-function-arguments=false" \
-    $WORK/abi_canon.mlir -o $WORK/abi_device_workspace.mlir
-  mv $WORK/abi_device_workspace.mlir $WORK/abi_canon.mlir
+  $PYTHON "$SCRIPTS/lib_v2/lower_v2.py" "$WORK/abi_canon.mlir" \
+    --backend cuda --memory-copies-only -o "$WORK/abi_workspace_input.mlir"
+  $PYTHON "$SCRIPTS/plan_abi_workspace.py" "$WORK/abi_workspace_input.mlir" \
+    --function "$POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION" \
+    --opt "$(command -v polygeist-opt)" --match-proof "$WORK/match.json" \
+    --report "$WORK/workspace.json" --output "$WORK/abi_device_workspace.mlir"
+  cp $WORK/abi_device_workspace.mlir $WORK/abi_canon.mlir
   DEVICE_WORKSPACE_PLANNED=1
 fi
 # Mark to_tensor results restrict so one-shot-bufferize keeps in-place semantics.
@@ -817,12 +823,14 @@ fi
 
 # CUB is a template library; its fixed C ABI is compiled with the pinned public
 # CCCL headers. Generated wrappers call this ABI after proving the reference.
-if [ "${POLYGEIST_ENABLE_CUB:-0}" != "0" ]; then
+NEEDS_CUB=$(grep -cE 'call @polygeist_v2_(Device(Reduce|Scan|SegmentedReduce)|ThreadReduce)_' "$WORK/abi_canon.mlir" || true)
+if [ "${POLYGEIST_ENABLE_CUB:-0}" != "0" ] || [ "$NEEDS_CUB" -gt 0 ]; then
   if [ "$TARGET" != jetson ] || [ "$ABI_BACKEND" != cuda ]; then
     echo "ERROR: CUB runtime requires the Jetson CUDA backend" >&2
     exit 1
   fi
   "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
+    --fmad=false --ftz=false --prec-div=true \
     -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
     -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
     -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \

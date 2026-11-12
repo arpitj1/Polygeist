@@ -68,7 +68,8 @@ static bool isDescriptorOnlyUse(Operation *op) {
   // integer arithmetic before llvm.inttoptr. These operations manipulate only
   // the descriptor-derived address; they do not access host memory.
   StringRef name = op->getName().getStringRef();
-  return name.starts_with("arith.") || name == "llvm.inttoptr" ||
+  return name.starts_with("arith.") || name == "llvm.getelementptr" ||
+         name == "llvm.inttoptr" ||
          name == "llvm.ptrtoint" ||
          name == "builtin.unrealized_conversion_cast";
 }
@@ -110,8 +111,19 @@ static bool hasOnlyDeviceOrDescriptorUses(Value root) {
       Operation *owner = use.getOwner();
       if (isa<gpu::LaunchFuncOp, gpu::HostRegisterOp, memref::DeallocOp>(owner))
         continue;
-      if (isGpuRuntimeCall(owner))
+      if (isGpuRuntimeCall(owner)) {
+        auto call = cast<func::CallOp>(owner);
+        auto callee = SymbolTable::lookupNearestSymbolFrom<func::FuncOp>(
+            call, call.getCalleeAttr());
+        // Descriptor metadata can stay on the host while data pointers accept
+        // device storage. This mask refines the all-pointer-operands contract.
+        auto data = callee ? callee->getAttrOfType<DenseI64ArrayAttr>(
+                                 "polygeist.gpu_data_operands")
+                           : DenseI64ArrayAttr();
+        if (data && !llvm::is_contained(data.asArrayRef(), use.getOperandNumber()))
+          return false;
         continue;
+      }
       // Extents/strides are values, not aliases of the storage. Their use to
       // size another allocation does not constitute a host access to root.
       if (isa<memref::DimOp>(owner))

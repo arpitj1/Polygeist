@@ -1,0 +1,41 @@
+{
+  "routine": "aten_renorm_scale",
+  "source": "Pinned ATen CUDA renorm scale-factor lambda; contiguous FP32 specialization",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/RenormKernel.cu",
+      "sha256": "aaeaef1df5f06de944b28bd36f70267f467d9ab4e60e095d2c27df2350045df7"
+    }
+  ],
+  "specs": [
+    {
+      "name": "aten_renorm_scale_f32",
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "args": [
+        "n",
+        "norm",
+        "maxnorm",
+        "output"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous nonoverlapping FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "floating reorderings require the relaxed model"
+      ],
+      "deviations": []
+    }
+  ],
+  "adaptation": "Expand TensorIterator gpu_kernel over a runtime extent; specialize scalar_t to float and maxnorm_s to an FP32 scalar parameter. Keep the exact lambda operations and constants."
+}

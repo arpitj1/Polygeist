@@ -82,29 +82,44 @@ def source_integer_types(spec, manifest, ref_c):
 
 
 def c_param_kinds(spec: str, fn_args: list[tuple[str, str]], names: list[str],
-                  lds: set[str], source_types=None) -> list[dict]:
+                  lds: set[str], source_types=None, validation=None) -> list[dict]:
     out = []
     source_types = source_types or {}
+    validation = validation or {}
     size_vals = iter([7, 5, 6, 4, 3, 8])
     scal_vals = iter([1.37, -0.61, 0.83, 1.9])
     for (ssa, ty), nm in zip(fn_args, names):
         if ty == "i32":
-            if nm in lds:
+            if nm in validation.get('scalars', {}):
+                val = validation['scalars'][nm]
+                if type(val) is not int or not -(1<<31) <= val < (1<<31):
+                    raise ValueError('invalid int32 validation parameter: '+nm)
+                out.append({"kind":"int", "name":nm, "val":val})
+            elif nm in lds:
                 out.append({"kind": "int", "name": nm, "val": LD})
             elif nm.startswith("inc"):
                 out.append({"kind": "int", "name": nm, "val": 2})
             else:
-                out.append({"kind": "int", "name": nm, "val": next(size_vals)})
+                out.append({"kind": "int", "name": nm, "val": next(size_vals, None)})
         elif ty in ("f32", "f64"):
             out.append({"kind": "dbl", "name": nm, "val": next(scal_vals),
                         "ctype": "float" if ty == "f32" else "double"})
         else:
-            array = re.fullmatch(r'memref<((?:(?:\?|\d+)x){1,2})([fi]\d+)>', ty)
+            array = re.fullmatch(r'memref<((?:(?:\?|\d+)x){1,16})([fi]\d+)>', ty)
             if not array:
                 raise ValueError(f"unsupported parameter type {ty}")
             dims = array[1].rstrip('x').split('x'); element = array[2]
             shape = [int(d) if d != '?' else (VEC if len(dims) == 1 else ROWS if i == 0 else LD)
                      for i, d in enumerate(dims)]
+            if nm in validation.get('arrays', {}):
+                shape = validation['arrays'][nm]
+                if (not isinstance(shape,list) or len(shape)!=len(dims)
+                        or any(type(x) is not int or x <= 0 for x in shape)
+                        or math.prod(shape)>1048576
+                        or any(d!='?' and int(d)!=x for d,x in zip(dims,shape))):
+                    raise ValueError('invalid validation array shape: '+nm)
+            elif len(dims)>2:
+                raise ValueError('rank > 2 requires an explicit validation shape: '+nm)
             param = {"kind": 'arr' + str(len(dims)), "name": nm, "shape": shape}
             if element in ('f32', 'f64'):
                 param['ctype'] = 'float' if element == 'f32' else 'double'
@@ -114,7 +129,19 @@ def c_param_kinds(spec: str, fn_args: list[tuple[str, str]], names: list[str],
                     raise ValueError(f'{nm}: integer MLIR storage lacks matching C signedness/type')
                 _, signed, bits = INTEGER_TYPES[ctype]
                 param.update(ctype=ctype, integer=True, signed=signed, bits=bits)
+            if nm in validation.get('array_values', {}):
+                values = validation['array_values'][nm]
+                if (not param.get('integer') or not isinstance(values, list) or not values
+                        or any(type(v) is not int for v in values)):
+                    raise ValueError('integer validation values required: ' + nm)
+                lo = -(1 << (param['bits'] - 1)) if param['signed'] else 0
+                hi = (1 << (param['bits'] - int(param['signed']))) - 1
+                if any(not lo <= v <= hi for v in values):
+                    raise ValueError('validation value outside storage range: ' + nm)
+                param['values'] = values
             out.append(param)
+    if any(p['kind']=='int' and p['val'] is None for p in out):
+        raise ValueError('additional dimensions need explicit validation values')
     return out
 
 
@@ -130,12 +157,9 @@ def harness(spec: str, params: list[dict], ret: str | None) -> str:
         elif p["kind"] == "dbl":
             ref_args.append(ct)
             impl_args.append(ct)
-        elif p["kind"] == "arr2":
-            ref_args.append(ct + " *")
-            impl_args += [ct + " *", ct + " *", "int64_t", "int64_t", "int64_t", "int64_t", "int64_t"]
         else:
             ref_args.append(ct + " *")
-            impl_args += [ct + " *", ct + " *", "int64_t", "int64_t", "int64_t"]
+            impl_args += [ct + " *", ct + " *", "int64_t"] + ["int64_t"]*(2*len(p['shape']))
     rt = {"f32": "float", "f64": "double"}.get(ret, "void")
     L.append(f"{rt} {spec}_ref({', '.join(ref_args)});")
     L.append(f"{rt} {spec}_impl({', '.join(impl_args)});")
@@ -144,7 +168,7 @@ def harness(spec: str, params: list[dict], ret: str | None) -> str:
     L.append("int main(void) {")
     L.append("  unsigned seed = 12345u;")
     for p in params:
-        if p["kind"] in ("arr2", "arr1"):
+        if p['kind'].startswith('arr'):
             n = math.prod(p.get("shape", [ROWS, LD] if p["kind"] == "arr2" else [VEC]))
             L.append(f"  static {p.get('ctype', 'double')} {p['name']}_r[{n}], {p['name']}_i[{n}];")
             if p.get('integer'):
@@ -153,10 +177,10 @@ def harness(spec: str, params: list[dict], ret: str | None) -> str:
                 minimum = -(1 << (bits - 1)) if signed else 0
                 lo = f"(-{maximum}LL - 1)" if signed else '0ULL'
                 hi = f"{maximum}{'LL' if signed else 'ULL'}"
-                values = [lo, hi, '0', '1', '-1' if signed else hi,
+                values = list(map(str,p['values'])) if 'values' in p else [lo, hi, '0', '1', '-1' if signed else hi,
                           str(maximum // 2), str(minimum // 2), '3']
-                L.append(f"  static const {p['ctype']} {p['name']}_edges[8] = {{" + ', '.join(values) + "};")
-                L.append(f"  for (int t = 0; t < {n}; t++) {{ {p['name']}_r[t] = {p['name']}_edges[t % 8]; "
+                L.append(f"  static const {p['ctype']} {p['name']}_edges[{len(values)}] = {{" + ', '.join(values) + "};")
+                L.append(f"  for (int t = 0; t < {n}; t++) {{ {p['name']}_r[t] = {p['name']}_edges[t % {len(values)}]; "
                          f"{p['name']}_i[t] = {p['name']}_r[t]; }}")
             else:
                 L.append(f"  for (int t = 0; t < {n}; t++) {{ {p['name']}_r[t] = rnd(&seed); "
@@ -169,13 +193,11 @@ def harness(spec: str, params: list[dict], ret: str | None) -> str:
         elif p["kind"] == "dbl":
             ra.append(repr(p["val"]))
             ia.append(repr(p["val"]))
-        elif p["kind"] == "arr2":
-            ra.append(f"{p['name']}_r")
-            shape = p.get("shape", [ROWS, LD])
-            ia += [f"{p['name']}_i", f"{p['name']}_i", "0", str(shape[0]), str(shape[1]), str(shape[1]), "1"]
         else:
             ra.append(f"{p['name']}_r")
-            ia += [f"{p['name']}_i", f"{p['name']}_i", "0", str(p.get("shape", [VEC])[0]), "1"]
+            shape=p['shape']
+            strides=[math.prod(shape[i+1:]) for i in range(len(shape))]
+            ia += [f"{p['name']}_i",f"{p['name']}_i","0"]+list(map(str,shape+strides))
     if rt != "void":
         L.append(f"  {rt} rr = {spec}_ref({', '.join(ra)});")
         L.append(f"  {rt} ri = {spec}_impl({', '.join(ia)});")
@@ -193,7 +215,7 @@ def harness(spec: str, params: list[dict], ret: str | None) -> str:
              "double r_ = d_ / (fabs(a_) > 1e-300 ? fabs(a_) : 1e-300); if (d_ > 0 && r_ > maxrel) maxrel = r_; "
              "if (!(d_ <= 1e-12 + 1e-12 * fabs(a_))) bad++; } } while (0)")
     for p in params:
-        if p["kind"] in ("arr2", "arr1"):
+        if p['kind'].startswith('arr'):
             n = math.prod(p.get("shape", [ROWS, LD] if p["kind"] == "arr2" else [VEC]))
             if p.get('integer'):
                 L.append(f"  for (int t = 0; t < {n}; t++) {{ if ({p['name']}_r[t] != {p['name']}_i[t]) bad++; "
@@ -244,7 +266,7 @@ def validate(spec_name: str, manifest_spec: dict, ref_c: Path, meta_lds: set[str
     ret = m.group(1) if m else None
     try:
         source_types = source_integer_types(spec_name, manifest_spec, ref_c)
-        params = c_param_kinds(spec_name, f.args, names, meta_lds, source_types)
+        params = c_param_kinds(spec_name, f.args, names, meta_lds, source_types, manifest_spec.get("validation"))
     except ValueError as e:
         return {**res, "verdict": "UNSUPPORTED_SIGNATURE", "why": str(e)}
     if level == 'affine':

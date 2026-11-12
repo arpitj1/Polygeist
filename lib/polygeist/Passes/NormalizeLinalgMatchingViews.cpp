@@ -33,12 +33,22 @@ struct ForwardUpdatedSubview : OpRewritePattern<SubmapOp> {
   LogicalResult matchAndRewrite(SubmapOp op,
                                 PatternRewriter &rewriter) const override {
     auto inverse = op.getBase().getDefiningOp<SubmapInverseOp>();
-    if (!inverse || !op.getMap().isPermutation() ||
+    if (!inverse)
+      return failure();
+    Value modified = inverse.getViewModified();
+    // Bounds refinement may restore a dynamic type around the written value.
+    // Look through shape-only casts, retaining the exact requested result type.
+    while (modified.getType() != op.getType()) {
+      auto cast = modified.getDefiningOp<tensor::CastOp>();
+      if (!cast)
+        return failure();
+      modified = cast.getSource();
+    }
+    if (!op.getMap().isPermutation() ||
         op.getMap() != inverse.getMap() ||
-        op.getType() != inverse.getViewModified().getType() ||
         op->getOperands().drop_front(1) != inverse->getOperands().drop_front(2))
       return failure();
-    rewriter.replaceOp(op, inverse.getViewModified());
+    rewriter.replaceOp(op, modified);
     return success();
   }
 };
@@ -51,12 +61,48 @@ struct DropOverwrittenSubview : OpRewritePattern<SubmapInverseOp> {
   LogicalResult matchAndRewrite(SubmapInverseOp op,
                                 PatternRewriter &rewriter) const override {
     auto prior = op.getBaseOriginal().getDefiningOp<SubmapInverseOp>();
-    if (!prior || !op.getMap().isPermutation() ||
+    if (!prior)
+      return failure();
+    Value modified = op.getViewModified();
+    Value previous = prior.getViewModified();
+    while (auto cast = modified.getDefiningOp<tensor::CastOp>())
+      modified = cast.getSource();
+    while (auto cast = previous.getDefiningOp<tensor::CastOp>())
+      previous = cast.getSource();
+    if (!op.getMap().isPermutation() ||
         op.getMap() != prior.getMap() ||
-        op.getViewModified().getType() != prior.getViewModified().getType() ||
+        modified.getType() != previous.getType() ||
         op->getOperands().drop_front(2) != prior->getOperands().drop_front(2))
       return failure();
     rewriter.updateRootInPlace(op, [&] { op->setOperand(0, prior.getBaseOriginal()); });
+    return success();
+  }
+};
+
+// Replacing every element of a static tensor leaves none of the destination's
+// old value live. This also exposes a reduction's real destination through a
+// temporary initializer, instead of retaining a redundant fill at a call ABI.
+struct DropCompleteWriteback : OpRewritePattern<SubmapInverseOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(SubmapInverseOp op, PatternRewriter &rewriter) const override {
+    auto type = dyn_cast<RankedTensorType>(op.getType());
+    if (!type || !type.hasStaticShape() || !op.getMap().isIdentity() ||
+        op.getViewModified().getType() != type || !op->hasOneUse())
+      return failure();
+    // Keep a standalone writeback as a matching boundary. Only flatten a
+    // complete inner write whose entire value is immediately written again.
+    auto outer = dyn_cast<SubmapInverseOp>(*op->getUsers().begin());
+    if (!outer || outer.getViewModified() != op.getResult())
+      return failure();
+    auto sizes = op->getOperands().drop_front(2);
+    if (sizes.size() != type.getRank())
+      return failure();
+    for (auto [size, extent] : llvm::zip(sizes, type.getShape())) {
+      APInt constant;
+      if (!matchPattern(size, m_ConstantInt(&constant)) || constant.getSExtValue() != extent)
+        return failure();
+    }
+    rewriter.replaceOp(op, op.getViewModified());
     return success();
   }
 };
@@ -74,6 +120,33 @@ static bool isScalarInitializer(Value value) {
   auto argument = dyn_cast<BlockArgument>(yielded);
   return !argument || argument.getOwner() != op.getBody();
 }
+
+// Reshaping a scalar fill preserves the captured scalar exactly. Keep it as a
+// visible initializer when upstream collapses all parallel axes of a consumer.
+// No reduction body, seed, or evaluation order changes here.
+struct CollapseScalarInitializer : OpRewritePattern<tensor::CollapseShapeOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(tensor::CollapseShapeOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!isScalarInitializer(op.getSrc()))
+      return failure();
+    auto producer = op.getSrc().getDefiningOp<linalg::GenericOp>();
+    Value scalar = producer.getBody()->getTerminator()->getOperand(0);
+    auto type = op.getResultType();
+    Value destination = rewriter.create<tensor::CollapseShapeOp>(
+        op.getLoc(), type, producer.getDpsInitOperand(0)->get(),
+        op.getReassociationIndices());
+    auto fill = rewriter.create<linalg::GenericOp>(
+        op.getLoc(), TypeRange{type}, ValueRange{}, ValueRange{destination},
+        ArrayRef<AffineMap>{rewriter.getMultiDimIdentityMap(type.getRank())},
+        SmallVector<utils::IteratorType>(type.getRank(), utils::IteratorType::parallel),
+        [&](OpBuilder &builder, Location loc, ValueRange) {
+          builder.create<linalg::YieldOp>(loc, scalar);
+        });
+    rewriter.replaceOp(op, fill.getResults());
+    return success();
+  }
+};
 
 // A pointwise consumer may read an initializer through a DPS input after
 // upstream removes an unused output dependence. Fuse that captured scalar
@@ -117,6 +190,37 @@ struct NormalizeScalarInitializer : OpRewritePattern<linalg::GenericOp> {
     rewriter.replaceOpWithNewOp<tensor::InsertOp>(
         op, op.getBody()->getTerminator()->getOperand(0),
         op.getDpsInitOperand(0)->get(), ValueRange{});
+    return success();
+  }
+};
+
+// A slice of an SSA tensor filled with one captured scalar is the same fill
+// over the slice's shape. Materialize that local initializer so tiled scalar
+// reductions retain the seed used by a source-imported reduction reference.
+struct SliceScalarInitializer : OpRewritePattern<tensor::ExtractSliceOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(tensor::ExtractSliceOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!isScalarInitializer(op.getSource()) || !op.getType().hasStaticShape())
+      return failure();
+    auto producer = op.getSource().getDefiningOp<linalg::GenericOp>();
+    Value scalar = producer.getBody()->getTerminator()->getOperand(0);
+    auto type = op.getType();
+    Value empty = rewriter.create<tensor::EmptyOp>(
+        op.getLoc(), type.getShape(), type.getElementType());
+    if (!type.getRank()) {
+      rewriter.replaceOpWithNewOp<tensor::InsertOp>(
+          op, scalar, empty, ValueRange{});
+      return success();
+    }
+    auto fill = rewriter.create<linalg::GenericOp>(
+        op.getLoc(), TypeRange{type}, ValueRange{}, ValueRange{empty},
+        ArrayRef<AffineMap>{rewriter.getMultiDimIdentityMap(type.getRank())},
+        SmallVector<utils::IteratorType>(type.getRank(), utils::IteratorType::parallel),
+        [&](OpBuilder &builder, Location loc, ValueRange) {
+          builder.create<linalg::YieldOp>(loc, scalar);
+        });
+    rewriter.replaceOp(op, fill.getResults());
     return success();
   }
 };
@@ -210,13 +314,14 @@ struct NormalizeScalarSliceWrite : OpRewritePattern<tensor::InsertSliceOp> {
 };
 
 // Preserve explicit submap bounds as static tensor dimensions where known.
-// Multiple-output operations need all result types updated together; cast
-// external users back to their original types without changing any indexing.
-struct RefineMultiOutputBounds : OpRewritePattern<linalg::GenericOp> {
+// Update all result types together; cast external users back to their original
+// types without changing any indexing. This also lets one-output operations
+// collapse known dimensions instead of introducing artificial unit-tile loops.
+struct RefineOperandBounds : OpRewritePattern<linalg::GenericOp> {
   using OpRewritePattern::OpRewritePattern;
   LogicalResult matchAndRewrite(linalg::GenericOp op,
                                 PatternRewriter &rewriter) const override {
-    if (!op.hasTensorSemantics() || op.getNumResults() < 2 ||
+    if (!op.hasTensorSemantics() || op.getNumResults() < 1 ||
         op.getNumResults() != op.getNumDpsInits())
       return failure();
     SmallVector<Value> inputs(op.getInputs()), outputs(op.getOutputs());
@@ -289,13 +394,45 @@ struct RefineMultiOutputBounds : OpRewritePattern<linalg::GenericOp> {
 // bounded identity submap rather than replacing a partial view by its base:
 // the latter changes the iteration domain. No scalar computation is inspected.
 struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
-  using OpRewritePattern::OpRewritePattern;
+  ExposeProjectedSubmaps(MLIRContext *context, bool preservePointwiseViews)
+      : OpRewritePattern(context),
+        preservePointwiseViews(preservePointwiseViews) {}
+
+  bool preservePointwiseViews;
 
   LogicalResult matchAndRewrite(linalg::GenericOp op,
                                 PatternRewriter &rewriter) const override {
     if (op.getNumDpsInits() != 1 || op.getNumResults() != 1)
       return failure();
     SmallVector<AffineMap> maps(op.getIndexingMapsArray());
+    // A pointwise operation already expressed in common logical coordinates
+    // can collapse those dimensions without exposing storage permutations or
+    // repeated input coordinates. Keep these on the views and their writebacks:
+    // moving them onto indexing maps forces unit tiles and small library calls.
+    // Reductions and combined-coordinate reads (such as sliding windows) keep
+    // the existing projection normalization and its storage-root convention.
+    if (preservePointwiseViews &&
+        op.getNumParallelLoops() == op.getNumLoops() &&
+        llvm::all_of(maps, [](AffineMap map) { return map.isIdentity(); }) &&
+        llvm::all_of(op.getInputs(), [](Value input) {
+          auto view = input.getDefiningOp<SubmapOp>();
+          if (!view)
+            return true;
+          // Fixed-coordinate slices have the same logical iteration space as
+          // projections. Keep any constant coordinate on the view, including
+          // nonzero slices; it does not require tiling the pointwise operation.
+          SmallVector<bool> seen(view.getMap().getNumDims(), false);
+          for (AffineExpr expr : view.getMap().getResults()) {
+            if (expr.isa<AffineConstantExpr>())
+              continue;
+            auto dim = expr.dyn_cast<AffineDimExpr>();
+            if (!dim || seen[dim.getPosition()])
+              return false;
+            seen[dim.getPosition()] = true;
+          }
+          return true;
+        }))
+      return failure();
     struct View {
       unsigned operand;
       SubmapOp submap;
@@ -466,12 +603,14 @@ struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
 // In particular, an operand indexed by only one member blocks the collapse.
 // Upstream performs the remaining legality checks and rewrites linalg.index.
 static SmallVector<ReassociationIndices>
-parallelGroups(linalg::GenericOp op) {
+orderedIterationGroups(linalg::GenericOp op) {
   auto iterators = op.getIteratorTypesArray();
   auto maps = op.getIndexingMapsArray();
   auto compatible = [&](int64_t left, int64_t right) {
-    if (iterators[left] != utils::IteratorType::parallel ||
-        iterators[right] != utils::IteratorType::parallel)
+    // Adjacent axes of the same kind retain their row-major traversal order.
+    // Reduction axes may collapse too; no reduction is moved across a parallel
+    // axis and no scalar expression is reassociated by this reshape.
+    if (iterators[left] != iterators[right])
       return false;
     for (AffineMap map : maps) {
       if (!map.isProjectedPermutation())
@@ -564,6 +703,124 @@ static Value collapseTensor(PatternRewriter &rewriter, Location loc, Value value
   return rewriter.createOrFold<tensor::CollapseShapeOp>(loc, type, value, groups);
 }
 
+// A complete quotient/remainder pair is a reshape coordinate, not an indirect
+// access. Split only exactly divisible static domains; require the resulting
+// map to be a permutation so neither reads nor writes gain duplicate elements.
+struct DivModDomain {
+  SmallVector<int64_t> originalShape, expandedShape;
+  SmallVector<ReassociationIndices> groups;
+  AffineMap permutation;
+};
+static std::optional<DivModDomain> splitDivModDomain(AffineMap map,
+                                                   ValueRange sizes) {
+  if (map.getNumSymbols() || map.getNumDims() != sizes.size())
+    return std::nullopt;
+  DivModDomain result;
+  SmallVector<int64_t> divisors(map.getNumDims(), 0);
+  bool found = false;
+  for (AffineExpr expr : map.getResults()) {
+    if (expr.isa<AffineDimExpr>())
+      continue;
+    auto binary = expr.dyn_cast<AffineBinaryOpExpr>();
+    if (!binary || (expr.getKind() != AffineExprKind::FloorDiv &&
+                    expr.getKind() != AffineExprKind::Mod))
+      return std::nullopt;
+    auto dim = binary.getLHS().dyn_cast<AffineDimExpr>();
+    auto divisor = binary.getRHS().dyn_cast<AffineConstantExpr>();
+    if (!dim || !divisor || divisor.getValue() <= 1)
+      return std::nullopt;
+    int64_t &factor = divisors[dim.getPosition()];
+    if (factor && factor != divisor.getValue())
+      return std::nullopt;
+    factor = divisor.getValue();
+    found = true;
+  }
+  if (!found)
+    return std::nullopt;
+  for (auto [number, size] : llvm::enumerate(sizes)) {
+    APInt constant;
+    if (!matchPattern(size, m_ConstantInt(&constant)) || constant.getSExtValue() <= 0)
+      return std::nullopt;
+    int64_t extent = constant.getSExtValue(), factor = divisors[number];
+    result.originalShape.push_back(extent);
+    int64_t next = result.expandedShape.size();
+    if (factor) {
+      if (extent % factor)
+        return std::nullopt;
+      result.expandedShape.append({extent / factor, factor});
+      result.groups.push_back({next, next + 1});
+    } else {
+      result.expandedShape.push_back(extent);
+      result.groups.push_back({next});
+    }
+  }
+  SmallVector<AffineExpr> expressions;
+  for (AffineExpr expr : map.getResults()) {
+    if (auto dim = expr.dyn_cast<AffineDimExpr>()) {
+      if (divisors[dim.getPosition()])
+        return std::nullopt;
+      expressions.push_back(getAffineDimExpr(result.groups[dim.getPosition()][0], map.getContext()));
+    } else {
+      auto binary = expr.cast<AffineBinaryOpExpr>();
+      unsigned position = binary.getLHS().cast<AffineDimExpr>().getPosition();
+      unsigned part = expr.getKind() == AffineExprKind::Mod;
+      expressions.push_back(getAffineDimExpr(result.groups[position][part], map.getContext()));
+    }
+  }
+  result.permutation = AffineMap::get(result.expandedShape.size(), 0, expressions, map.getContext());
+  if (!result.permutation.isPermutation())
+    return std::nullopt;
+  return result;
+}
+
+struct SplitDivModSubview : OpRewritePattern<SubmapOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(SubmapOp op, PatternRewriter &rewriter) const override {
+    auto type = dyn_cast<RankedTensorType>(op.getType());
+    auto domain = splitDivModDomain(op.getMap(), op.getSizes());
+    if (!type || !domain)
+      return failure();
+    SmallVector<Value> sizes;
+    for (int64_t size : domain->expandedShape)
+      sizes.push_back(rewriter.create<arith::ConstantIndexOp>(op.getLoc(), size));
+    auto expandedType = RankedTensorType::get(domain->expandedShape, type.getElementType());
+    Value expanded = rewriter.create<SubmapOp>(op.getLoc(), expandedType,
+        op.getBase(), sizes, domain->permutation);
+    Value collapsed = collapseTensor(rewriter, op.getLoc(), expanded, domain->groups);
+    if (collapsed.getType() != type)
+      collapsed = rewriter.create<tensor::CastOp>(op.getLoc(), type, collapsed);
+    rewriter.replaceOp(op, collapsed);
+    return success();
+  }
+};
+
+struct SplitDivModWriteback : OpRewritePattern<SubmapInverseOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(SubmapInverseOp op, PatternRewriter &rewriter) const override {
+    if (!isa<RankedTensorType>(op.getType()))
+      return failure();
+    auto domain = splitDivModDomain(op.getMap(),
+        op->getOperands().drop_front(2 + op.getMap().getNumSymbols()));
+    if (!domain)
+      return failure();
+    Value modified = op.getViewModified();
+    while (auto cast = modified.getDefiningOp<tensor::CastOp>())
+      modified = cast.getSource();
+    auto type = dyn_cast<RankedTensorType>(modified.getType());
+    if (!type || type.getShape() != ArrayRef<int64_t>(domain->originalShape))
+      return failure();
+    auto expandedType = RankedTensorType::get(domain->expandedShape, type.getElementType());
+    Value expanded = rewriter.create<tensor::ExpandShapeOp>(op.getLoc(), expandedType,
+        modified, domain->groups);
+    SmallVector<Value> sizes;
+    for (int64_t size : domain->expandedShape)
+      sizes.push_back(rewriter.create<arith::ConstantIndexOp>(op.getLoc(), size));
+    rewriter.replaceOpWithNewOp<SubmapInverseOp>(op, op.getType(),
+        op.getBaseOriginal(), expanded, sizes, domain->permutation);
+    return success();
+  }
+};
+
 struct CollapseSubmap : OpRewritePattern<tensor::CollapseShapeOp> {
   using OpRewritePattern::OpRewritePattern;
   LogicalResult matchAndRewrite(tensor::CollapseShapeOp op,
@@ -586,7 +843,10 @@ struct ExpandInverse : OpRewritePattern<SubmapInverseOp> {
   using OpRewritePattern::OpRewritePattern;
   LogicalResult matchAndRewrite(SubmapInverseOp op,
                                 PatternRewriter &rewriter) const override {
-    auto expand = op.getViewModified().getDefiningOp<tensor::ExpandShapeOp>();
+    Value modified = op.getViewModified();
+    while (auto cast = modified.getDefiningOp<tensor::CastOp>())
+      modified = cast.getSource();
+    auto expand = modified.getDefiningOp<tensor::ExpandShapeOp>();
     if (!expand || !op.getMap().isIdentity())
       return failure();
     auto groups = expand.getReassociationIndices();
@@ -811,8 +1071,11 @@ static LogicalResult sliceParallelDimensions(Operation *root,
       dialect->getCanonicalizationPatterns(patterns);
   for (RegisteredOperationName operation :
        root->getContext()->getRegisteredOperations())
+    // EraseIdentityGenericOp would remove a tiled copy before the imported
+    // copy specification can match it. Retain its semantic operation here.
     if (operation.getDialectNamespace() != "polygeist" &&
-        operation.getDialectNamespace() != "kernel")
+        operation.getDialectNamespace() != "kernel" &&
+        operation.getStringRef() != linalg::GenericOp::getOperationName())
       operation.getCanonicalizationPatterns(patterns, root->getContext());
   FrozenRewritePatternSet cleanup(std::move(patterns));
   for (Operation *loop : tiledRoots) {
@@ -829,21 +1092,27 @@ static LogicalResult sliceParallelDimensions(Operation *root,
   return success();
 }
 
-// A static rank-reduced tile already has exact extents. Expose those extents as
-// identity views for the same matcher used by source-imported references.
+// Static tiles and collapsed tensors already have exact extents. Expose those
+// extents as identity views for the matcher used by source-imported references.
 static void exposeStaticSliceBounds(Operation *root, bool scalarViews) {
   SmallVector<linalg::GenericOp> candidates;
   root->walk([&](linalg::GenericOp op) {
     if (!op.getNumDpsInits() || op.getNumDpsInits() != op.getNumResults() ||
-        (!scalarViews && op.getNumResults() != 1) ||
-        !op->getParentOfType<scf::ForOp>())
+        (!scalarViews && (op.getNumResults() != 1 ||
+                          !op->getParentOfType<scf::ForOp>())))
       return;
     bool needsBounds = false;
-    for (Value value : op->getOperands()) {
+    for (auto [index, value] : llvm::enumerate(op->getOperands())) {
       auto type = dyn_cast<RankedTensorType>(value.getType());
       if (!type || !type.hasStaticShape() || (!scalarViews && type.getRank() == 0))
         return;
       if (type.getRank() == 0)
+        continue;
+      // This input already carries an explicit bounded producer writeback.
+      // Wrapping it again lets view forwarding erase that producer's boundary
+      // before the source-derived matcher can match the producer independently.
+      if (index < op.getNumDpsInputs() &&
+          value.getDefiningOp<SubmapInverseOp>())
         continue;
       needsBounds |= !value.getDefiningOp<SubmapOp>();
     }
@@ -861,6 +1130,9 @@ static void exposeStaticSliceBounds(Operation *root, bool scalarViews) {
     SmallVector<SmallVector<Value>> outputSizes(originalOutputs.size());
     for (OpOperand &operand : op->getOpOperands()) {
       if (operand.get().getDefiningOp<SubmapOp>())
+        continue;
+      if (operand.getOperandNumber() < op.getNumDpsInputs() &&
+          operand.get().getDefiningOp<SubmapInverseOp>())
         continue;
       auto type = cast<RankedTensorType>(operand.get().getType());
       if (type.getRank() == 0)
@@ -893,12 +1165,20 @@ static void exposeStaticSliceBounds(Operation *root, bool scalarViews) {
 // This changes storage only: the residual iterators, initializer and operation
 // order are retained. No arithmetic identity or reduction reassociation is used.
 struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
-  using OpRewritePattern::OpRewritePattern;
+  SplitReductionInputs(MLIRContext *context, bool reductions, bool pointwise)
+      : OpRewritePattern(context), reductions(reductions), pointwise(pointwise) {}
+  bool reductions;
+  bool pointwise;
   LogicalResult matchAndRewrite(linalg::GenericOp op,
                                 PatternRewriter &rewriter) const override {
-    if (!op.hasTensorSemantics() || !op.getNumReductionLoops())
+    if (!op.hasTensorSemantics() ||
+        (op.getNumReductionLoops() ? !reductions : !pointwise))
       return failure();
     Block *body = op.getBody();
+    // Do not split the single operation of a materialized producer again.
+    // A useful split removes at least one operation from a composite payload.
+    if (std::distance(body->begin(), body->end()) <= 2)
+      return failure();
     Operation &first = body->front();
     if (first.getNumResults() != 1 || !isa<FloatType>(first.getResult(0).getType()) ||
         first.getNumRegions() || isa<arith::ConstantOp>(first) ||
@@ -935,20 +1215,36 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
                       .createLoopRanges(rewriter, loc);
     SmallVector<int64_t> shape;
     SmallVector<Value> dynamic;
+    SmallVector<Value> bounds;
     for (auto range : ranges) {
-      auto size = getConstantIntValue(range.size);
+      Value bound = getValueOrCreateConstantIndexOp(rewriter, loc, range.size);
+      if (auto dim = bound.getDefiningOp<tensor::DimOp>()) {
+        auto position = getConstantIntValue(dim.getIndex());
+        if (auto view = dim.getSource().getDefiningOp<SubmapOp>())
+          if (position && *position >= 0 &&
+              *position < static_cast<int64_t>(view.getSizes().size()))
+            bound = view.getSizes()[*position];
+      }
+      bounds.push_back(bound);
+      auto size = getConstantIntValue(bound);
       shape.push_back(size.value_or(ShapedType::kDynamic));
       if (!size)
-        dynamic.push_back(cast<Value>(range.size));
+        dynamic.push_back(bound);
     }
     Type element = first.getResult(0).getType();
     Value empty = rewriter.create<tensor::EmptyOp>(loc, shape, element, dynamic);
+    auto identity = rewriter.getMultiDimIdentityMap(op.getNumLoops());
+    // Retain the same bounded destination/writeback form produced by raising
+    // C reference implementations. The identity view covers the entire fresh
+    // tensor, so no old output value or out-of-domain element is introduced.
+    Value destination = rewriter.create<SubmapOp>(
+        loc, empty.getType(), empty, bounds, identity);
     SmallVector<AffineMap> producerMaps(maps.begin(), maps.begin() + inputs);
     producerMaps.push_back(rewriter.getMultiDimIdentityMap(op.getNumLoops()));
     SmallVector<utils::IteratorType> parallel(op.getNumLoops(),
                                             utils::IteratorType::parallel);
     auto producer = rewriter.create<linalg::GenericOp>(
-        loc, TypeRange{empty.getType()}, op.getInputs(), ValueRange{empty},
+        loc, TypeRange{empty.getType()}, op.getInputs(), ValueRange{destination},
         producerMaps, parallel, [&](OpBuilder &builder, Location nested,
                                    ValueRange arguments) {
           IRMapping mapping;
@@ -958,7 +1254,9 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
           builder.create<linalg::YieldOp>(nested, copy->getResults());
         });
     SmallVector<Value> residualInputs(op.getInputs());
-    residualInputs.push_back(producer.getResult(0));
+    Value produced = rewriter.create<SubmapInverseOp>(
+        loc, empty.getType(), empty, producer.getResult(0), bounds, identity);
+    residualInputs.push_back(produced);
     maps.insert(maps.begin() + inputs,
                 rewriter.getMultiDimIdentityMap(op.getNumLoops()));
     auto residual = rewriter.create<linalg::GenericOp>(
@@ -979,6 +1277,32 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
   }
 };
 
+// A rank-zero tensor input denotes one scalar independent of every iterator.
+// Expose it as an SSA capture so the imported scalar-parameter references and
+// rank-reduced application tiles use the same representation.
+struct CaptureScalarTensorInput : OpRewritePattern<linalg::GenericOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(linalg::GenericOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!op.hasTensorSemantics())
+      return failure();
+    for (auto [index, input] : llvm::enumerate(op.getInputs())) {
+      auto type = dyn_cast<RankedTensorType>(input.getType());
+      BlockArgument argument = op.getRegion().front().getArgument(index);
+      if (!type || type.getRank() || argument.use_empty() ||
+          op.getIndexingMapsArray()[index].getNumResults())
+        continue;
+      auto scalar = rewriter.create<tensor::ExtractOp>(op.getLoc(), input,
+                                                      ValueRange{});
+      rewriter.updateRootInPlace(op, [&] {
+        argument.replaceAllUsesWith(scalar.getResult());
+      });
+      return success();
+    }
+    return failure();
+  }
+};
+
 struct NormalizeLinalgMatchingViewsPass
     : NormalizeLinalgMatchingViewsBase<NormalizeLinalgMatchingViewsPass> {
   void getDependentDialects(DialectRegistry &registry) const override {
@@ -987,7 +1311,8 @@ struct NormalizeLinalgMatchingViewsPass
   }
 
   void runOnOperation() override {
-    if (maxParallelDims || maxOperandRank || splitReductionInputs) {
+    if (maxParallelDims || maxOperandRank || splitReductionInputs ||
+        splitPointwiseInputs) {
       RewritePatternSet outputs(&getContext());
       populateNormalizeTensorReductionOutputPatterns(outputs);
       if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(outputs)))) {
@@ -995,9 +1320,10 @@ struct NormalizeLinalgMatchingViewsPass
         return;
       }
     }
-    if (splitReductionInputs) {
+    if (splitReductionInputs || splitPointwiseInputs) {
       RewritePatternSet split(&getContext());
-      split.add<SplitReductionInputs>(&getContext());
+      split.add<SplitReductionInputs>(&getContext(), splitReductionInputs,
+                                      splitPointwiseInputs);
       linalg::populateEraseUnusedOperandsAndResultsPatterns(split);
       if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(split)))) {
         signalPassFailure();
@@ -1005,10 +1331,12 @@ struct NormalizeLinalgMatchingViewsPass
       }
     }
     RewritePatternSet views(&getContext());
-    views.add<ExposeProjectedSubmaps>(&getContext());
+    views.add<SplitDivModSubview, SplitDivModWriteback>(&getContext());
+    views.add<ExposeProjectedSubmaps>(
+        &getContext(), (maxParallelDims || maxOperandRank) && fuseInitializers);
     if ((maxParallelDims || maxOperandRank) && fuseInitializers)
       views.add<ForwardUpdatedSubview, FuseScalarInitializerInput,
-                RefineMultiOutputBounds>(&getContext());
+                RefineOperandBounds>(&getContext());
     linalg::populateMoveInitOperandsToInputPattern(views);
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(views)))) {
       signalPassFailure();
@@ -1027,16 +1355,32 @@ struct NormalizeLinalgMatchingViewsPass
     }
     RewritePatternSet collapse(&getContext());
     linalg::populateCollapseDimensions(collapse, [&](linalg::GenericOp op) {
-      // Preserve scalar initializer shape until the consumer is tiled. A
-      // preceding flatten/expand pair would hide that producer from fusion.
+      // Keep scalar fills visible to the later producer/consumer tiling step.
       if ((maxParallelDims || maxOperandRank) && fuseInitializers &&
-          ((op.getNumResults() == 1 &&
-            isScalarInitializer(op.getResult(0))) ||
-           llvm::any_of(op.getOutputs(), isScalarInitializer)))
+          op.getNumResults() == 1 && isScalarInitializer(op.getResult(0)))
         return SmallVector<ReassociationIndices>{};
-      return parallelGroups(op);
+      auto groups = orderedIterationGroups(op);
+      if ((maxParallelDims || maxOperandRank) && fuseInitializers &&
+          llvm::any_of(op.getOutputs(), isScalarInitializer)) {
+        // A single parallel batch can keep its scalar fill in the same
+        // collapsed coordinates. Partial parallel collapse still needs the
+        // existing producer/consumer tiling to keep the seed visible.
+        auto iterators = op.getIteratorTypesArray();
+        bool oneParallelBatch = llvm::any_of(groups, [&](const ReassociationIndices &group) {
+          return iterators[group.front()] == utils::IteratorType::parallel &&
+                 group.size() == op.getNumParallelLoops();
+        });
+        if (oneParallelBatch)
+          return groups;
+        // Reduction-only groups do not reshape the output initializer.
+        llvm::erase_if(groups, [&](const ReassociationIndices &group) {
+          return iterators[group.front()] != utils::IteratorType::reduction;
+        });
+      }
+      return groups;
     });
-    collapse.add<CollapseSubmap, ExpandInverse, CollapseTensorMemref>(&getContext());
+    collapse.add<CollapseSubmap, ExpandInverse, CollapseTensorMemref,
+                 CollapseScalarInitializer>(&getContext());
     if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(collapse)))) {
       signalPassFailure();
       return;
@@ -1050,8 +1394,12 @@ struct NormalizeLinalgMatchingViewsPass
       if (fuseInitializers) {
         RewritePatternSet finalViews(&getContext());
         finalViews.add<ForwardUpdatedSubview, DropOverwrittenSubview,
-                       NormalizeScalarInitializer, ForwardScalarInsertedView,
-                       DropOverwrittenScalarInsert, NormalizeScalarSliceWrite>(&getContext());
+                       DropCompleteWriteback,
+                       NormalizeScalarInitializer, SliceScalarInitializer,
+                       ForwardScalarInsertedView,
+                       DropOverwrittenScalarInsert, NormalizeScalarSliceWrite,
+                       CaptureScalarTensorInput>(&getContext());
+        linalg::populateEraseUnusedOperandsAndResultsPatterns(finalViews);
         if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(finalViews)))) {
           signalPassFailure();
           return;

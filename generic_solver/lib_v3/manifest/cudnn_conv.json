@@ -1,0 +1,447 @@
+{
+  "routine": "cudnn_conv",
+  "source": "NVIDIA cuDNN9 public sample CPU reference, specialization described in ref_c",
+  "upstream_files": [
+    {
+      "path": "third_party/cudnn_reference/conv_sample.cpp",
+      "sha256": "0b5d337651b2847684c9c1a407f6f44a34669fd564d58563634214b9c0142138"
+    }
+  ],
+  "specs": [
+    {
+      "name": "cudnn_conv2d_valid_d1_f32",
+      "defines": {
+        "DILATION": 1
+      },
+      "args": [
+        "N",
+        "IC",
+        "IH",
+        "IW",
+        "OC",
+        "KH",
+        "KW",
+        "OH",
+        "OW",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_conv2d_d1_f32",
+          "arguments": [
+            "N",
+            "IC",
+            "IH",
+            "IW",
+            "OC",
+            "KH",
+            "KW",
+            "OH",
+            "OW",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "N",
+              "IC",
+              "IH",
+              "IW"
+            ],
+            "filter": [
+              "OC",
+              "IC",
+              "KH",
+              "KW"
+            ],
+            "output": [
+              "N",
+              "OC",
+              "OH",
+              "OW"
+            ]
+          },
+          "bounds": {
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OW": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "NCHW FP32, disjoint contiguous arrays",
+        "positive dimensions with int32 representable tensor strides",
+        "OH=IH-DILATION*(KH-1), OW=IW-DILATION*(KW-1); checked by the typed CUDA wrapper",
+        "cuDNN may reorder floating point reductions; relaxed matching only when operation order differs; validate against C and native ATen"
+      ],
+      "deviations": [
+        "Expose existing cross-correlation branch; sample hardcodes convolution mode"
+      ],
+      "validation": {
+        "scalars": {
+          "N": 2,
+          "IC": 3,
+          "IH": 9,
+          "IW": 11,
+          "OC": 5,
+          "KH": 3,
+          "KW": 2,
+          "OH": 7,
+          "OW": 10
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            9,
+            11
+          ],
+          "filter": [
+            5,
+            3,
+            3,
+            2
+          ],
+          "output": [
+            2,
+            5,
+            7,
+            10
+          ]
+        }
+      }
+    },
+    {
+      "name": "cudnn_conv2d_valid_d2_f32",
+      "defines": {
+        "DILATION": 2
+      },
+      "args": [
+        "N",
+        "IC",
+        "IH",
+        "IW",
+        "OC",
+        "KH",
+        "KW",
+        "OH",
+        "OW",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_conv2d_d2_f32",
+          "arguments": [
+            "N",
+            "IC",
+            "IH",
+            "IW",
+            "OC",
+            "KH",
+            "KW",
+            "OH",
+            "OW",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "N",
+              "IC",
+              "IH",
+              "IW"
+            ],
+            "filter": [
+              "OC",
+              "IC",
+              "KH",
+              "KW"
+            ],
+            "output": [
+              "N",
+              "OC",
+              "OH",
+              "OW"
+            ]
+          },
+          "bounds": {
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OW": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "NCHW FP32, disjoint contiguous arrays",
+        "positive dimensions with int32 representable tensor strides",
+        "OH=IH-DILATION*(KH-1), OW=IW-DILATION*(KW-1); checked by the typed CUDA wrapper",
+        "cuDNN may reorder floating point reductions; relaxed matching only when operation order differs; validate against C and native ATen"
+      ],
+      "deviations": [
+        "Expose existing cross-correlation branch; sample hardcodes convolution mode"
+      ],
+      "validation": {
+        "scalars": {
+          "N": 2,
+          "IC": 3,
+          "IH": 9,
+          "IW": 11,
+          "OC": 5,
+          "KH": 3,
+          "KW": 2,
+          "OH": 5,
+          "OW": 9
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            9,
+            11
+          ],
+          "filter": [
+            5,
+            3,
+            3,
+            2
+          ],
+          "output": [
+            2,
+            5,
+            5,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "name": "cudnn_conv2d_valid_unbatched_d2_f32",
+      "defines": {
+        "DILATION": 2,
+        "BATCHED": 0
+      },
+      "args": [
+        "IC",
+        "IH",
+        "IW",
+        "OC",
+        "KH",
+        "KW",
+        "OH",
+        "OW",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_conv2d_unbatched_d2_f32",
+          "arguments": [
+            "IC",
+            "IH",
+            "IW",
+            "OC",
+            "KH",
+            "KW",
+            "OH",
+            "OW",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "IC",
+              "IH",
+              "IW"
+            ],
+            "filter": [
+              "OC",
+              "IC",
+              "KH",
+              "KW"
+            ],
+            "output": [
+              "OC",
+              "OH",
+              "OW"
+            ]
+          },
+          "bounds": {
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OW": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "NCHW FP32, disjoint contiguous arrays",
+        "positive dimensions with int32 representable tensor strides",
+        "OH=IH-DILATION*(KH-1), OW=IW-DILATION*(KW-1); checked by the typed CUDA wrapper",
+        "cuDNN may reorder floating point reductions; relaxed matching only when operation order differs; validate against C and native ATen"
+      ],
+      "deviations": [
+        "Expose existing cross-correlation branch; sample hardcodes convolution mode"
+      ],
+      "validation": {
+        "scalars": {
+          "IC": 3,
+          "IH": 9,
+          "IW": 11,
+          "OC": 5,
+          "KH": 3,
+          "KW": 2,
+          "OH": 5,
+          "OW": 9
+        },
+        "arrays": {
+          "input": [
+            3,
+            9,
+            11
+          ],
+          "filter": [
+            5,
+            3,
+            3,
+            2
+          ],
+          "output": [
+            5,
+            5,
+            9
+          ]
+        }
+      }
+    }
+  ],
+  "adaptation": "NCHW float, resizeFactor=1, alpha=1, beta=0, unit stride, no padding. Explicitly select the existing cross-correlation branch. Delinearize the sample output/filter spatial iteration lexicographically. Keep fval*ival+accumulation order. All dimensions remain arguments. See the C source and independent upstream-source comparison."
+}

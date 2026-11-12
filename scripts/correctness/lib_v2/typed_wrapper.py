@@ -38,7 +38,7 @@ def contract(A, spec, target, ret, args):
     cfg = target['runtime_adapter']
     allowed = {'schema', 'kind', 'entry', 'arguments', 'arrays', 'bounds', 'alias_policy', 'linkage'}
     if (set(cfg) - allowed or cfg.get('schema') != 1
-            or cfg.get('kind') != 'typed_c_wrapper' or ret not in ('void', 'float', 'double')):
+            or cfg.get('kind') != 'typed_c_wrapper' or ret not in ('void', 'float', 'double', 'int')):
         raise A.AbiError('unsupported typed C-wrapper schema')
     if cfg.get('linkage', 'required') not in ('required', 'optional'):
         raise A.AbiError('unsupported typed C-wrapper linkage')
@@ -59,7 +59,7 @@ def contract(A, spec, target, ret, args):
         raise A.AbiError('runtime entry lacks the selected vendor binding')
     try:
         text = _preprocess_header(str(header), hashlib.sha256(raw.encode()).hexdigest(), A.CLANG)
-        declaration = re.search(r'\b(void|float|double)\s+' + re.escape(entry) + r'\s*\(([^;{}]*)\)\s*;', text)
+        declaration = re.search(r'\b(void|float|double|int)\s+' + re.escape(entry) + r'\s*\(([^;{}]*)\)\s*;', text)
         if not declaration or declaration[1] != ret:
             raise ValueError('runtime/reference return types disagree')
         prototype = [_parameter(p.strip(), text) for p in A._split_top(declaration[2])]
@@ -88,9 +88,11 @@ def contract(A, spec, target, ret, args):
     if not isinstance(bounds, dict) or set(bounds) != dimensions:
         raise A.AbiError('every integer argument needs explicit bounds')
     for name, bound in bounds.items():
-        if (not isinstance(bound, dict) or set(bound) != {'min', 'max'}
+        if (not isinstance(bound, dict) or not {'min', 'max'} <= set(bound)
+                or set(bound) - {'min', 'max', 'multiple_of'}
                 or any(type(v) is not int for v in bound.values())
-                or not 0 <= bound['min'] <= bound['max'] <= 2147483647):
+                or not -2147483648 <= bound['min'] <= bound['max'] <= 2147483647
+                or not 1 <= bound.get('multiple_of', 1) <= 2147483647):
             raise A.AbiError('invalid integer bounds: ' + name)
     for name, shape in shapes.items():
         arg = arrays[name]
@@ -104,7 +106,7 @@ def contract(A, spec, target, ret, args):
                     and type(d['offset']) is int and -2147483647 <= d['offset'] <= 2147483647
                     and 0 < bounds[d['dimension']]['min'] + d['offset']
                     and bounds[d['dimension']]['max'] + d['offset'] <= 2147483647)
-        if (not isinstance(shape, list) or arg.rank not in (1, 2)
+        if (not isinstance(shape, list) or not 1 <= arg.rank <= 16
                 or len(shape) != arg.rank or any(not valid_dimension(d) for d in shape)):
             raise A.AbiError('array extents require positive fixed sizes or bounded dimensions')
         if arg.vla_ld is not None and shape[-1] != arg.vla_ld:
@@ -149,6 +151,9 @@ def generate(ca, prototype):
     for name, bound in cfg['bounds'].items():
         body.append(f'  if ({name} < {bound["min"]} || {name} > {bound["max"]})\n'
                     f'    polygeist_v2_fatal("{ca.call}", "integer outside wrapper bounds");\n')
+        if 'multiple_of' in bound:
+            body.append(f'  if ({name} % {bound["multiple_of"]} != 0)\n'
+                        f'    polygeist_v2_fatal("{ca.call}", "integer violates wrapper divisibility");\n')
     for p in arrays:
         dims = cfg['arrays'][p.name]
         body.append(f'  int64_t pv2_bytes_{p.name} = sizeof({p.elem});\n')
@@ -157,7 +162,9 @@ def generate(ca, prototype):
             body.append(f'  if ({expr} <= 0 || pv2_bytes_{p.name} > INT64_MAX / {expr})\n'
                         f'    polygeist_v2_fatal("{ca.call}", "array extent overflow");\n'
                         f'  pv2_bytes_{p.name} *= {expr};\n')
-        stride = '1' if p.rank == 1 else extent_expression(dims[-1])
+        # Higher-rank typed arrays use the contiguous-layout flag proved by
+        # ABI lowering. BLAS-compatible rank-two arrays retain their ld.
+        stride = extent_expression(dims[-1]) if p.rank == 2 else '1'
         body.append(f'  if ({p.layout} != {stride} || !{p.name} || {p.name}_bytes < pv2_bytes_{p.name})\n'
                     f'    polygeist_v2_fatal("{ca.call}", "array layout or capacity mismatch");\n')
     for i, p in enumerate(arrays):

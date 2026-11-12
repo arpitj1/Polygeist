@@ -24,6 +24,29 @@ def run(args, **kwargs):
     return subprocess.run([str(a) for a in args], capture_output=True, text=True, **kwargs)
 
 class MemrefCopy(unittest.TestCase):
+    def test_scalar_transfers_and_stack_storage(self):
+        text = '''module {
+ func.func @scalar(%a: memref<?xf32>, %b: memref<?xf32>, %i: index) {
+  %local = memref.alloca() : memref<f32>
+  %v = memref.load %a[%i] : memref<?xf32>
+  memref.store %v, %local[] : memref<f32>
+  %w = memref.load %local[] : memref<f32>
+  memref.store %w, %b[%i] : memref<?xf32>
+  return
+ }
+ func.func @other_scope(%local: memref<f32>) -> f32 {
+  %v = memref.load %local[] : memref<f32>
+  return %v : f32
+ }
+}'''
+        output = LOWER.rewrite_memory_copies(text, 'cuda')
+        self.assertEqual(output.count('func.call @polygeist_v2_memref_copy('), 3)
+        self.assertIn('memref.store %v, %local[]', output)
+        p = run([ROOT/'build/bin/polygeist-opt'], input=output)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        # Both workspace planning and final host lowering invoke this step.
+        self.assertEqual(LOWER.rewrite_memory_copies(output, 'cuda'), output)
+
     def test_cpu_preserved_and_cuda_ir_valid(self):
         self.assertEqual(LOWER.rewrite_memory_copies(TEXT, 'cpu'), TEXT)
         self.assertEqual(LOWER.rewrite_memory_copies(TEXT, 'pva'), TEXT)

@@ -170,7 +170,7 @@ def _result_types(op_text: str, name: str, nres: int) -> list[str]:
         return [tail0.replace("memref<", "tensor<")]
     if name in ("arith.cmpi", "arith.cmpf"):
         return ["i1"]
-    if name in ("tensor.dim", "memref.dim"):
+    if name in ("tensor.dim", "memref.dim", "affine.apply", "affine.min", "affine.max"):
         return ["index"]
     if name == "tensor.extract":
         m = re.match(r"tensor<(?:[\d?]+x)*(\w+)>", tail0)

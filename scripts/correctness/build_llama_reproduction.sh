@@ -8,8 +8,8 @@ source "$HERE/common_env.sh"
 OUT=${1:?usage: build_llama_reproduction.sh OUTPUT_DIRECTORY}
 mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)
-BENCH="$REPO_ROOT/issues/llama_section42"
-SOURCE="$REPO_ROOT/third_party/cnn-extracted/llama2_extended_forward_bench.c"
+BENCH=${POLYGEIST_LLAMA_BENCH:-"$REPO_ROOT/issues/llama_section42"}
+SOURCE=${POLYGEIST_LLAMA_SOURCE:-"$REPO_ROOT/third_party/cnn-extracted/llama2_extended_forward_bench.c"}
 CUDA=${CUDA:-/usr/local/cuda-12.6/targets/sbsa-linux}
 GGML_BUILD=${POLYGEIST_GGML_BUILD:-$BENCH/build-ggml-jetson}
 : "${POLYGEIST_CUTENSOR_ROOT:?set to the AArch64 cuTENSOR tree}"
@@ -47,7 +47,7 @@ POLYGEIST_INLINE_GPU_ENTRY_CALLS=1 \
   "$OUT/session-work/wrapper.o" "$OUT/session-work/harness.o" \
   "$OUT/session-work/spec_runtime.o" "$OUT/iteration-timing.o"
 "$CXX" -O3 -std=c++17 "${DEFS[@]}" "$HERE/llama_extended_ggml_bench.cpp" \
-  -I"$REPO_ROOT/third_party/whisper.cpp/ggml/include" \
+  -I"${POLYGEIST_GGML_INCLUDE:-$REPO_ROOT/third_party/whisper.cpp/ggml/include}" \
   -L"$GGML_BUILD/ggml/src" -L"$GGML_BUILD/ggml/src/ggml-cuda" \
   -L"$CUDA/lib" -L"$CUDA/lib/stubs" -Wl,--no-as-needed \
   -lggml -lggml-base -lggml-cpu -lggml-cuda -lcublas -lcudart -lcuda \

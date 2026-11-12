@@ -122,6 +122,59 @@ def insert_after_module_open(text: str, lines: str) -> str:
 # Stage 1: stub defns
 # ---------------------------------------------------------------------------
 
+def mark_tensor_roots(text: str, specs: dict, names: dict) -> str:
+    """Retain read-only roots when every use is a view or a known read.
+
+    Library read/write roles come from the validated ABI. Unknown consumers
+    retain the historical writable treatment; no computation is recognized.
+    """
+    import mlir_lite as ML
+    module = ML.Module(text)
+    uses = {}
+    for op in module.ops:
+        for index, value in enumerate(op.operands):
+            definition = module.def_of(value, op)
+            if definition:
+                uses.setdefault((definition[0].idx, definition[1]), []).append((op, index))
+    views = {'polygeist.submap', 'tensor.cast', 'tensor.collapse_shape',
+             'tensor.expand_shape', 'tensor.extract_slice'}
+
+    def readonly(root):
+        pending, seen = [(root.idx, 0)], set()
+        while pending:
+            key = pending.pop()
+            if key in seen:
+                continue
+            seen.add(key)
+            for op, index in uses.get(key, []):
+                if op.name in views and index == 0:
+                    pending.extend((op.idx, k) for k in range(len(op.results)))
+                elif op.name in ('tensor.dim', 'tensor.extract') and index == 0:
+                    continue
+                elif op.name == 'linalg.generic' and index < len(op.ins):
+                    continue
+                elif op.name == 'kernel.launch':
+                    symbol = re.search(r'@([\w.$-]+)\(', op.header)
+                    spec = specs.get(names.get(symbol[1], symbol[1])) if symbol else None
+                    if (spec is None or index >= len(spec.args) or
+                            spec.args[index].intent != 'in'):
+                        return False
+                else:
+                    return False
+        return True
+
+    for op in reversed(module.ops):
+        if op.name != 'bufferization.to_tensor' or not op.results:
+            continue
+        # Preserve explicit contracts; infer only the unannotated C boundary.
+        if re.search(r'\b(restrict|writable)\b', op.header):
+            continue
+        replacement = re.sub(r'(bufferization\.to_tensor\s+%[\w.$-]+)\s*:',
+                             r'\1 restrict'+('' if readonly(op) else ' writable')+' :', op.text)
+        text = text[:op.start] + replacement + text[op.end:]
+    return text
+
+
 def prepare(text: str, specs: dict, calls: dict | None = None) -> tuple[str, dict]:
     """-> (text, defn name -> spec)"""
     text = strip_defns(text)
@@ -205,8 +258,7 @@ def prepare(text: str, specs: dict, calls: dict | None = None) -> tuple[str, dic
     text = "\n".join(lines)
     if stubs:
         text = insert_after_module_open(text, "".join(stubs))
-    text = re.sub(r"bufferization\.to_tensor (%[^ ]*) :",
-                  r"bufferization.to_tensor \1 restrict writable :", text)
+    text = mark_tensor_roots(text, specs, names)
     return text, names
 
 
@@ -230,8 +282,9 @@ def _views_left(text: str) -> bool:
     return bool(re.search(r"polygeist\.submap(Inverse)?\(.*tensor<", text))
 
 
-def _cleanup_views(text: str, log: list) -> str:
-    text = run_opt(["--lower-polygeist-submap", "--canonicalize-polygeist"], text, log)
+def _cleanup_views(text: str, log: list, affine_copy_views=False) -> str:
+    submaps = '--lower-polygeist-submap' + ('=affine-copy-writeback=true' if affine_copy_views else '')
+    text = run_opt([submaps, "--canonicalize-polygeist"], text, log)
     if "polygeist.submap" in text:
         text = run_opt(["--convert-linalg-to-loops", "--canonicalize",
                         "--lower-polygeist-submap", "--canonicalize"], text, log)
@@ -252,19 +305,20 @@ def legalize(text: str, log: list) -> str:
         return out.read_text()
 
 
-def bufferize(text: str, log: list, allow_legaliser: bool = True) -> str:
+def bufferize(text: str, log: list, allow_legaliser: bool = True,
+              affine_copy_views: bool = False) -> str:
     if "tensor<" not in text:
         return text
     src = text
     # production flow first (polygeist_build.sh ABI cleanup)
-    text = _cleanup_views(src, log)
+    text = _cleanup_views(src, log, affine_copy_views)
     if _views_left(text):
         if not allow_legaliser:
             raise LowerError("tensor-form polygeist.submap/submapInverse survive the production "
                              "view lowering (dynamic-size reduction write-back)")
         log.append({"note": "production view lowering left tensor submaps; "
                             "falling back to legalize_tensor_submaps.py"})
-        text = _cleanup_views(legalize(src, log), log)
+        text = _cleanup_views(legalize(src, log), log, affine_copy_views)
         if _views_left(text):
             raise LowerError("tensor-form submaps survive even the legaliser")
     # affine.for has no BufferizableOpInterface: tensor iter_args would stay
@@ -379,6 +433,17 @@ class ArrayVal:
             if spec_inc is None:
                 return st32
             return e.op(f"arith.muli {st32}, {spec_inc} : i32", "inc")
+        if self.rank > 2:
+            # A typed multidimensional C array is contiguous. Verify every
+            # non-unit dimension instead of pretending it has a BLAS ld.
+            expected = c1
+            for size, stride in reversed(list(zip(self.sizes, self.strides))):
+                equal = e.op(f"arith.cmpi eq, {stride}, {expected} : index", "dense")
+                unit = e.op(f"arith.cmpi ule, {size}, {c1} : index", "unit")
+                valid = e.op(f"arith.ori {equal}, {unit} : i1", "dense")
+                e.raw(f'cf.assert {valid}, "typed array requires contiguous strides"')
+                expected = e.op(f"arith.muli {expected}, {size} : index", "extent")
+            return e.const(1, 'i32')
         raise LowerError(f"{what}: rank-{self.rank} operand has no BLAS layout")
 
 
@@ -419,6 +484,29 @@ def pack_matrix(e: Emitter, av: ArrayVal, written: bool) -> str:
             f"(!llvm.ptr, {types}, i32) -> ()")
 
 
+def vector_needs_layout_adapter(ty: str) -> bool:
+    if memref_info(ty)[0] != 1:
+        return False
+    layout = re.search(r'strided<\[([^]]+)\]', ty)
+    return layout[1].strip() != '1' if layout else ',' in ty
+
+
+def pack_vector(e: Emitter, av: ArrayVal, written: bool) -> str:
+    """Use the existing device-aware layout copy for a contiguous vector API."""
+    n = e.op(f"arith.index_cast {av.sizes[0]} : index to i64", 'dim')
+    stride = e.op(f"arith.index_cast {av.strides[0]} : index to i64", 'stride')
+    width = ELEM_BYTES[memref_info(av.ty)[1]]
+    arguments = [av.ptr, av.bytes, e.const(1, 'i64'), n,
+                 e.const(0, 'i64'), stride, e.const(width, 'i32')]
+    types = '!llvm.ptr, i64, i64, i64, i64, i64, i32'
+    av.ptr = e.op(f"func.call @polygeist_v2_matrix_pack({', '.join(arguments)}) : ({types}) -> !llvm.ptr", 'packed')
+    av.bytes = e.op(f"arith.muli {n}, {e.const(width, 'i64')} : i64", 'dense')
+    av.strides = [e.const(1, 'index')]
+    write = e.const(int(written), 'i32')
+    return (f"func.call @polygeist_v2_matrix_release({', '.join([av.ptr] + arguments + [write])}) : "
+            f"(!llvm.ptr, {types}, i32) -> ()")
+
+
 def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[list[str], str]:
     ind = m.group("ind")
     ops = split_top(m.group("ops"))
@@ -450,14 +538,42 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
             return e.const(int(b[1]), "i32")
         raise LowerError(f"{sa.spec}: cannot bind int from {b}")
 
-    # Adapt only the ordinary BLAS layout contract. Typed/descriptor adapters
-    # keep their own original extent/alias rules and are never repacked here.
+    # Exact shape contracts are needed for higher-rank C arrays: a capacity
+    # check alone cannot prove the inner strides required by a VLA prototype.
+    if ca.runtime_adapter and ca.runtime_adapter.get('kind') == 'typed_c_wrapper':
+        for p in ca.params:
+            if p.tkind != 'array' or p.rank <= 2:
+                continue
+            av = array(sa.binding[p.name][1], p.name)
+            for actual, dimension in zip(av.sizes, ca.runtime_adapter['arrays'][p.name]):
+                if type(dimension) is int:
+                    expected = e.const(dimension, 'index')
+                else:
+                    name = dimension['dimension'] if isinstance(dimension, dict) else dimension
+                    value = int_value(sa.binding[name])
+                    expected = e.op(f'arith.index_cast {value} : i32 to index', 'extent')
+                    if isinstance(dimension, dict):
+                        offset = e.const(dimension['offset'], 'index')
+                        expected = e.op(f'arith.addi {expected}, {offset} : index', 'extent')
+                equal = e.op(f'arith.cmpi eq, {actual}, {expected} : index', 'shape')
+                e.raw(f'cf.assert {equal}, "typed array extent differs from declared shape"')
+
+    # Ordinary BLAS matrices and contiguous vector-only CUDA adapters need
+    # packing. Pointwise graphs already accept strides directly. Preserve
+    # original alias checks before any packing can hide an overlap.
     packed_indices = set()
     if not ca.descriptor_adapter and not ca.runtime_adapter:
         for p in ca.params:
             if p.tkind == 'int' and p.layout_of:
                 i = sa.binding[p.layout_of][1]
                 if matrix_needs_layout_adapter(tys[i]):
+                    packed_indices.add(i)
+    elif (ca.runtime_adapter and ca.backends == ['cuda'] and
+          ca.runtime_adapter.get('kind') != 'pointwise_reference'):
+        for p in ca.params:
+            if p.tkind == 'array':
+                i = sa.binding[p.name][1]
+                if vector_needs_layout_adapter(tys[i]):
                     packed_indices.add(i)
     if packed_indices:
         # Resolve every original descriptor before allocating any copy, so
@@ -468,8 +584,9 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
         for i in sorted(packed_indices):
             av = arrays[i]
             c1 = e.const(1, 'index')
-            nonunit = e.op(f"arith.cmpi ne, {av.strides[1]}, {c1} : index", 'nonunit')
-            multiple = e.op(f"arith.cmpi ugt, {av.sizes[1]}, {c1} : index", 'multiple')
+            axis = av.rank - 1
+            nonunit = e.op(f"arith.cmpi ne, {av.strides[axis]}, {c1} : index", 'nonunit')
+            multiple = e.op(f"arith.cmpi ugt, {av.sizes[axis]}, {c1} : index", 'multiple')
             needed = e.op(f"arith.andi {nonunit}, {multiple} : i1", 'pack_needed')
             flag = e.op(f"arith.extui {needed} : i1 to i32", 'pack_flag')
             for j, other in arrays.items():
@@ -477,7 +594,8 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
                     e.raw(f"func.call @polygeist_v2_matrix_require_disjoint({av.ptr}, {av.bytes}, "
                           f"{other.ptr}, {other.bytes}, {flag}) : (!llvm.ptr, i64, !llvm.ptr, i64, i32) -> ()")
         for i in sorted(packed_indices):
-            releases.append(pack_matrix(e, arrays[i], sa.args[i].intent in ('out', 'inout')))
+            pack = pack_vector if arrays[i].rank == 1 else pack_matrix
+            releases.append(pack(e, arrays[i], sa.args[i].intent in ('out', 'inout')))
     args, atys = [], []
     for p in ca.params:
         b = sa.binding[p.name]
@@ -519,7 +637,7 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
     callee = f"polygeist_v2_{ca.call}"
     res = m.group("res")
     ret = ca.returns
-    ret_ty = {"float": "f32", "double": "f64"}.get(ret)
+    ret_ty = MLIR_ELEMENT_TYPES.get(ret)
     # bufferized launches have no results; the only SSA result a library call
     # can produce is the scalar of a value-returning spec
     if rtys and not (ret and rtys == [ret_ty]):
@@ -581,12 +699,182 @@ def rewrite(text: str, names: dict, specs: dict, calls: dict, report: list,
 
 COPY_RE = re.compile(r'^(?P<ind>\s*)memref\.copy (?P<src>%[\w$.\-]+), (?P<dst>%[\w$.\-]+) : (?P<sty>memref<.*>) to (?P<dty>memref<.*>)\s*$')
 
+COPY_DECL = ('  func.func private @polygeist_v2_memref_copy(i64, i64, !llvm.ptr, '
+             '!llvm.ptr, !llvm.ptr, !llvm.ptr, !llvm.ptr) attributes '
+             '{polygeist.gpu_runtime, polygeist.gpu_data_operands = array<i64: 5, 6>}\n')
+
+
+def emit_descriptor_copy(e, element, sizes, source_strides, destination_strides,
+                         source, destination):
+    rank = len(sizes)
+    pointers = []
+    for values in (sizes, source_strides, destination_strides):
+        ty = f'memref<{max(rank, 1)}xi64>'
+        storage = e.op(f'memref.alloca() : {ty}', 'meta')
+        for i, value in enumerate(values):
+            at = e.const(i, 'index')
+            val = e.op(f'arith.index_cast {value} : index to i64', 'dim')
+            e.raw(f'memref.store {val}, {storage}[{at}] : {ty}')
+        address = e.op(f'memref.extract_aligned_pointer_as_index {storage} : {ty} -> index', 'address')
+        integer = e.op(f'arith.index_cast {address} : index to i64', 'addr')
+        pointers.append(e.op(f'llvm.inttoptr {integer} : i64 to !llvm.ptr', 'ptr'))
+    args = [e.const(rank, 'i64'), e.const(ELEM_BYTES[element], 'i64'),
+            *pointers, source, destination]
+    types = ['i64', 'i64'] + ['!llvm.ptr'] * 5
+    e.raw(f"func.call @polygeist_v2_memref_copy({', '.join(args)}) : ({', '.join(types)}) -> ()")
+
+
+def affine_memory_copies(text: str) -> str:
+    """Lower pure affine memory movement to descriptors after bufferization.
+
+    Computation bodies, reductions, symbolic/nonlinear maps and unproved loop
+    extents stay unchanged. The copy runtime preserves holes and handles alias
+    overlap; this only composes addresses, without selecting library kernels.
+    """
+    import mlir_lite as ML
+    module = ML.Module(text)
+    changed = False
+    for op in reversed(module.ops):
+        if (op.name != 'linalg.generic' or op.results or len(op.ins) != 1 or
+                len(op.outs) != 1 or not op.iters or set(op.iters) != {'parallel'} or
+                len(op.maps) != 2):
+            continue
+        body = [line for line in op.body if line != '}']
+        if len(body) != 2:
+            continue
+        args = re.match(r'\^bb\w*\((%[\w.$-]+)\s*:', body[0])
+        if not args or not re.fullmatch(r'linalg.yield '+re.escape(args[1])+r'\s*:\s*\w+', body[1]):
+            continue
+        tys = op.in_types + op.out_types
+        if any(not ty.startswith('memref<') for ty in tys):
+            continue
+        rank = len(op.iters)
+        maps = []
+        for mapping in op.maps:
+            nd, ns, _ = ML.parse_affine_map(mapping)
+            if nd != rank or ns:
+                break
+            try:
+                poly = ML.map_apply(mapping, ML.identity_dims(rank), [])
+            except ML.AffineParseError:
+                break
+            if any(any(key and (len(key) != 1 or key[0][0] != 'd') for key in p) for p in poly):
+                break
+            maps.append(poly)
+        if len(maps) != 2:
+            continue
+        bounds = {}
+        for operand, mapping in enumerate(maps):
+            for dim, polynomial in enumerate(mapping):
+                iterator = ML.pure_dim(polynomial)
+                if iterator is not None:
+                    bounds.setdefault(iterator, (operand, dim))
+        if set(bounds) != set(range(rank)):
+            continue
+        element = memref_info(tys[0])[1]
+        if element not in ELEM_BYTES or memref_info(tys[1])[1] != element:
+            continue
+        ind = re.match(r'\s*', op.header)[0]
+        e = Emitter(ind + '  ', 'affinecopy'+str(op.idx))
+        arrays = [ArrayVal(e, value, ty, element)
+                  for value, ty in zip(op.ins+op.outs, tys)]
+        sizes = [arrays[bounds[i][0]].sizes[bounds[i][1]] for i in range(rank)]
+        pointers, strides = [], []
+        for array, mapping in zip(arrays, maps):
+            def dot(coefficients):
+                result = e.const(0, 'index')
+                for coefficient, stride in zip(coefficients, array.strides):
+                    if coefficient:
+                        c = e.const(coefficient, 'index')
+                        term = e.op(f'arith.muli {c}, {stride} : index', 'stride')
+                        result = e.op(f'arith.addi {result}, {term} : index', 'sum')
+                return result
+            strides.append([dot([p.get((("d", i),), 0) for p in mapping])
+                            for i in range(rank)])
+            offset = dot([p.get((), 0) for p in mapping])
+            scale = e.const(ELEM_BYTES[element], 'index')
+            offset = e.op(f'arith.muli {offset}, {scale} : index', 'bytes')
+            offset = e.op(f'arith.index_cast {offset} : index to i64', 'offset')
+            pointers.append(e.op(f'llvm.getelementptr {array.ptr}[{offset}] : '
+                                '(!llvm.ptr, i64) -> !llvm.ptr, i8', 'ptr'))
+        emit_descriptor_copy(e, element, sizes, *strides, *pointers)
+        e.raw('memref.alloca_scope.return')
+        replacement = '\n'.join([ind+'memref.alloca_scope {', *e.lines, ind+'}'])+'\n'
+        text = text[:op.start] + replacement + text[op.end:]
+        changed = True
+    if changed and 'func.func private @polygeist_v2_memref_copy(' not in text:
+        text = insert_after_module_open(text, COPY_DECL)
+    return text
+
+
+def scalar_memory_copies(text: str) -> str:
+    """Stage scalar host accesses through copies when the buffer may be on CUDA.
+
+    This is address-space plumbing after matching, including scalar returns
+    written to application buffers. It does not recognize arithmetic. Proven
+    stack storage stays directly accessible, so repeated lowering is stable.
+    """
+    import mlir_lite as ML
+    module = ML.Module(text)
+    views = {'memref.cast', 'memref.subview', 'memref.reinterpret_cast',
+             'memref.collapse_shape', 'memref.expand_shape', 'memref.view'}
+
+    def stack(value, use):
+        definition = module.def_of(value, use)
+        if not definition:
+            return False
+        root = definition[0]
+        if root.name == 'memref.alloca':
+            return True
+        return bool(root.name in views and root.operands and stack(root.operands[0], root))
+
+    for op in reversed(module.ops):
+        if op.name not in ('memref.load', 'memref.store'):
+            continue
+        load = op.name == 'memref.load'
+        match = re.fullmatch(
+            r'(?P<ind>\s*)(?:(?P<result>%[\w$.\-]+) = memref\.load |'
+            r'memref\.store (?P<value>%[\w$.\-]+), )(?P<buffer>%[\w$.\-]+)'
+            r'\[(?P<indices>[^]]*)\] : (?P<type>memref<.*>)\s*', op.text)
+        if not match or stack(match['buffer'], op):
+            continue
+        rank, elem = memref_info(match['type'])
+        if elem not in ELEM_BYTES:
+            raise LowerError('unsupported CUDA scalar memory element: ' + elem)
+        indices = split_top(match['indices'])
+        if len(indices) != rank:
+            raise LowerError('scalar access rank mismatch')
+        e = Emitter(match['ind'] + '  ', 'scalar' + str(op.idx))
+        ty = f'memref<{elem}>'
+        slot = e.op(f'memref.alloca() : {ty}', 'slot')
+        if rank:
+            viewty = f'memref<{elem}, strided<[], offset: ?>>'
+            ones = ', '.join(['1'] * rank)
+            view = e.op(f'memref.subview {match["buffer"]}[{match["indices"]}] '
+                        f'[{ones}] [{ones}] : {match["type"]} to {viewty}', 'view')
+        else:
+            view, viewty = match['buffer'], match['type']
+        if load:
+            e.raw(f'memref.copy {view}, {slot} : {viewty} to {ty}')
+            value = e.op(f'memref.load {slot}[] : {ty}', 'value')
+            e.raw(f'memref.alloca_scope.return {value} : {elem}')
+            first = f'{match["result"]} = memref.alloca_scope -> ({elem}) {{'
+        else:
+            e.raw(f'memref.store {match["value"]}, {slot}[] : {ty}')
+            e.raw(f'memref.copy {slot}, {view} : {ty} to {viewty}')
+            e.raw('memref.alloca_scope.return')
+            first = 'memref.alloca_scope {'
+        replacement = '\n'.join([match['ind'] + first, *e.lines, match['ind'] + '}']) + '\n'
+        text = text[:op.start] + replacement + text[op.end:]
+    return text
+
 
 def rewrite_memory_copies(text: str, backend: str) -> str:
     """CUDA operands may be device pointers; residual memory movement must
     preserve that address space. CPU/PVA emission is unchanged."""
     if backend != 'cuda':
         return text
+    text = scalar_memory_copies(affine_memory_copies(text))
     lines, used = [], False
     for n, line in enumerate(text.split('\n')):
         m = COPY_RE.match(line)
@@ -606,20 +894,7 @@ def rewrite_memory_copies(text: str, backend: str) -> str:
             e.raw(f'cf.assert {ok}, "lib_v2 memory copy: shape mismatch"')
         prefix, e.lines = e.lines, []
         e.ind += '  '
-        def metadata(values):
-            ty = f'memref<{max(rank, 1)}xi64>'
-            storage = e.op(f'memref.alloca() : {ty}', 'meta')
-            for i, value in enumerate(values):
-                at = e.const(i, 'index')
-                val = e.op(f'arith.index_cast {value} : index to i64', 'dim')
-                e.raw(f'memref.store {val}, {storage}[{at}] : {ty}')
-            address = e.op(f'memref.extract_aligned_pointer_as_index {storage} : {ty} -> index', 'address')
-            integer = e.op(f'arith.index_cast {address} : index to i64', 'addr')
-            return e.op(f'llvm.inttoptr {integer} : i64 to !llvm.ptr', 'ptr')
-        pointers = [metadata(src.sizes), metadata(src.strides), metadata(dst.strides)]
-        args = [e.const(rank, 'i64'), e.const(ELEM_BYTES[elem], 'i64'), *pointers, src.ptr, dst.ptr]
-        types = ['i64', 'i64'] + ['!llvm.ptr'] * 5
-        e.raw(f"func.call @polygeist_v2_memref_copy({', '.join(args)}) : ({', '.join(types)}) -> ()")
+        emit_descriptor_copy(e, elem, src.sizes, src.strides, dst.strides, src.ptr, dst.ptr)
         lines.extend(prefix)
         lines.append(m['ind'] + 'memref.alloca_scope {')
         lines.extend(e.lines)
@@ -628,8 +903,7 @@ def rewrite_memory_copies(text: str, backend: str) -> str:
         used = True
     output = '\n'.join(lines)
     if used and 'func.func private @polygeist_v2_memref_copy(' not in output:
-        output = insert_after_module_open(output,
-            '  func.func private @polygeist_v2_memref_copy(i64, i64, !llvm.ptr, !llvm.ptr, !llvm.ptr, !llvm.ptr, !llvm.ptr)\n')
+        output = insert_after_module_open(output, COPY_DECL)
     return output
 
 def lower(text: str, do_bufferize: bool = True, report: dict | None = None,
@@ -655,7 +929,8 @@ def lower(text: str, do_bufferize: bool = True, report: dict | None = None,
         raise LowerError("no ABI for " + ", ".join(f"{s} ({errors.get(s, 'not a lib_v2 spec')})" for s in bad))
     text, names = prepare(text, specs, calls)
     if do_bufferize:
-        text = bufferize(text, report["opt"], allow_legaliser)
+        text = bufferize(text, report["opt"], allow_legaliser,
+                         affine_copy_views=(backend == 'cuda'))
     # Resolve lifetimes before rewriting launches to raw-pointer calls. After
     # that rewrite memref liveness cannot see the call's use of the buffer.
     if deallocate:

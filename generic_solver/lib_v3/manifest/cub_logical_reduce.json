@@ -1,0 +1,235 @@
+{
+  "routine": "cub_logical_reduce",
+  "source": "Pinned public CUB ThreadReduceSequential with cuda::std::logical_and<int> / logical_or<int>",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh",
+      "sha256": "f0dfb01c1cbd0eb590c14cf763370863ce1dd83483de1e105f0332f9105108b1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_reduce.cuh",
+      "sha256": "79dbfc30428098941bb0db6dac316d2ba94cde4351483837076e91334e5c9399"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__functional/operations.h",
+      "sha256": "8b201a02ba305dc0c882cda06680f5dbd77a0b5d65e5c9c7e23e745e78c0da98"
+    }
+  ],
+  "adaptation": "Inline the seeded prefix into the sequential loop; specialize integer inputs and logical operators. Return the logical 0/1 result as the fixed int C ABI.",
+  "specs": [
+    {
+      "name": "cub_reduce_value_and_i32",
+      "defines": {
+        "LOGICAL_AND": 1,
+        "RETURN_VALUE": 1
+      },
+      "target": {
+        "library": "CUB",
+        "call": "DeviceReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_reduce_value_and_i32",
+          "arguments": [
+            "n",
+            "seed",
+            "input"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "seed": {
+              "min": -2147483648,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "n",
+        "seed",
+        "input"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX, contiguous read-only signed 32-bit input",
+        "logical result is exactly 0 or 1; nonzero input represents true"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "cub_reduce_value_or_i32",
+      "defines": {
+        "LOGICAL_AND": 0,
+        "RETURN_VALUE": 1
+      },
+      "target": {
+        "library": "CUB",
+        "call": "DeviceReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_reduce_value_or_i32",
+          "arguments": [
+            "n",
+            "seed",
+            "input"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "seed": {
+              "min": -2147483648,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "n",
+        "seed",
+        "input"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX, contiguous read-only signed 32-bit input",
+        "logical result is exactly 0 or 1; nonzero input represents true"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "cub_reduce_and_i32",
+      "defines": {
+        "LOGICAL_AND": 1,
+        "RETURN_VALUE": 0
+      },
+      "target": {
+        "library": "CUB",
+        "call": "DeviceReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_reduce_and_i32",
+          "arguments": [
+            "n",
+            "seed",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              1
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "seed": {
+              "min": -2147483648,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "n",
+        "seed",
+        "input",
+        "output"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX, contiguous read-only signed 32-bit input",
+        "logical result is exactly 0 or 1; nonzero input represents true"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "cub_reduce_or_i32",
+      "defines": {
+        "LOGICAL_AND": 0,
+        "RETURN_VALUE": 0
+      },
+      "target": {
+        "library": "CUB",
+        "call": "DeviceReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_reduce_or_i32",
+          "arguments": [
+            "n",
+            "seed",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              1
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "seed": {
+              "min": -2147483648,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "n",
+        "seed",
+        "input",
+        "output"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX, contiguous read-only signed 32-bit input",
+        "logical result is exactly 0 or 1; nonzero input represents true"
+      ],
+      "deviations": []
+    }
+  ]
+}

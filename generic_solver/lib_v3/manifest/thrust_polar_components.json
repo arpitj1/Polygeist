@@ -1,0 +1,86 @@
+{
+  "routine": "thrust_polar_components",
+  "source": "Pinned ATen CUDA polar scalar implementation and public Thrust binary transform with zip output",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/ComplexKernel.cu",
+      "sha256": "8769ad79acc681924436a543effd28d158277bfa221de4b7e281b63bfce2852e"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/sequential/for_each.h",
+      "sha256": "c9206514e44123c02f1f0e2f4231f26a162dab5ffde911d22a22a9d5a408cc82"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/iterator/zip_iterator.h",
+      "sha256": "e91e10bdaf2a55b9ee7c9f1faf287f31a4da56c52736bf6d829048d991c14f6e"
+    }
+  ],
+  "adaptation": "Specialize the existing ATen CUDA polar lambda to float, preserve each scalar operation and return the real/imaginary components through separate arrays using a zip iterator.",
+  "specs": [
+    {
+      "name": "thrust_polar_components_f32",
+      "args": [
+        "n",
+        "magnitude",
+        "angle",
+        "real",
+        "imag"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_polar_components_f32",
+          "arguments": [
+            "n",
+            "magnitude",
+            "angle",
+            "real",
+            "imag"
+          ],
+          "arrays": {
+            "magnitude": [
+              "n"
+            ],
+            "angle": [
+              "n"
+            ],
+            "real": [
+              "n"
+            ],
+            "imag": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice sinf/cosf approximate the mathematical results; validate numerical error against C and native ATen, no fast math or FTZ"
+      ],
+      "deviations": []
+    }
+  ]
+}

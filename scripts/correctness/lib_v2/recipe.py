@@ -72,7 +72,11 @@ PRODUCTION = Recipe(
     cgeist_tail=["--raise-scf-to-affine", "-fPIC", "-S"],
     # --delinearize-memref-accesses recovers n-D views of hand-linearized
     # buffers (A[i*S + j]) before dependence analysis; a no-op on PolyBench.
-    raise_passes=["--delinearize-memref-accesses", "--remove-iter-args", "--affine-parallelize",
+    # Normalize dependent lower bounds before dependence analysis. Upstream
+    # AffineLoopNormalize exposes fixed-size tiles without turning their
+    # disjoint writes into masked reductions over the entire output domain.
+    raise_passes=["--delinearize-memref-accesses", "--remove-iter-args",
+                  "--affine-loop-normalize", "--affine-parallelize",
                   "--raise-affine-to-linalg-pipeline"],
     debuf_passes=["--linalg-debufferize=use-multi-root=true"],
     select_extra="externalize-dependencies=true",

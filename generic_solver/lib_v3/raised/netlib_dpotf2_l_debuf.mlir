@@ -7,7 +7,7 @@
 #map6 = affine_map<(d0, d1)[s0] -> (s0, d1 + s0 + 1)>
 #map7 = affine_map<(d0, d1) -> (d0, d1)>
 #map8 = affine_map<(d0)[s0] -> (s0, d0 + s0 + 1)>
-module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<f16, dense<16> : vector<2xi32>>, #dlti.dl_entry<f64, dense<64> : vector<2xi32>>, #dlti.dl_entry<f128, dense<128> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<271>, dense<32> : vector<4xi32>>, #dlti.dl_entry<i8, dense<8> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<270>, dense<32> : vector<4xi32>>, #dlti.dl_entry<i16, dense<16> : vector<2xi32>>, #dlti.dl_entry<i32, dense<32> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr, dense<64> : vector<4xi32>>, #dlti.dl_entry<i1, dense<8> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<272>, dense<64> : vector<4xi32>>, #dlti.dl_entry<i64, dense<64> : vector<2xi32>>, #dlti.dl_entry<f80, dense<128> : vector<2xi32>>, #dlti.dl_entry<"dlti.endianness", "little">, #dlti.dl_entry<"dlti.stack_alignment", 128 : i32>>, llvm.data_layout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128", llvm.target_triple = "x86_64-unknown-linux-gnu", "polygeist.target-cpu" = "x86-64", "polygeist.target-features" = "+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87", "polygeist.tune-cpu" = "generic"} {
+module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<i8, dense<8> : vector<2xi32>>, #dlti.dl_entry<i16, dense<16> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr, dense<64> : vector<4xi32>>, #dlti.dl_entry<i1, dense<8> : vector<2xi32>>, #dlti.dl_entry<f64, dense<64> : vector<2xi32>>, #dlti.dl_entry<f128, dense<128> : vector<2xi32>>, #dlti.dl_entry<i32, dense<32> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<270>, dense<32> : vector<4xi32>>, #dlti.dl_entry<f16, dense<16> : vector<2xi32>>, #dlti.dl_entry<i64, dense<64> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<271>, dense<32> : vector<4xi32>>, #dlti.dl_entry<!llvm.ptr<272>, dense<64> : vector<4xi32>>, #dlti.dl_entry<f80, dense<128> : vector<2xi32>>, #dlti.dl_entry<"dlti.endianness", "little">, #dlti.dl_entry<"dlti.stack_alignment", 128 : i32>>, llvm.data_layout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128", llvm.target_triple = "x86_64-unknown-linux-gnu", "polygeist.target-cpu" = "x86-64", "polygeist.target-features" = "+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87", "polygeist.tune-cpu" = "generic"} {
   func.func @netlib_dpotf2_l(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>) attributes {llvm.linkage = #llvm.linkage<external>} {
     %cst = arith.constant 1.000000e+00 : f64
     %cst_0 = arith.constant -1.000000e+00 : f64
@@ -16,15 +16,14 @@ module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<f16, dense<16> : 
     %c1 = arith.constant 1 : index
     %0 = bufferization.to_tensor %arg2 : memref<?x?xf64>
     %1 = arith.index_cast %arg0 : i32 to index
-    %2 = arith.subi %1, %c1 : index
-    %3 = affine.apply #map(%c0)[%1]
-    %4 = arith.subi %1, %c1 : index
-    %5 = affine.apply #map(%c0)[%1]
-    %6 = affine.for %arg3 = 0 to %1 iter_args(%arg4 = %0) -> (tensor<?x?xf64>) {
-      %alloca = memref.alloca() : memref<f64>
-      %8 = bufferization.to_tensor %alloca : memref<f64>
-      %inserted = tensor.insert %cst_1 into %8[] : tensor<f64>
-      %9 = polygeist.submap(%arg4, %arg3, %2) {map = #map1} : (tensor<?x?xf64>, index, index) -> tensor<?xf64>
+    %2 = tensor.empty() : tensor<f64>
+    %3 = arith.subi %1, %c1 : index
+    %4 = affine.apply #map(%c0)[%1]
+    %5 = arith.subi %1, %c1 : index
+    %6 = affine.apply #map(%c0)[%1]
+    %7:2 = affine.for %arg3 = 0 to %1 iter_args(%arg4 = %2, %arg5 = %0) -> (tensor<f64>, tensor<?x?xf64>) {
+      %inserted = tensor.insert %cst_1 into %arg4[] : tensor<f64>
+      %9 = polygeist.submap(%arg5, %arg3, %3) {map = #map1} : (tensor<?x?xf64>, index, index) -> tensor<?xf64>
       %10 = linalg.generic {doc = "", indexing_maps = [#map2, #map3], iterator_types = ["reduction"], library_call = ""} ins(%9 : tensor<?xf64>) outs(%inserted : tensor<f64>) {
       ^bb0(%in: f64, %out: f64):
         %23 = arith.mulf %in, %in : f64
@@ -35,14 +34,14 @@ module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<f16, dense<16> : 
         linalg.yield %27 : f64
       } -> tensor<f64>
       %extracted = tensor.extract %10[] : tensor<f64>
-      %extracted_2 = tensor.extract %arg4[%arg3, %arg3] : tensor<?x?xf64>
+      %extracted_2 = tensor.extract %arg5[%arg3, %arg3] : tensor<?x?xf64>
       %11 = arith.subf %extracted_2, %extracted : f64
       %12 = math.sqrt %11 : f64
-      %inserted_3 = tensor.insert %12 into %arg4[%arg3, %arg3] : tensor<?x?xf64>
-      %13 = polygeist.submap(%inserted_3, %arg3, %4) {map = #map1} : (tensor<?x?xf64>, index, index) -> tensor<?xf64>
-      %14 = polygeist.submap(%13, %4, %3) {map = #map4} : (tensor<?xf64>, index, index) -> tensor<?x?xf64>
-      %15 = polygeist.submap(%inserted_3, %arg3, %4, %3) {map = #map5} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?xf64>
-      %16 = polygeist.submap(%inserted_3, %arg3, %4, %3) {map = #map6} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?xf64>
+      %inserted_3 = tensor.insert %12 into %arg5[%arg3, %arg3] : tensor<?x?xf64>
+      %13 = polygeist.submap(%inserted_3, %arg3, %5) {map = #map1} : (tensor<?x?xf64>, index, index) -> tensor<?xf64>
+      %14 = polygeist.submap(%13, %5, %4) {map = #map4} : (tensor<?xf64>, index, index) -> tensor<?x?xf64>
+      %15 = polygeist.submap(%inserted_3, %arg3, %5, %4) {map = #map5} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?xf64>
+      %16 = polygeist.submap(%inserted_3, %arg3, %5, %4) {map = #map6} : (tensor<?x?xf64>, index, index, index) -> tensor<?x?xf64>
       %17 = linalg.generic {doc = "", indexing_maps = [#map7, #map7, #map7], iterator_types = ["reduction", "parallel"], library_call = ""} ins(%14, %15 : tensor<?x?xf64>, tensor<?x?xf64>) outs(%16 : tensor<?x?xf64>) {
       ^bb0(%in: f64, %in_4: f64, %out: f64):
         %23 = arith.mulf %in, %cst_0 : f64
@@ -57,9 +56,9 @@ module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<f16, dense<16> : 
         %32 = arith.select %31, %29, %out : f64
         linalg.yield %32 : f64
       } -> tensor<?x?xf64>
-      %18 = polygeist.submapInverse(%inserted_3, %17, %arg3, %4, %3) {map = #map6} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index, index) -> tensor<?x?xf64>
+      %18 = polygeist.submapInverse(%inserted_3, %17, %arg3, %5, %4) {map = #map6} : (tensor<?x?xf64>, tensor<?x?xf64>, index, index, index) -> tensor<?x?xf64>
       %19 = arith.divf %cst, %12 : f64
-      %20 = polygeist.submap(%18, %arg3, %5) {map = #map8} : (tensor<?x?xf64>, index, index) -> tensor<?xf64>
+      %20 = polygeist.submap(%18, %arg3, %6) {map = #map8} : (tensor<?x?xf64>, index, index) -> tensor<?xf64>
       %21 = linalg.generic {doc = "", indexing_maps = [#map2], iterator_types = ["parallel"], library_call = ""} outs(%20 : tensor<?xf64>) {
       ^bb0(%out: f64):
         %23 = arith.mulf %19, %out : f64
@@ -69,11 +68,11 @@ module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<f16, dense<16> : 
         %27 = arith.select %26, %23, %out : f64
         linalg.yield %27 : f64
       } -> tensor<?xf64>
-      %22 = polygeist.submapInverse(%18, %21, %arg3, %5) {map = #map8} : (tensor<?x?xf64>, tensor<?xf64>, index, index) -> tensor<?x?xf64>
-      affine.yield %22 : tensor<?x?xf64>
+      %22 = polygeist.submapInverse(%18, %21, %arg3, %6) {map = #map8} : (tensor<?x?xf64>, tensor<?xf64>, index, index) -> tensor<?x?xf64>
+      affine.yield %10, %22 : tensor<f64>, tensor<?x?xf64>
     }
-    %7 = bufferization.to_memref %6 : memref<?x?xf64>
-    memref.copy %7, %arg2 : memref<?x?xf64> to memref<?x?xf64>
+    %8 = bufferization.to_memref %7#1 : memref<?x?xf64>
+    memref.copy %8, %arg2 : memref<?x?xf64> to memref<?x?xf64>
     return
   }
 }

@@ -1,0 +1,109 @@
+{
+  "routine": "cub_ordered_row_prefix",
+  "source": "Pinned public CUB sequential ThreadReduce over per-row prefixes",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh",
+      "sha256": "f0dfb01c1cbd0eb590c14cf763370863ce1dd83483de1e105f0332f9105108b1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__functional/operations.h",
+      "sha256": "8b201a02ba305dc0c882cda06680f5dbd77a0b5d65e5c9c7e23e745e78c0da98"
+    }
+  ],
+  "adaptation": "Each row is reduced over its provided length, retaining source order. A nonpositive length leaves the seed unchanged.",
+  "specs": [
+    {
+      "name": "cub_ordered_row_prefix_sum_f32",
+      "defines": {
+        "LOGICAL": 0
+      },
+      "args": [
+        "rows",
+        "cols",
+        "input",
+        "length",
+        "output"
+      ],
+      "target": {
+        "library": "CUB",
+        "call": "ThreadReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_ordered_row_prefix_sum_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "input",
+            "length",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "length": [
+              "rows"
+            ],
+            "output": [
+              "rows"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "assumptions": [
+        "positive physical row/column extents; each logical length <= cols",
+        "nonpositive logical lengths produce the zero seed",
+        "disjoint contiguous arrays; ordered FP32 addition"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 8,
+          "cols": 7
+        },
+        "arrays": {
+          "input": [
+            8,
+            7
+          ],
+          "length": [
+            8
+          ],
+          "output": [
+            8
+          ]
+        },
+        "array_values": {
+          "length": [
+            -1,
+            0,
+            7,
+            1,
+            6,
+            2,
+            5,
+            3
+          ]
+        }
+      }
+    }
+  ]
+}

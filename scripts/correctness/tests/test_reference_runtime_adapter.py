@@ -39,4 +39,22 @@ class ReferenceRuntimeAdapter(unittest.TestCase):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'ref.c';p.write_text('/* double stale[][wrong] */\nvoid f(int a,int b,float X[][a],SCALAR Y[][b]);')
    self.assertEqual(B.vla_leading_dims(p),{'a':'X','b':'Y'})
+ def test_vla_explicit_outer_extent_and_local_arrays(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d)/'ref.c';p.write_text('''
+#define PARAMS int rows, int cols, int input[rows][cols]
+#define ELEMENT input[row][column]
+void reference(PARAMS, int output[rows]) {
+  int scratch[rows][unused];
+  output[0] = input[0][0];
+}
+void second(int rows, int stride, const float other[rows][stride]);
+''')
+   self.assertEqual(B.vla_leading_dims(p),{'stride':'other','cols':'input'})
+ def test_existing_macro_and_blas_layouts(self):
+  refs=HERE.parents[1]/'generic_solver/lib_v3/ref_c'
+  for name,expected in [('dpotf2',{'lda':'A'}),('dtrsv',{'lda':'A'}),
+                        ('openblas_dgemm',{'lda':'A','ldb':'B','ldc':'C'})]:
+   with self.subTest(name=name):
+    self.assertEqual(B.vla_leading_dims(refs/(name+'.c')),expected)
 if __name__=='__main__':unittest.main()

@@ -17,22 +17,23 @@ class ScalarReturns(unittest.TestCase):
    with patch.object(A,'REPO',root),patch.object(A,'CLANG','cc'):
     return T.contract(A,'reference',target,ret,args)
  def test_return_types_are_exact(self):
-  for ret in ['float','double']:
+  for ret in ['float','double','int']:
    with self.subTest(ret=ret):self.setup_contract(ret)
    for wrong in ['void','double' if ret=='float' else 'float']:
     with self.subTest(ret=ret,wrong=wrong),self.assertRaises(A.AbiError):self.setup_contract(ret,wrong)
-  with self.assertRaises(A.AbiError):self.setup_contract('int')
+  with self.assertRaises(A.AbiError):self.setup_contract('long')
  def test_call_abi_carries_return_type(self):
-  for ret in ['float','double','void']:
+  for ret in ['float','double','int','void']:
    sa=A.SpecAbi('reference','Reduce_reference',ret,[],{},{});target=dict(library='Vendor',call='Reduce',backends=['cuda'])
    with patch.object(A,'manifest_entry',return_value=(None,{'target':target})),patch.object(R,'contract',return_value=([],{},{})):
     self.assertEqual(R.build_call(A,'Reduce_reference',[sa]).returns,ret if ret!='void' else None)
  def test_compiled_scalar_result_and_cleanup(self):
-  for ret in ['float','double']:
+  for ret in ['float','double','int']:
    params,_,cfg=self.setup_contract(ret);ca=A.CallAbi('scalar_'+ret,'Vendor','Reduce',params,[],returns=ret,backends=['cuda'],runtime_adapter=cfg)
    code='''#include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 static int done;
 static void polygeist_v2_fatal(const char*a,const char*b){(void)a;(void)b;exit(73);}
 typedef struct{const void*p;} polygeist_v2_map_t;
@@ -46,12 +47,12 @@ static void polygeist_cublas_pipeline_end(void){done|=1;}
 static void polygeist_require_gpu_libraries_end(void){done|=2;}
 static void polygeist_v2_map_to_host(polygeist_v2_map_t*m){(void)m;done|=4;}
 '''+ret+' wrapper(int n,const '+ret+' *x){(void)n;return x[0];}\n'+T.generate(ca,G.proto)+'''
-int main(int argc,char**argv){(void)argv;SCALAR input[]={-0.0,INFINITY,-INFINITY,NAN,1.23456789012345};
+int main(int argc,char**argv){(void)argv;SCALAR input[]={VALUES};
  if(argc>1){polygeist_v2_scalar_TYPE(1,input,1,1);return 99;}
  for(int i=0;i<5;++i){SCALAR result=polygeist_v2_scalar_TYPE(1,input+i,sizeof(SCALAR),1);
- if(done!=7)return 2;if(isnan(input[i])){if(!isnan(result))return 3;}
- else if(result!=input[i] || !!signbit(result)!=!!signbit(input[i]))return 4;}return 0;}
-'''.replace('SCALAR',ret).replace('TYPE',ret)
+ if(done!=7)return 2;if(memcmp(&result,&input[i],sizeof(result)))return 4;}return 0;}
+'''.replace('SCALAR',ret).replace('TYPE',ret).replace('VALUES',
+ '-2147483647-1,2147483647,-1,0,1' if ret=='int' else '-0.0,INFINITY,-INFINITY,NAN,1.23456789012345')
    with tempfile.TemporaryDirectory() as temp:
     p=Path(temp);(p/'test.c').write_text(code);subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-misleading-indentation',str(p/'test.c'),'-o',str(p/'test')],check=True,capture_output=True)
     self.assertEqual(subprocess.run([str(p/'test')]).returncode,0)

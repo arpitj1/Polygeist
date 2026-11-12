@@ -206,6 +206,8 @@ def FoldSCFIf : Pass<"fold-scf-if"> {
 def LowerPolygeistSubmap : Pass<"lower-polygeist-submap"> {
   let summary = "Lower polygeist.submap and polygeist.submapInverse to standard MLIR";
   let constructor = "mlir::polygeist::createLowerPolygeistSubmapPass()";
+  let options = [Option<"affineCopyWriteback", "affine-copy-writeback", "bool",
+                         "false", "Keep injective affine writebacks as Linalg data movement">];
   let dependentDialects = [
     "arith::ArithDialect",
     "linalg::LinalgDialect",
@@ -231,7 +233,9 @@ def NormalizeLinalgMatchingViews : Pass<"normalize-linalg-matching-views"> {
                  Option<"fuseInitializers", "fuse-initializers", "bool",
                         "false", "Optionally fuse scalar initializers into parallel tiles">,
                  Option<"splitReductionInputs", "split-reduction-inputs", "bool",
-                        "false", "Materialize pure scalar producers independently of reduction state">];
+                        "false", "Materialize pure scalar producers independently of reduction state">,
+                 Option<"splitPointwiseInputs", "split-pointwise-inputs", "bool",
+                        "false", "Materialize pure prefixes of composite parallel computations">];
   let dependentDialects = [
     "arith::ArithDialect", "bufferization::BufferizationDialect",
     "linalg::LinalgDialect", "memref::MemRefDialect", "tensor::TensorDialect",

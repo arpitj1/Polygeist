@@ -1251,6 +1251,14 @@ struct SimplifySubViewUsers : public OpRewritePattern<memref::SubViewOp> {
   LogicalResult matchAndRewrite(memref::SubViewOp subindex,
                                 PatternRewriter &rewriter) const override {
     bool changed = false;
+    // This pattern only adjusts a leading index or drops exactly that axis.
+    // General rank-reducing subviews (including scalar views of several
+    // dimensions) are handled by upstream MemRef lowering. Re-indexing those
+    // here would lose coordinates and can attempt to erase an empty index list.
+    int64_t sourceRank = subindex.getSourceType().getRank();
+    int64_t resultRank = subindex.getType().getRank();
+    if (resultRank != sourceRank && resultRank + 1 != sourceRank)
+      return failure();
     int64_t offs = -1;
     for (auto tup :
          llvm::zip(subindex.getStaticOffsets(), subindex.getStaticSizes(),

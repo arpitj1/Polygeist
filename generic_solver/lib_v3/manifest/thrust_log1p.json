@@ -1,0 +1,72 @@
+{
+  "routine": "thrust_log1p",
+  "source": "Pinned ATen CUDA log1p scalar functor and public Thrust transform",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/UnaryLogKernels.cu",
+      "sha256": "4ffc9f091bbbae5d612bb0a8475f315c701e17ad25e636765f7b291322512ce4"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/sequential/for_each.h",
+      "sha256": "c9206514e44123c02f1f0e2f4231f26a162dab5ffde911d22a22a9d5a408cc82"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    }
+  ],
+  "adaptation": "Specialize the ATen log1p CUDA functor to float; expand contiguous Thrust transform traversal as C subscripts. Runtime calls Thrust CUDA transform with ::log1pf, preserving log1p rather than log(1+x).",
+  "specs": [
+    {
+      "name": "thrust_log1p_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_log1p_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice log1pf approximates the mathematical result; validate numerical error against C and native ATen, no fast math or FTZ"
+      ],
+      "deviations": []
+    }
+  ]
+}

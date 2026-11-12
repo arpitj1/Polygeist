@@ -14,7 +14,7 @@ class TypedEmission(unittest.TestCase):
     def setUpClass(cls):
         cls.temp=tempfile.TemporaryDirectory();cls.path=Path(cls.temp.name)
         cfg=dict(kind='typed_c_wrapper',memory_domain='host',entry='vendor',
-                 bounds={'h':{'min':3,'max':2147483647},'w':{'min':3,'max':2147483647}},
+                 bounds={'h':{'min':3,'max':2147483647,'multiple_of':2},'w':{'min':3,'max':2147483647}},
                  arrays={'input':['h','w'],'output':[{'dimension':'h','offset':-1},'w']},
                  ordered_arguments=['h','w','input','output'])
         params=[A.AbiParam('h','int'),A.AbiParam('w','int')]
@@ -38,7 +38,7 @@ static void vendor64(int32_t h,int32_t w,const unsigned long*x,unsigned long*y){
 int main(int argc,char**argv){
  int mode=argc>1?atoi(argv[1]):0;uint16_t x[32],y[32];for(int i=0;i<32;i++){x[i]=(uint16_t)(32768+i);y[i]=65535;}
  int h=4,w=5,si=5,so=5;int64_t xb=40,yb=30;uint16_t*out=y;
- if(mode==1)yb=29;if(mode==2)so=4;if(mode==3)h=2;if(mode==4)out=x;if(mode==5){polygeist_v2_overflow(2147483647,2147483647,(unsigned long*)x,INT64_MAX,2147483647,(unsigned long*)y,INT64_MAX,2147483647);return 99;}
+ if(mode==1)yb=29;if(mode==2)so=4;if(mode==3)h=2;if(mode==4)out=x;if(mode==6)h=3;if(mode==5){polygeist_v2_overflow(2147483646,2147483647,(unsigned long*)x,INT64_MAX,2147483647,(unsigned long*)y,INT64_MAX,2147483647);return 99;}
  polygeist_v2_submit_reference(h,w,x,xb,si,out,yb,so);
  if(calls!=1)return 2;for(int i=0;i<32;i++){if(x[i]!=(uint16_t)(32768+i))return 3;uint16_t want=(i/5>=1&&i/5<3&&i%5>=1&&i%5<4)?x[i]:65535;if(y[i]!=want)return 4;}return 0;}
 '''
@@ -49,7 +49,7 @@ int main(int argc,char**argv){
     def test_partial_output_preserves_border_and_guards(self):
         self.assertEqual(subprocess.run([str(self.path/'test'),'0']).returncode,0)
     def test_capacity_layout_bounds_overlap_and_overflow_fail_closed(self):
-        for mode in range(1,6):
+        for mode in range(1,7):
             with self.subTest(mode=mode):self.assertEqual(subprocess.run([str(self.path/'test'),str(mode)]).returncode,73)
     def test_cuda_uses_exact_pointer_types_and_device_mapping(self):
         ca=copy.deepcopy(self.ca);ca.backends=['cuda'];ca.runtime_adapter['memory_domain']='cuda_device'

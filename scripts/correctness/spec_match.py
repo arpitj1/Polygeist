@@ -95,7 +95,7 @@ def capabilities(rows, backend, disabled=(), only=None):
 def semantic_inputs():
     paths = [HERE / name for name in (
         'spec_match.py', 'kernel_match.py', 'eqsat_ablation.py',
-        'polygeist_build.sh', 'build_jetson.sh')]
+        'polygeist_build.sh', 'build_jetson.sh', 'plan_abi_workspace.py')]
     paths += sorted((HERE / 'lib_v2').glob('*.py'))
     paths += sorted((HERE / 'region_match').glob('*.py'))
     paths += [MATCH.SPEC_DIR / 'import_manifest.json']
@@ -192,16 +192,19 @@ def normalize_matched_application(text, library, normalize):
 
 def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
           region_budget=60, region=True, normalize_parallel=False, max_parallel_dims=0, max_operand_rank=0,
-          fuse_initializers=False):
+          fuse_initializers=False, split_reduction_inputs=False, split_pointwise_inputs=False):
     if not isinstance(max_parallel_dims, int) or max_parallel_dims < 0:
         raise SpecificationError('parallel rank limit must be a nonnegative integer')
     if not isinstance(max_operand_rank, int) or max_operand_rank < 0:
         raise SpecificationError('operand rank limit must be a nonnegative integer')
     if not isinstance(fuse_initializers, bool):
         raise SpecificationError('initializer fusion must be a boolean')
+    if not isinstance(split_reduction_inputs, bool) or not isinstance(split_pointwise_inputs, bool):
+        raise SpecificationError('scalar prefix splitting must be a boolean')
     if fuse_initializers and not (max_parallel_dims or max_operand_rank):
         raise SpecificationError('initializer fusion requires a parallel tiling rank limit')
-    normalize_parallel = normalize_parallel or max_parallel_dims > 0 or max_operand_rank > 0
+    normalize_parallel = (normalize_parallel or max_parallel_dims > 0 or max_operand_rank > 0
+                          or split_reduction_inputs or split_pointwise_inputs)
     if semantic_configuration()['numeric_model'] not in {'strict', 'relaxed'}:
         raise SpecificationError('unknown numerical model')
     if re.search(r'\bkernel\.launch\s+@', text):
@@ -227,6 +230,10 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
                 rank_options.append('max-operand-rank=' + str(max_operand_rank))
             if fuse_initializers:
                 rank_options.append('fuse-initializers=true')
+            if split_reduction_inputs:
+                rank_options.append('split-reduction-inputs=true')
+            if split_pointwise_inputs:
+                rank_options.append('split-pointwise-inputs=true')
             if rank_options:
                 option += '=' + ' '.join(rank_options)
             baseline, baseline_matches, baseline_diagnostics = MATCH.run(
@@ -270,12 +277,15 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
     if set(emitted) - allowed:
         raise SpecificationError('matcher emitted a call outside the validated specification registry')
     evidence = []
+    search_diagnostics = []
     for item in matches:
         name = item.get('spec') or item.get('region_match')
         if not name or item.get('recognition_only'):
+            search_diagnostics.append(item)
             continue
         names = name.split('+')
         if any(n not in rows for n in names):
+            search_diagnostics.append(item)
             continue  # diagnostic such as a timeout, not a match
         evidence.append(dict(
             engine='linalg' if 'spec' in item else 'region',
@@ -284,6 +294,8 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
             references=[{k: v for k, v in rows[n].items() if k != 'entry'} for n in names],
             targets=[rows[n]['entry']['target'] for n in names]))
     proved = {name for item in evidence for name in item['specifications']}
+    if search_diagnostics:
+        diagnostics['search'] = search_diagnostics
     if set(emitted) - proved:
         raise SpecificationError('emitted call lacks specification-match evidence')
     proof = dict(
@@ -301,6 +313,31 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
     if normalization:
         proof['view_normalization'] = normalization
     return output, proof
+
+
+def valid_normalization_option(option):
+    prefix, separator, suffix = option.partition('=')
+    if prefix != '--normalize-linalg-matching-views':
+        return False
+    if not separator:
+        return True
+    order = ['max-parallel-dims', 'max-operand-rank', 'fuse-initializers',
+             'split-reduction-inputs', 'split-pointwise-inputs']
+    seen = []
+    for item in suffix.split(' '):
+        name, sep, value = item.partition('=')
+        if not sep or name not in order or name in seen:
+            return False
+        if seen and order.index(name) <= order.index(seen[-1]):
+            return False
+        if name.startswith('max-'):
+            if not re.fullmatch(r'[1-9][0-9]*', value):
+                return False
+        elif value != 'true':
+            return False
+        seen.append(name)
+    return ('fuse-initializers' not in seen or
+            any(name in seen for name in order[:2]))
 
 
 def verify(text, proof, *, backend=None):
@@ -321,11 +358,7 @@ def verify(text, proof, *, backend=None):
     if proof.get('matcher_sha256') != digest(Path(MATCH.__file__).read_text()):
         raise SpecificationError('stored match evidence uses a different matcher revision')
     normalization = proof.get('view_normalization')
-    if normalization and (not re.fullmatch(
-                          r'--normalize-linalg-matching-views(?:=(?:'
-                          r'max-parallel-dims=[1-9][0-9]*(?: max-operand-rank=[1-9][0-9]*)?'
-                          r'|max-operand-rank=[1-9][0-9]*)(?: fuse-initializers=true)?)?',
-                          str(normalization.get('pass_name', ''))) or
+    if normalization and (not valid_normalization_option(str(normalization.get('pass_name', ''))) or
                           normalization.get('cleanup') != ['--cse'] or
                           normalization.get('compiler_sha256') !=
                           PROVENANCE.file_hash(Path(RECIPE.POLYGEIST_OPT))):
@@ -359,6 +392,10 @@ def main(argv=None):
                    help='optional upstream slicing candidate with this operand rank limit')
     p.add_argument('--fuse-initializers', action='store_true',
                    help='use upstream scalar-initializer fusion inside parallel tiles')
+    p.add_argument('--split-reduction-inputs', action='store_true',
+                   help='produce an optional candidate with independent reduction inputs materialized')
+    p.add_argument('--split-pointwise-inputs', action='store_true',
+                   help='produce an optional candidate with pure composite pointwise prefixes materialized')
     p.add_argument('--normalize-parallel-dims', action='store_true',
                    help='produce a dimension-collapse candidate using the same pass on both sides')
     p.add_argument('--numeric-model', choices=['strict', 'relaxed'],
@@ -383,7 +420,9 @@ def main(argv=None):
                               normalize_parallel=args.normalize_parallel_dims,
                               max_parallel_dims=args.max_parallel_dims,
                               max_operand_rank=args.max_operand_rank,
-                              fuse_initializers=args.fuse_initializers)
+                              fuse_initializers=args.fuse_initializers,
+                              split_reduction_inputs=args.split_reduction_inputs,
+                              split_pointwise_inputs=args.split_pointwise_inputs)
         if args.report:
             args.report.write_text(json.dumps(proof, indent=2) + '\n')
         if not args.dry_run:

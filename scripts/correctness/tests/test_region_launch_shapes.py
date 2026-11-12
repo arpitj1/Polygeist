@@ -33,5 +33,15 @@ class LaunchShapeTests(unittest.TestCase):
         self.assertNotIn('memref.cast', text)
         self.assertIn(actual, text)
 
+    def test_unused_outer_extent_binds_capacity_not_stride(self):
+        program=SimpleNamespace(func=SimpleNamespace(args=[('%array','memref<?xf32, strided<[3], offset: 2>>')]))
+        emitter=_Emit(program,'test')
+        spec=_LaunchSpec('reference',[('%capacity','i32'),('%x','memref<?xf32>')],
+                        {'%capacity':'capacity','%x':'x'},{'capacity':('x',0)},{})
+        binding=Binding({'%x':('%array',None,(0,))},{},{})
+        description=_launch(emitter,spec,binding)
+        self.assertEqual(description['capacity'],'size0(%array)')
+        self.assertIn('arith.index_cast %test_md1#2 : index to i32','\n'.join(emitter.lines))
+
 if __name__ == '__main__':
     unittest.main()

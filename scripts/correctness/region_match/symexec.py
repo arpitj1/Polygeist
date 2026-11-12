@@ -1133,6 +1133,7 @@ class Executor:
             for part in _split_top(m.group(5)):
                 a, b = part.split("=")
                 iter_args.append((a.strip(), b.strip()))
+        carried_types = _split_top(m.group(6)) if m.group(6) else []
         T0 = prefix + [Aff.cst(pos)]
         body_prefix = prefix + [Aff.cst(pos + 1), Aff.var(var)]
         scal = {}
@@ -1141,11 +1142,14 @@ class Executor:
             if isinstance(v, TensorVal):
                 self.check_current(v)
                 self.env[barg] = TensorVal(v.buf, v.buf.version, v.view)
-            elif isinstance(v, (FVal, Undef)):
+            elif isinstance(v, (FVal, IdxVal, Undef)):
+                element = carried_types[k].strip() if k < len(carried_types) else ''
+                if not re.fullmatch(r'f(?:16|32|64)|i(?:1|8|16|32|64)|index', element):
+                    raise Unsupported('loop-carried scalar has unsupported type: ' + element)
                 self.scratch_count += 1
-                b = self.new_buffer(f"scratch{self.scratch_count}", "scratch", "f64", self.loop_vars, [])
+                b = self.new_buffer(f"scratch{self.scratch_count}", "scratch", element, self.loop_vars, [])
                 b.rank = 0
-                e = v.e if isinstance(v, FVal) else EUndef()
+                e = self.fval(init)
                 self.emit(b, [Aff.var(p) for p in b.priv], e, T0 + [Aff.cst(k), Aff.cst(1)], origin="iter_arg init")
                 scal[k] = b
             else:
