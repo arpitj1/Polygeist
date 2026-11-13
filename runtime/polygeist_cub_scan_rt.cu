@@ -67,8 +67,8 @@ static void reduce_require_cuda(cudaError_t status, const char *operation) {
   }
 }
 
-template<class T, class Op>
-static void cub_reduce(int32_t n, T seed, const T *input, T *output, Op op) {
+template<class T, class Input, class Op>
+static void cub_reduce(int32_t n, T seed, Input input, T *output, Op op) {
   cudaStream_t stream = (cudaStream_t)polygeist_cuda_graph_stream();
   int device;
   reduce_require_cuda(cudaGetDevice(&device), "device");
@@ -106,8 +106,8 @@ extern "C" void polygeist_cub_reduce_product_f32(int32_t n, float seed, const fl
 
 // CUB exposes device output storage; this C ABI returns the completed scalar.
 // No scalar computation is reimplemented here.
-template<class T, class Op>
-static T cub_reduce_value(int32_t n, T seed, const T *input, Op op) {
+template<class T, class Input, class Op>
+static T cub_reduce_value(int32_t n, T seed, Input input, Op op) {
   cudaStream_t stream = (cudaStream_t)polygeist_cuda_graph_stream();
   cudaStreamCaptureStatus capture;
   reduce_require_cuda(cudaStreamIsCapturing(stream, &capture), "scalar capture query");
@@ -138,6 +138,9 @@ extern "C" float polygeist_cub_reduce_value_sum_f32(int32_t n, float seed, const
 }
 extern "C" double polygeist_cub_reduce_value_sum_f64(int32_t n, double seed, const double *input) {
   return cub_reduce_value(n, seed, input, cuda::std::plus<double>{});
+}
+extern "C" float polygeist_cub_reduce_value_max_f32(int32_t n, float seed, const float *input) {
+  return cub_reduce_value(n, seed, input, cuda::maximum<float>{});
 }
 
 
@@ -170,12 +173,85 @@ extern "C" void polygeist_cub_reduce_or_i32(int n, int seed, const int *input, i
 #include <cub/device/device_segmented_reduce.cuh>
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/transform_iterator.h>
+#include <thrust/iterator/transform_output_iterator.h>
+#include <cuda/std/cmath>
+struct AbsoluteF32 {
+  __host__ __device__ float operator()(float value) const {
+    return cuda::std::fabs(value);
+  }
+};
+extern "C" float polygeist_cub_reduce_value_max_abs_f32(
+    int32_t n, float seed, const float *input) {
+  auto values = thrust::make_transform_iterator(input, AbsoluteF32{});
+  return cub_reduce_value(n, seed, values, cuda::maximum<float>{});
+}
 struct RowOffset {
   int64_t columns;
   __host__ __device__ int64_t operator()(int64_t row) const {
     return row * columns;
   }
 };
+
+// Project the public key/value result into the caller's int32 output ABI.
+// The vendor reduction computes both the extremum and its tie-broken index.
+struct ArgExtremumKey {
+  __host__ __device__ int operator()(cub::KeyValuePair<int, float> value) const {
+    return value.key;
+  }
+};
+struct ArgExtremumOutput
+    : thrust::transform_output_iterator<ArgExtremumKey, int *> {
+  using Base = thrust::transform_output_iterator<ArgExtremumKey, int *>;
+  // CUB infers its reduction tuple from the output iterator's value_type,
+  // before Thrust applies the final int32 key projection on assignment.
+  using value_type = cub::KeyValuePair<int, float>;
+  explicit ArgExtremumOutput(int *output) : Base(output, ArgExtremumKey{}) {}
+};
+template<bool minimum>
+static void cub_segmented_arg_extremum(int rows, int cols,
+                                       const float *input, int *output) {
+  if (rows <= 0 || cols <= 0) {
+    std::fprintf(stderr, "polygeist CUB arg reduction requires nonempty rows\n");
+    std::abort();
+  }
+  auto offsets = thrust::make_transform_iterator(
+      thrust::counting_iterator<int64_t>(0), RowOffset{cols});
+  auto keys = ArgExtremumOutput(output);
+  cudaStream_t stream = (cudaStream_t)polygeist_cuda_graph_stream();
+  int device;
+  reduce_require_cuda(cudaGetDevice(&device), "arg reduction device");
+  struct Scratch { int device; void *pointer; size_t capacity; Scratch *next; };
+  static thread_local Scratch *head = nullptr;
+  Scratch *scratch = head;
+  while (scratch && scratch->device != device) scratch = scratch->next;
+  if (!scratch) { scratch = new Scratch{device, nullptr, 0, head}; head = scratch; }
+  auto invoke = [&](void *storage, size_t &bytes) {
+    if constexpr (minimum)
+      return cub::DeviceSegmentedReduce::ArgMin(storage, bytes, input, keys,
+          rows, offsets, offsets + 1, stream);
+    else
+      return cub::DeviceSegmentedReduce::ArgMax(storage, bytes, input, keys,
+          rows, offsets, offsets + 1, stream);
+  };
+  size_t bytes = 0;
+  reduce_require_cuda(invoke(nullptr, bytes), "arg reduction scratch query");
+  if (bytes > scratch->capacity) {
+    reduce_require_cuda(cudaStreamSynchronize(stream), "arg reduction synchronize");
+    reduce_require_cuda(cudaFree(scratch->pointer), "arg reduction scratch free");
+    scratch->pointer = nullptr; scratch->capacity = 0;
+    reduce_require_cuda(cudaMalloc(&scratch->pointer, bytes), "arg reduction allocation");
+    scratch->capacity = bytes;
+  }
+  reduce_require_cuda(invoke(scratch->pointer, bytes), "arg reduction");
+}
+extern "C" void polygeist_cub_segmented_argmax_f32(
+    int rows, int cols, const float *input, int *output) {
+  cub_segmented_arg_extremum<false>(rows, cols, input, output);
+}
+extern "C" void polygeist_cub_segmented_argmin_f32(
+    int rows, int cols, const float *input, int *output) {
+  cub_segmented_arg_extremum<true>(rows, cols, input, output);
+}
 template<class T, class Input, class Begin, class End, class Op>
 static void cub_segmented_reduce_offsets(int rows, int cols, T seed,
     Input input, T *output, Begin begin, End end, Op op) {

@@ -253,6 +253,16 @@ def algebra_rules(include_distributivity: bool = True):
     c1, c2 = vars_("c1 c2", f64)
     rules = [
         *integer_rules,
+        # Finite real-valued ordering identities. These are deliberately
+        # absent in strict mode: fmax handles NaNs differently from ordered
+        # select, and conditional negation preserves a negative zero.
+        rewrite(Term.Select(Term.Cmp("ogt", a, b), a, b))
+        .to(Term.Binary("max", a, b)),
+        rewrite(Term.Select(Term.Cmp("olt", a, b), b, a))
+        .to(Term.Binary("max", a, b)),
+        rewrite(Term.Binary("max", a, b)).to(Term.Binary("max", b, a)),
+        rewrite(Term.Select(Term.Cmp("olt", a, zero),
+                            Term.Unary("negf", a), a)).to(Term.Abs(a)),
         # Commutativity
         rewrite(a + b).to(b + a),
         rewrite(a * b).to(b * a),
@@ -741,6 +751,16 @@ def encode_body_yields(g: GenericBody) -> list[Term]:
         return env[name]
 
     for line in g.body_lines:
+        local_index = re.match(
+            r"(%[\w_]+)\s*=\s*(?:linalg\.index|affine\.apply)\b", line.strip())
+        if local_index:
+            # Keep index calculations opaque to scalar algebra. The whole-DAG
+            # matcher proves their definitions recursively, including the
+            # linalg dimension permutation and the exact affine map. A scalar
+            # capture alone must never authorize a library replacement.
+            result = local_index.group(1)
+            env[result] = Term.Cap(result)
+            continue
         m = re.match(
             r"(%[\w_]+)\s*=\s*(\w+\.\w+)\s+(.*?)\s*:\s*\S+", line.strip()
         )
@@ -1540,6 +1560,12 @@ def _conditional_proof_candidate(left, right) -> bool:
             has_conditional |= (current[0] == "Select" or
                                 current[:2] in {("Binary", "and"),
                                                 ("Binary", "or")})
+            if numeric_model() == "relaxed":
+                # Ordering rules can turn a conditional into a scalar
+                # primitive. Admit that topology to the same bounded search;
+                # the e-graph must still prove the instantiated expressions.
+                has_conditional |= (current[0] == "Abs" or
+                                    current[:2] == ("Binary", "max"))
             if current[0] in {"In", "Out", "Cap", "Lit", "Access"}:
                 leaves.add(current)
             for child in current[1:]:

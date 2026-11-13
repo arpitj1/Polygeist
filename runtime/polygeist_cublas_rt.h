@@ -71,6 +71,14 @@ void polygeist_cub_reduce_or_i32(int n, int seed, const int *input, int *output)
 float polygeist_cub_reduce_value_sum_f32(int32_t n, float seed, const float *input);
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceReduce polygeist_cub_reduce_value_sum_f64 */
 double polygeist_cub_reduce_value_sum_f64(int32_t n, double seed, const double *input);
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceReduce polygeist_cub_reduce_value_max_f32 */
+float polygeist_cub_reduce_value_max_f32(int32_t n, float seed, const float *input);
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceReduce polygeist_cub_reduce_value_max_abs_f32 */
+float polygeist_cub_reduce_value_max_abs_f32(int32_t n, float seed, const float *input);
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduceArgMax polygeist_cub_segmented_argmax_f32 */
+void polygeist_cub_segmented_argmax_f32(int rows, int cols, const float *input, int *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceSegmentedReduceArgMin polygeist_cub_segmented_argmin_f32 */
+void polygeist_cub_segmented_argmin_f32(int rows, int cols, const float *input, int *output);
 
 /* POLYGEIST_TYPED_VENDOR_ENTRY CUB DeviceHistogramEven polygeist_cub_histogram_even_i32 */
 void polygeist_cub_histogram_even_i32(int32_t count, const int32_t *samples,

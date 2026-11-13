@@ -41,6 +41,30 @@ func.func @state_dependent(%x:tensor<?x?xf32>,%seed:tensor<?xf32>,%scale:f32) ->
 // CHECK: arith.mulf
 // CHECK-NOT: linalg.generic
 // CHECK: return
+func.func @conditional_input(%x:tensor<?x?xf32>,%seed:tensor<?xf32>) -> tensor<?xf32> {
+ %zero=arith.constant 0.0:f32
+ %result=linalg.generic {indexing_maps=[#row,#out],iterator_types=["parallel","reduction"]} ins(%x:tensor<?x?xf32>) outs(%seed:tensor<?xf32>) {
+ ^bb0(%a:f32,%acc:f32):
+  %negative=arith.cmpf olt,%a,%zero:f32
+  %negated=arith.negf %a:f32
+  %value=arith.select %negative,%negated,%a:f32
+  %next=arith.addf %acc,%value:f32
+  linalg.yield %next:f32
+ } -> tensor<?xf32>
+ return %result:tensor<?xf32>
+}
+// CHECK-LABEL: func.func @conditional_input
+// CHECK: linalg.generic
+// CHECK-SAME: iterator_types = ["parallel", "parallel"]
+// CHECK: arith.cmpf
+// CHECK: arith.negf
+// CHECK: arith.select
+// CHECK-NEXT: linalg.yield
+// CHECK: linalg.generic
+// CHECK-SAME: iterator_types = ["parallel", "reduction"]
+// CHECK: arith.addf
+// CHECK-NEXT: linalg.yield
+// CHECK: return
 func.func private @external_effect(f32)->f32
 func.func @effectful(%x:tensor<?x?xf32>,%seed:tensor<?xf32>) -> tensor<?xf32> {
  %result=linalg.generic {indexing_maps=[#row,#out],iterator_types=["parallel","reduction"]} ins(%x:tensor<?x?xf32>) outs(%seed:tensor<?xf32>) {

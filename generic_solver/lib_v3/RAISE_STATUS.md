@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 13, PARTIAL: 48, RAISED: 181, UNSOUND: 2, UNVALIDATED: 16 (total 260)
+Summary: NOT_RAISED: 13, PARTIAL: 48, RAISED: 185, UNSOUND: 2, UNVALIDATED: 16 (total 264)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -109,9 +109,13 @@ Summary: NOT_RAISED: 13, PARTIAL: 48, RAISED: 181, UNSOUND: 2, UNVALIDATED: 16 (
 | `cub_reduce_sum_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_sum_f64` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_product_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_reduce_value_max_abs_f32` | cub_reduce_max_abs_value | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_reduce_value_max_f32` | cub_reduce_max_value | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_sum_f32` | cub_reduce_value | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_sum_f64` | cub_reduce_value | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_row_product_scan_f32` | cub_row_product_scan | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_segmented_argmax_f32` | cub_segmented_arg_extrema | RAISED | 4 | - | EXACT / EXACT |  |
+| `cub_segmented_argmin_f32` | cub_segmented_arg_extrema | RAISED | 4 | - | EXACT / EXACT |  |
 | `cub_segmented_sum_f32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_sum_f64` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_xor_i32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |

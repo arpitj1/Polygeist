@@ -54,8 +54,15 @@ def sh(cmd, log: Path, timeout=900, stdout=None) -> int:
 
 
 def lower(inp: Path, d: Path, tag: str, fn: str, log: Path) -> Path | None:
+    # Preserve coupled reduction states while exposing their physical tensor
+    # projections. The same generic view normalization is available to both
+    # application and imported-library matching.
+    normalized = d / f"{tag}_views.mlir"
+    if sh([R.POLYGEIST_OPT, "--normalize-linalg-matching-views", inp,
+           "-o", normalized], log):
+        return None
     legal = d / f"{tag}_legal.mlir"
-    if sh([PY, HERE / "legalize_tensor_submaps.py", inp, "-o", legal], log):
+    if sh([PY, HERE / "legalize_tensor_submaps.py", normalized, "-o", legal], log):
         return None
     canon = d / f"{tag}_canon.mlir"
     if sh([R.POLYGEIST_OPT, "--lower-polygeist-submap", "--canonicalize-polygeist",

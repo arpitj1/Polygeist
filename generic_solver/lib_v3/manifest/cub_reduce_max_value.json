@@ -1,0 +1,64 @@
+{
+  "routine": "cub_reduce_max_value",
+  "source": "Pinned CUB ThreadReduceSequential with public cuda::maximum<float>",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh",
+      "sha256": "f0dfb01c1cbd0eb590c14cf763370863ce1dd83483de1e105f0332f9105108b1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_reduce.cuh",
+      "sha256": "79dbfc30428098941bb0db6dac316d2ba94cde4351483837076e91334e5c9399"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/__functional/maximum.h",
+      "sha256": "5de98cb4112b0a88e27b453743e6ef6010f83fdf019db9a61846b429d2f77fc5"
+    }
+  ],
+  "adaptation": "Inline the seeded ThreadReduce prefix array, expose its static extent as n, and specialize its operator to cuda::maximum<float>, whose body calls fmax. Preserve the scalar return. The execution adapter calls CUB DeviceReduce with the same operator and seed.",
+  "specs": [
+    {
+      "name": "cub_reduce_value_max_f32",
+      "target": {
+        "library": "CUB",
+        "call": "DeviceReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_reduce_value_max_f32",
+          "arguments": [
+            "n",
+            "seed",
+            "input"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "n",
+        "seed",
+        "input"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous read-only FP32 input and a scalar result",
+        "cuda::maximum<float> uses fmax semantics; floating exception flags are not observed"
+      ],
+      "deviations": []
+    }
+  ]
+}

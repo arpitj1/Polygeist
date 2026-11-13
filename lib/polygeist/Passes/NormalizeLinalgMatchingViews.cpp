@@ -441,7 +441,8 @@ struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
 
   LogicalResult matchAndRewrite(linalg::GenericOp op,
                                 PatternRewriter &rewriter) const override {
-    if (op.getNumDpsInits() != 1 || op.getNumResults() != 1)
+    if (!op.hasTensorSemantics() || op.getNumDpsInits() == 0 ||
+        op.getNumDpsInits() != op.getNumResults())
       return failure();
     SmallVector<AffineMap> maps(op.getIndexingMapsArray());
     // A pointwise operation already expressed in common logical coordinates
@@ -479,7 +480,7 @@ struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
       RankedTensorType type;
     };
     SmallVector<View> views;
-    SubmapInverseOp inverse;
+    SmallVector<SubmapInverseOp> inverses(op.getNumResults());
     auto iterators = op.getIteratorTypesArray();
     SmallVector<Value> extentValues(op.getNumLoops());
     SmallVector<int64_t> extentConstants(op.getNumLoops(), ShapedType::kDynamic);
@@ -541,17 +542,21 @@ struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
         continue;
       if (submap.getMap().isIdentity() && type == submap.getType())
         continue;
-      if (number == op.getNumDpsInputs()) {
-        if (!op.getResult(0).hasOneUse())
-          continue;
-        auto candidate = dyn_cast<SubmapInverseOp>(
-            *op.getResult(0).getUsers().begin());
-        if (!candidate || candidate.getViewModified() != op.getResult(0) ||
-            candidate.getBaseOriginal() != submap.getBase() ||
-            candidate.getMap() != submap.getMap() ||
-            candidate->getOperands().drop_front(2) !=
-                submap->getOperands().drop_front(1))
-          continue;
+      if (number >= op.getNumDpsInputs()) {
+        unsigned output = number - op.getNumDpsInputs();
+        Value result = op.getResult(output);
+        SubmapInverseOp candidate;
+        if (!result.use_empty()) {
+          if (!result.hasOneUse())
+            continue;
+          candidate = dyn_cast<SubmapInverseOp>(*result.getUsers().begin());
+          if (!candidate || candidate.getViewModified() != result ||
+              candidate.getBaseOriginal() != submap.getBase() ||
+              candidate.getMap() != submap.getMap() ||
+              candidate->getOperands().drop_front(2) !=
+                  submap->getOperands().drop_front(1))
+            continue;
+        }
         // Every parallel loop must write a distinct output; precisely the
         // reduction dimensions may be absent from its physical indexing map.
         SmallVector<bool> used(op.getNumLoops(), false);
@@ -562,7 +567,7 @@ struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
           valid &= used[i] == (iterators[i] == utils::IteratorType::parallel);
         if (!valid)
           continue;
-        inverse = candidate;
+        inverses[output] = candidate;
       }
       maps[number] = composed;
       views.push_back({number, submap, sizes, type});
@@ -615,25 +620,32 @@ struct ExposeProjectedSubmaps : OpRewritePattern<linalg::GenericOp> {
       if (view.operand < inputs.size())
         inputs[view.operand] = replacement;
       else
-        outputs[0] = replacement;
+        outputs[view.operand - inputs.size()] = replacement;
     }
+    SmallVector<Type> resultTypes;
+    for (Value output : outputs)
+      resultTypes.push_back(output.getType());
     auto replacement = rewriter.create<linalg::GenericOp>(
-        op.getLoc(), TypeRange{outputs[0].getType()}, inputs, outputs, maps,
+        op.getLoc(), resultTypes, inputs, outputs, maps,
         iterators, rewriter.getStringAttr(""), rewriter.getStringAttr(""));
     rewriter.cloneRegionBefore(op.getRegion(), replacement.getRegion(),
                                replacement.getRegion().end());
-    if (inverse) {
-      const View &view = views.back();
-      rewriter.setInsertionPoint(inverse);
-      auto restored = rewriter.create<SubmapInverseOp>(
-          inverse.getLoc(), inverse.getType(), inverse.getBaseOriginal(),
-          replacement.getResult(0), view.sizes,
-          rewriter.getMultiDimIdentityMap(view.type.getRank()));
-      rewriter.replaceOp(inverse, restored.getResult());
-      rewriter.eraseOp(op);
-    } else {
-      rewriter.replaceOp(op, replacement.getResults());
+    for (unsigned output = 0; output < op.getNumResults(); ++output) {
+      if (auto inverse = inverses[output]) {
+        const View &view = *llvm::find_if(views, [&](const View &v) {
+          return v.operand == inputs.size() + output;
+        });
+        rewriter.setInsertionPoint(inverse);
+        auto restored = rewriter.create<SubmapInverseOp>(
+            inverse.getLoc(), inverse.getType(), inverse.getBaseOriginal(),
+            replacement.getResult(output), view.sizes,
+            rewriter.getMultiDimIdentityMap(view.type.getRank()));
+        rewriter.replaceOp(inverse, restored.getResult());
+      } else if (!op.getResult(output).use_empty()) {
+        op.getResult(output).replaceAllUsesWith(replacement.getResult(output));
+      }
     }
+    rewriter.eraseOp(op);
     return success();
   }
 };
@@ -1218,17 +1230,68 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
     // A useful split removes at least one operation from a composite payload.
     if (std::distance(body->begin(), body->end()) <= 2)
       return failure();
-    Operation &first = body->front();
-    if (first.getNumResults() != 1 || !isa<FloatType>(first.getResult(0).getType()) ||
-        first.getNumRegions() || isa<arith::ConstantOp>(first) ||
-        !isMemoryEffectFree(&first) || !isSpeculatable(&first))
-      return failure();
     unsigned inputs = op.getNumDpsInputs();
-    for (Value operand : first.getOperands()) {
-      if (auto argument = dyn_cast<BlockArgument>(operand)) {
-        if (argument.getOwner() == body && argument.getArgNumber() >= inputs)
-          return failure();
+    Operation *root = &body->front();
+    SmallVector<Operation *> expression;
+    bool firstFloat = root->getNumResults() == 1 &&
+                      isa<FloatType>(root->getResult(0).getType());
+    if (op.getNumReductionLoops() && !firstFloat) {
+      // Find the pure input-only DAG feeding the state update. Its first
+      // instruction may produce a predicate rather than a float. Moving the
+      // whole expression preserves that predicate and avoids materializing
+      // an intermediate that has no corresponding library specification.
+      llvm::SmallPtrSet<Operation *, 16> independent;
+      for (Operation &candidate : body->without_terminator()) {
+        if (candidate.getNumRegions() || !isMemoryEffectFree(&candidate) ||
+            !isSpeculatable(&candidate))
+          continue;
+        bool inputOnly = llvm::all_of(candidate.getOperands(), [&](Value v) {
+          if (auto arg = dyn_cast<BlockArgument>(v))
+            return arg.getOwner() != body || arg.getArgNumber() < inputs;
+          Operation *definition = v.getDefiningOp();
+          return definition->getBlock() != body || independent.contains(definition);
+        });
+        if (inputOnly)
+          independent.insert(&candidate);
       }
+      root = nullptr;
+      for (Operation &candidate : body->without_terminator()) {
+        if (!independent.contains(&candidate) || candidate.getNumResults() != 1 ||
+            !isa<FloatType>(candidate.getResult(0).getType()) ||
+            isa<arith::ConstantOp>(candidate))
+          continue;
+        if (llvm::any_of(candidate.getResult(0).getUsers(), [&](Operation *user) {
+              return user->getBlock() == body && !isa<linalg::YieldOp>(user) &&
+                     !independent.contains(user);
+            })) {
+          root = &candidate;
+          break;
+        }
+      }
+      if (!root)
+        return failure();
+      llvm::SmallPtrSet<Operation *, 16> needed;
+      auto collect = [&](auto &&self, Operation *node) -> void {
+        if (!node || node->getBlock() != body || !needed.insert(node).second)
+          return;
+        for (Value operand : node->getOperands())
+          self(self, operand.getDefiningOp());
+      };
+      collect(collect, root);
+      for (Operation &candidate : body->without_terminator())
+        if (needed.contains(&candidate))
+          expression.push_back(&candidate);
+    } else {
+      if (root->getNumResults() != 1 ||
+          !isa<FloatType>(root->getResult(0).getType()) || root->getNumRegions() ||
+          isa<arith::ConstantOp>(root) || !isMemoryEffectFree(root) ||
+          !isSpeculatable(root))
+        return failure();
+      for (Value operand : root->getOperands())
+        if (auto arg = dyn_cast<BlockArgument>(operand))
+          if (arg.getOwner() == body && arg.getArgNumber() >= inputs)
+            return failure();
+      expression.push_back(root);
     }
     auto maps = op.getIndexingMapsArray();
     if (!llvm::all_of(maps, [](AffineMap map) {
@@ -1270,7 +1333,7 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
       if (!size)
         dynamic.push_back(bound);
     }
-    Type element = first.getResult(0).getType();
+    Type element = root->getResult(0).getType();
     Value empty = rewriter.create<tensor::EmptyOp>(loc, shape, element, dynamic);
     auto identity = rewriter.getMultiDimIdentityMap(op.getNumLoops());
     // Retain the same bounded destination/writeback form produced by raising
@@ -1289,8 +1352,9 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
           IRMapping mapping;
           for (unsigned i = 0; i < inputs; ++i)
             mapping.map(body->getArgument(i), arguments[i]);
-          auto copy = builder.clone(first, mapping);
-          builder.create<linalg::YieldOp>(nested, copy->getResults());
+          for (Operation *operation : expression)
+            builder.clone(*operation, mapping);
+          builder.create<linalg::YieldOp>(nested, mapping.lookup(root->getResult(0)));
         });
     SmallVector<Value> residualInputs(op.getInputs());
     Value produced = rewriter.create<SubmapInverseOp>(
@@ -1307,9 +1371,10 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
             mapping.map(body->getArgument(i), arguments[i]);
           for (unsigned i = inputs; i < body->getNumArguments(); ++i)
             mapping.map(body->getArgument(i), arguments[i + 1]);
-          mapping.map(first.getResult(0), arguments[inputs]);
-          for (Operation &operation : llvm::drop_begin(*body))
-            builder.clone(operation, mapping);
+          mapping.map(root->getResult(0), arguments[inputs]);
+          for (Operation &operation : *body)
+            if (&operation != root)
+              builder.clone(operation, mapping);
         });
     rewriter.replaceOp(op, residual->getResults());
     return success();

@@ -1,0 +1,72 @@
+{
+  "routine": "cub_reduce_max_abs_value",
+  "source": "Pinned CUB ThreadReduce over a public Thrust transform iterator using cuda::std::fabs, reduced with cuda::maximum<float>",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh",
+      "sha256": "f0dfb01c1cbd0eb590c14cf763370863ce1dd83483de1e105f0332f9105108b1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_reduce.cuh",
+      "sha256": "79dbfc30428098941bb0db6dac316d2ba94cde4351483837076e91334e5c9399"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/__functional/maximum.h",
+      "sha256": "5de98cb4112b0a88e27b453743e6ef6010f83fdf019db9a61846b429d2f77fc5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__cmath/abs.h",
+      "sha256": "d9e00c5da46f66c1efc3c17dcca56eb0556af4064c960887b83f72eed1d0e641"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/iterator/transform_iterator.h",
+      "sha256": "b9e07830b5a183b6b8c2c6ef1ae5ae04b2e3efd5750b3f5aeeddc74272f6b9a6"
+    }
+  ],
+  "adaptation": "Inline the transform iterator dereference and the public fabs and maximum scalar functors into seeded ThreadReduce. Expose its static extent as runtime n, preserve the scalar return and seed. The runtime invokes actual CUB DeviceReduce on a Thrust transform iterator, without materializing transformed storage.",
+  "specs": [
+    {
+      "name": "cub_reduce_value_max_abs_f32",
+      "target": {
+        "library": "CUB",
+        "call": "DeviceReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_reduce_value_max_abs_f32",
+          "arguments": [
+            "n",
+            "seed",
+            "input"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "args": [
+        "n",
+        "seed",
+        "input"
+      ],
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous read-only FP32 input and a scalar result",
+        "cuda::maximum<float> uses fmax semantics; floating exception flags are not observed"
+      ],
+      "deviations": []
+    }
+  ]
+}

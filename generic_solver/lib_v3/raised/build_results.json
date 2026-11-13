@@ -4928,6 +4928,110 @@
   }
  },
  {
+  "spec": "cub_reduce_value_max_abs_f32",
+  "routine": "cub_reduce_max_abs_value",
+  "wrapper": "generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32.c --function=cub_reduce_value_max_abs_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_reduce_value_max_abs_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32.mlir -o generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_reduce_value_max_abs_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 1
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 2,
+   "submaps": 2
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_reduce_value_max_abs_f32",
+   "declarations": [
+    "func.func private @fmaxf(f32, f32) -> f32 attributes {llvm.linkage = #llvm.linkage<external>, polygeist.pure}"
+   ],
+   "params": [
+    "n",
+    "seed",
+    "input"
+   ],
+   "outputs": [],
+   "returns": [
+    "f32"
+   ],
+   "leading_dims": {},
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cub_reduce_value_max_f32",
+  "routine": "cub_reduce_max_value",
+  "wrapper": "generic_solver/lib_v3/raised/cub_reduce_value_max_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_reduce_value_max_f32.c --function=cub_reduce_value_max_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_reduce_value_max_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_reduce_value_max_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_reduce_value_max_f32.mlir -o generic_solver/lib_v3/raised/cub_reduce_value_max_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_reduce_value_max_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_reduce_value_max_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 1
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 2,
+   "submaps": 2
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_reduce_value_max_f32",
+   "declarations": [
+    "func.func private @fmaxf(f32, f32) -> f32 attributes {llvm.linkage = #llvm.linkage<external>, polygeist.pure}"
+   ],
+   "params": [
+    "n",
+    "seed",
+    "input"
+   ],
+   "outputs": [],
+   "returns": [
+    "f32"
+   ],
+   "leading_dims": {},
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
   "spec": "cub_reduce_value_sum_f32",
   "routine": "cub_reduce_value",
   "wrapper": "generic_solver/lib_v3/raised/cub_reduce_value_sum_f32.c",
@@ -5069,6 +5173,112 @@
    "returns": [],
    "leading_dims": {
     "cols": "output"
+   },
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cub_segmented_argmax_f32",
+  "routine": "cub_segmented_arg_extrema",
+  "wrapper": "generic_solver/lib_v3/raised/cub_segmented_argmax_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_segmented_argmax_f32.c --function=cub_segmented_argmax_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_segmented_argmax_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_segmented_argmax_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_segmented_argmax_f32.mlir -o generic_solver/lib_v3/raised/cub_segmented_argmax_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_segmented_argmax_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_segmented_argmax_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 4,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 8
+  },
+  "linalg_analysis": {
+   "generics": 4,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 8
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_segmented_argmax_f32",
+   "declarations": [],
+   "params": [
+    "rows",
+    "cols",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "cols": "input"
+   },
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "cub_segmented_argmin_f32",
+  "routine": "cub_segmented_arg_extrema",
+  "wrapper": "generic_solver/lib_v3/raised/cub_segmented_argmin_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_segmented_argmin_f32.c --function=cub_segmented_argmin_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_segmented_argmin_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_segmented_argmin_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_segmented_argmin_f32.mlir -o generic_solver/lib_v3/raised/cub_segmented_argmin_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_segmented_argmin_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_segmented_argmin_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 4,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 8
+  },
+  "linalg_analysis": {
+   "generics": 4,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 8
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_segmented_argmin_f32",
+   "declarations": [],
+   "params": [
+    "rows",
+    "cols",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "cols": "input"
    },
    "unreferenced": []
   },

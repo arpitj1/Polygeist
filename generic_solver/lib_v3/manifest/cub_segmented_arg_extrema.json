@@ -1,0 +1,139 @@
+{
+  "routine": "cub_segmented_arg_extrema",
+  "source": "Pinned public CUB ThreadReduce and ArgMax/ArgMin functors",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_reduce.cuh",
+      "sha256": "f0dfb01c1cbd0eb590c14cf763370863ce1dd83483de1e105f0332f9105108b1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/thread/thread_operators.cuh",
+      "sha256": "ae0a392daefe2a2aa2b65b66413ce413e7a99e7ed5636fbc858b046ff270570f"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cub/device/device_segmented_reduce.cuh",
+      "sha256": "001d84cdb0741b419c46370e25ea6304fb44aeb1101a4dcfbbf675da1fc59c34"
+    }
+  ],
+  "adaptation": "Instantiate nonempty contiguous FP32 rows with int32 keys, seed from the first element, sequentially reduce the remaining elements, and expose the key result. The seed and increasing-key specialization preserve the public first-extremum tie rule. The runtime invokes actual DeviceSegmentedReduce ArgMax/ArgMin with a key-projection output iterator.",
+  "specs": [
+    {
+      "name": "cub_segmented_argmax_f32",
+      "defines": {
+        "ARG_MIN": 0
+      },
+      "args": [
+        "rows",
+        "cols",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "CUB",
+        "call": "DeviceSegmentedReduceArgMax",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_segmented_argmax_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "rows"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "assumptions": [
+        "Nonempty contiguous finite FP32 rows; disjoint int32 output; rows and cols within INT_MAX",
+        "Return the first index on equal values, relative to the start of each row; NaN behavior is outside this API equivalence"
+      ],
+      "deviations": [
+        "Project the key from the public key/value result",
+        "Sequential keys increase, so the smaller-key equal-value branch is unreachable; the parallel CUB functor retains it"
+      ]
+    },
+    {
+      "name": "cub_segmented_argmin_f32",
+      "defines": {
+        "ARG_MIN": 1
+      },
+      "args": [
+        "rows",
+        "cols",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "CUB",
+        "call": "DeviceSegmentedReduceArgMin",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_segmented_argmin_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "rows"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional"
+        }
+      },
+      "assumptions": [
+        "Nonempty contiguous finite FP32 rows; disjoint int32 output; rows and cols within INT_MAX",
+        "Return the first index on equal values, relative to the start of each row; NaN behavior is outside this API equivalence"
+      ],
+      "deviations": [
+        "Project the key from the public key/value result",
+        "Sequential keys increase, so the smaller-key equal-value branch is unreachable; the parallel CUB functor retains it"
+      ]
+    }
+  ]
+}
