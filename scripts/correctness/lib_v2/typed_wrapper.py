@@ -57,7 +57,8 @@ def _parameter(parameter, text):
 
 def contract(A, spec, target, ret, args):
     cfg = target['runtime_adapter']
-    allowed = {'schema', 'kind', 'entry', 'arguments', 'arrays', 'bounds', 'alias_policy', 'linkage'}
+    allowed = {'schema', 'kind', 'entry', 'arguments', 'arrays', 'bounds', 'alias_policy', 'linkage',
+               'configuration'}
     if (set(cfg) - allowed or cfg.get('schema') != 1
             or cfg.get('kind') != 'typed_c_wrapper' or ret not in ('void', 'float', 'double', 'int')):
         raise A.AbiError('unsupported typed C-wrapper schema')
@@ -89,10 +90,28 @@ def contract(A, spec, target, ret, args):
     ordered = cfg.get('arguments')
     references = {arg.name: arg for arg in args}
     if (not isinstance(ordered, list) or len(ordered) != len(prototype)
-            or any(not isinstance(v, str) or v not in references for v in ordered)
-            or set(ordered) != set(references)):
+            or any(not isinstance(v, (str, dict)) for v in ordered)
+            or {v for v in ordered if isinstance(v, str)} != set(references)):
         raise A.AbiError('runtime contract must bind every reference and wrapper parameter')
+    configured = {}
+    try:
+        if 'configuration' in cfg:
+            from scalar_configuration import resolve
+            configured = resolve(cfg['configuration'], A.manifest_entry(spec)[1].get('defines', {}))
+    except (ValueError, SyntaxError) as error:
+        raise A.AbiError(str(error)) from error
+    resolved = []
     for name, (element, pointer, const) in zip(ordered, prototype):
+        if isinstance(name, dict):
+            from scalar_configuration import literal
+            try:
+                if pointer:
+                    raise ValueError('configuration cannot synthesize a pointer')
+                resolved.append({'literal': literal(name, configured, element)})
+            except ValueError as error:
+                raise A.AbiError(str(error)) from error
+            continue
+        resolved.append(name)
         arg = references[name]
         if (canonical_type(arg.ctype) != element or (arg.kind == 'array') != pointer
                 or (pointer and const and arg.intent in ('out', 'inout'))):
@@ -100,7 +119,10 @@ def contract(A, spec, target, ret, args):
         if not pointer and not ((arg.kind == 'int' and element == 'int') or
                                 (arg.kind == 'scalar' and element in ('float', 'double'))):
             raise A.AbiError('wrapper scalar requires exact int32, FP32, or FP64 storage')
-    return geometry(A, target, args, cfg, ordered)
+    params, binding, validated = geometry(A, target, args, cfg, resolved)
+    if configured:
+        validated['resolved_configuration'] = configured
+    return params, binding, validated
 
 
 def geometry(A, target, args, cfg, ordered):
@@ -239,6 +261,9 @@ def generate(ca, prototype, emit_call=None):
     by_name = {p.name: p for p in arrays}
     arguments = []
     for name in cfg['ordered_arguments']:
+        if isinstance(name, dict):
+            arguments.append(name['literal'])
+            continue
         p = by_name.get(name)
         if cuda and p:
             element = ('const ' if not p.written else '') + p.elem

@@ -4,6 +4,11 @@
 include "mlir/Pass/PassBase.td"
 include "mlir/Rewrite/PassUtil.td"
 
+def LowerSupportedMathToLibm : Pass<"lower-supported-math-to-libm"> {
+  let summary = "Apply upstream libm patterns while retaining other math operations";
+  let constructor = "mlir::polygeist::createLowerSupportedMathToLibmPass()";
+}
+
 def SelectFunc : Pass<"select-func"> {
   let summary = "Run a pass pipeline on selected functions by name";
   let constructor = "mlir::polygeist::createSelectFuncPass()";

@@ -286,6 +286,7 @@ class Executor:
         # consumed as data rather than as an index, e.g. a histogram count)
         self.atom_reads: dict[str, Optional[Expr]] = {}
         self.index_atom_ranges: dict[str, list[Cons]] = {}
+        self.carried_input_loads: dict[int, IdxVal] = {}
 
     # -- helpers --------------------------------------------------------
     def new_buffer(self, name, kind, ty, priv=None, shape=None) -> Buffer:
@@ -389,6 +390,9 @@ class Executor:
         """Value of a load: an integer element of a function argument is an
         index atom (usable in bounds, gathers and scatters; equations.py
         rejects it if the region writes that array), anything else a value."""
+        carried = self.carried_input_loads.get(r.buf.id)
+        if carried is not None and r.idx == tuple(Aff.var(p) for p in r.buf.priv):
+            return carried
         if r.buf.kind == "arg" and r.buf.elem in _INT_TYPES and not r.buf.priv:
             a = atom(r.buf.name, r.idx)
             (name, _), = a.terms
@@ -396,6 +400,19 @@ class Executor:
             # the same element loaded at two different times (around a store)
             # has no single value: it can no longer be used as data
             self.atom_reads[name] = r if prev is r or (prev is not None and prev.time == r.time) else None
+            # A loaded integer has its declared bit width even when promoted
+            # to an index atom. Retaining that fact permits safe round trips
+            # through index and bounded loops without assuming arbitrary
+            # array values fit into a narrower integer type.
+            if r.buf.elem != 'index':
+                bits = int(r.buf.elem[1:])
+                bounds = [ge(a, -(1 << (bits - 1))),
+                          le(a, (1 << (bits - 1)) - 1)]
+                # These facts justify casts, not additional iteration-domain
+                # predicates. Attaching them to stores changes reduction
+                # partitions and can incorrectly hide an initialization.
+                self.integer_type_facts.extend(
+                    fact for fact in bounds if fact not in self.integer_type_facts)
             return IdxVal(a, r)
         return FVal(r)
 
@@ -1181,6 +1198,89 @@ class Executor:
                 raise Unsupported("multi-result bound without max/min")
         return vals
 
+    def _carried_input_load(self, body, result, initial, var, lower, time):
+        """Resolve x(i+1)=input[f(i)] when its base case also agrees.
+
+        This is scalar recurrence elimination, not a library recognition rule.
+        Only a direct integer load from a function argument is admitted. The
+        caller rejects writes to that buffer during the loop; prior writes
+        are conservatively rejected here. The usual index-atom checks retain
+        the same read-only requirement during equation matching.
+        """
+        if not isinstance(initial, IdxVal) or not isinstance(initial.data, ERead):
+            return None
+        load = next((item for item in body if item.results == [result]), None)
+        if load is None or load.name not in ('affine.load', 'memref.load'):
+            return None
+        match = re.match(r'.*?=\s*\S+\s+(%[\w$.#-]+)\[(.*)\]\s*:', load.line)
+        if match is None:
+            return None
+        try:
+            source = self.get(match.group(1))
+            indices = self._index_list(match.group(2), load.name)
+            buffer, coords = self.access(source, indices)
+        except Unsupported:
+            return None
+        if (buffer is not initial.data.buf or buffer.kind != 'arg' or
+                buffer.elem not in _INT_TYPES or buffer.priv or
+                any(statement.buf is buffer for statement in self.stmts)):
+            return None
+        previous = tuple(coord.subst({var: Aff.var(var) - 1}) for coord in coords)
+        first = tuple(coord.subst({var: lower}) for coord in previous)
+        if first != initial.data.idx:
+            return None
+        read = ERead(buffer, previous, tuple(time), (), tuple(self.loop_vars))
+        return self.loaded(read), buffer, buffer.version
+
+    def _scratch_input_loads(self, body, var, lower, time, outer_vars, outer_domain):
+        """The same recurrence after a scalar iter_arg was spilled to memory."""
+        result = {}
+        readonly = []
+        for position, store in enumerate(body):
+            if store.name not in ('affine.store', 'memref.store'):
+                continue
+            match = re.match(r'\S+\s+(%[\w$.#-]+),\s*(%[\w$.#-]+)\[\]\s*:', store.line)
+            if match is None:
+                continue
+            value, name = match.groups()
+            memory = self.env.get(name)
+            if not isinstance(memory, MemVal) or memory.view is not None:
+                continue
+            buffer = memory.buf
+            if buffer.kind != 'scratch' or buffer.rank != 0:
+                continue
+            if any(other_name != name and isinstance(other, (MemVal, TensorVal)) and
+                   other.buf is buffer for other_name, other in self.env.items()):
+                continue
+            uses = []
+            def collect(operations, top_position):
+                for item in operations:
+                    if re.search(re.escape(name) + r'(?![\w$.-])', item.line):
+                        uses.append((top_position, item))
+                    for region in item.regions:
+                        collect(region, top_position)
+            for top_position, item in enumerate(body):
+                collect([item], top_position)
+            # Exactly one unconditional write, with every read before it.
+            # Reject aliases, calls, conditional writes, and later reads.
+            if any(item is not store and
+                   (item.name not in ('affine.load', 'memref.load') or top >= position)
+                   for top, item in uses):
+                continue
+            previous = [statement for statement in self.stmts if statement.buf is buffer]
+            if len(previous) != 1:
+                continue
+            initial = previous[0]
+            if (initial.vars != outer_vars or list(initial.domain) != outer_domain or initial.guard or
+                    not isinstance(initial.value, ERead)):
+                continue
+            loaded = self.loaded(initial.value)
+            carried = self._carried_input_load(body, value, loaded, var, lower, time)
+            if carried is not None:
+                result[buffer.id] = carried[0]
+                readonly.append(carried[1:])
+        return result, readonly
+
     def _for(self, op: Op, prefix, pos):
         line = op.line
         if op.name == "affine.for":
@@ -1236,6 +1336,31 @@ class Executor:
             self.env[iter_args[k][0]] = FVal(ERead(b, tuple(Aff.var(p) for p in b.priv), tuple(body_prefix + [Aff.cst(0), Aff.cst(0)]), (), tuple(self.loop_vars)))
         self.env[iv] = IdxVal(Aff.var(var))
         body = op.regions[0]
+        carried_loads = []
+        old_carried_loads = dict(self.carried_input_loads)
+        # A yielded input load may describe the next iteration's scalar
+        # exactly, including the first iteration. Retain scratch state for
+        # loop results, but expose that load for body indexing.
+        terminal = body[-1] if body else None
+        ym = (re.match(r'\S+\s+(.*?)\s*:', terminal.line)
+              if terminal and terminal.name in ('affine.yield', 'scf.yield') else None)
+        yield_tokens = [token.strip() for token in ym.group(1).split(',')] if ym else []
+        if len(lows) == 1:
+            scratch, readonly = self._scratch_input_loads(
+                body, var, lows[0], body_prefix + [Aff.cst(0), Aff.cst(0)],
+                old_vars, old_dom)
+            self.carried_input_loads.update(scratch)
+            carried_loads.extend(readonly)
+            for k in scal:
+                if k >= len(yield_tokens):
+                    continue
+                barg, init = iter_args[k]
+                carried = self._carried_input_load(
+                    body, yield_tokens[k], self.get(init), var, lows[0],
+                    body_prefix + [Aff.cst(0), Aff.cst(0)])
+                if carried is not None:
+                    self.env[barg] = carried[0]
+                    carried_loads.append(carried[1:])
         yields = []
         bpos = 1
         for bop in body:
@@ -1245,6 +1370,9 @@ class Executor:
                 continue
             self.exec_op(bop, body_prefix, bpos)
             bpos += 4
+        if any(buffer.version != version for buffer, version in carried_loads):
+            raise Unsupported('loop-carried input load depends on a written buffer')
+        self.carried_input_loads = old_carried_loads
         results = []
         for k, (barg, init) in enumerate(iter_args):
             y = self.get(yields[k])

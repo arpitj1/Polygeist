@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 191, UNSOUND: 2, UNVALIDATED: 16 (total 272)
+Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (total 286)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -55,6 +55,8 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 191, UNSOUND: 2, UNVALIDATED: 16 (
 | `aten_logical_or_f32` | aten_logical_or | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `aten_logical_xor_f32` | aten_logical_xor | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `aten_lt_f32` | aten_lt | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `aten_mse_f32` | aten_mse | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `aten_mse_backward_f32` | aten_mse | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `aten_mul_f32` | aten_mul | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `aten_nansum_ordered_f32` | aten_nansum | RAISED | 2 | - | EXACT / UNSOUND |  |
 | `aten_ne_f32` | aten_ne | RAISED | 1 | - | EXACT / UNSOUND |  |
@@ -251,6 +253,7 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 191, UNSOUND: 2, UNVALIDATED: 16 (
 | `openblas_somatcopy_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `openblas_somatcopy_transpose_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `opencv_bilinear2x_f32` | opencv_bilinear | RAISED | 1 | - | EXACT / EXACT |  |
+| `opencv_box3x3_u8` | opencv_box_fixed | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
 | `opencv_gaussian3x3_u8` | opencv_gaussian_fixed | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
 | `opencv_histogram_u8_u32` | opencv_histogram | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `opencv_histogram_u8_s32` | opencv_histogram | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
@@ -281,6 +284,17 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 191, UNSOUND: 2, UNVALIDATED: 16 (
 | `thrust_divide_scalars_f32` | thrust_divide | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `thrust_fill_f32` | thrust_fill | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `thrust_log1p_f32` | thrust_log1p | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_exp2_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_expm1_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_log2_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_log10_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_erfc_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_lgamma_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_hypot_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_fmod_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_fmax_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_fmin_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `thrust_nextafter_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
 | `thrust_polar_components_f32` | thrust_polar_components | RAISED | 2 | - | EXACT / UNSOUND |  |
 
 ## Minimal reproducers for non-RAISED specs

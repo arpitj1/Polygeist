@@ -841,12 +841,12 @@ def encode_body_yields(g: GenericBody) -> list[Term]:
                     "acos", "acosh", "asin", "asinh", "atan", "atanh",
                     "ceil", "cos", "cosh", "exp", "floor", "log",
                     "erf", "erfc", "exp2", "expm1", "log1p", "log2", "log10",
-                    "round", "roundeven", "trunc",
+                    "round", "roundeven", "trunc", "lgamma",
                     "sin", "sinh", "sqrt", "tan", "tanh",
                 }
                 binary = {"fmax": "max", "fmin": "min", "fmod": "mod",
                           "hypot": "hypot", "remainder": "remainder",
-                          "pow": "pow"}
+                          "pow": "pow", "nextafter": "nextafter"}
                 if call.group(3) and callee in binary:
                     env[result] = Term.Binary(
                         binary[callee], resolve(call.group(2)),

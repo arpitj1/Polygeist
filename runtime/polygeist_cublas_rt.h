@@ -721,20 +721,19 @@ void polygeist_pva_conv2d_3x3_i16(
                                      const uint16_t *, uint16_t *);          \
   void polygeist_pva_##op##_3x3_s16(int32_t, int32_t,                       \
                                      const int16_t *, int16_t *)
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaBoxFilterSubmit polygeist_pva_boxfilter_3x3_u8 */
 POLYGEIST_DECLARE_PVA_FILTER_TYPES(boxfilter);
 POLYGEIST_DECLARE_PVA_FILTER_TYPES(morphology_dilate);
 #undef POLYGEIST_DECLARE_PVA_FILTER_TYPES
 #define POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(suffix, type)                    \
   void polygeist_pva_gaussian_3x3_##suffix(                                 \
       int32_t, int32_t, float, float, const type *, type *)
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaGaussianFilterSubmit polygeist_pva_gaussian_3x3_u8 */
 POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(u8, uint8_t);
 POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(s8, int8_t);
 POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(u16, uint16_t);
 POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(s16, int16_t);
 #undef POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE
-/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaGaussianFilterSubmit polygeist_pva_gaussian_binomial3x3_u8 */
-void polygeist_pva_gaussian_binomial3x3_u8(int32_t, int32_t,
-                                          const uint8_t *, uint8_t *);
 void polygeist_pva_bilateral_3x3_u8(int32_t, int32_t, float, float,
                                      const uint8_t *, uint8_t *);
 /* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaImageHistogramSubmit polygeist_pva_histogram_256_u8_u32 */
@@ -1206,6 +1205,28 @@ void polygeist_ordered_rows_divided_sum_f32(int32_t rows, int32_t cols, float se
 void polygeist_ordered_rows_nansum_f32(int32_t rows, int32_t cols,
                                      const float *input, float *output);
 
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_exp2_f32 */
+void polygeist_thrust_exp2_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_expm1_f32 */
+void polygeist_thrust_expm1_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_log2_f32 */
+void polygeist_thrust_log2_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_log10_f32 */
+void polygeist_thrust_log10_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_erfc_f32 */
+void polygeist_thrust_erfc_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_lgamma_f32 */
+void polygeist_thrust_lgamma_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_hypot_f32 */
+void polygeist_thrust_hypot_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_fmod_f32 */
+void polygeist_thrust_fmod_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_fmax_f32 */
+void polygeist_thrust_fmax_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_fmin_f32 */
+void polygeist_thrust_fmin_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_nextafter_f32 */
+void polygeist_thrust_nextafter_f32(int32_t n, const float *left, const float *right, float *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_log1p_f32 */
 void polygeist_thrust_log1p_f32(int32_t n, const float *input, float *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_sin_f32 */

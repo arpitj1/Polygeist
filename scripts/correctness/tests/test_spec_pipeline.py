@@ -43,6 +43,21 @@ def program(body, argtype='memref<64xf64>'):
 
 
 class ScalarSemantics(unittest.TestCase):
+    def test_libm_gamma_is_not_an_uninterpreted_wildcard(self):
+        gamma = KM.encode_body(scalar(['%v = func.call @lgammaf(%in) : (f32) -> f32'], 'f32'))
+        logarithm = KM.encode_body(scalar(['%v = func.call @logf(%in) : (f32) -> f32'], 'f32'))
+        with patch.dict(os.environ, POLYGEIST_NUMERIC_MODEL='strict'):
+            self.assertTrue(KM.equivalent(gamma, gamma))
+            self.assertFalse(KM.equivalent(gamma, logarithm))
+
+    def test_nextafter_preserves_operand_order(self):
+        a = KM.Term.Binary('nextafter', KM.Term.In(0), KM.Term.In(1))
+        b = KM.Term.Binary('nextafter', KM.Term.In(1), KM.Term.In(0))
+        for model in ('strict','relaxed'):
+            with patch.dict(os.environ, POLYGEIST_NUMERIC_MODEL=model):
+                self.assertTrue(KM.equivalent(a,a))
+                self.assertFalse(KM.equivalent(a,b))
+
     def test_rounding_is_not_identity(self):
         rounded = KM.encode_body(scalar([
             '%x = arith.truncf %in : f64 to f32',
@@ -258,6 +273,16 @@ class ImportedPipeline(unittest.TestCase):
                 SM.verify(self.output, self.proof)
         with self.assertRaises(SM.SpecificationError):
             SM.verify(self.output, self.proof, backend='cuda')
+
+    def test_backend_policy_change_cannot_reuse_evidence(self):
+        with patch.dict(os.environ, POLYGEIST_BACKEND_ERROR_BUDGETS='{"opencv_box3x3_u8":3}'):
+            with self.assertRaises(SM.SpecificationError):
+                SM.verify(self.output, self.proof)
+
+    def test_backend_contract_evidence_cannot_be_invented(self):
+        altered = dict(self.proof, backend_contracts={'unexpected': {'configuration': {}}})
+        with self.assertRaises(SM.SpecificationError):
+            SM.verify(self.output, altered)
 
     def test_engine_change_cannot_reuse_evidence(self):
         with patch.object(SM, 'semantic_inputs', return_value={}):

@@ -1,0 +1,78 @@
+{
+  "routine": "aten_mse",
+  "source": "Pinned ATen FP32 mse and unit-gradient mse_backward scalar kernels",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cpu/BinaryOpsKernel.cpp",
+      "sha256": "debaeadf5a64ee11090b2baff9fc1086775c8761f316965c819d95da77cb8269"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cpu/PointwiseOpsKernel.cpp",
+      "sha256": "0aecb8dd000cb95bb55938ca715965f3be3ee68f9b99982e743061215ebdb4fa"
+    }
+  ],
+  "adaptation": "TensorIterator traversal becomes a contiguous FP32 C loop. Preserve scalar operation order. Backward fixes grad_output to one and retains value as a parameter. cuDNN graph emission is mechanical from this raised public reference; no cuDNN source is claimed.",
+  "specs": [
+    {
+      "name": "aten_mse_f32",
+      "defines": {
+        "BACKWARD": 0
+      },
+      "args": [
+        "n",
+        "input",
+        "target",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "errno and floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_mse_backward_f32",
+      "defines": {
+        "BACKWARD": 1
+      },
+      "args": [
+        "n",
+        "input",
+        "target",
+        "value",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "errno and floating exception flags are not observed"
+      ],
+      "deviations": []
+    }
+  ]
+}

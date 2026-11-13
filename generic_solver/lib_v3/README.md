@@ -55,6 +55,11 @@ bitwise agreement with a vendor library's internal reduction order. Both
 models retain numeric cast operations and their types; an error
 budget alone does not justify a match.
 
+PVA API parameters may be derived from checked reference specializations.
+Quantized backend implementations require an explicit numerical contract and
+per-specification error budget, separately from source/reference equivalence.
+See [PVA parameter configuration and numerical contracts](PVA_NUMERICS.md).
+
 The match report records reference/manifests, generated-library hashes, matcher
 sources, numeric model, backend, selected APIs, and operand bindings. The build
 checks it before ABI lowering. Resuming with `--semantic-mlir` requires

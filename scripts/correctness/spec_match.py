@@ -25,6 +25,7 @@ import abi_v2 as ABI
 import match_v2 as MATCH
 import spec_provenance as PROVENANCE
 import recipe as RECIPE
+import backend_contract as BACKEND
 
 
 class SpecificationError(ValueError):
@@ -64,6 +65,7 @@ def registry():
 
 def capabilities(rows, backend, disabled=(), only=None):
     calls, bound, errors = ABI.build_table()
+    policy = BACKEND.budgets()
     allowed = set()
     rejected = {}
     for name, row in rows.items():
@@ -87,6 +89,8 @@ def capabilities(rows, backend, disabled=(), only=None):
             rejected[name] = errors.get(name, 'no validated target ABI binding')
         elif backend not in calls[bound[name].call].backends:
             rejected[name] = 'validated API adapter unavailable for requested backend'
+        elif BACKEND.rejection(name, target, policy):
+            rejected[name] = BACKEND.rejection(name, target, policy)
         else:
             allowed.add(name)
     return allowed, rejected
@@ -122,7 +126,21 @@ def abi_digest():
 def semantic_configuration():
     return dict(numeric_model=os.environ.get('POLYGEIST_NUMERIC_MODEL', 'strict'),
                 eqsat_ablation=os.environ.get('EQSAT_ABLATION', 'full'),
-                spec_suite=MATCH.SUITE)
+                spec_suite=MATCH.SUITE, backend_error_budgets=BACKEND.budgets())
+
+
+def backend_evidence(names, rows):
+    calls, bound, _ = ABI.build_table()
+    result = {}
+    policy = BACKEND.budgets()
+    for name in sorted(set(names)):
+        target = rows[name]['entry']['target']
+        cfg = calls[bound[name].call].runtime_adapter or {}
+        configuration = cfg.get('resolved_configuration')
+        numerical = BACKEND.evidence(name, target, policy)
+        if configuration or numerical:
+            result[name] = dict(configuration=configuration, numerical_contract=numerical)
+    return result
 
 
 def restore_library_metadata(original, normalized):
@@ -331,6 +349,7 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
         matcher_sha256=digest(Path(MATCH.__file__).read_text()),
         elapsed_ms=round((time.monotonic() - started) * 1000, 3),
         emitted=emitted, matches=evidence, rejected_specifications=rejected,
+        backend_contracts=backend_evidence(emitted, rows),
         diagnostics=diagnostics,
         validation_stage='recognition-and-ABI-binding; vendor execution not yet checked')
     if normalization:
@@ -392,9 +411,12 @@ def verify(text, proof, *, backend=None):
                 if digest((ROOT / row[key]).read_text()) != row[key + '_sha256']:
                     raise SpecificationError('stored reference inputs have changed')
     emitted = re.findall(r'\bkernel\.launch\s+@([\w.$-]+)', text)
-    allowed, _ = capabilities(registry(), proof['backend'])
+    rows = registry()
+    allowed, _ = capabilities(rows, proof['backend'])
     if set(emitted) - allowed:
         raise SpecificationError('stored launch no longer has a valid reference import and ABI')
+    if proof.get('backend_contracts', {}) != backend_evidence(emitted, rows):
+        raise SpecificationError('stored backend configuration or numerical contract has changed')
     proved = {name for item in proof.get('matches', []) for name in item['specifications']}
     if emitted != proof.get('emitted') or set(emitted) - proved:
         raise SpecificationError('stored launch list is not justified by match evidence')

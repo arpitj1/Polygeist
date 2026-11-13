@@ -53,12 +53,12 @@
 void NETLIB_SPEC(int h,int w,const uint8_t input[h][w],uint8_t output[h][w]) {
   uint16_t horizontal[h][w];
   for(int y=0;y<h;++y) for(int x=1;x<w-1;++x) {
-    uint16_t left=(uint16_t)((uint16_t)input[y][x-1]<<8)>>2;
-    uint16_t right=(uint16_t)((uint16_t)input[y][x+1]<<8)>>2;
-    uint16_t middle=(uint16_t)((uint16_t)input[y][x]<<8)>>1;
+    uint16_t left=(uint16_t)((uint16_t)input[y][x-1]<<8)>>H_SIDE_SHIFT;
+    uint16_t right=(uint16_t)((uint16_t)input[y][x+1]<<8)>>H_SIDE_SHIFT;
+    uint16_t middle=(uint16_t)((uint16_t)input[y][x]<<8)>>H_CENTER_SHIFT;
     horizontal[y][x]=(uint16_t)((uint16_t)(left+right)+middle);
   }
   for(int y=1;y<h-1;++y) for(int x=1;x<w-1;++x)
     output[y][x]=(uint8_t)(((uint32_t)horizontal[y-1][x]+(uint32_t)horizontal[y+1][x]+
-                          ((uint32_t)horizontal[y][x]<<1)+(1<<9))>>10);
+                          ((uint32_t)horizontal[y][x]<<V_CENTER_SHIFT)+V_ROUND)>>V_OUTPUT_SHIFT);
 }

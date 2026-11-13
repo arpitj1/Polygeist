@@ -49,7 +49,7 @@ extern "C" void polygeist_thrust_polar_components_f32(
   }
 }
 template<class Function>
-static void trigonometric_transform(int32_t n, const float *input,
+static void scalar_transform(int32_t n, const float *input,
                                     float *output, Function function) {
   if (n <= 0 || !input || !output) std::abort();
   auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
@@ -57,16 +57,65 @@ static void trigonometric_transform(int32_t n, const float *input,
                     output, function);
   cudaError_t status = cudaGetLastError();
   if (status != cudaSuccess) {
-    std::fprintf(stderr, "polygeist Thrust trigonometry: %s\n", cudaGetErrorString(status));
+    std::fprintf(stderr, "polygeist Thrust transform: %s\n", cudaGetErrorString(status));
     std::abort();
   }
 }
 extern "C" void polygeist_thrust_sin_f32(int32_t n, const float *input, float *output) {
-  trigonometric_transform(n, input, output, SinF32{});
+  scalar_transform(n, input, output, SinF32{});
 }
 extern "C" void polygeist_thrust_cos_f32(int32_t n, const float *input, float *output) {
-  trigonometric_transform(n, input, output, CosF32{});
+  scalar_transform(n, input, output, CosF32{});
 }
+// Fixed-ABI instances of the imported public scalar functors. These wrappers
+// only dispatch to Thrust; specification matching determines their arguments.
+#define POLYGEIST_UNARY_MATH(NAME)                                            \
+  struct Math_##NAME {                                                       \
+    __host__ __device__ float operator()(float x) const {                     \
+      return ::NAME##f(x);                                                   \
+    }                                                                       \
+  };                                                                        \
+  extern "C" void polygeist_thrust_##NAME##_f32(                             \
+      int32_t n, const float *input, float *output) {                         \
+    scalar_transform(n, input, output, Math_##NAME{});                        \
+  }
+POLYGEIST_UNARY_MATH(exp2)
+POLYGEIST_UNARY_MATH(expm1)
+POLYGEIST_UNARY_MATH(log2)
+POLYGEIST_UNARY_MATH(log10)
+POLYGEIST_UNARY_MATH(erfc)
+POLYGEIST_UNARY_MATH(lgamma)
+#undef POLYGEIST_UNARY_MATH
+
+template<class Function>
+static void scalar_transform(int32_t n, const float *left, const float *right,
+                             float *output, Function function) {
+  if (n <= 0 || !left || !right || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::transform(thrust::cuda::par_nosync.on(stream), left, left + n, right,
+                    output, function);
+  cudaError_t status = cudaGetLastError();
+  if (status != cudaSuccess) {
+    std::fprintf(stderr, "polygeist Thrust transform: %s\n", cudaGetErrorString(status));
+    std::abort();
+  }
+}
+#define POLYGEIST_BINARY_MATH(NAME)                                           \
+  struct Math_##NAME {                                                       \
+    __host__ __device__ float operator()(float x, float y) const {             \
+      return ::NAME##f(x, y);                                                \
+    }                                                                       \
+  };                                                                        \
+  extern "C" void polygeist_thrust_##NAME##_f32(                             \
+      int32_t n, const float *left, const float *right, float *output) {       \
+    scalar_transform(n, left, right, output, Math_##NAME{});                   \
+  }
+POLYGEIST_BINARY_MATH(hypot)
+POLYGEIST_BINARY_MATH(fmod)
+POLYGEIST_BINARY_MATH(fmax)
+POLYGEIST_BINARY_MATH(fmin)
+POLYGEIST_BINARY_MATH(nextafter)
+#undef POLYGEIST_BINARY_MATH
 extern "C" void polygeist_thrust_log1p_f32(int32_t n, const float *input,
                                          float *output) {
   if (n <= 0 || !input || !output) std::abort();

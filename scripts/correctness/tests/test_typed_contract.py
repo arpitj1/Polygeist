@@ -9,6 +9,43 @@ import abi_v2 as A
 import typed_wrapper as T
 
 class TypedContracts(unittest.TestCase):
+    def configured_contract(self, expression='f32(1.0 / SCALE)', parameter='float'):
+        args=[A.SpecArg('n','int',ctype='int'),
+              A.SpecArg('input','array',rank=1,intent='in',ctype='float'),
+              A.SpecArg('output','array',rank=1,intent='out',ctype='float')]
+        cfg=dict(schema=1,kind='typed_c_wrapper',entry='wrapper',
+                 arguments=['n',{'configuration':'gain','type':'float'},'input','output'],
+                 arrays={'input':['n'],'output':['n']},bounds={'n':{'min':1,'max':4096}},
+                 configuration=dict(schema=1,inputs=['SCALE'],values={'gain':expression},
+                                    checks=['0 < gain <= 1']))
+        target=dict(library='TestLibrary',call='vendorSubmit',backends=['pva'],runtime_adapter=cfg)
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);(root/'runtime').mkdir()
+            (root/'runtime/polygeist_cublas_rt.h').write_text(
+                '/* POLYGEIST_TYPED_VENDOR_ENTRY TestLibrary vendorSubmit wrapper */\n'
+                'void wrapper(int, '+parameter+', const float *, float *);\n')
+            with patch.object(A,'REPO',root),patch.object(A,'CLANG','gcc'),patch.object(
+                    A,'manifest_entry',return_value=(None,{'defines':{'SCALE':8}})):
+                return T.contract(A,'reference',target,'void',args)
+
+    def test_configured_arguments_are_typed_and_marshaled(self):
+        params,_,cfg=self.configured_contract()
+        self.assertEqual(cfg['resolved_configuration']['gain'],.125)
+        call=A.CallAbi('selected','TestLibrary','vendorSubmit',params,[],runtime_adapter=cfg)
+        code=T.generate(call,lambda _: 'void selected(void)')
+        self.assertIn('wrapper(n, 0x1.0000000000000p-3f, input, output);',code)
+        self.assertNotIn('log(',code)
+
+    def test_configuration_cannot_create_pointer_or_change_api_precision(self):
+        for parameter in ('float *','double','int'):
+            with self.subTest(parameter=parameter),self.assertRaises(A.AbiError):
+                self.configured_contract(parameter=parameter)
+
+    def test_configuration_rejects_failed_check_and_unrounded_api_value(self):
+        for expression in ('f32(-1.0)','0.1'):
+            with self.subTest(expression=expression),self.assertRaises(A.AbiError):
+                self.configured_contract(expression=expression)
+
     def contract(self,element='float',wrapper_element='float',rank=1,backend='cuda',change=None,readonly=False):
         dims=['n'] if rank==1 else ['h','w'] if rank==2 else ['d'+str(i) for i in range(rank)]
         args=[A.SpecArg(d,'int',ctype='int') for d in dims]

@@ -18,6 +18,7 @@ add_mlir_dialect_library(MLIRPolygeistTransforms
   RaiseToLinalg.cpp
   LinalgDebufferize.cpp
   LowerPolygeistSubmap.cpp
+  LowerSupportedMathToLibm.cpp
   NormalizeLinalgMatchingViews.cpp
   LowerKernelLaunch.cpp
   ComposeCutensornetNetworks.cpp
@@ -69,6 +70,7 @@ add_mlir_dialect_library(MLIRPolygeistTransforms
   MLIRLinalgTransforms
   MLIRMathDialect
   MLIRMathToLLVM
+  MLIRMathToLibm
   MLIRMemRefDialect
   MLIRNVVMDialect
   MLIRPass

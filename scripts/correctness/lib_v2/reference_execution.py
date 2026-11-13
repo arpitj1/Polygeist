@@ -31,7 +31,7 @@ PY = sys.executable
 
 
 LOWER_TO_LLVM = [
-    "--convert-math-to-llvm", "--convert-math-to-libm",
+    "--convert-math-to-llvm=approximate-log1p=false", "--convert-math-to-libm",
     "--empty-tensor-to-alloc-tensor", "--lower-affine",
     "--one-shot-bufferize=bufferize-function-boundaries",
     "--convert-linalg-to-loops", "--convert-scf-to-cf", "--expand-strided-metadata",
@@ -66,6 +66,7 @@ def lower(inp: Path, d: Path, tag: str, fn: str, log: Path) -> Path | None:
         return None
     canon = d / f"{tag}_canon.mlir"
     if sh([R.POLYGEIST_OPT, "--lower-polygeist-submap", "--canonicalize-polygeist",
+           "--lower-supported-math-to-libm",
            legal, "-o", canon], log):
         return None
     if "polygeist.submap" in canon.read_text():

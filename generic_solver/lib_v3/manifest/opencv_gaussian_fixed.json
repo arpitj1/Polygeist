@@ -29,10 +29,18 @@
         "runtime_adapter": {
           "schema": 1,
           "kind": "typed_c_wrapper",
-          "entry": "polygeist_pva_gaussian_binomial3x3_u8",
+          "entry": "polygeist_pva_gaussian_3x3_u8",
           "arguments": [
             "h",
             "w",
+            {
+              "configuration": "sigma_x",
+              "type": "float"
+            },
+            {
+              "configuration": "sigma_y",
+              "type": "float"
+            },
             "input",
             "output"
           ],
@@ -56,12 +64,49 @@
               "max": 46340
             }
           },
-          "alias_policy": "disjoint"
+          "alias_policy": "disjoint",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "H_SIDE_SHIFT",
+              "H_CENTER_SHIFT",
+              "V_CENTER_SHIFT",
+              "V_OUTPUT_SHIFT",
+              "V_ROUND"
+            ],
+            "values": {
+              "x_side": "1.0 / (2 ** H_SIDE_SHIFT)",
+              "x_center": "1.0 / (2 ** H_CENTER_SHIFT)",
+              "y_side": "256.0 / (2 ** V_OUTPUT_SHIFT)",
+              "y_center": "y_side * (2 ** V_CENTER_SHIFT)",
+              "sigma_x": "f32(sqrt(-1.0 / (2.0 * log(x_side / x_center))))",
+              "sigma_y": "f32(sqrt(-1.0 / (2.0 * log(y_side / y_center))))",
+              "qx": "f32(exp(f32(-0.5 / f32(sigma_x * sigma_x))))",
+              "qy": "f32(exp(f32(-0.5 / f32(sigma_y * sigma_y))))",
+              "normalizer": "f32(f32(1.0 + f32(2.0 * qx)) * f32(1.0 + f32(2.0 * qy)))",
+              "corner": "floor(f32(f32(256.0 * f32(qx * qy)) / normalizer))",
+              "x_edge": "floor(f32(f32(256.0 * qx) / normalizer))",
+              "y_edge": "floor(f32(f32(256.0 * qy) / normalizer))",
+              "center": "256 - 4 * corner - 2 * x_edge - 2 * y_edge"
+            },
+            "checks": [
+              "0 < x_side < x_center",
+              "0 < y_side < y_center",
+              "2 * x_side + x_center == 1",
+              "2 * y_side + y_center == 1",
+              "2 * V_ROUND == 2 ** V_OUTPUT_SHIFT",
+              "corner == 256 * x_side * y_side",
+              "x_edge == 256 * x_side * y_center",
+              "y_edge == 256 * x_center * y_side",
+              "center == 256 * x_center * y_center"
+            ]
+          }
         }
       },
       "assumptions": [
         "3 <= h,w <= 46340; contiguous disjoint arrays; preserve border",
-        "PVA sigmaX=sigmaY=0.8493218f, whose quantized 3x3 coefficients implement the [1,2,1] outer product divided by 16; round with +8 before shift4."
+        "Sigma parameters are recovered from the imported fixed-point reference specialization. The configuration checks FP32 API parameters, quantized coefficients, normalization and source rounding before binding.",
+        "Public PVA Gaussian quantization model: FP32 weights, truncate normalized coefficients scaled by 256, add residual to center. Vendor execution must be validated independently; public documentation does not specify every floating-point intermediate."
       ],
       "deviations": [],
       "validation": {
@@ -79,6 +124,13 @@
             6
           ]
         }
+      },
+      "defines": {
+        "H_SIDE_SHIFT": 2,
+        "H_CENTER_SHIFT": 1,
+        "V_CENTER_SHIFT": 1,
+        "V_OUTPUT_SHIFT": 10,
+        "V_ROUND": 512
       }
     }
   ]

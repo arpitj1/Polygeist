@@ -1,0 +1,644 @@
+{
+  "routine": "thrust_pointwise_math",
+  "source": "Pinned public ATen CUDA scalar math functors and Thrust transform",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/BinaryGeometricKernels.cu",
+      "sha256": "b55753d6f313fac1a5b6fd77a5cd65c1e0ec9293e70302ee1dc3bf1903fcc131"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/BinaryRemainderKernel.cu",
+      "sha256": "29e3981ec8d6bbdd4f442ce23aef8f7b1fd2ae2c5bb8c2683ffefaddedc15f35"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/Math.cuh",
+      "sha256": "ac3c3025545ccfe8656a3e410de867a9f55d44e89e3d6f7cf6c4d0ddca421c41"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/MaxMinElementwiseKernel.cu",
+      "sha256": "783930ff1e566e76aa3f6e82e651b1a73634d94aed1690c5c1ced4a4dbe757e3"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/StepKernel.cu",
+      "sha256": "3c3fb390b41b92bb56d62e353e610f6ed26b57ea030b6ef621520c4c6c54762f"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/UnaryGammaKernels.cu",
+      "sha256": "ad2039cba9a4e5b08eb5080339f44ca343552b6292b77dd71a8320ff7a7d7e2f"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/UnaryLogKernels.cu",
+      "sha256": "4ffc9f091bbbae5d612bb0a8475f315c701e17ad25e636765f7b291322512ce4"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/UnaryOpsKernel.cu",
+      "sha256": "ae9e870121de229ffb5cac1cfccab0bde4184d1c6da91dcd2c10de3ddaa9a4e5"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/UnarySpecialOpsKernel.cu",
+      "sha256": "f1c4b8ad9a28b5f2fe94fedcd5df80325a5697951a2884e01d09261b578f80fe"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/sequential/for_each.h",
+      "sha256": "c9206514e44123c02f1f0e2f4231f26a162dab5ffde911d22a22a9d5a408cc82"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    }
+  ],
+  "adaptation": "Specialize the cited CUDA scalar functors to FP32 and expand the public Thrust transform traversal to C subscripts. Preserve the exact unary or binary math call, argument order, and FP32 type. The runtime invokes real Thrust transform with the same CUDA libdevice function. No application operation names participate in matching.",
+  "specs": [
+    {
+      "name": "thrust_exp2_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_exp2_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "exp2f",
+        "MATH_ARITY": 1
+      }
+    },
+    {
+      "name": "thrust_expm1_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_expm1_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "expm1f",
+        "MATH_ARITY": 1
+      }
+    },
+    {
+      "name": "thrust_log2_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_log2_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "log2f",
+        "MATH_ARITY": 1
+      }
+    },
+    {
+      "name": "thrust_log10_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_log10_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "log10f",
+        "MATH_ARITY": 1
+      }
+    },
+    {
+      "name": "thrust_erfc_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_erfc_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "erfcf",
+        "MATH_ARITY": 1
+      }
+    },
+    {
+      "name": "thrust_lgamma_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_lgamma_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ",
+        "the libm signgam global is not observed"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "lgammaf",
+        "MATH_ARITY": 1
+      }
+    },
+    {
+      "name": "thrust_hypot_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_hypot_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "hypotf",
+        "MATH_ARITY": 2
+      }
+    },
+    {
+      "name": "thrust_fmod_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_fmod_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "fmodf",
+        "MATH_ARITY": 2
+      }
+    },
+    {
+      "name": "thrust_fmax_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_fmax_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "fmaxf",
+        "MATH_ARITY": 2
+      }
+    },
+    {
+      "name": "thrust_fmin_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_fmin_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "fminf",
+        "MATH_ARITY": 2
+      }
+    },
+    {
+      "name": "thrust_nextafter_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_nextafter_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "nextafterf",
+        "MATH_ARITY": 2
+      }
+    }
+  ]
+}

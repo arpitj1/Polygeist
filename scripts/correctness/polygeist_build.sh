@@ -577,6 +577,11 @@ if [ "$ABI_BACKEND" = cuda ]; then
     2>"$WORK/memory-copy.err"
   mv "$WORK/abi_memory.mlir" "$WORK/abi_canon.mlir"
 fi
+# Preserve accurate libm primitives before LLVM's approximate expansions.
+polygeist-opt --lower-supported-math-to-libm "$WORK/abi_canon.mlir" \
+  -o "$WORK/abi_math.mlir" 2>"$WORK/math.err" || {
+    echo "ERROR: math lowering failed; see $WORK/math.err" >&2; exit 1; }
+mv "$WORK/abi_math.mlir" "$WORK/abi_canon.mlir"
 C_STYLE_ABI=0
 GPU_TO_LLVM_ARGS=()
 if [ "$DEVICE_WORKSPACE_PLANNED" -ne 0 ]; then
@@ -596,7 +601,7 @@ if grep -qE 'polygeist\.(memref2pointer|pointer2memref)' $WORK/abi_canon.mlir; t
     # the required external model and can prepare the complete application.
     C_ABI_OPT=polygeist-opt
   fi
-  $C_ABI_OPT --allow-unregistered-dialect --convert-math-to-llvm \
+  $C_ABI_OPT --allow-unregistered-dialect --convert-math-to-llvm=approximate-log1p=false \
     --empty-tensor-to-alloc-tensor --lower-affine \
     --one-shot-bufferize=bufferize-function-boundaries \
     --convert-linalg-to-loops --convert-scf-to-cf \
@@ -609,7 +614,7 @@ if grep -qE 'polygeist\.(memref2pointer|pointer2memref)' $WORK/abi_canon.mlir; t
     $WORK/pre_llvm.mlir -o $WORK/llvm.mlir 2>>$WORK/mlir.err || {
       echo "ERROR: Polygeist C-ABI lowering failed; see $WORK/mlir.err" >&2; cat $WORK/mlir.err >&2; exit 1; }
 else
-  $MLIR_OPT --convert-math-to-llvm \
+  $MLIR_OPT --convert-math-to-llvm=approximate-log1p=false \
     --empty-tensor-to-alloc-tensor \
     --lower-affine \
     --one-shot-bufferize=bufferize-function-boundaries \

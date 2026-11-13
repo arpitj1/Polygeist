@@ -240,6 +240,7 @@ def lower_memref_linalg(inp: Path, d: Path, fn: str, log: Path) -> Path | None:
     # behind, which upstream mlir-opt cannot parse.
     if E.sh([R.POLYGEIST_OPT, "--canonicalize-polygeist",
              "--convert-linalg-to-loops", "--lower-polygeist-submap",
+             "--lower-supported-math-to-libm",
              inp, "-o", loops], log):
         return None
     llm, ll = d / "linalg_llvm.mlir", d / "linalg_kernel.ll"

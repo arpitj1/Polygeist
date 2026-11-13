@@ -1,0 +1,121 @@
+{
+  "routine": "opencv_box_fixed",
+  "source": "Public OpenCV RowSum<uchar,ushort> and ColumnSum<ushort,uchar>, commit 8bc22eba5946100e9b2470c60939c3f2588c28d7; public reference for closed PVA API with separate quantization contract",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/box_filter.simd.hpp",
+      "sha256": "d18696d999c76bbbf746dc6935f069043b9679a8370502c4828f164c022d9f03"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_box3x3_u8",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "PVA",
+        "call": "pvaBoxFilterSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_boxfilter_3x3_u8",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              "h",
+              "w"
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        },
+        "numerical_contract": {
+          "schema": 1,
+          "kind": "bounded_linear_quantization",
+          "source_weights": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "source_denominator": 9,
+          "backend_weights": [
+            29,
+            28,
+            29,
+            28,
+            29,
+            28,
+            29,
+            28,
+            28
+          ],
+          "backend_denominator": 256,
+          "input_range": [
+            0,
+            255
+          ],
+          "source_rounding_error": 0.5,
+          "backend_rounding_error": 0.5,
+          "source": "https://docs.nvidia.com/pva/solutions/0.4.0/impl/operator/boxfilter.html",
+          "assumptions": [
+            "U8 pixels; identical 3x3 interior neighborhood and preserved output border.",
+            "No accumulator overflow. Both outputs round the normalized nonnegative sum to nearest integer.",
+            "PVA Q8 coefficient truncation and residual distribution follow the cited public model; validate the installed backend independently."
+          ]
+        }
+      },
+      "assumptions": [
+        "3 <= h,w <= 46340; contiguous disjoint arrays; preserve border.",
+        "The public Q23 normalization equals the rounded integer average for every U8 nine-pixel sum; backend quantization is a separate numerical contract."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            5,
+            6
+          ]
+        }
+      }
+    }
+  ]
+}
