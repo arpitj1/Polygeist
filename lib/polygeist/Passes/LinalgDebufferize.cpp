@@ -2585,6 +2585,19 @@ static void rewriteLinalgGeneric(MultiRootCtx &ctx,
   rewriter.cloneRegionBefore(generic.getRegion(), newGeneric.getRegion(),
                              newGeneric.getRegion().end());
 
+  // Read-only buffers captured by a scalar payload use the tensor state at
+  // this operation, just like explicit inputs. canHandle rejects captures
+  // of an output root, where a snapshot could lose an iteration dependence.
+  for (auto load : llvm::make_early_inc_range(
+           newGeneric.getBody()->getOps<memref::LoadOp>())) {
+    auto tensor = ctx.rootToTensor.find(load.getMemRef());
+    assert(tensor != ctx.rootToTensor.end() && "capture checked before rewrite");
+    rewriter.setInsertionPoint(load);
+    rewriter.replaceOpWithNewOp<tensor::ExtractOp>(
+        load, tensor->second, load.getIndices());
+  }
+  rewriter.setInsertionPointAfter(newGeneric);
+
   // For each output: apply inverse chain into the root's current tensor.
   for (auto [idx, info] : llvm::enumerate(outRouting)) {
     Value resultSlice = newGeneric.getResult(idx);
@@ -2872,7 +2885,16 @@ static bool canHandle(func::FuncOp funcOp,
     if (auto load = dyn_cast<memref::LoadOp>(op)) {
       if (!checkValTracked(load.getMemRef())) { ok = false; return WalkResult::interrupt(); }
       if (valTouchesTrackedMemref(load.getMemRef())) {
-        if (isUnderUnhandledRegion(op)) { ok = false; return WalkResult::interrupt(); }
+        auto generic = dyn_cast<linalg::GenericOp>(op->getParentOp());
+        bool readOnlyCapture = generic && !isUnderUnhandledRegion(generic) &&
+            load.getMemRef() == findRoot(load.getMemRef()) &&
+            llvm::none_of(generic.getOutputs(), [&](Value output) {
+              return findRoot(output) == load.getMemRef();
+            });
+        if (isUnderUnhandledRegion(op) && !readOnlyCapture) {
+          ok = false;
+          return WalkResult::interrupt();
+        }
         hasMemrefWork = true;
       }
       return WalkResult::advance();
@@ -3072,6 +3094,8 @@ static bool hasCrossRootGeneric(func::FuncOp funcOp) {
     for (Value operand : generic->getOperands())
       if (operand.getType().isa<MemRefType>())
         roots.insert(findRoot(operand));
+    for (auto load : generic.getBody()->getOps<memref::LoadOp>())
+      roots.insert(findRoot(load.getMemRef()));
     if (roots.size() > 1) {
       found = true;
       return WalkResult::interrupt();

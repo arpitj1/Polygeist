@@ -152,13 +152,15 @@ _ATOM_OF: dict[tuple, str] = {}
 _ATOM_INFO: dict[str, tuple[str, tuple]] = {}
 
 
-def atom(arr: str, coords) -> Aff:
-    key = (arr, tuple(coords))
+def atom(arr: str, coords, conversion: str = "") -> Aff:
+    key = (arr, tuple(coords), conversion) if conversion else (arr, tuple(coords))
     name = _ATOM_OF.get(key)
     if name is None:
         # content-derived (Aff reprs are canonical), so a name means the same
         # element in every process -- spec systems are pickled to disk
         name = f"@{arr}[{', '.join(map(repr, key[1]))}]"
+        if conversion:
+            name = conversion + '(' + name + ')'
         _ATOM_OF[key] = name
         _ATOM_INFO[name] = key
     return Aff.var(name)
@@ -182,17 +184,22 @@ def is_atom(v: str) -> bool:
 
 def atom_info(v: str) -> tuple[str, tuple]:
     """(array, coords) of an atom variable."""
-    return _ATOM_INFO[v]
+    return _ATOM_INFO[v][:2]
+
+
+def atom_conversion(v: str) -> str:
+    info = _ATOM_INFO[v]
+    return info[2] if len(info) == 3 else ""
 
 
 def _subst_atom(name: str, m: Mapping[str, Aff]) -> Aff:
-    arr, coords = _ATOM_INFO[name]
+    arr, coords = atom_info(name)
     new_coords = tuple(a.subst(m) for a in coords)
     r = m.get("@arr:" + arr)
     new_arr = next(iter(r.vars())) if r is not None else arr
     if new_arr == arr and new_coords == coords:
         return Aff.var(name)
-    return atom(new_arr, new_coords)
+    return atom(new_arr, new_coords, atom_conversion(name))
 
 
 def deps(names) -> set[str]:

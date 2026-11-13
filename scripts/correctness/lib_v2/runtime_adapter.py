@@ -68,8 +68,11 @@ def reference_region(A, spec, args, extent):
     return f, g, gb, inputs, output
 
 
-def pointwise_graph(A, spec, args, extent):
-    f, g, gb, inputs, output = reference_region(A, spec, args, extent)
+def pointwise_graph(A, spec, args, extent=None, *, reference=None, input_slots=4):
+    f, g, gb, inputs, output = reference or reference_region(A, spec, args, extent)
+    if input_slots not in (4, 8):
+        raise A.AbiError("unsupported pointwise input slot count")
+    scalar_base, node_base = input_slots, input_slots + 8
     import kernel_match as K
     runtime=(A.REPO/'runtime/polygeist_cublas_rt_cuda.c').read_text()
     modes={name:int(op) for op,name in re.findall(r'case (\d+): \*mode = CUDNN_POINTWISE_(\w+); return true;',runtime)}
@@ -88,7 +91,7 @@ def pointwise_graph(A, spec, args, extent):
         types[name]=literal_types.get(name)
         if types[name]!='f32':continue
         if len(scalars)==8:raise A.AbiError('too many pointwise constants')
-        values[name]=4+len(scalars);types[name]='f32';scalars.append(value)
+        values[name]=scalar_base+len(scalars);types[name]='f32';scalars.append(value)
     scalar_parameters=set()
     for arg in args:
         if arg.kind!='scalar':continue
@@ -96,7 +99,7 @@ def pointwise_graph(A, spec, args, extent):
             raise A.AbiError('pointwise scalar capture must preserve FP32 type')
         if len(scalars)==8:raise A.AbiError('too many pointwise scalar operands')
         scalar_arguments[arg.name]=len(scalars)
-        values['%'+arg.name]=4+len(scalars);types['%'+arg.name]='f32';scalars.append(0.0)
+        values['%'+arg.name]=scalar_base+len(scalars);types['%'+arg.name]='f32';scalars.append(0.0)
         scalar_parameters.add('%'+arg.name)
     definitions={result:op for op in f.ops for result in op.results}
     active=set();used_parameters=set();temporary=0
@@ -110,7 +113,7 @@ def pointwise_graph(A, spec, args, extent):
             raise A.AbiError('vendor/runtime lacks CUDNN_POINTWISE_'+mode)
         refs=[values[x] for x in operands]+[0,0,0]
         instructions.append((modes[mode]<<24)|(refs[0]<<16)|(refs[1]<<8)|refs[2])
-        values[result]=12+len(instructions)-1;types[result]=result_type
+        values[result]=node_base+len(instructions)-1;types[result]=result_type
 
     def alias(result,source):
         types[result]=types[source]
@@ -172,10 +175,10 @@ def pointwise_graph(A, spec, args, extent):
     def scalar_literal(value):
         # Reuse a literal only by exact value/sign, never a parameter slot.
         for name,index in values.items():
-            if 4 <= index < 4+len(scalars) and index-4 not in scalar_arguments.values() and types[name]=='f32' and scalars[index-4].hex()==float(value).hex():
+            if scalar_base <= index < scalar_base+len(scalars) and index-scalar_base not in scalar_arguments.values() and types[name]=='f32' and scalars[index-scalar_base].hex()==float(value).hex():
                 return name
         if len(scalars)==8:raise A.AbiError('too many pointwise constants')
-        name=temp();values[name]=4+len(scalars);types[name]='f32';scalars.append(float(value))
+        name=temp();values[name]=scalar_base+len(scalars);types[name]='f32';scalars.append(float(value))
         return name
 
     def lower_constant_conversion(line):
@@ -329,7 +332,7 @@ def pointwise_graph(A, spec, args, extent):
     for line in gb.body_lines:lower_instruction(line)
     if used_parameters!=scalar_parameters:raise A.AbiError('unused pointwise scalar parameter')
     if (not instructions or len(instructions)>24 or len(gb.yield_values)!=1 or
-            values.get(gb.yield_values[0])!=12+len(instructions)-1 or
+            values.get(gb.yield_values[0])!=node_base+len(instructions)-1 or
             types.get(gb.yield_values[0])!='f32'):
         raise A.AbiError('pointwise output must be the final supported instruction')
     words=[0]*12
@@ -372,6 +375,9 @@ def unary_reference(A, spec, args, extent):
 
 def contract(A,spec,target,ret,args):
     cfg=target['runtime_adapter']
+    if cfg.get('kind') == 'tensor_pointwise_reference':
+        from tensor_pointwise import contract as tensor_contract
+        return tensor_contract(A, spec, target, ret, args)
     if cfg.get('kind') == 'typed_c_wrapper':
         from typed_wrapper import contract as typed_contract
         return typed_contract(A, spec, target, ret, args)

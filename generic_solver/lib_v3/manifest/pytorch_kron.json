@@ -1,0 +1,118 @@
+{
+  "routine": "pytorch_kron",
+  "source": "PyTorch d7af122d81a49b1fa7a31ba52bd57c026f092646 public KronImpl::kron_out contiguous FP32 rank-two path; explicit broadcast TensorIterator coordinates",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/LinearAlgebra.cpp",
+      "sha256": "fcdd1ad6f3ba2d00dd85cbf48e49bc4be8d904da71f6021cbffbf194ea1475e1"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/BinaryMulKernel.cu",
+      "sha256": "2a6325d254dc598ca00c1d359fbb01352b44afd2f803fb2cb761fdfeada8f1e0"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/BinaryInternal.h",
+      "sha256": "1b2537bf34f3d420c6e55a253e95565cbd1fd2fb37917b753c0b7103e8829599"
+    }
+  ],
+  "specs": [
+    {
+      "name": "pytorch_kron_f32",
+      "args": [
+        "M",
+        "N",
+        "P",
+        "Q",
+        "self",
+        "other",
+        "output"
+      ],
+      "target": {
+        "library": "cuTENSOR",
+        "call": "cutensorElementwiseBinaryExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensor_kronecker_product2d_f32",
+          "arguments": [
+            "M",
+            "N",
+            "P",
+            "Q",
+            "self",
+            "other",
+            "output"
+          ],
+          "arrays": {
+            "self": [
+              "M",
+              "N"
+            ],
+            "other": [
+              "P",
+              "Q"
+            ],
+            "output": [
+              {
+                "product": [
+                  "M",
+                  "P"
+                ]
+              },
+              {
+                "product": [
+                  "N",
+                  "Q"
+                ]
+              }
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 32767
+            },
+            "N": {
+              "min": 1,
+              "max": 32767
+            },
+            "P": {
+              "min": 1,
+              "max": 32767
+            },
+            "Q": {
+              "min": 1,
+              "max": 32767
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "validation": {
+        "scalars": {
+          "M": 3,
+          "N": 4,
+          "P": 2,
+          "Q": 5
+        },
+        "arrays": {
+          "self": [
+            3,
+            4
+          ],
+          "other": [
+            2,
+            5
+          ],
+          "output": [
+            6,
+            20
+          ]
+        }
+      }
+    }
+  ]
+}

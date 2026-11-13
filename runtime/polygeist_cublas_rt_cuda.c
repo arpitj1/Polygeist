@@ -5540,24 +5540,43 @@ static void integer_origin_bilinear_2x_f32(
   sync_stream_if_outside_pipeline();
 }
 
-void polygeist_reference_avg_pool3d_backward_k2_f32(
-    int32_t S, int32_t O0, int32_t O1, int32_t O2,
-    int32_t R0, int32_t R1, int32_t R2,
+void polygeist_reference_bilinear2x_f32(
+    int32_t B, int32_t C, int32_t H, int32_t W,
+    const float *input, float *output) {
+  if (B <= 0 || C <= 0 || H <= 0 || W <= 0 ||
+      H > 4194304 || W > 4194304 || !input || !output)
+    abort();
+  polygeist_cublas_init();
+  ensure_cudnn();
+  integer_origin_bilinear_2x_f32(B, C, H, W, input, output);
+  unregister_host_safe((void *)input);
+  unregister_host_safe(output);
+}
+
+static void reference_average_pool_backward_k2_f32(
+    int spatialRank, int32_t S, const int32_t *outputSizes,
+    const int32_t *remainders,
     const float *grad_output, float *grad_input) {
-  if (S <= 0 || O0 <= 0 || O1 <= 0 || O2 <= 0 ||
-      O0 > INT32_MAX / 2 || O1 > INT32_MAX / 2 || O2 > INT32_MAX / 2 ||
-      R0 < 0 || R0 > 1 || R1 < 0 || R1 > 1 || R2 < 0 || R2 > 1 ||
+  if (S <= 0 || spatialRank < 2 || spatialRank > 3 ||
       !grad_output || !grad_input) {
     fprintf(stderr, "cuDNN average pooling backward: invalid dimensions\n");
     abort();
   }
   polygeist_cublas_init();
   ensure_cudnn();
-  int inputDims[5] = {S, 1, 2 * O0 + R0, 2 * O1 + R1, 2 * O2 + R2};
-  int outputDims[5] = {S, 1, O0, O1, O2};
+  int inputDims[5] = {S, 1}, outputDims[5] = {S, 1};
+  for (int d = 0; d < spatialRank; ++d) {
+    if (outputSizes[d] <= 0 || outputSizes[d] > INT32_MAX / 2 ||
+        remainders[d] < 0 || remainders[d] > 1) {
+      fprintf(stderr, "cuDNN average pooling backward: invalid dimensions\n");
+      abort();
+    }
+    inputDims[d + 2] = 2 * outputSizes[d] + remainders[d];
+    outputDims[d + 2] = outputSizes[d];
+  }
   int inputStrides[5], outputStrides[5];
   int64_t inputCount = 1, outputCount = 1;
-  for (int d = 4; d >= 0; --d) {
+  for (int d = spatialRank + 1; d >= 0; --d) {
     if (inputCount > INT32_MAX || outputCount > INT32_MAX) {
       fprintf(stderr, "cuDNN average pooling backward: stride overflow\n");
       abort();
@@ -5576,14 +5595,14 @@ void polygeist_reference_avg_pool3d_backward_k2_f32(
   CUDNN_CHECK(cudnnCreateTensorDescriptor(&inputDesc));
   CUDNN_CHECK(cudnnCreateTensorDescriptor(&outputDesc));
   CUDNN_CHECK(cudnnCreatePoolingDescriptor(&poolDesc));
-  CUDNN_CHECK(cudnnSetTensorNdDescriptor(inputDesc, CUDNN_DATA_FLOAT, 5,
+  CUDNN_CHECK(cudnnSetTensorNdDescriptor(inputDesc, CUDNN_DATA_FLOAT, spatialRank + 2,
                                         inputDims, inputStrides));
-  CUDNN_CHECK(cudnnSetTensorNdDescriptor(outputDesc, CUDNN_DATA_FLOAT, 5,
+  CUDNN_CHECK(cudnnSetTensorNdDescriptor(outputDesc, CUDNN_DATA_FLOAT, spatialRank + 2,
                                         outputDims, outputStrides));
   int window[3] = {2, 2, 2}, padding[3] = {0, 0, 0}, step[3] = {2, 2, 2};
   CUDNN_CHECK(cudnnSetPoolingNdDescriptor(poolDesc,
       CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, CUDNN_PROPAGATE_NAN,
-      3, window, padding, step));
+      spatialRank, window, padding, step));
   float one = 1.0f, zero = 0.0f;
   // cuDNN permits NULL forward inputs and descriptors for average pooling:
   // https://docs.nvidia.com/deeplearning/cudnn/backend/v9.13.0/api/cudnn-ops-library.html#cudnnpoolingbackward
@@ -5595,6 +5614,23 @@ void polygeist_reference_avg_pool3d_backward_k2_f32(
   CUDNN_CHECK(cudnnDestroyTensorDescriptor(outputDesc));
   unregister_host_safe((void *)grad_output);
   unregister_host_safe(grad_input);
+}
+
+void polygeist_reference_avg_pool3d_backward_k2_f32(
+    int32_t S, int32_t O0, int32_t O1, int32_t O2,
+    int32_t R0, int32_t R1, int32_t R2,
+    const float *grad_output, float *grad_input) {
+  int32_t sizes[3] = {O0, O1, O2}, remainders[3] = {R0, R1, R2};
+  reference_average_pool_backward_k2_f32(3, S, sizes, remainders,
+                                        grad_output, grad_input);
+}
+
+void polygeist_reference_avg_pool2d_backward_k2_f32(
+    int32_t S, int32_t O0, int32_t O1, int32_t R0, int32_t R1,
+    const float *grad_output, float *grad_input) {
+  int32_t sizes[2] = {O0, O1}, remainders[2] = {R0, R1};
+  reference_average_pool_backward_k2_f32(2, S, sizes, remainders,
+                                        grad_output, grad_input);
 }
 
 void polygeist_cudnn_adaptive_pool_f32(
@@ -8009,20 +8045,31 @@ void polygeist_cutensor_kronecker_product2d_f32(
       handle, &yDesc, 2, yExtents, yStrides, CUDA_R_32F, 128));
   CUTENSOR_CHECK(cutensorCreateTensorDescriptor(
       handle, &outputDesc, 4, outExtents, outStrides, CUDA_R_32F, 128));
-  CUTENSOR_CHECK(cutensorCreateElementwiseTrinary(
+  // cuTENSOR's binary API requires its second operand to have the output
+  // descriptor. Materialize that broadcast directly in the destination; no
+  // arithmetic is performed by the layout copy. A trinary MUL+ADD with gamma
+  // zero is not equivalent: it loses negative zero and may read old NaNs.
+  extern int polygeist_thrust_memref_copy(
+      int64_t, int64_t, const int64_t *, const int64_t *, const int64_t *,
+      const void *, void *);
+  int64_t broadcastStrides[4] = {0, D, 0, 1};
+  if (!polygeist_thrust_memref_copy(4, sizeof(float), outExtents,
+                                  broadcastStrides, outStrides, deviceY,
+                                  deviceOutput)) {
+    fprintf(stderr, "unsupported Kronecker broadcast layout\n");
+    abort();
+  }
+  CUTENSOR_CHECK(cutensorCreateElementwiseBinary(
       handle, &operation, xDesc, xModes, CUTENSOR_OP_IDENTITY,
-      yDesc, yModes, CUTENSOR_OP_IDENTITY,
       outputDesc, outModes, CUTENSOR_OP_IDENTITY,
-      outputDesc, outModes, CUTENSOR_OP_MUL, CUTENSOR_OP_ADD,
-      CUTENSOR_COMPUTE_DESC_32F));
+      outputDesc, outModes, CUTENSOR_OP_MUL, CUTENSOR_COMPUTE_DESC_32F));
   CUTENSOR_CHECK(cutensorCreatePlanPreference(
       handle, &preference, CUTENSOR_ALGO_DEFAULT, CUTENSOR_JIT_MODE_NONE));
   CUTENSOR_CHECK(cutensorCreatePlan(
       handle, &plan, operation, preference, 0));
-  float one = 1.0f, zero = 0.0f;
-  CUTENSOR_CHECK(cutensorElementwiseTrinaryExecute(
-      handle, plan, &one, deviceX, &one, deviceY, &zero, deviceOutput,
-      deviceOutput, g_stream));
+  float one = 1.0f;
+  CUTENSOR_CHECK(cutensorElementwiseBinaryExecute(
+      handle, plan, &one, deviceX, &one, deviceOutput, deviceOutput, g_stream));
   sync_stream_if_outside_pipeline();
   CUTENSOR_CHECK(cutensorDestroyPlan(plan));
   CUTENSOR_CHECK(cutensorDestroyPlanPreference(preference));
@@ -8519,6 +8566,18 @@ void polygeist_cudnn_maxpool_batched(
   cudnnDestroyTensorDescriptor(in_desc);
   cudnnDestroyTensorDescriptor(out_desc);
   cudnnDestroyPoolingDescriptor(pool_desc);
+}
+
+void polygeist_reference_maxpool2x2_f32(
+    int32_t B, int32_t C, int32_t OH, int32_t OW,
+    const float *input, float *output) {
+  if (B <= 0 || C <= 0 || OH <= 0 || OW <= 0 ||
+      OH > INT32_MAX / 2 || OW > INT32_MAX / 2 || !input || !output)
+    abort();
+  polygeist_cudnn_maxpool_batched(B, C, 2 * OH, 2 * OW, OH, OW,
+                                input, output);
+  unregister_host_safe((void *)input);
+  unregister_host_safe(output);
 }
 
 void polygeist_cudnn_batchnorm_inference(
@@ -11610,3 +11669,6 @@ void polygeist_reference_conv3d_f32(
   }
   polygeist_cudnn_conv3d_channels_f32(IC,ID,IH,IW,OC,KD,KH,KW,input,filter,NULL,output);
 }
+
+// Descriptor-only emission of imported parallel library references.
+#include "polygeist_tensor_pointwise_rt.inc"

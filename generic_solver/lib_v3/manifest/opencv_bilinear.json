@@ -1,0 +1,117 @@
+{
+  "routine": "opencv_bilinear",
+  "source": "OpenCV ResizeLayerImpl::forward floating-point bilinear interpolation; reference counterpart for cuDNN spatial transformer sampler",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/dnn/src/layers/resize_layer.cpp",
+      "sha256": "411dd842dbe59a91c277bf3b119f085060257cc0e09240f00ec0125932ca85fc"
+    }
+  ],
+  "adaptation": "Expose NCHW planes, specialize scale to one half, and express exactly representable coordinate fractions using integer quotient/remainder. Preserve upstream difference-form interpolation.",
+  "specs": [
+    {
+      "name": "opencv_bilinear2x_f32",
+      "args": [
+        "B",
+        "C",
+        "H",
+        "W",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnSpatialTfSamplerForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_bilinear2x_f32",
+          "arguments": [
+            "B",
+            "C",
+            "H",
+            "W",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "B",
+              "C",
+              "H",
+              "W"
+            ],
+            "output": [
+              "B",
+              "C",
+              {
+                "terms": {
+                  "H": 2
+                },
+                "offset": 0
+              },
+              {
+                "terms": {
+                  "W": 2
+                },
+                "offset": 0
+              }
+            ]
+          },
+          "bounds": {
+            "B": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "C": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "H": {
+              "min": 1,
+              "max": 4194304
+            },
+            "W": {
+              "min": 1,
+              "max": 4194304
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Disjoint contiguous FP32 NCHW arrays, positive checked dimensions, spatial dimensions at most 2^22.",
+        "Integer-origin coordinates at half spacing with border clamping; finite inputs and relaxed floating-point reassociation."
+      ],
+      "deviations": [
+        "Expose the independent batch and channel planes as NCHW arrays; specialize scales to one half.",
+        "Use exact quotient/remainder coordinate arithmetic and equivalent final-coordinate clamping under the checked extent bounds."
+      ],
+      "validation": {
+        "scalars": {
+          "B": 2,
+          "C": 3,
+          "H": 3,
+          "W": 5
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            3,
+            5
+          ],
+          "output": [
+            2,
+            3,
+            6,
+            10
+          ]
+        }
+      }
+    }
+  ]
+}

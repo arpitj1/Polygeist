@@ -20,7 +20,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .affine import Aff, Cons, NonAffine, ge, le, lt, eq, negate, atom, is_atom, atoms_in
+from .affine import Aff, Cons, NonAffine, ge, le, lt, eq, negate, atom, is_atom, atoms_in, atom_info, atom_conversion
 from .mlir_parse import Func, Op, parse_affine_map, parse_affine_set, parse_affine_expr, _split_top
 
 
@@ -78,6 +78,7 @@ class ToMem:
 @dataclass
 class IdxVal:
     aff: Aff
+    data: Optional[Expr] = None
 
 
 @dataclass
@@ -283,7 +284,8 @@ class Executor:
         self.writeback_tops: dict[int, list[int]] = {}
         # index atom -> the read it stands for (used when the integer is
         # consumed as data rather than as an index, e.g. a histogram count)
-        self.atom_reads: dict[str, Optional[ERead]] = {}
+        self.atom_reads: dict[str, Optional[Expr]] = {}
+        self.index_atom_ranges: dict[str, list[Cons]] = {}
 
     # -- helpers --------------------------------------------------------
     def new_buffer(self, name, kind, ty, priv=None, shape=None) -> Buffer:
@@ -324,7 +326,7 @@ class Executor:
         if isinstance(v, Undef):
             return EUndef()
         if isinstance(v, IdxVal):
-            return self.int_as_data(v.aff, tok)
+            return v.data if v.data is not None else self.int_as_data(v.aff, tok)
         raise Unsupported(f"{tok} is not a float value")
 
     def int_as_data(self, a: Aff, tok: str = "") -> Expr:
@@ -344,12 +346,22 @@ class Executor:
             out = term if out is None else EBin("add", out, term)
         return out
 
-    def access(self, val, idx: list[Aff]) -> tuple[Buffer, tuple]:
+    def access(self, val, idx: list[Aff], extra_domain=()) -> tuple[Buffer, tuple]:
         if isinstance(val, (TensorVal, MemVal)):
             buf = val.buf
             coords = _subst_view(val.view, idx)
         else:
             raise Unsupported(f"access through {type(val).__name__}")
+        if (buf.kind == 'arg' and buf.rank == 2 and not buf.priv and
+                len(coords) == 2 and buf.shape[1] is not None and
+                buf.shape[1].is_const() and buf.shape[1].const > 0 and
+                'strided<' not in buf.arg_type and 'affine_map' not in buf.arg_type):
+            from .coordinate_views import _factor
+            width = buf.shape[1].const
+            factored = _factor(coords[0].scale(width) + coords[1], width,
+                               list(self.domain) + list(self.read_guard) + list(extra_domain))
+            if factored is not None:
+                coords = factored
         full = [Aff.var(p) for p in buf.priv] + list(coords)
         return buf, tuple(full)
 
@@ -359,8 +371,10 @@ class Executor:
 
     def emit(self, buf, idx, value: Expr, time: list[Aff], extra_vars=(), extra_dom=(),
              guard=(), par=(), origin=""):
+        used_atoms = atoms_in(v for coordinate in idx for v in coordinate.vars())
+        type_facts = [fact for name in used_atoms for fact in self.index_atom_ranges.get(name, [])]
         st = Stmt(len(self.stmts), list(self.loop_vars) + list(extra_vars),
-                  list(self.domain) + list(extra_dom), list(guard), list(time), buf,
+                  list(self.domain) + type_facts + list(extra_dom), list(guard), list(time), buf,
                   list(idx), value, set(par), self.cur_top, origin)
         self.stmts.append(st)
         self.stored.setdefault(id(value), (st,))
@@ -382,7 +396,7 @@ class Executor:
             # the same element loaded at two different times (around a store)
             # has no single value: it can no longer be used as data
             self.atom_reads[name] = r if prev is r or (prev is not None and prev.time == r.time) else None
-            return IdxVal(a)
+            return IdxVal(a, r)
         return FVal(r)
 
     # -- driver ---------------------------------------------------------
@@ -490,7 +504,29 @@ class Executor:
                 unsigned = n in ('arith.extui', 'arith.index_castui')
                 facts = self.domain + self.integer_type_facts
                 if unsigned and not implies(facts, ge(v.aff, 0)):
-                    raise Unsupported('unsigned index conversion may change a negative value')
+                    # A zero extension of a raw integer array element is an
+                    # exact typed operation, not an identity on signed values.
+                    # Preserve it as an opaque index atom on both sides.
+                    name = (v.aff.terms[0][0] if v.aff.const == 0 and
+                            len(v.aff.terms) == 1 and v.aff.terms[0][1] == 1 else None)
+                    read = self.atom_reads.get(name)
+                    if (target_bits <= source_bits or name is None or not is_atom(name)
+                            or atom_conversion(name) or not isinstance(read, ERead)
+                            or read.buf.elem != src):
+                        raise Unsupported('unsigned index conversion may change a negative value')
+                    # The mathematical index is the unsigned interpretation
+                    # of the source bits. Any wider destination represents
+                    # exactly the same nonnegative integer.
+                    conversion = 'unsigned-read:' + src
+                    arr, coords = atom_info(name)
+                    converted = atom(arr, coords, conversion)
+                    converted_name = converted.terms[0][0]
+                    self.atom_reads[converted_name] = EUn(conversion, read)
+                    bounds = [ge(converted, 0),le(converted, (1 << source_bits) - 1)]
+                    self.integer_type_facts.extend(bounds)
+                    self.index_atom_ranges[converted_name] = bounds
+                    self.env[res[0]] = IdxVal(converted, EUn(conversion, read))
+                    return
                 if target_bits < source_bits:
                     low = 0 if unsigned else -(1 << (target_bits - 1))
                     high = (1 << (target_bits if unsigned else target_bits - 1)) - 1
@@ -522,7 +558,11 @@ class Executor:
                     r = a.aff - b.aff
                 else:
                     r = a.aff * b.aff
-                self.env[res[0]] = IdxVal(r)
+                data = None
+                if a.data is not None or b.data is not None:
+                    opn = n + ':' + rest.rsplit(':', 1)[1].strip()
+                    data = EBin(opn, self.fval(m.group(1)), self.fval(m.group(2)))
+                self.env[res[0]] = IdxVal(r, data)
             except NonAffine:
                 self.env[res[0]] = Undef()
             return
@@ -531,6 +571,12 @@ class Executor:
             # coefficient (e.g. a stride specialised to 1)
             m = re.match(r"\S+\s+(%[\w$.#-]+),\s*(%[\w$.#-]+)", rest)
             a, b = self.get(m.group(1)), self.get(m.group(2))
+            if n in ('arith.divsi','arith.divui') and any(
+                    isinstance(v,FVal) or isinstance(v,IdxVal) and v.data is not None
+                    for v in (a,b)):
+                opn=n+':'+rest.rsplit(':',1)[1].strip()
+                self.env[res[0]]=FVal(EBin(opn,self.fval(m.group(1)),self.fval(m.group(2))))
+                return
             if isinstance(a, IdxVal) and isinstance(b, IdxVal) and b.aff.is_const() \
                     and b.aff.const > 0 and all(c % b.aff.const == 0 for _, c in a.aff.terms) \
                     and a.aff.const % b.aff.const == 0:
@@ -618,6 +664,12 @@ class Executor:
                 self.env[res[0]] = Undef()
                 return
             self.env[res[0]] = CondAff(table[kind])
+            return
+        if n in ("arith.shli", "arith.shrsi", "arith.shrui", "arith.ori", "arith.xori"):
+            m = re.match(r"\S+\s+(%[\w$.#-]+),\s*(%[\w$.#-]+)", rest)
+            ty = rest.rsplit(':', 1)[1].strip()
+            self.env[res[0]] = FVal(EBin(n + ':' + ty,
+                self.fval(m.group(1)), self.fval(m.group(2))))
             return
         if n == "arith.andi":
             m = re.match(r"\S+\s+(%[\w$.#-]+),\s*(%[\w$.#-]+)", rest)
@@ -1068,7 +1120,7 @@ class Executor:
             guard: list[Cons] = []
             val = _strip_guards(val, out_reads[k], guard)
             idx = outmap.apply(dimaff, [])
-            buf, coords = self.access(outv, idx)
+            buf, coords = self.access(outv, idx, dom)
             self.loop_vars = old_vars + gv
             st = Stmt(len(self.stmts), list(old_vars) + gv, list(old_dom) + dom, guard,
                       t + dimaff + [Aff.cst(1 + k)], buf, list(coords), val, par, self.cur_top,

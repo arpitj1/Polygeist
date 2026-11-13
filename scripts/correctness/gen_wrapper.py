@@ -197,7 +197,10 @@ def parse_signature(c_text: str, kernel_name: str):
                 raise ValueError(f"Couldn't infer pointer extent for arg: {a}")
             prefix = ('U' if pointer_type == 'uint8_t' else
                       'B' if pointer_type == 'int8_t' else
-                      'I' if pointer_type in ('int', 'uint32_t', 'int32_t') else
+                      'H' if pointer_type == 'uint16_t' else
+                      'S' if pointer_type == 'int16_t' else
+                      'J' if pointer_type == 'uint32_t' else
+                      'I' if pointer_type in ('int', 'int32_t') else
                       'L' if pointer_type in ('long long',
                                               'unsigned long long') else '')
             out.append((f'{prefix}1D', name, size))
@@ -247,7 +250,7 @@ def _is_plain_c_array(a: str) -> bool:
     (e.g. 'double A[NI][NJ]' or 'int A[N]' or 'short A[NI][NJ][NK]').
     Distinguishable from a pointer-to-scalar (`double *alpha`) because
     array params always have a square-bracket dim list."""
-    if not re.match(r"^\s*(?:const\s+)?(?:unsigned\s+char|signed\s+char|unsigned\s+int|unsigned|double|float|int|short|long|DATA_TYPE|_Float16|__bf16)\b", a):
+    if not re.match(r"^\s*(?:const\s+)?(?:unsigned\s+char|signed\s+char|unsigned\s+int|unsigned|double|float|int|short|long|DATA_TYPE|_Float16|__bf16|u?int(?:8|16|32)_t)\b", a):
         return False
     return re.search(r"\[\s*[^\]]*\s*\]\s*(?:\[\s*[^\]]*\s*\])*\s*$", a) is not None
 
@@ -259,7 +262,7 @@ def _parse_plain_c_array(a: str):
     it identically to the POLYBENCH macro form.
     """
     m = re.match(
-        r"^\s*(?:const\s+)?(unsigned\s+char|signed\s+char|unsigned\s+int|unsigned|double|float|int|short|long|DATA_TYPE|_Float16|__bf16)"
+        r"^\s*(?:const\s+)?(unsigned\s+char|signed\s+char|unsigned\s+int|unsigned|double|float|int|short|long|DATA_TYPE|_Float16|__bf16|u?int(?:8|16|32)_t)"
         r"\s+(\w+)((?:\s*\[\s*[^\]]*\s*\])+)\s*$",
         a,
     )
@@ -270,9 +273,12 @@ def _parse_plain_c_array(a: str):
     if not dims:
         raise ValueError(f"Plain-C-array arg has no dimensions: {a!r}")
     dims = ["(size + 1)" if not d and name == "lhs" else d for d in dims]
-    prefix = ('U' if ctype == 'unsigned char' else
-              'B' if ctype == 'signed char' else
-              'I' if ctype in ('unsigned int', 'unsigned', 'int', 'short',
+    prefix = ('U' if ctype in ('unsigned char', 'uint8_t') else
+              'B' if ctype in ('signed char', 'int8_t') else
+              'H' if ctype == 'uint16_t' else
+              'S' if ctype == 'int16_t' else
+              'J' if ctype == 'uint32_t' else
+              'I' if ctype in ('unsigned int', 'unsigned', 'int', 'int32_t', 'short',
                                'long') else '')
     return (f'{prefix}{len(dims)}D', name, dims)
 
@@ -326,24 +332,18 @@ def gen_wrapper(kernel_name: str, args, dtype: str = 'double',
             wrapper_args.append(f"struct cartesian *{name}")
             call_args.append(
                 f"(float *){name}, (float *){name}, 0, {size}, 3, 3, 1")
-        elif re.fullmatch(r'(?:I|U|B|L)?[1-9][0-9]*D', k):
-            is_integer = k.startswith('I')
-            is_unsigned_byte = k.startswith('U')
-            is_signed_byte = k.startswith('B')
-            is_long_long = k.startswith('L')
-            rank = int(k[1:-1] if (is_integer or is_unsigned_byte or
-                                   is_signed_byte or is_long_long) else k[:-1])
+        elif re.fullmatch(r'(?:I|U|B|L|H|S|J)?[1-9][0-9]*D', k):
+            element_types = {'I': 'int', 'U': 'unsigned char', 'B': 'signed char',
+                             'L': 'long long', 'H': 'uint16_t', 'S': 'int16_t',
+                             'J': 'uint32_t'}
+            typed = k[0] in element_types
+            rank = int(k[1:-1] if typed else k[:-1])
             name = a[1]
             dims = list(a[2:])
             if len(dims) != rank:
                 raise ValueError(
                     f"{k} argument {name} has {len(dims)} dimensions")
-            arg_dtype = ("int" if is_integer else
-                         "unsigned char" if is_unsigned_byte else dtype)
-            if is_signed_byte:
-                arg_dtype = "signed char"
-            if is_long_long:
-                arg_dtype = "long long"
+            arg_dtype = element_types[k[0]] if typed else dtype
             extern_args.extend([
                 f"{arg_dtype} *{name}_b", f"{arg_dtype} *{name}_a",
                 f"int64_t {name}_off",

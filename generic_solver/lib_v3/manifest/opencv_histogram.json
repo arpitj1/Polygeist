@@ -1,0 +1,156 @@
+{
+  "routine": "opencv_histogram",
+  "source": "OpenCV commit 8bc22eba5946100e9b2470c60939c3f2588c28d7, public OpenCL histogram and merge; public equivalent reference for closed PVA API",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/opencl/histogram.cl",
+      "sha256": "b30577b8e45e565aea3ee3baa6be68bb60f1edcf7cf3c5f30fd538a24f73a2bd"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_histogram_u8_u32",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "OUTPUT_TYPE": "uint32_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaImageHistogramSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_histogram_256_u8_u32",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              256
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "3 <= h,w <= 46340; contiguous disjoint arrays; all 256 uint8 bins"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "h": 8,
+          "w": 9
+        },
+        "arrays": {
+          "input": [
+            8,
+            9
+          ],
+          "output": [
+            256
+          ]
+        }
+      }
+    },
+    {
+      "name": "opencv_histogram_u8_s32",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "OUTPUT_TYPE": "int32_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaImageHistogramSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_histogram_256_u8_s32",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              256
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "3 <= h,w <= 46340; contiguous disjoint arrays; all 256 uint8 bins"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "h": 8,
+          "w": 9
+        },
+        "arrays": {
+          "input": [
+            8,
+            9
+          ],
+          "output": [
+            256
+          ]
+        }
+      }
+    }
+  ],
+  "adaptation": [
+    "kercn=1, one work-group/work-item specialization; atomic increments serialized with the same integer arithmetic",
+    "contiguous row/column coordinates exposed from src_index; address and visit order preserved",
+    "the single partial histogram is copied by the public merge stage",
+    "dimensions restricted so signed local counters cannot overflow"
+  ]
+}

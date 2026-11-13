@@ -86,7 +86,8 @@ def import_kernel_match(lib_path: Path):
     os.environ["POLYGEIST_KERNEL_LIBRARY"] = str(lib_path)
     import kernel_match  # noqa: E402
     KM = kernel_match
-    KM.configure_matcher("egglog")
+    import proof_metrics
+    KM.configure_matcher("egglog", collect_egraph_sizes=proof_metrics.measured_sizes())
     import eqsat_ablation  # EQSAT_ABLATION env switch; default "full" leaves KM unchanged
     eqsat_ablation.install_linalg_level(KM)
     return KM
@@ -419,8 +420,52 @@ class Matcher:
             except Exception:
                 m = None
             res = None if m is None else dict(m[2])
+            if res is None:
+                res = self.captured_read_bindings(sop, aop, pi, rho, perm, step)
         self._body_cache[ck] = res
         return res
+
+    def captured_read_bindings(self, sop, aop, pi, rho, application, step):
+        """Use exact payload structure to propose captures, then ask EqSat.
+
+        Tensor reads have arbitrarily named local SSA results. Matching their
+        index definitions avoids enumerating every permutation of scalar
+        leaves. Accesses, dimensions, and outer values are still checked by
+        the whole-DAG matcher after the scalar proof.
+        """
+        if not any('tensor.extract ' in line for line in sop.body):
+            return None
+        if len(sop.iters) > 6 or step.body_per_yield is not None:
+            return None
+        try:
+            template = KM._parse_term(KM._term_repr(step.body))
+            body = KM._parse_term(KM._term_repr(KM.encode_body(application)))
+        except ValueError:
+            return None
+        captures = KM._ordered_unique_ast_nodes(template, {'Cap'})
+        candidates = KM._ordered_unique_ast_nodes(body, {'Cap'})
+        local_defs = self._local_defs(sop.body)
+        if not captures or len(captures) > 12 or any(c[1] not in local_defs for c in captures):
+            return None
+        tried = set()
+        for sigma in itertools.permutations(range(len(sop.iters))):
+            if any(sop.iters[d] != aop.iters[sigma[d]] for d in range(len(sigma))):
+                continue
+            proposal = {}
+            for capture in captures:
+                matches = [candidate for candidate in candidates
+                           if self.body_local_pairs(capture[1], candidate[1], sop, aop,
+                                                    pi, rho, sigma) is not None]
+                if len(matches) != 1:
+                    break
+                proposal[capture[1]] = matches[0]
+            else:
+                key = tuple(sorted(proposal.items()))
+                if key not in tried:
+                    tried.add(key)
+                    if KM.prove_distributive_binding(body, template, proposal):
+                        return proposal
+        return None
 
     @staticmethod
     def _local_defs(body_lines) -> dict[str, str]:
@@ -434,7 +479,7 @@ class Matcher:
     def body_local_pairs(self, s_name, a_name, sop, aop, pi, rho, sigma, depth=0):
         """Structural equality of body-local opaque values (linalg.index,
         affine.apply, ...).  Returns extra outer-value pairs or None."""
-        if depth > 8:
+        if depth > 32:
             return None
         sl = self._local_defs(sop.body)
         al = self._local_defs(aop.body)
@@ -448,6 +493,15 @@ class Matcher:
             if not (mi_s and mi_a):
                 return None
             return [] if sigma[int(mi_s.group(1))] == int(mi_a.group(1)) else None
+        # Captured tensor reads retain their complete index expressions. The
+        # outer value binding checks shape extents separately, so dynamic and
+        # static tensor types may agree here if their rank and element type do.
+        if s_rhs.startswith('tensor.extract ') and a_rhs.startswith('tensor.extract '):
+            s_type, a_type = s_rhs.rsplit(':', 1)[1].strip(), a_rhs.rsplit(':', 1)[1].strip()
+            if not types_compatible(s_type, a_type):
+                return None
+            s_rhs = s_rhs.rsplit(':', 1)[0]
+            a_rhs = a_rhs.rsplit(':', 1)[0]
         if re.sub(r"\s+", " ", ML.SSA_RE.sub("%_", s_rhs)) != re.sub(r"\s+", " ", ML.SSA_RE.sub("%_", a_rhs)):
             return None
         s_ops, a_ops = ML.SSA_RE.findall(s_rhs), ML.SSA_RE.findall(a_rhs)
@@ -507,16 +561,21 @@ class Matcher:
                 used[hit] = True
                 pairs += [("val", s, a) for s, a in zip(vals, at[hit][3])]
                 continue
-            # unit-stride specialisation: spec term c*d*s, app term c*d
-            if len(vals) == 1:
+            # Specialize a symbolic coefficient only by exact integer
+            # division. The normal extent binding still checks type, existing
+            # parameter bindings and the imported literal policy.
+            value = None
+            if len(vals) == 1 and c:
                 for j, (d2, o2, c2, v2) in enumerate(at):
-                    if not used[j] and d2 == dims and o2 == opq and c2 == c and not v2:
-                        hit = j
+                    if (not used[j] and d2 == dims and o2 == opq and not v2
+                            and c2 % c == 0 and 0 <= c2 // c < (1 << 31)):
+                        hit, value = j, c2 // c
                         break
             if hit is None:
                 return None
             used[hit] = True
-            pairs.append(("unit", vals[0], None))
+            pairs.append(("unit", vals[0], None) if value == 1
+                         else ("extent", vals[0], value))
         return pairs
 
     def compare_reduced(self, st: Trace, at: Trace, sigma):
@@ -1763,6 +1822,9 @@ def run(text: str, lib_path: Path, region: bool = True, diag: bool = False,
         for m in matcher.find(spec):
             (rejected if "rejected" in m else all_matches).append(m)
     selected = select(all_matches)
+    import proof_metrics
+    proof_metrics.emit('linalg_match', **KM.matcher_telemetry(),
+                       candidates=len(all_matches), external_matches=len(selected))
     out = Rewriter(matcher, lib).rewrite(selected) if selected else text
     report: list = []
     for m in selected:

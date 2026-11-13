@@ -355,6 +355,7 @@ if [ "$WHOLE_PROGRAM" -eq 0 ] && \
 fi
 
 # ─── Step 2: raise affine → linalg + debufferize ────────────────────────
+echo "  [2/9] affine → Linalg → tensor IR"
 SELECT_FUNC_ARGS=(--select-func=func-name="$FUNCTION")
 if [ "$HARNESS_INPUT" = "$INPUT" ]; then
   # The normally compiled source harness supplies helper definitions.  Keep
@@ -384,6 +385,18 @@ fi
 # ─── Step 3: imported-specification matching ──────────────────────────
 echo "  [3/9] imported specifications: Linalg then generic region matching"
 MATCHER_ARGS=(--backend "$ABI_BACKEND" --report "$WORK/match.json")
+if [ "${POLYGEIST_MATCH_REGION:-1}" = 0 ]; then
+  MATCHER_ARGS+=(--no-region-match)
+fi
+if [ -n "${POLYGEIST_MATCH_REGION_BUDGET:-}" ]; then
+  MATCHER_ARGS+=(--region-budget "$POLYGEIST_MATCH_REGION_BUDGET")
+fi
+if [ -n "${POLYGEIST_MATCH_ONLY_KERNELS:-}" ]; then
+  read -r -a SELECTED_KERNELS <<< "$POLYGEIST_MATCH_ONLY_KERNELS"
+  for SELECTED_KERNEL in "${SELECTED_KERNELS[@]}"; do
+    MATCHER_ARGS+=(--only-kernel "$SELECTED_KERNEL")
+  done
+fi
 if [ "${POLYGEIST_NORMALIZE_PARALLEL_DIMS:-0}" != 0 ]; then
   MATCHER_ARGS+=(--normalize-parallel-dims)
 fi
@@ -679,12 +692,18 @@ else
            -lcudart -lm -lpthread -ldl \
            -Wl,-rpath,/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu"
   if [ "$ABI_BACKEND" = pva ]; then
-    PVA_SOLUTIONS_ROOT="${PVASOL_ROOT:?set PVASOL_ROOT for PVA builds}"
     PVA_CUPVA_ROOT="${CUPVA_SDK_ROOT:?set CUPVA_SDK_ROOT for PVA builds}"
     PVA_STAGED_LIBS="${PVA_LIB_STAGE:?set PVA_LIB_STAGE for PVA builds}"
     PVA_TARGET_RPATH="${POLYGEIST_PVA_TARGET_RPATH:-/usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu/nvidia}"
-    PVA_OPERATOR_INC="$PVA_SOLUTIONS_ROOT/public/src/operator/include"
-    PVA_NVCV_INC="$PVA_SOLUTIONS_ROOT/public/3rdparty/cvcuda/src/nvcv/src/include"
+    # Consume installed SDK headers; no vendor source checkout is required.
+    PVA_OPERATOR_INC="${PVA_OPERATOR_INCLUDE:-}"
+    PVA_NVCV_INC="${NVCV_INCLUDE:-}"
+    if [ -n "${PVASOL_ROOT:-}" ]; then
+      PVA_OPERATOR_INC="${PVA_OPERATOR_INC:-$PVASOL_ROOT/public/src/operator/include}"
+      PVA_NVCV_INC="${PVA_NVCV_INC:-$PVASOL_ROOT/public/3rdparty/cvcuda/src/nvcv/src/include}"
+    fi
+    : "${PVA_OPERATOR_INC:?set PVA_OPERATOR_INCLUDE to the installed operator headers}"
+    : "${PVA_NVCV_INC:?set NVCV_INCLUDE to installed CV-CUDA headers}"
     for required in "$PVA_OPERATOR_INC/OpBoxFilter.h" \
                     "$PVA_NVCV_INC/nvcv/Tensor.h" \
                     "$PVA_CUPVA_ROOT/include/cupva_host.h" \
@@ -701,7 +720,7 @@ else
              -lpva_operator -lnvcv_types -lcupva_host -lcudart \
              -lm -lpthread -ldl -Wl,--allow-shlib-undefined \
              -Wl,-rpath,$PVA_TARGET_RPATH"
-    echo "         + staged PVA Solutions runtime adapter"
+    echo "         + installed PVA runtime adapter"
   fi
   if [ "${POLYGEIST_MINIMAL_CUDA_RUNTIME:-0}" != "0" ]; then
     RT_CFLAGS+=("-DPOLYGEIST_DISABLE_CUSPARSE"

@@ -800,6 +800,28 @@ class Builder:
             lo = self.pick_bound(lows, R, fv, lower=True)
             hi = self.pick_bound(ups, R, fv, lower=False) + 1
             return FFold(fv, lo, hi, dom + grd + residual, f, prev)
+        if has_acc(f) and len(fiber) > 1 and buf.elem.startswith('i'):
+            if prev is None:
+                raise Reject('ordered fold into uninitialised scratch')
+            # Preserve lexical loop order and the exact typed update. Only
+            # rectangular enclosing ranges are supported here. All original
+            # predicates remain on the innermost update, so skipped elements
+            # and empty domains leave the incoming accumulator unchanged.
+            ranges = []
+            variables = set(fiber)
+            for fv in fiber:
+                lows, ups, _ = bounds_of(fv, dom)
+                lows = [b for b in lows if not (deps(b.vars()) & variables)]
+                ups = [b for b in ups if not (deps(b.vars()) & variables)]
+                lo = self.pick_bound(lows, R, fv, lower=True)
+                hi = self.pick_bound(ups, R, fv, lower=False) + 1
+                ranges.append((fv, lo, hi))
+            body = f
+            for depth in range(len(ranges)-1, -1, -1):
+                fv, lo, hi = ranges[depth]
+                guard = dom + grd + residual if depth == len(ranges)-1 else []
+                body = FFold(fv, lo, hi, guard, body, prev if depth == 0 else FAcc())
+            return body
         # This summary separates the incoming accumulator from a sum, which
         # permits reassociation. Do not use it in strict scalar-order mode.
         from kernel_match import numeric_model
@@ -1009,6 +1031,27 @@ class Builder:
             if implies_all(rctx, Rs):
                 self.stats["reads_scratch_inlined"] += 1
                 return _freshen(fsubst(fc, m))
+        # Exact piecewise final state, only when every queried element is covered.
+        from .affine import subtract
+        pieces = []
+        uncovered = [rctx]
+        for Rc, fc in eqs:
+            m = {f"v{k}": a for k, a in enumerate(idx)}
+            Rs = [c.subst(m) for c in Rc]
+            if not feasible(rctx + Rs):
+                continue
+            if any(feasible(rctx + Rs + old) for old, _ in pieces):
+                raise Reject('overlapping scratch element regions')
+            pieces.append((Rs, _freshen(fsubst(fc, m))))
+            uncovered = [part for region in uncovered for part in subtract(region, Rs)]
+            if len(uncovered) > 64 or len(pieces) > 16:
+                raise Reject('piecewise scratch expansion budget exceeded')
+        if not uncovered and pieces:
+            result = pieces[-1][1]
+            for Rs, fc in reversed(pieces[:-1]):
+                result = FSel(("aff", tuple(Rs)), fc, result)
+            self.stats["reads_scratch_inlined"] += 1
+            return result
         raise Reject(f"scratch read {C}{idx} spans several element regions")
 
     def value_at(self, C: Buffer, idx: list[Aff], rctx: list[Cons], t: list[Aff]) -> Optional[F]:
@@ -1146,7 +1189,8 @@ def canonicalize(f: F, ctx: list[Cons], params: set[str]) -> F:
     f = _orient_sums(f, ctx)
     f = _simplify_sel(f, ctx)
     f = _rename_bound(f, 0)
-    return f
+    from .integer_normalize import normalize
+    return normalize(f, ctx)
 
 
 def fold_integer_casts(f: F, bindings=None) -> F:

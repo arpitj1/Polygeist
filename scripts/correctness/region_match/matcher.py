@@ -1623,6 +1623,9 @@ def _fmt_param(v) -> str:
     parts = []
     for k, c in v.terms:
         if is_atom(k):
+            from .affine import atom_conversion
+            if atom_conversion(k):
+                raise Unsupported('typed index reads cannot yet be materialized as ABI scalars')
             arr, coords = atom_info(k)
             name = f"{arr}[{', '.join(_fmt_param(a) for a in coords)}]"
         else:

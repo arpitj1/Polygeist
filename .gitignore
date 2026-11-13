@@ -91,3 +91,6 @@ pythonenv*
 # own version of these.
 scripts/correctness/run_jetson.sh
 scripts/correctness/logs/
+
+# Handwritten source for descriptor-based vendor emission.
+!runtime/polygeist_tensor_pointwise_rt.inc

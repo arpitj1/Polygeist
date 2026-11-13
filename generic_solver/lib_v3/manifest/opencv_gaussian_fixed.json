@@ -1,0 +1,85 @@
+{
+  "routine": "opencv_gaussian_fixed",
+  "source": "Public OpenCV scalar 3-tap fixed-point Gaussian, commit 8bc22eba5946100e9b2470c60939c3f2588c28d7; public equivalent reference for closed PVA API",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/smooth.simd.hpp",
+      "sha256": "1a4c10ce02263451cb8f78ef5c75b3ac44c79f77a8a37f2eec65967d5adb1aaf"
+    },
+    {
+      "path": "third_party/opencv/modules/imgproc/src/fixedpoint.inl.hpp",
+      "sha256": "daf6e02b7a4fba0e81393f32d62cffee43362fb0a40efac2c835005090d944fa"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_gaussian3x3_u8",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "PVA",
+        "call": "pvaGaussianFilterSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_gaussian_binomial3x3_u8",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              "h",
+              "w"
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "3 <= h,w <= 46340; contiguous disjoint arrays; preserve border",
+        "PVA sigmaX=sigmaY=0.8493218f, whose quantized 3x3 coefficients implement the [1,2,1] outer product divided by 16; round with +8 before shift4."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            5,
+            6
+          ]
+        }
+      }
+    }
+  ]
+}

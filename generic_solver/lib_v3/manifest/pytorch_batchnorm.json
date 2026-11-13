@@ -1,0 +1,116 @@
+{
+  "routine": "pytorch_batchnorm",
+  "source": "PyTorch d7af122d81a49b1fa7a31ba52bd57c026f092646, public batch_norm_transform_input_kernel, train=true saved-statistics path",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cuda/Normalization.cuh",
+      "sha256": "66fa99d77f9f936cb86850f16da9b73066451238883aab774394e0cc07f319c5"
+    }
+  ],
+  "specs": [
+    {
+      "name": "pytorch_batchnorm_saved_f32",
+      "args": [
+        "N",
+        "C",
+        "H",
+        "W",
+        "input",
+        "mean",
+        "invstd",
+        "weight",
+        "bias",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "tensor_pointwise_reference",
+          "arrays": {
+            "input": [
+              "N",
+              "C",
+              "H",
+              "W"
+            ],
+            "mean": [
+              "C"
+            ],
+            "invstd": [
+              "C"
+            ],
+            "weight": [
+              "C"
+            ],
+            "bias": [
+              "C"
+            ],
+            "output": [
+              "N",
+              "C",
+              "H",
+              "W"
+            ]
+          },
+          "bounds": {
+            "N": {
+              "min": 1,
+              "max": 65536
+            },
+            "C": {
+              "min": 1,
+              "max": 65536
+            },
+            "H": {
+              "min": 1,
+              "max": 65536
+            },
+            "W": {
+              "min": 1,
+              "max": 65536
+            }
+          }
+        }
+      },
+      "validation": {
+        "scalars": {
+          "N": 2,
+          "C": 3,
+          "H": 4,
+          "W": 5
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "mean": [
+            3
+          ],
+          "invstd": [
+            3
+          ],
+          "weight": [
+            3
+          ],
+          "bias": [
+            3
+          ],
+          "output": [
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

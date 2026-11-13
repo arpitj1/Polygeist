@@ -27,7 +27,8 @@ from egglog import f64, rewrite, ruleset, vars_
 
 SCALAR_CATS = ("comm", "assoc", "ident", "zero", "coeff", "litfold")
 REGION_CATS = ("index", "mask", "sum", "subdiv", "perm")
-ALL_CATS = SCALAR_CATS + REGION_CATS
+# Expanding distributive rules only run in the bounded isolated proof worker.
+ALL_CATS = SCALAR_CATS + REGION_CATS + ("distrib",)
 
 
 def mode() -> tuple[str, frozenset]:
@@ -86,7 +87,8 @@ def install_linalg_level(km) -> tuple[str, frozenset]:
         km._unablated_algebra_rules = km.algebra_rules
     km.algebra_rules = km._unablated_algebra_rules
     if m == "none":
-        km.configure_matcher("syntactic")
+        import proof_metrics
+        km.configure_matcher("syntactic", collect_egraph_sizes=proof_metrics.measured_sizes())
     elif m == "drop":
         rs = scalar_ruleset(km, cats)
         km.algebra_rules = lambda include_distributivity=True: rs  # noqa: E731

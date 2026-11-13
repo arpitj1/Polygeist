@@ -53,6 +53,32 @@ class TensorInverseWriteback(unittest.TestCase):
             if result['verdict'] != 'EXACT':
                 self.fail(str(result)+'\n'+(root/'validate/scatter/defn/log.txt').read_text()[-3500:])
 
+    def test_dynamic_inner_extent_controls_its_stride(self):
+        source = SOURCE.replace('%offset: i32,', '%offset: i32, %width: i32,')
+        source = source.replace('memref<?x2xf32>', 'memref<?x?xf32>').replace('tensor<?x2xf32>', 'tensor<?x?xf32>')
+        source = source.replace('%two = arith.constant 2 : index', '%two = arith.index_cast %width : i32 to index')
+        source = source.replace('%view, %O, %N, %two)', '%view, %O, %two, %N, %two)')
+        source = source.replace('(d0,d1)[s0] -> (2*d0+d1+s0)', '(d0,d1)[s0,s1] -> (d0*s1+d1+s0)')
+        source = source.replace('index, index, index) -> tensor<?xf32>', 'index, index, index, index) -> tensor<?xf32>')
+        lowered, count = L.legalize(source)
+        self.assertEqual(count, 1)
+        self.assertNotIn('polygeist.submapInverse', lowered)
+        unrelated = source.replace('%view, %O, %two, %N, %two)', '%view, %O, %N, %N, %two)')
+        self.assertEqual(L.legalize(unrelated), (unrelated, 0))
+        with tempfile.TemporaryDirectory(dir=ROOT / 'build') as directory:
+            root = Path(directory)
+            (root/'scatter_debuf.mlir').write_text(source)
+            reference = root/'ref.c'
+            reference.write_text("""void NETLIB_SPEC(int n,int offset,int width,float source[n][width],float out[11]) {
+              for(int i=0;i<n;++i)for(int j=0;j<width;++j)
+                out[offset+width*i+j]=source[i][j];
+            }""")
+            manifest = dict(args=['n','offset','width','source','out'], validation=dict(
+                scalars=dict(n=2,offset=1,width=3),arrays=dict(source=[2,3],out=[11])))
+            with patch.object(V, 'RAISED', root), patch.object(V, 'WORK', root/'validate'):
+                result = V.validate('scatter', manifest, reference, set())
+            self.assertEqual(result['verdict'], 'EXACT', result)
+
     def test_overlapping_map_is_not_an_overwrite_reduction(self):
         overlapping = SOURCE.replace('2*d0+d1+s0', 'd0+d1+s0')
         self.assertEqual(L.legalize(overlapping), (overlapping, 0))

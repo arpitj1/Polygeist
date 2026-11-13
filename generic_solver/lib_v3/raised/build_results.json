@@ -43,8 +43,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.965,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -95,8 +95,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.668,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -151,6 +151,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "00822795566f6a9004409c23dd2d065b76132954eb0dd616075a85431edd7d63"
   }
  },
  {
@@ -198,8 +201,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.636,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -251,8 +254,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 547.4,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -304,8 +307,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.743,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -358,8 +361,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.336,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -410,8 +413,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.325,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -462,8 +465,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.855,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -512,8 +515,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.765,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -563,8 +566,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.688,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -615,8 +618,76 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.44,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "aten_avg_pool2d_backward_k2_f32",
+  "routine": "aten_avg_pool2d_backward",
+  "wrapper": "generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32.c --function=aten_avg_pool2d_backward_k2_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=aten_avg_pool2d_backward_k2_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32.mlir -o generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32_linalg.mlir -o generic_solver/lib_v3/raised/aten_avg_pool2d_backward_k2_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "aten_avg_pool2d_backward_k2_f32",
+   "declarations": [],
+   "params": [
+    "S",
+    "O0",
+    "O1",
+    "R0",
+    "R1",
+    "grad_output",
+    "grad_input"
+   ],
+   "outputs": [
+    "grad_input"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [],
+   "array_dimensions": {
+    "O0": [
+     {
+      "array": "grad_output",
+      "axis": 1
+     }
+    ],
+    "O1": [
+     {
+      "array": "grad_output",
+      "axis": 2
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -691,8 +762,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -741,8 +812,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.994,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -792,8 +863,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.965,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -843,8 +914,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.364,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -895,8 +966,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.598,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -945,8 +1016,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.958,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -997,8 +1068,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.504,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1050,8 +1121,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.012,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1101,8 +1172,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 136.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1152,8 +1223,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9989,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1202,8 +1273,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.824,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1252,8 +1323,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.635,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1302,8 +1373,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.956,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1352,8 +1423,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.965,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1403,8 +1474,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.966,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1453,8 +1524,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.804,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1503,8 +1574,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.804,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1554,8 +1625,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.966,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1604,8 +1675,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.656,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1655,8 +1726,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.09,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1705,8 +1776,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.637,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1756,8 +1827,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.625,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1809,8 +1880,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9989,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1860,8 +1931,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.985,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1911,8 +1982,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.149,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -1961,8 +2032,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.971,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2013,8 +2084,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 77.76,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2064,8 +2135,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.985,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2114,8 +2185,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9938,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2165,8 +2236,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.985,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2216,8 +2287,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9989,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2267,8 +2338,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.985,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2318,8 +2389,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.786,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2371,8 +2442,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 6.281,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2422,8 +2493,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.985,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2472,8 +2543,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.884,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2523,8 +2594,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 11.38,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2574,8 +2645,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.955,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2624,8 +2695,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 138.4,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2675,8 +2746,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.994,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2725,8 +2796,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 9.467,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2818,8 +2889,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.919,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2870,8 +2941,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9989,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2920,8 +2991,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.719,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -2971,8 +3042,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.615,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3021,8 +3092,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.994,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3071,8 +3142,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.698,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3122,8 +3193,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.718,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3172,8 +3243,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.819,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3224,8 +3295,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.125,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3274,8 +3345,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3325,8 +3396,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 7.355,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3376,8 +3447,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9938,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3426,8 +3497,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.979,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3476,8 +3547,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.457,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3526,8 +3597,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.743,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3577,8 +3648,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.731,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3630,8 +3701,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.609,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -3680,8 +3751,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9938,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4179,8 +4250,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4269,8 +4340,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9938,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4320,8 +4391,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 8.658,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4374,6 +4445,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "2c2fc663846b272f01fa6311f42c5885fd485653f961abf8a5e98611ceef5bfe"
   }
  },
  {
@@ -4424,6 +4498,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "24f73c8df5a79d11d7de6dfa35b6145679e049d076fcf6b9075622f1e5467077"
   }
  },
  {
@@ -4475,6 +4552,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "f04c3d6d5c860ad8b373b0b395382fe960b8fddba961ba1c8fc4a987de59a87a"
   }
  },
  {
@@ -4526,6 +4606,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "d129c7b918d4cee7c5879c09c19371c035f66dcfc446dd903408001155425136"
   }
  },
  {
@@ -4617,8 +4700,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 7.651,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4672,8 +4755,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.653,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4727,8 +4810,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 10.88,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4819,8 +4902,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 9.129,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4870,8 +4953,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 9.129,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4921,8 +5004,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.01372,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -4977,6 +5060,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "d28cfb1ff3b2eb352773f2f257987f4de8369314705bf6cd819d2ccb39850519"
   }
  },
  {
@@ -5029,6 +5115,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "a04ba9781bd8322a68fad71dab0bd40733fb8869cdfefd15ace420163dd816c3"
   }
  },
  {
@@ -5075,8 +5164,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 9.129,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5125,8 +5214,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 9.129,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5183,6 +5272,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "f0dd6e08508930c55490d5129dfecb8d268fbb6e44eced4255670742e460a244"
   }
  },
  {
@@ -5232,8 +5324,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5285,8 +5377,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5339,8 +5431,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 7.651,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5397,6 +5489,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "2530fb301764d2721c7b2d097e62bae2de6f525ab979849f32f29fcac8fe2a3f"
   }
  },
  {
@@ -5447,8 +5542,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5500,8 +5595,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5554,8 +5649,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5608,8 +5703,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5662,8 +5757,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -5782,6 +5877,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "bc631762fbd1c7c0d47468c44fa269a74a1e6bb5d2193a9eab394c725ccc7621"
   }
  },
  {
@@ -5898,6 +5996,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "c8a9380207288bc3aa31879368b20083188181277d14492485887ae6639bdeec"
   }
  },
  {
@@ -6003,6 +6104,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "79970617d842cbf04ad33ee18b58e2b3fc282a9a2b24eb91bda5df28e98ba578"
   }
  },
  {
@@ -6169,6 +6273,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "d12ff289c9356cf12f29ac8cb25ac0ef9c44ccf3c323ae793e33f61966195b04"
   }
  },
  {
@@ -6413,6 +6520,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "9958c7358ea996240dc7b4dc7b9e117513202e9862841a4e66b3155d9ff46c1c"
   }
  },
  {
@@ -6500,6 +6610,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "20ef4adf556dc6f1fc566b695839ea061753d5188aa95d87032744557ec42731"
   }
  },
  {
@@ -6576,8 +6689,8 @@
   "validation": {
    "defn": "UNSOUND",
    "defn_maxabs": 0.8961,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.8961,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -6615,8 +6728,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9794,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -6697,8 +6810,8 @@
   "validation": {
    "defn": "UNSOUND",
    "defn_maxabs": 0.9794,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9794,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -6794,8 +6907,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2147000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -6845,8 +6958,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.187,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -6897,8 +7010,85 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.178,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "darknet_maxpool2x2_f32",
+  "routine": "darknet_maxpool",
+  "wrapper": "generic_solver/lib_v3/raised/darknet_maxpool2x2_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/darknet_maxpool2x2_f32.c --function=darknet_maxpool2x2_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/darknet_maxpool2x2_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=darknet_maxpool2x2_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/darknet_maxpool2x2_f32.mlir -o generic_solver/lib_v3/raised/darknet_maxpool2x2_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/darknet_maxpool2x2_f32_linalg.mlir -o generic_solver/lib_v3/raised/darknet_maxpool2x2_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "darknet_maxpool2x2_f32",
+   "declarations": [],
+   "params": [
+    "B",
+    "C",
+    "OH",
+    "OW",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [],
+   "array_dimensions": {
+    "C": [
+     {
+      "array": "input",
+      "axis": 1
+     },
+     {
+      "array": "output",
+      "axis": 1
+     }
+    ],
+    "OH": [
+     {
+      "array": "output",
+      "axis": 2
+     }
+    ],
+    "OW": [
+     {
+      "array": "output",
+      "axis": 3
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -6975,8 +7165,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7454,8 +7644,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9989,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7520,8 +7710,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.3696,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7584,8 +7774,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 7.807,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7648,8 +7838,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 7.807,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7713,8 +7903,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 7.807,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7822,7 +8012,7 @@
    "submaps": 6
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyr2k_ln_beta0",
    "declarations": [],
@@ -7855,8 +8045,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7886,7 +8076,7 @@
    "submaps": 5
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyr2k_ln_beta1",
    "declarations": [],
@@ -7919,8 +8109,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -7950,7 +8140,7 @@
    "submaps": 6
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyr2k_ln",
    "declarations": [],
@@ -7984,8 +8174,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8128,8 +8318,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9989,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8195,8 +8385,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.3696,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8226,7 +8416,7 @@
    "submaps": 1
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyr2k_ln_alpha0_beta0",
    "declarations": [],
@@ -8261,8 +8451,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8292,7 +8482,7 @@
    "submaps": 1
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyr2k_ln_alpha0",
    "declarations": [],
@@ -8328,8 +8518,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8388,8 +8578,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 10.45,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8448,8 +8638,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 11.36,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8509,8 +8699,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 9.888,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8569,8 +8759,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 12.52,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8630,8 +8820,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 12.79,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8661,7 +8851,7 @@
    "submaps": 4
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_ln_beta0",
    "declarations": [],
@@ -8690,8 +8880,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8721,7 +8911,7 @@
    "submaps": 3
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_ln_beta1",
    "declarations": [],
@@ -8750,8 +8940,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8781,7 +8971,7 @@
    "submaps": 4
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_ln",
    "declarations": [],
@@ -8811,8 +9001,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8842,7 +9032,7 @@
    "submaps": 4
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_lt_beta0",
    "declarations": [],
@@ -8871,8 +9061,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8902,7 +9092,7 @@
    "submaps": 4
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_lt",
    "declarations": [],
@@ -8932,8 +9122,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -8993,8 +9183,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9898,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9055,8 +9245,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.3662,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9086,7 +9276,7 @@
    "submaps": 1
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_ln_alpha0_beta0",
    "declarations": [],
@@ -9116,8 +9306,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9147,7 +9337,7 @@
    "submaps": 1
   },
   "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)",
   "meta": {
    "spec": "netlib_dsyrk_ln_alpha0",
    "declarations": [],
@@ -9178,8 +9368,8 @@
   "validation": {
    "defn": "LOWER_FAIL",
    "defn_maxabs": null,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9529,8 +9719,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.481,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9568,8 +9758,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.481,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9607,8 +9797,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9646,8 +9836,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9685,8 +9875,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9724,8 +9914,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9763,8 +9953,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9802,8 +9992,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
-   "linalg_maxabs": null,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -9862,8 +10052,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.9938,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10225,8 +10415,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.538,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10277,8 +10467,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.931,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10328,8 +10518,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.325,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10380,8 +10570,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.931,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10431,8 +10621,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.369,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10496,8 +10686,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.504,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10562,8 +10752,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 8.882e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 8.882e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.67,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10627,8 +10817,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.016,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10693,8 +10883,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.276,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10758,8 +10948,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 2.776e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 2.776e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.383,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10824,8 +11014,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.708,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10889,8 +11079,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.98,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -10955,8 +11145,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 6.527,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11019,8 +11209,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.099,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11083,8 +11273,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.517,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11147,8 +11337,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.252,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11211,8 +11401,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.37,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11269,7 +11459,7 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
+   "linalg": "RUN_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
@@ -11327,7 +11517,7 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
+   "linalg": "RUN_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
@@ -11386,7 +11576,7 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
+   "linalg": "RUN_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
@@ -11444,8 +11634,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 2.22e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 2.22e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.231,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11502,8 +11692,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 2.22e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 2.22e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.888,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11561,8 +11751,8 @@
   "validation": {
    "defn": "WITHIN_1e-12",
    "defn_maxabs": 4.441e-16,
-   "linalg": "WITHIN_1e-12",
-   "linalg_maxabs": 4.441e-16,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.634,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11619,7 +11809,7 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
+   "linalg": "RUN_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
@@ -11669,8 +11859,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 0.3698,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11720,8 +11910,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.723,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11771,8 +11961,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 5.723,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11828,8 +12018,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "RUN_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11885,8 +12075,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "RUN_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -11949,8 +12139,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.091,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12013,8 +12203,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.091,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12063,8 +12253,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.965,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12120,8 +12310,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 15.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12212,6 +12402,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "7147618968c084042d35f400f0b0c095ca8cd4385c234fe5c2238b1e790ffdaa"
   }
  },
  {
@@ -12296,6 +12489,9 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "106b85084d0f24bde77b5d5f978c30a82e8347213149a1866dd65357ca67e15e"
   }
  },
  {
@@ -12358,7 +12554,7 @@
    "defn": "UNSOUND",
    "defn_maxabs": 2.384e-07,
    "linalg": "UNSOUND",
-   "linalg_maxabs": 2.384e-07,
+   "linalg_maxabs": 5.504,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12424,7 +12620,7 @@
    "defn": "UNSOUND",
    "defn_maxabs": 4.768e-07,
    "linalg": "UNSOUND",
-   "linalg_maxabs": 4.768e-07,
+   "linalg_maxabs": 5.67,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12480,7 +12676,7 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "LOWER_FAIL",
+   "linalg": "RUN_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
@@ -12537,8 +12733,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.512,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12596,8 +12792,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.965,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12655,6 +12851,217 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.911,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "opencv_bilinear2x_f32",
+  "routine": "opencv_bilinear",
+  "wrapper": "generic_solver/lib_v3/raised/opencv_bilinear2x_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/opencv_bilinear2x_f32.c --function=opencv_bilinear2x_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_bilinear2x_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=opencv_bilinear2x_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_bilinear2x_f32.mlir -o generic_solver/lib_v3/raised/opencv_bilinear2x_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_bilinear2x_f32_linalg.mlir -o generic_solver/lib_v3/raised/opencv_bilinear2x_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 1
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 4,
+   "submaps": 1
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "opencv_bilinear2x_f32",
+   "declarations": [],
+   "params": [
+    "B",
+    "C",
+    "H",
+    "W",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [],
+   "array_dimensions": {
+    "C": [
+     {
+      "array": "input",
+      "axis": 1
+     },
+     {
+      "array": "output",
+      "axis": 1
+     }
+    ],
+    "H": [
+     {
+      "array": "input",
+      "axis": 2
+     }
+    ],
+    "W": [
+     {
+      "array": "input",
+      "axis": 3
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "3d764458a99c5e179a9c730d5f2e1dd6f0323fffefae654175334a94251a5da6"
+  }
+ },
+ {
+  "spec": "opencv_gaussian3x3_u8",
+  "routine": "opencv_gaussian_fixed",
+  "wrapper": "generic_solver/lib_v3/raised/opencv_gaussian3x3_u8.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/opencv_gaussian3x3_u8.c --function=opencv_gaussian3x3_u8 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_gaussian3x3_u8.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=opencv_gaussian3x3_u8 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_gaussian3x3_u8.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_u8_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_gaussian3x3_u8_linalg.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_u8_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 8
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 8
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "opencv_gaussian3x3_u8",
+   "declarations": [],
+   "params": [
+    "h",
+    "w",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "w": "output"
+   },
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "opencv_histogram_u8_u32",
+  "routine": "opencv_histogram",
+  "wrapper": "generic_solver/lib_v3/raised/opencv_histogram_u8_u32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/opencv_histogram_u8_u32.c --function=opencv_histogram_u8_u32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_histogram_u8_u32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=opencv_histogram_u8_u32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_histogram_u8_u32.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u8_u32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_histogram_u8_u32_linalg.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u8_u32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 3,
+   "submaps": 3
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "opencv_histogram_u8_s32",
+  "routine": "opencv_histogram",
+  "wrapper": "generic_solver/lib_v3/raised/opencv_histogram_u8_s32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/opencv_histogram_u8_s32.c --function=opencv_histogram_u8_s32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_histogram_u8_s32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=opencv_histogram_u8_s32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_histogram_u8_s32.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u8_s32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_histogram_u8_s32_linalg.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u8_s32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [
+    "affine.for"
+   ],
+   "loop_count": 2,
+   "memref_access": 3,
+   "submaps": 3
+  },
+  "status": "PARTIAL",
+  "reason": "2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -12708,8 +13115,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12761,8 +13168,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12814,8 +13221,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -12867,10 +13274,162 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "pytorch_batchnorm_saved_f32",
+  "routine": "pytorch_batchnorm",
+  "wrapper": "generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32.c --function=pytorch_batchnorm_saved_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=pytorch_batchnorm_saved_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32.mlir -o generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32_linalg.mlir -o generic_solver/lib_v3/raised/pytorch_batchnorm_saved_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 10
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 10
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "pytorch_batchnorm_saved_f32",
+   "declarations": [],
+   "params": [
+    "N",
+    "C",
+    "H",
+    "W",
+    "input",
+    "mean",
+    "invstd",
+    "weight",
+    "bias",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": [],
+   "array_dimensions": {
+    "C": [
+     {
+      "array": "input",
+      "axis": 1
+     },
+     {
+      "array": "output",
+      "axis": 1
+     }
+    ],
+    "H": [
+     {
+      "array": "input",
+      "axis": 2
+     },
+     {
+      "array": "output",
+      "axis": 2
+     }
+    ],
+    "W": [
+     {
+      "array": "input",
+      "axis": 3
+     },
+     {
+      "array": "output",
+      "axis": 3
+     }
+    ]
+   }
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "9d497c572919a101368fd68e6f75a513efd55724bc33741d312a1683c1477c09"
+  }
+ },
+ {
+  "spec": "pytorch_kron_f32",
+  "routine": "pytorch_kron",
+  "wrapper": "generic_solver/lib_v3/raised/pytorch_kron_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/pytorch_kron_f32.c --function=pytorch_kron_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/pytorch_kron_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=pytorch_kron_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/pytorch_kron_f32.mlir -o generic_solver/lib_v3/raised/pytorch_kron_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/pytorch_kron_f32_linalg.mlir -o generic_solver/lib_v3/raised/pytorch_kron_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "pytorch_kron_f32",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "P",
+    "Q",
+    "self",
+    "other",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "N": "self",
+    "Q": "other"
+   },
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "abb0c48915ae16d3e9b572923fb51e8495907b454c228e4c9967e9fcbe3b5c0a"
   }
  },
  {
@@ -12998,8 +13557,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.636,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13049,8 +13608,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.335,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13100,8 +13659,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.335,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13151,8 +13710,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.741,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13202,8 +13761,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.455,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13253,8 +13812,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.194,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13304,8 +13863,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.183,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13355,8 +13914,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.961,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13406,8 +13965,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.786,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13457,8 +14016,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.325,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13508,8 +14067,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.325,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13559,8 +14118,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.835,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13610,8 +14169,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4295000000.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13661,8 +14220,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 136.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13712,8 +14271,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 189.3,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13763,8 +14322,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.703,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13814,8 +14373,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 3.245,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13864,8 +14423,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 2.351,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13914,8 +14473,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 4.558,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }
@@ -13967,8 +14526,8 @@
   "validation": {
    "defn": "EXACT",
    "defn_maxabs": 0.0,
-   "linalg": "EXACT",
-   "linalg_maxabs": 0.0,
+   "linalg": "UNSOUND",
+   "linalg_maxabs": 1.784,
    "affine": "EXACT",
    "affine_maxabs": 0.0
   }

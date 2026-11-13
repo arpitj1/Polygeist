@@ -1,0 +1,117 @@
+{
+  "routine": "darknet_maxpool",
+  "source": "Public-domain Darknet forward_maxpool_layer value output; reference counterpart for cuDNN pooling",
+  "upstream_files": [
+    {
+      "path": "third_party/darknet/src/maxpool_layer.c",
+      "sha256": "734a0014a8f5291aa3cacec2f072941f7cabc915c804fb5d5510e12338490b03"
+    }
+  ],
+  "adaptation": "Preserve the ordered -FLT_MAX seeded reduction from the public reference; expose NCHW arrays and specialize a checked, nonoverlapping 2x2 window configuration.",
+  "specs": [
+    {
+      "name": "darknet_maxpool2x2_f32",
+      "args": [
+        "B",
+        "C",
+        "OH",
+        "OW",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnPoolingForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_maxpool2x2_f32",
+          "arguments": [
+            "B",
+            "C",
+            "OH",
+            "OW",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "B",
+              "C",
+              {
+                "terms": {
+                  "OH": 2
+                },
+                "offset": 0
+              },
+              {
+                "terms": {
+                  "OW": 2
+                },
+                "offset": 0
+              }
+            ],
+            "output": [
+              "B",
+              "C",
+              "OH",
+              "OW"
+            ]
+          },
+          "bounds": {
+            "B": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "C": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "OH": {
+              "min": 1,
+              "max": 1073741823
+            },
+            "OW": {
+              "min": 1,
+              "max": 1073741823
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "Disjoint contiguous FP32 NCHW arrays and positive checked dimensions; no padding, a 2x2 window and stride 2, even input dimensions",
+        "Finite inputs; no floating exception observation. cuDNN does not propagate NaNs."
+      ],
+      "deviations": [
+        "Project only the values output of Darknet; its independent argmax output has no effect on values.",
+        "Specialize the library configuration to zero padding and size=stride=2; expose contiguous dimensions and eliminate in-bounds checks using input spatial extents 2*OH and 2*OW."
+      ],
+      "validation": {
+        "scalars": {
+          "B": 2,
+          "C": 3,
+          "OH": 3,
+          "OW": 5
+        },
+        "arrays": {
+          "input": [
+            2,
+            3,
+            6,
+            10
+          ],
+          "output": [
+            2,
+            3,
+            3,
+            5
+          ]
+        }
+      }
+    }
+  ]
+}

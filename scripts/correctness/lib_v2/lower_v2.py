@@ -540,7 +540,7 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
 
     # Exact shape contracts are needed for higher-rank C arrays: a capacity
     # check alone cannot prove the inner strides required by a VLA prototype.
-    if ca.runtime_adapter and ca.runtime_adapter.get('kind') == 'typed_c_wrapper':
+    if ca.runtime_adapter and ca.runtime_adapter.get('kind') in ('typed_c_wrapper', 'tensor_pointwise_reference'):
         for p in ca.params:
             if p.tkind != 'array' or p.rank <= 2:
                 continue
@@ -548,6 +548,15 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
             for actual, dimension in zip(av.sizes, ca.runtime_adapter['arrays'][p.name]):
                 if type(dimension) is int:
                     expected = e.const(dimension, 'index')
+                elif isinstance(dimension, dict) and 'product' in dimension:
+                    expected = e.const(1, 'index')
+                    for factor in dimension['product']:
+                        if type(factor) is int:
+                            term = e.const(factor, 'index')
+                        else:
+                            value = int_value(sa.binding[factor])
+                            term = e.op(f'arith.index_cast {value} : i32 to index', 'extent')
+                        expected = e.op(f'arith.muli {expected}, {term} : index', 'extent')
                 elif isinstance(dimension, dict) and 'terms' in dimension:
                     from typed_wrapper import dimension_terms
                     terms, offset = dimension_terms(dimension)
@@ -917,6 +926,134 @@ def rewrite_memory_copies(text: str, backend: str) -> str:
         output = insert_after_module_open(output, COPY_DECL)
     return output
 
+def drop_overwritten_materializations(text: str, specs: dict, names: dict,
+                                      calls: dict) -> tuple[str, int]:
+    """Remove dead copies into private buffers before complete overwrites.
+
+    The imported reference validates a write-only [0,n) output.
+    Static allocation cardinality and full-buffer aliases prove that the call
+    overwrites every byte; any intervening read or control flow blocks removal.
+    This is memory-effect cleanup after selection, not library recognition.
+    """
+    import math
+    import mlir_lite as ML
+    import runtime_adapter
+    module = ML.Module(text)
+    uses = {}
+    for op in module.ops:
+        for index, value in enumerate(op.operands):
+            definition = module.def_of(value, op)
+            if definition:
+                uses.setdefault((definition[0].idx, definition[1]), []).append((op, index))
+    views = {'memref.cast', 'memref.collapse_shape', 'memref.expand_shape'}
+    removed = set()
+    for launch in module.ops:
+        m = LAUNCH_RE.match(launch.header) if launch.name == 'kernel.launch' else None
+        if not m:
+            continue
+        spec = specs.get(names.get(m['sym'], m['sym']))
+        call = calls.get(spec.call) if spec else None
+        cfg = call.runtime_adapter if call else None
+        if not call:
+            continue
+        operands = split_top(m['ops'])
+        if cfg and cfg.get('kind') == 'pointwise_reference':
+            extent_name,output_name=cfg['extent_arg'],cfg['graph']['output']
+        else:
+            # Derive the same effect for any validated rank-one reference,
+            # including ordinary vendor APIs without a graph adapter. The
+            # imported body, never the API or application name, establishes
+            # the complete write range and absence of reads of old output.
+            effect=None
+            for arg in spec.args:
+                if arg.kind!='int':continue
+                try:
+                    f,g,gb,inputs,output=runtime_adapter.reference_region(A,spec.spec,spec.args,arg.name)
+                except (A.AbiError,ValueError,KeyError,IndexError):
+                    continue
+                allowed={'polygeist.submap','polygeist.submapInverse',
+                         'linalg.generic','linalg.yield','kernel.yield'}
+                if any(o.name not in allowed and not o.name.startswith(('arith.','math.')) for o in f.ops):
+                    continue
+                writes=[o for o in f.ops if o.name=='polygeist.submapInverse']
+                returns=[o for o in f.ops if o.name=='kernel.yield']
+                if (len(writes)!=1 or len(returns)!=1 or len(g.results)!=1 or
+                        len(writes[0].results)!=1 or
+                        writes[0].operands[:2]!=['%'+output,g.results[0]] or
+                        returns[0].operands!=writes[0].results or
+                        'map=affine_map<(d0)->(d0)>' not in re.sub(r'\s+','',writes[0].text)):
+                    continue
+                # The inverse view must write the very extent used by the
+                # region's output view; extra or different coordinates fail.
+                outview=next((o for o in f.ops if g.outs[0] in o.results),None)
+                if outview is None or writes[0].operands[2:]!=outview.operands[1:]:
+                    continue
+                effect=(arg.name,output);break
+            if effect is None:continue
+            extent_name,output_name=effect
+        extent_index = next(i for i, a in enumerate(spec.args) if a.name == extent_name)
+        output_index = next(i for i, a in enumerate(spec.args) if a.name == output_name)
+        # The validated reference writes [0,n). Require that this is exactly
+        # the entire allocation, not merely a prefix of a larger destination.
+        extent = module.def_of(operands[extent_index], launch)
+        cm = re.search(r'arith.constant (\d+) : i32', extent[0].header) if extent else None
+        if not cm or int(cm[1]) <= 0:
+            continue
+        definition = module.def_of(operands[output_index], launch)
+        while definition and definition[0].name in views:
+            view = definition[0]
+            definition = module.def_of(view.operands[0], view)
+        if (not definition or definition[0].name != 'memref.alloc' or
+                definition[0].block != launch.block):
+            continue
+        allocation = definition[0]
+        shape = re.search(r': memref<((?:\d+x)+)f32>\s*$', allocation.header)
+        if not shape or math.prod(map(int, shape[1].rstrip('x').split('x'))) != int(cm[1]):
+            continue
+        # A fresh private allocation cannot have hidden aliases. Follow only
+        # full-buffer shape views; all other uses before the call are a barrier.
+        pending, seen, copies, safe = [(allocation.idx, 0)], set(), [], True
+        while pending and safe:
+            key = pending.pop()
+            if key in seen:
+                continue
+            seen.add(key)
+            for op, index in uses.get(key, []):
+                if op.start > launch.start:
+                    continue
+                if op.block != launch.block:
+                    safe = False
+                    break
+                if op.idx == launch.idx:
+                    if index != output_index:
+                        safe = False
+                        break
+                elif op.name in views and index == 0:
+                    pending.extend((op.idx, i) for i in range(len(op.results)))
+                elif op.name == 'memref.dim' and index == 0:
+                    continue
+                elif (op.name == 'linalg.generic' and not op.results and
+                      len(op.ins) == 1 and len(op.outs) == 1 and index == 1 and
+                      op.iters and set(op.iters) == {'parallel'}):
+                    body = [line for line in op.body if line != '}']
+                    arg = re.match(r'\^bb\w*\((%[\w.$-]+)\s*:', body[0]) if len(body) == 2 else None
+                    if not arg or not re.fullmatch(r'linalg.yield ' + re.escape(arg[1]) + r'\s*:\s*f32', body[1]):
+                        safe = False
+                        break
+                    copies.append(op)
+                elif op.name == 'memref.copy' and index == 1:
+                    copies.append(op)
+                else:
+                    safe = False
+                    break
+        if safe:
+            removed.update(op.idx for op in copies)
+    for op in reversed(module.ops):
+        if op.idx in removed:
+            text = text[:op.start] + text[op.end:]
+    return text, len(removed)
+
+
 def lower(text: str, do_bufferize: bool = True, report: dict | None = None,
           allow_legaliser: bool = True, backend: str = "cpu",
           deallocate: bool = False) -> str:
@@ -942,6 +1079,8 @@ def lower(text: str, do_bufferize: bool = True, report: dict | None = None,
     if do_bufferize:
         text = bufferize(text, report["opt"], allow_legaliser,
                          affine_copy_views=(backend == 'cuda'))
+    text, removed = drop_overwritten_materializations(text, specs, names, calls)
+    report['eliminated_output_initializations'] = removed
     # Resolve lifetimes before rewriting launches to raw-pointer calls. After
     # that rewrite memref liveness cannot see the call's use of the buffer.
     if deallocate:

@@ -94,7 +94,8 @@ def capabilities(rows, backend, disabled=(), only=None):
 
 def semantic_inputs():
     paths = [HERE / name for name in (
-        'spec_match.py', 'kernel_match.py', 'eqsat_ablation.py',
+        'spec_match.py', 'kernel_match.py', 'scalar_eqsat_worker.py', 'eqsat_ablation.py',
+        'proof_metrics.py', 'proof_worker.py', 'gen_wrapper.py',
         'polygeist_build.sh', 'build_jetson.sh', 'plan_abi_workspace.py')]
     paths += sorted((HERE / 'lib_v2').glob('*.py'))
     paths += sorted((HERE / 'region_match').glob('*.py'))
@@ -107,7 +108,8 @@ def semantic_inputs():
         'polygeist_gpu_workspace_cache.h',
         'polygeist_v2_matrix_layout.inc', 'polygeist_v2_memref_copy.inc',
         'polygeist_pointwise_partition.h', 'polygeist_pointwise_rounding.inc',
-        'polygeist_pointwise_division.inc', 'polygeist_thrust_rt.cu')]
+        'polygeist_pointwise_division.inc', 'polygeist_tensor_pointwise_rt.inc',
+        'polygeist_thrust_rt.cu')]
     return PROVENANCE.record([path for path in paths if path.is_file()])
 
 

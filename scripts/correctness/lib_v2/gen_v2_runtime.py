@@ -219,6 +219,9 @@ def gen_cuda(calls) -> str:
 
 def gen_runtime_adapter_cuda(ca) -> str:
     cfg = ca.runtime_adapter
+    if cfg['kind'] == 'tensor_pointwise_reference':
+        from tensor_pointwise import generate
+        return generate(ca, proto)
     if cfg['kind'] == 'typed_c_wrapper':
         from typed_wrapper import generate
         return generate(ca, proto)

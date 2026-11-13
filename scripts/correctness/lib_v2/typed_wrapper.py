@@ -100,6 +100,11 @@ def contract(A, spec, target, ret, args):
         if not pointer and not ((arg.kind == 'int' and element == 'int') or
                                 (arg.kind == 'scalar' and element in ('float', 'double'))):
             raise A.AbiError('wrapper scalar requires exact int32, FP32, or FP64 storage')
+    return geometry(A, target, args, cfg, ordered)
+
+
+def geometry(A, target, args, cfg, ordered):
+    """Validate bounded array geometry after an adapter validates its ABI."""
     arrays = {a.name: a for a in args if a.kind == 'array'}
     dimensions = {a.name for a in args if a.kind == 'int'}
     shapes = cfg.get('arrays', {})
@@ -118,6 +123,22 @@ def contract(A, spec, target, ret, args):
     for name, shape in shapes.items():
         arg = arrays[name]
         def valid_dimension(d):
+            if isinstance(d, dict) and set(d) == {'product'}:
+                factors = d['product']
+                if not isinstance(factors, list) or not 2 <= len(factors) <= 8:
+                    return False
+                maximum = 1
+                for factor in factors:
+                    if type(factor) is int:
+                        low = high = factor
+                    elif isinstance(factor, str) and factor in bounds:
+                        low, high = bounds[factor]['min'], bounds[factor]['max']
+                    else:
+                        return False
+                    if low <= 0 or high > 2147483647 // maximum:
+                        return False
+                    maximum *= high
+                return True
             try:
                 terms, low = dimension_terms(d)
             except (ValueError, TypeError):
@@ -153,10 +174,12 @@ def contract(A, spec, target, ret, args):
             params.append(A.AbiParam(param.layout, 'int', layout_of=arg.name))
             binding[param.layout] = ('const_num', 1)
     return params, binding, dict(cfg, ordered_arguments=ordered,
-                                 memory_domain='cuda_device' if backend == ['cuda'] else 'host')
+                                 memory_domain='cuda_device' if target['backends'] == ['cuda'] else 'host')
 
 
 def extent_expression(dimension):
+    if isinstance(dimension, dict) and set(dimension) == {'product'}:
+        return '(' + ' * '.join(extent_expression(d) for d in dimension['product']) + ')'
     if isinstance(dimension, dict) and 'terms' in dimension:
         terms, offset = dimension_terms(dimension)
         return '(' + ' + '.join([f'((int64_t){name} * ({coefficient}))'
@@ -167,7 +190,7 @@ def extent_expression(dimension):
     return f'(int64_t){dimension}'
 
 
-def generate(ca, prototype):
+def generate(ca, prototype, emit_call=None):
     """Mechanically marshal an already proved reference to its typed C entry."""
     cfg = ca.runtime_adapter
     arrays = [p for p in ca.params if p.tkind == 'array']
@@ -223,7 +246,10 @@ def generate(ca, prototype):
         else:
             arguments.append(name)
     result = f'{ca.returns} pv2_result = ' if ca.returns else ''
-    body.append(f'  {result}{cfg["entry"]}({", ".join(arguments)});\n')
+    if emit_call is None:
+        body.append(f'  {result}{cfg["entry"]}({", ".join(arguments)});\n')
+    else:
+        body.append(emit_call(dict(zip(cfg['ordered_arguments'], arguments))))
     if cuda:
         body += ['  polygeist_cublas_pipeline_end();\n',
                  '  polygeist_require_gpu_libraries_end();\n',

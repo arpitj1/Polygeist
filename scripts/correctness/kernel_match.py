@@ -20,6 +20,7 @@ import re
 import sys
 import json
 import time
+import subprocess
 from collections import Counter
 from itertools import product
 from dataclasses import dataclass
@@ -47,6 +48,7 @@ def configure_matcher(mode: str = "egglog", *, collect_egraph_sizes: bool = Fals
         "proofs_attempted": 0,
         "proofs_matched": 0,
         "proof_elapsed_ms": 0.0,
+        "saturation_elapsed_ms": 0.0,
         "proof_elapsed_max_ms": 0.0,
         "telemetry_elapsed_ms": 0.0,
         "egraph_nodes_sum": 0,
@@ -55,6 +57,10 @@ def configure_matcher(mode: str = "egglog", *, collect_egraph_sizes: bool = Fals
         "egraph_classes_max": 0,
         "rule_matches": 0,
         "proofs_over_10s": 0,
+        "proof_timeouts": 0,
+        "proof_worker_errors": 0,
+        "proof_iterations": 0,
+        "proof_isolation_ms": 0.0,
         "template_attempts": 0,
         "syntactic_unifications": 0,
         "syntactic_comparisons": 0,
@@ -662,6 +668,8 @@ _OP_PATTERNS = {
     "arith.subi": "integer",
     "arith.divsi": "integer",
     "arith.divui": "integer",
+    "arith.remsi": "integer",
+    "arith.remui": "integer",
     "math.sqrt": "sqrt",
     "math.absf": "abs",
     "math.absi": "abs",
@@ -752,7 +760,7 @@ def encode_body_yields(g: GenericBody) -> list[Term]:
 
     for line in g.body_lines:
         local_index = re.match(
-            r"(%[\w_]+)\s*=\s*(?:linalg\.index|affine\.apply)\b", line.strip())
+            r"(%[\w_]+)\s*=\s*(?:linalg\.index|affine\.apply|tensor\.extract)\b", line.strip())
         if local_index:
             # Keep index calculations opaque to scalar algebra. The whole-DAG
             # matcher proves their definitions recursively, including the
@@ -913,6 +921,33 @@ def _has_negative_zero(node) -> bool:
 
 def equivalent(a: Term, b: Term, include_distributivity: bool = True) -> bool:
     """Are two Terms equivalent under the current algebra rules?"""
+    import proof_metrics as metrics
+    seconds = metrics.deadline_seconds()
+    if not seconds or _MATCHER_MODE == 'syntactic':
+        return _equivalent_local(a, b, include_distributivity)
+    started = time.perf_counter()
+    try:
+        result = metrics.graph_call(dict(kind='scalar', left=_parse_term(_term_repr(a)),
+            right=_parse_term(_term_repr(b)),distributivity=include_distributivity,
+            collect=_COLLECT_EGRAPH_SIZES),seconds)
+        for key,value in result['counters'].items():
+            if key in ('mode','iteration_limit'):continue
+            previous=_MATCHER_TELEMETRY.get(key,0)
+            _MATCHER_TELEMETRY[key]=max(previous,value) if '_max' in key else previous+value
+        return result['matched']
+    except metrics.ProofDeadline:
+        _MATCHER_TELEMETRY['proofs_attempted'] += 1
+        _MATCHER_TELEMETRY['proof_timeouts'] += 1
+        return False
+    except RuntimeError:
+        _MATCHER_TELEMETRY['proofs_attempted'] += 1
+        _MATCHER_TELEMETRY['proof_worker_errors'] += 1
+        return False
+    finally:
+        _MATCHER_TELEMETRY['proof_isolation_ms'] += (time.perf_counter()-started)*1000
+
+
+def _equivalent_local(a: Term, b: Term, include_distributivity: bool = True) -> bool:
     left = _parse_term(_term_repr(a))
     right = _parse_term(_term_repr(b))
     # Raw f64 primitive atoms equate both zero signs. Our negative-zero atom
@@ -937,7 +972,15 @@ def equivalent(a: Term, b: Term, include_distributivity: bool = True) -> bool:
     started = time.perf_counter()
     eg = EGraph()
     eg.register(a, b)
-    report = eg.run(algebra_rules(include_distributivity) * 8)
+    rules = algebra_rules(include_distributivity)
+    saturation_started = time.perf_counter()
+    for iteration in range(8):
+        report = eg.run(rules)
+        _MATCHER_TELEMETRY['proof_iterations'] += 1
+        _MATCHER_TELEMETRY['rule_matches'] += sum(report.num_matches_per_rule.values())
+        if not report.updated:
+            break
+    _MATCHER_TELEMETRY['saturation_elapsed_ms'] += (time.perf_counter()-saturation_started)*1000
     try:
         eg.check(a == b)
         matched = True
@@ -947,8 +990,6 @@ def equivalent(a: Term, b: Term, include_distributivity: bool = True) -> bool:
     _MATCHER_TELEMETRY["proof_elapsed_ms"] += elapsed_ms
     _MATCHER_TELEMETRY["proof_elapsed_max_ms"] = max(
         _MATCHER_TELEMETRY["proof_elapsed_max_ms"], elapsed_ms)
-    _MATCHER_TELEMETRY["rule_matches"] += sum(
-        report.num_matches_per_rule.values())
     if elapsed_ms > 10_000.0:
         _MATCHER_TELEMETRY["proofs_over_10s"] += 1
     if matched:
@@ -1617,6 +1658,64 @@ def _egglog_accepts_binding(body_ast, template_ast, bindings: dict) -> bool:
         return False
     return equivalent(_ast_to_term(body_ast), _ast_to_term(instantiated),
                       include_distributivity=False)
+
+
+def prove_distributive_binding(body_ast, template_ast, bindings: dict) -> bool:
+    """Prove a structurally proposed capture binding in an isolated e-graph.
+
+    This is a bounded proof attempt, never a polynomial or pattern-based
+    acceptance fallback. Opaque typed operations retain their exact terms.
+    """
+    if numeric_model() != 'relaxed' or _MATCHER_MODE != 'egglog':
+        return False
+    instantiated = _substitute_caps(template_ast, bindings)
+    if max(_ast_node_count(body_ast), _ast_node_count(instantiated)) > 160:
+        return False
+    # Distributivity may duplicate leaves, but it cannot rename them. Ignore
+    # the two identities that the existing relaxed rules may introduce.
+    def leaves(node):
+        return set(_ordered_unique_ast_nodes(node, {'Cap', 'In', 'Out', 'Lit'})) - {
+            ('Lit', 0.0), ('Lit', 1.0)}
+    if leaves(body_ast) != leaves(instantiated):
+        return False
+    request = dict(left=body_ast, right=instantiated,
+                   collect_sizes=_COLLECT_EGRAPH_SIZES)
+    started = time.perf_counter()
+    _MATCHER_TELEMETRY['proofs_attempted'] += 1
+    result = {}
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(Path(__file__).with_name('scalar_eqsat_worker.py'))],
+            input=json.dumps(request), text=True, capture_output=True, timeout=10)
+        if completed.returncode == 0:
+            result = json.loads(completed.stdout)
+        else:
+            _MATCHER_TELEMETRY['distributive_worker_errors'] = (
+                _MATCHER_TELEMETRY.get('distributive_worker_errors', 0) + 1)
+    except subprocess.TimeoutExpired:
+        _MATCHER_TELEMETRY['proofs_over_10s'] += 1
+        _MATCHER_TELEMETRY['proof_timeouts'] += 1
+    except (ValueError, OSError):
+        _MATCHER_TELEMETRY['distributive_worker_errors'] = (
+            _MATCHER_TELEMETRY.get('distributive_worker_errors', 0) + 1)
+    elapsed = (time.perf_counter()-started)*1000
+    _MATCHER_TELEMETRY['proof_elapsed_ms'] += elapsed
+    _MATCHER_TELEMETRY['proof_elapsed_max_ms'] = max(
+        _MATCHER_TELEMETRY['proof_elapsed_max_ms'], elapsed)
+    _MATCHER_TELEMETRY['rule_matches'] += result.get('rule_matches', 0)
+    _MATCHER_TELEMETRY['proof_iterations'] += result.get('iterations', 0)
+    _MATCHER_TELEMETRY['saturation_elapsed_ms'] += result.get('saturation_elapsed_ms', 0)
+    for kind in ('nodes', 'classes'):
+        _MATCHER_TELEMETRY['egraph_'+kind+'_sum'] += result.get(kind, 0)
+        _MATCHER_TELEMETRY['egraph_'+kind+'_max'] = max(
+            _MATCHER_TELEMETRY['egraph_'+kind+'_max'], result.get(kind, 0))
+    for kind in ('iterations', 'saturation_elapsed_ms'):
+        key = 'distributive_'+kind
+        _MATCHER_TELEMETRY[key] = _MATCHER_TELEMETRY.get(key, 0) + result.get(kind, 0)
+    matched = result.get('matched') is True
+    if matched:
+        _MATCHER_TELEMETRY['proofs_matched'] += 1
+    return matched
 
 
 def body_matches_template(body: Term, template: Term) -> Optional[dict]:

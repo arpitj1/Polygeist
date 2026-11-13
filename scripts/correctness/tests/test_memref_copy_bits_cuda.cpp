@@ -44,6 +44,8 @@ int main() {
     {2,{65,97},{97,1},{1,65},0}, // tiled transpose, both partial edge tiles
     {3,{2,65,37},{0,1,65},{2405,37,1},0}, // tiled transpose with batch broadcast
     {3,{2,65,37},{2405,1,-65},{2405,37,1},2340}, // reversed tiled source axis
+    {5,{2,2,9,11,11},{2178,1089,121,11,1},{2178,1089,1,99,9},0}, // tiled copy with three batch axes
+    {5,{2,2,17,31,2},{2108,1054,62,1,31},{2108,1054,1,34,17},0}, // occupied tiles with three batch axes
     {16,{1,1,1,1,1,1,1,1,1,1,1,1,1,1,7,11},
        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,1},
        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,7},0}, // rank limit/unit dims

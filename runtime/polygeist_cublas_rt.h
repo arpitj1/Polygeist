@@ -519,6 +519,19 @@ void polygeist_reference_avg_pool3d_backward_k2_f32(
     int32_t S, int32_t O0, int32_t O1, int32_t O2,
     int32_t R0, int32_t R1, int32_t R2,
     const float *grad_output, float *grad_input);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnPoolingBackward polygeist_reference_avg_pool2d_backward_k2_f32 */
+void polygeist_reference_avg_pool2d_backward_k2_f32(
+    int32_t S, int32_t O0, int32_t O1, int32_t R0, int32_t R1,
+    const float *grad_output, float *grad_input);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnPoolingForward polygeist_reference_maxpool2x2_f32 */
+void polygeist_reference_maxpool2x2_f32(
+    int32_t B, int32_t C, int32_t OH, int32_t OW,
+    const float *input, float *output);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnSpatialTfSamplerForward polygeist_reference_bilinear2x_f32 */
+void polygeist_reference_bilinear2x_f32(
+    int32_t B, int32_t C, int32_t H, int32_t W,
+    const float *input, float *output);
 void polygeist_cudnn_adaptive_pool_f32(
     int32_t operation, int32_t rank, int32_t N, int32_t C,
     int32_t I0, int32_t I1, int32_t I2,
@@ -719,8 +732,13 @@ POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(s8, int8_t);
 POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(u16, uint16_t);
 POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE(s16, int16_t);
 #undef POLYGEIST_DECLARE_PVA_GAUSSIAN_TYPE
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaGaussianFilterSubmit polygeist_pva_gaussian_binomial3x3_u8 */
+void polygeist_pva_gaussian_binomial3x3_u8(int32_t, int32_t,
+                                          const uint8_t *, uint8_t *);
 void polygeist_pva_bilateral_3x3_u8(int32_t, int32_t, float, float,
                                      const uint8_t *, uint8_t *);
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaImageHistogramSubmit polygeist_pva_histogram_256_u8_u32 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaImageHistogramSubmit polygeist_pva_histogram_256_u8_s32 */
 void polygeist_pva_histogram_256_u8_u32(int32_t, int32_t, const uint8_t *,
                                         uint32_t *);
 void polygeist_pva_histogram_256_u8_s32(int32_t, int32_t, const uint8_t *,
@@ -795,6 +813,7 @@ void polygeist_cudnn_depthwise_conv2d_f32(
 void polygeist_reference_depthwise_conv2d_f32(
     int32_t B, int32_t C, int32_t H, int32_t W, int32_t RH, int32_t RW,
     const float *input, const float *filter, const float *bias, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuTENSOR cutensorElementwiseBinaryExecute polygeist_cutensor_kronecker_product2d_f32 */
 void polygeist_cutensor_kronecker_product2d_f32(
     int32_t A, int32_t B, int32_t C, int32_t D,
     const float *x, const float *y, float *output);
@@ -1222,6 +1241,16 @@ void polygeist_reference_conv3d_f32(
     int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
     int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
     const float *input, const float *filter, float *output);
+
+
+/* Descriptor program derived from a validated parallel reference. */
+typedef struct {
+ int32_t rank, inputs, nodes;
+ int64_t dims[8], input_dims[8][8], input_strides[8][8], output_strides[8];
+ uint64_t words[12];
+} PolygeistPointwiseTensorLayout;
+void polygeist_cudnn_tensor_pointwise_f32(const PolygeistPointwiseTensorLayout *,
+                                        const float *const *,const float *,float *);
 
 #ifdef __cplusplus
 }

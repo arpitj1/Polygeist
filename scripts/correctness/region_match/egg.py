@@ -42,7 +42,7 @@ import kernel_match as km  # noqa: E402  (read-only reuse of Term + algebra_rule
 from egglog import (EGraph, Expr, StringLike, String, i64, i64Like, function, relation,  # noqa: E402
                     rewrite, rule, ruleset, union, vars_, var)
 
-from .affine import Aff, atom_info, is_atom  # noqa: E402
+from .affine import Aff, atom_info, atom_conversion, is_atom  # noqa: E402
 from .equations import F, FAcc, FBin, FConst, FFold, FIndex, FLast, FParam, FRead, FSel, FSum, FUn  # noqa: E402
 
 Term = km.Term
@@ -53,6 +53,9 @@ class RmIx(Expr):
 
     @classmethod
     def lit(cls, v: i64Like) -> "RmIx": ...
+
+    @classmethod
+    def converted(cls, kind: StringLike, value: "RmIx") -> "RmIx": ...
 
     def __add__(self, other: "RmIx") -> "RmIx": ...
 
@@ -240,6 +243,8 @@ def enc_ix(a: Aff, ns: str) -> RmIx:
         if is_atom(v):
             arr, coords = atom_info(v)
             t = rm_ixread(RmArr(f"{ns}in:{arr}"), enc_idx(coords, ns))
+            if atom_conversion(v):
+                t = RmIx.converted(atom_conversion(v), t)
         else:
             t = RmIx(_nsname(v, ns))
         if k != 1:
@@ -351,6 +356,41 @@ class EggResult:
 
 def check_equal(fa: Term, fs: Term, unions: list[tuple], facts: list[tuple],
                 iters: int = 10, collect: bool = True) -> EggResult:
+    import proof_metrics as metrics
+    seconds = metrics.deadline_seconds()
+    started = time.perf_counter()
+    timeout = False
+    error = None
+    try:
+        if seconds:
+            payload=metrics.graph_call(dict(kind='region',left=str(fa),right=str(fs),
+                unions=[[str(a),str(b)] for a,b in unions],
+                facts=[[str(a),str(b)] for a,b in facts],iterations=iters,
+                collect=collect or metrics.measured_sizes()),seconds)['result']
+            result=EggResult(False,0,0,0,0)
+            result.__dict__.update(payload)
+        else:
+            result=_check_equal_local(fa,fs,unions,facts,iters,collect or metrics.measured_sizes())
+    except metrics.ProofDeadline:
+        result = EggResult(False, 0, 0, 0, 0)
+        timeout = True
+    except RuntimeError as exception:
+        if not seconds:
+            raise
+        result = EggResult(False, 0, 0, 0, 0)
+        error = str(exception)
+    metrics.emit('region_proof', matched=result.ok, proof_elapsed_ms=result.ms,
+                 wall_elapsed_ms=(time.perf_counter()-started)*1000,
+                 egraph_nodes=result.nodes, egraph_classes=result.classes,
+                 iterations=result.iters, timeout=timeout, worker_error=error,
+                 saturation_elapsed_ms=getattr(result,'saturation_elapsed_ms',0),
+                 rule_matches=getattr(result,'rule_matches',0),
+                 telemetry_elapsed_ms=getattr(result,'telemetry_elapsed_ms',0))
+    return result
+
+
+def _check_equal_local(fa: Term, fs: Term, unions: list[tuple], facts: list[tuple],
+                       iters: int = 10, collect: bool = True) -> EggResult:
     t0 = time.perf_counter()
     eg = EGraph()
     eg.register(fa, fs)
@@ -361,15 +401,20 @@ def check_equal(fa: Term, fs: Term, unions: list[tuple], facts: list[tuple],
     ok = False
     n = 0
     sched = rules()
+    rule_matches = 0
+    saturation_started = time.perf_counter()
     for n in range(1, iters + 1):
         rep = eg.run(sched)
+        rule_matches += sum(rep.num_matches_per_rule.values())
         if eg.check_bool(fa == fs):
             ok = True
             break
         if not rep.updated:
             break
+    saturation_ms = (time.perf_counter()-saturation_started)*1000
     ms = (time.perf_counter() - t0) * 1000.0
     nodes = classes = 0
+    telemetry_started = time.perf_counter()
     if collect:
         try:
             ser = json.loads(eg._serialize(split_primitive_outputs=False,
@@ -378,4 +423,8 @@ def check_equal(fa: Term, fs: Term, unions: list[tuple], facts: list[tuple],
             classes = len(ser.get("class_data", {}))
         except Exception:
             nodes = sum(sz for _, sz in eg.all_function_sizes())
-    return EggResult(ok, ms, nodes, classes, n)
+    result = EggResult(ok, ms, nodes, classes, n)
+    result.rule_matches = rule_matches
+    result.saturation_elapsed_ms = saturation_ms
+    result.telemetry_elapsed_ms = (time.perf_counter()-telemetry_started)*1000
+    return result

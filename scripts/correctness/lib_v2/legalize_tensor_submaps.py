@@ -404,6 +404,52 @@ def _injective_tiled_map(accesses, sizes):
     return used == {axis for axis, size in enumerate(sizes) if size != 1}
 
 
+def _injective_symbolic_tiled_map(accesses, bounds, sizes):
+    """Prove a packed mixed-radix map using its actual iteration extents.
+
+    A nonempty iteration domain implies that every extent is positive. Each
+    coordinate group is accepted only when its strides are exactly successive
+    products of those extents, so distinct source points cannot overlap. An
+    unrelated symbolic stride never acquires a positivity or size assumption.
+    """
+    if any(size is not None and size < 0 for size in sizes):
+        return False
+    if 0 in sizes:
+        return True
+    used = set()
+    for access in accesses:
+        coefficients = {}
+        for monomial, coefficient in access.items():
+            if any(atom[0] == 'x' for atom in monomial):
+                return False
+            dimensions = [atom[1] for atom in monomial if atom[0] == 'd']
+            if not dimensions:
+                continue
+            if len(dimensions) != 1:
+                return False
+            dimension = dimensions[0]
+            if sizes[dimension] == 1:
+                continue
+            factors = tuple(atom for atom in monomial if atom[0] != 'd')
+            coefficients[dimension] = ML.p_add(coefficients.get(dimension, {}),
+                                               {factors: coefficient})
+        if used.intersection(coefficients):
+            return False
+        used.update(coefficients)
+        stride = ML.p_const(1)
+        while coefficients:
+            candidates = [axis for axis, coefficient in coefficients.items()
+                          if coefficient == stride]
+            if len(candidates) != 1:
+                return False
+            axis = candidates[0]
+            extent = (ML.p_const(sizes[axis]) if sizes[axis] is not None
+                      else {(('v', bounds[axis]),): 1})
+            stride = ML.p_mul(stride, extent)
+            del coefficients[axis]
+    return used == {axis for axis, size in enumerate(sizes) if size != 1}
+
+
 def legalize_inverse_writebacks(mod: ML.Module):
     """Sequential tensor scatter for proven-injective affine writebacks.
 
@@ -439,7 +485,8 @@ def legalize_inverse_writebacks(mod: ML.Module):
             access = ML.map_apply(affine_map, ML.identity_dims(rank),
                                   [{(('v', name),): 1} for name in symbols])
             sizes = [_constant_index(mod, bound, op) for bound in bounds]
-            if not _injective_tiled_map(access, sizes):
+            if not (_injective_tiled_map(access, sizes) or
+                    _injective_symbolic_tiled_map(access, bounds, sizes)):
                 continue
         except (ML.AffineParseError, IndexError, ValueError):
             continue

@@ -108,27 +108,57 @@ struct MemrefCopy {
 // for transposed views. This copies bits only; the descriptors determine every
 // address, and the caller has already established disjoint storage and unique
 // destinations. Other axes (including source broadcasts) are independent tiles.
-template<class Word>
+__device__ static uint32_t copy_quotient(uint32_t n, uint32_t d,
+                                        uint32_t reciprocal) {
+  uint32_t q = d == 1 ? n : __umulhi(n, reciprocal);
+  return q - (q * d > n);
+}
+
+static uint32_t copy_reciprocal(uint32_t divisor) {
+  return divisor == 1 ? 0 :
+      static_cast<uint32_t>(((uint64_t(1) << 32) + divisor - 1) / divisor);
+}
+
+template<class Word, bool Narrow>
 __global__ void memref_copy_transpose(MemrefCopy copy, int source_axis,
                                       int destination_axis,
                                       int64_t source_tiles,
                                       int64_t destination_tiles,
+                                      uint32_t source_reciprocal,
+                                      uint32_t destination_reciprocal,
                                       int64_t source_size, int64_t destination_size,
                                       int64_t source_cross_stride,
                                       int64_t destination_cross_stride) {
   __shared__ Word tile[32][33];
   int64_t batch = blockIdx.x;
-  int64_t sx = (batch % source_tiles) * 32;
-  batch /= source_tiles;
-  int64_t dy = (batch % destination_tiles) * 32;
-  batch /= destination_tiles;
+  int64_t sx, dy;
+  if (Narrow) {
+    uint32_t q = copy_quotient(batch, source_tiles, source_reciprocal);
+    sx = (batch - q * source_tiles) * 32;
+    batch = q;
+    q = copy_quotient(batch, destination_tiles, destination_reciprocal);
+    dy = (batch - q * destination_tiles) * 32;
+    batch = q;
+  } else {
+    sx = (batch % source_tiles) * 32;
+    batch /= source_tiles;
+    dy = (batch % destination_tiles) * 32;
+    batch /= destination_tiles;
+  }
   int64_t source_base = 0, destination_base = 0;
   #pragma unroll
   for (int dim = MemrefCopy::max_rank - 1; dim >= 0; --dim) {
     if (dim >= copy.rank || dim == source_axis || dim == destination_axis)
       continue;
-    int64_t coordinate = batch % copy.sizes[dim];
-    batch /= copy.sizes[dim];
+    int64_t coordinate;
+    if (Narrow) {
+      uint32_t q = copy_quotient(batch, copy.sizes[dim], copy.reciprocal[dim]);
+      coordinate = batch - q * copy.sizes[dim];
+      batch = q;
+    } else {
+      coordinate = batch % copy.sizes[dim];
+      batch /= copy.sizes[dim];
+    }
     source_base += coordinate * copy.source_strides[dim];
     destination_base += coordinate * copy.destination_strides[dim];
   }
@@ -149,6 +179,7 @@ __global__ void memref_copy_transpose(MemrefCopy copy, int source_axis,
   }
 }
 
+template<bool Narrow>
 static bool launch_tiled_memref_copy(const MemrefCopy &copy, int64_t count,
                                      cudaStream_t stream) {
   if (count < 4096) return false;
@@ -160,6 +191,11 @@ static bool launch_tiled_memref_copy(const MemrefCopy &copy, int64_t count,
   if (source_axis < 0 || destination_axis < 0 || source_axis == destination_axis ||
       copy.sizes[source_axis] < 8 || copy.sizes[destination_axis] < 8)
     return false;
+  // Small axis pairs leave most of each 32x32 tile empty. The flat traversal
+  // combines those short independent batches into full blocks instead.
+  if (std::min(copy.sizes[source_axis], int64_t(32)) *
+      std::min(copy.sizes[destination_axis], int64_t(32)) < 512)
+    return false;
   int64_t source_tiles = (copy.sizes[source_axis] + 31) / 32;
   int64_t destination_tiles = (copy.sizes[destination_axis] + 31) / 32;
   int64_t tiles = (count / copy.sizes[source_axis] /
@@ -170,8 +206,10 @@ static bool launch_tiled_memref_copy(const MemrefCopy &copy, int64_t count,
   if (alignment % copy.element) return false;
   dim3 threads(32, 8);
   #define COPY_TILED_WORD(bytes, type) \
-    case bytes: memref_copy_transpose<type><<<tiles, threads, 0, stream>>>( \
+    case bytes: memref_copy_transpose<type, Narrow><<<tiles, threads, 0, stream>>>( \
         copy, source_axis, destination_axis, source_tiles, destination_tiles, \
+        Narrow ? copy_reciprocal(source_tiles) : 0, \
+        Narrow ? copy_reciprocal(destination_tiles) : 0, \
         copy.sizes[source_axis], copy.sizes[destination_axis], \
         copy.source_strides[destination_axis], \
         copy.destination_strides[source_axis]); break
@@ -202,8 +240,7 @@ template<class Word, bool Narrow> struct MemrefCopyOperation : MemrefCopy {
         // q*d fits uint32_t because it is at most n+d < 2^32.
         uint32_t n = static_cast<uint32_t>(linear);
         uint32_t d = static_cast<uint32_t>(sizes[dim]);
-        uint32_t q = d == 1 ? n : __umulhi(n, reciprocal[dim]);
-        q -= q * d > n;
+        uint32_t q = copy_quotient(n, d, reciprocal[dim]);
         index = n - q * d;
         linear = q;
       } else {
@@ -296,12 +333,12 @@ extern "C" int polygeist_thrust_memref_copy(
   }
   bool narrow = count <= INT32_MAX;
   if (narrow) for (int64_t i = 0; i < copy.rank; ++i) {
-    uint64_t divisor = copy.sizes[i];
-    copy.reciprocal[i] = divisor == 1 ? 0 :
-        static_cast<uint32_t>(((uint64_t(1) << 32) + divisor - 1) / divisor);
+    copy.reciprocal[i] = copy_reciprocal(copy.sizes[i]);
   }
   auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
-  if (!launch_tiled_memref_copy(copy, count, stream)) {
+  bool tiled = narrow ? launch_tiled_memref_copy<true>(copy, count, stream)
+                      : launch_tiled_memref_copy<false>(copy, count, stream);
+  if (!tiled) {
     if (narrow) launch_aligned_memref_copy<true>(copy, count, stream);
     else launch_aligned_memref_copy<false>(copy, count, stream);
   }

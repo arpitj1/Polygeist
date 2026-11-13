@@ -4,6 +4,7 @@
 #include "mlir/Dialect/Affine/Analysis/Utils.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Affine/Passes.h"
+#include "mlir/Dialect/Affine/Utils.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Arith/Transforms/Passes.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
@@ -2914,7 +2915,8 @@ struct HybridAffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
           !sameAffineLoadStoreAddress(load, targetStore))
         return failure();
       else if (load.getMemRef() != targetStore.getMemRef() &&
-               !load.getAffineMap().isProjectedPermutation())
+               !llvm::all_of(load.getAffineMap().getResults(),
+                             [](AffineExpr expr) { return expr.isPureAffine(); }))
         return failure();
 
     Value storedValue = targetStore.getValueToStore();
@@ -2973,15 +2975,17 @@ struct HybridAffineForOpRaising : public OpRewritePattern<affine::AffineForOp> {
                              targetStore.getLoc());
     for (affine::AffineLoadOp outputLoad : affineLoads) {
       if (!sameAffineLoadStoreAddress(outputLoad, targetStore)) {
-        SmallVector<Value> indices;
-        for (AffineExpr expr : outputLoad.getAffineMap().getResults()) {
-          auto dim = expr.dyn_cast<AffineDimExpr>();
-          assert(dim && "projected permutation checked before mutation");
-          indices.push_back(outputLoad.getMapOperands()[dim.getPosition()]);
-        }
         rewriter.setInsertionPoint(outputLoad);
+        // Preserve arbitrary pure affine input indices as scalar payload
+        // arithmetic. They need not be linalg indexing maps: a gather or a
+        // clamped interpolation reads its input through the payload. The
+        // destination dependence and address checks above still apply.
+        auto indices = affine::expandAffineMap(
+            rewriter, outputLoad.getLoc(), outputLoad.getAffineMap(),
+            outputLoad.getMapOperands());
+        assert(indices && "pure affine map checked before mutation");
         rewriter.replaceOpWithNewOp<memref::LoadOp>(
-            outputLoad, outputLoad.getMemRef(), indices);
+            outputLoad, outputLoad.getMemRef(), *indices);
         continue;
       }
       if (storedValue == outputLoad.getResult())

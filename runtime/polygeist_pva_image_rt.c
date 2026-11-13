@@ -202,6 +202,14 @@ static void run_image_operation(ImageOperation operation, NVCVDataType dtype,
   }
 
 DEFINE_FILTER_WRAPPERS(u8, uint8_t, NVCV_DATA_TYPE_U8)
+/* A fixed configuration of the vendor Gaussian API for the imported public
+ * 3-tap binomial reference. exp(-1/(2*sigma^2)) = 1/2 gives [1,2,1]/4
+ * on each axis. The rounded FP32 sigma below retains these quantized weights.
+ * No application computation is reproduced in this ABI adapter. */
+void polygeist_pva_gaussian_binomial3x3_u8(
+    int32_t h, int32_t w, const uint8_t *in, uint8_t *out) {
+  polygeist_pva_gaussian_3x3_u8(h, w, 0.8493218f, 0.8493218f, in, out);
+}
 DEFINE_FILTER_WRAPPERS(s8, int8_t, NVCV_DATA_TYPE_S8)
 DEFINE_FILTER_WRAPPERS(u16, uint16_t, NVCV_DATA_TYPE_U16)
 DEFINE_FILTER_WRAPPERS(s16, int16_t, NVCV_DATA_TYPE_S16)
