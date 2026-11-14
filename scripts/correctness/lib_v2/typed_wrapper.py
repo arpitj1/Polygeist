@@ -116,9 +116,9 @@ def contract(A, spec, target, ret, args):
         if (canonical_type(arg.ctype) != element or (arg.kind == 'array') != pointer
                 or (pointer and const and arg.intent in ('out', 'inout'))):
             raise A.AbiError('runtime/reference parameter types or intents disagree: ' + name)
-        if not pointer and not ((arg.kind == 'int' and element == 'int') or
+        if not pointer and not ((arg.kind == 'int' and element in ('int', 'unsigned int')) or
                                 (arg.kind == 'scalar' and element in ('float', 'double'))):
-            raise A.AbiError('wrapper scalar requires exact int32, FP32, or FP64 storage')
+            raise A.AbiError('wrapper scalar requires exact int32, uint32, FP32, or FP64 storage')
     params, binding, validated = geometry(A, target, args, cfg, resolved)
     if configured:
         validated['resolved_configuration'] = configured
@@ -135,11 +135,14 @@ def geometry(A, target, args, cfg, ordered):
         raise A.AbiError('every array needs an explicit extent contract')
     if not isinstance(bounds, dict) or set(bounds) != dimensions:
         raise A.AbiError('every integer argument needs explicit bounds')
+    integer_types = {a.name: canonical_type(a.ctype) for a in args if a.kind == 'int'}
     for name, bound in bounds.items():
+        unsigned = integer_types[name] == 'unsigned int'
+        minimum, maximum = (0, 4294967295) if unsigned else (-2147483648, 2147483647)
         if (not isinstance(bound, dict) or not {'min', 'max'} <= set(bound)
                 or set(bound) - {'min', 'max', 'multiple_of'}
                 or any(type(v) is not int for v in bound.values())
-                or not -2147483648 <= bound['min'] <= bound['max'] <= 2147483647
+                or not minimum <= bound['min'] <= bound['max'] <= maximum
                 or not 1 <= bound.get('multiple_of', 1) <= 2147483647):
             raise A.AbiError('invalid integer bounds: ' + name)
     for name, shape in shapes.items():
@@ -187,7 +190,8 @@ def geometry(A, target, args, cfg, ordered):
                                layout=arg.name + '_stride', written=arg.intent in ('out', 'inout'),
                                const=arg.intent == 'in')
         elif arg.kind == 'int':
-            param = A.AbiParam(arg.name, 'int')
+            param = A.AbiParam(arg.name, 'int',
+                               elem='unsigned int' if canonical_type(arg.ctype) == 'unsigned int' else None)
         else:
             param = A.AbiParam(arg.name, 'scalar', elem=arg.ctype)
         params.append(param)
@@ -225,8 +229,15 @@ def generate(ca, prototype, emit_call=None):
         body.append(f'  if (!{cfg["entry"]})\n'
                     f'    polygeist_v2_fatal("{ca.call}", "optional vendor entry is not linked");\n')
     for name, bound in cfg['bounds'].items():
-        body.append(f'  if ({name} < {bound["min"]} || {name} > {bound["max"]})\n'
-                    f'    polygeist_v2_fatal("{ca.call}", "integer outside wrapper bounds");\n')
+        unsigned = any(p.name == name and p.elem == 'unsigned int' for p in ca.params)
+        guards = []
+        if not unsigned or bound['min'] > 0:
+            guards.append(f'{name} < {bound["min"]}')
+        if not unsigned or bound['max'] < 4294967295:
+            guards.append(f'{name} > {bound["max"]}')
+        if guards:
+            body.append(f'  if ({" || ".join(guards)})\n'
+                        f'    polygeist_v2_fatal("{ca.call}", "integer outside wrapper bounds");\n')
         if 'multiple_of' in bound:
             body.append(f'  if ({name} % {bound["multiple_of"]} != 0)\n'
                         f'    polygeist_v2_fatal("{ca.call}", "integer violates wrapper divisibility");\n')

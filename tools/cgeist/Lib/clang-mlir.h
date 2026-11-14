@@ -284,6 +284,7 @@ public:
   ValueCategory VisitParenExpr(clang::ParenExpr *expr);
 
   ValueCategory VisitVarDecl(clang::VarDecl *decl);
+  ValueCategory VisitVarDeclImpl(clang::VarDecl *decl);
 
   ValueCategory VisitForStmt(clang::ForStmt *fors);
 

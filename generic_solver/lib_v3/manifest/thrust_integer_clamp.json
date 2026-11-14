@@ -1,0 +1,198 @@
+{
+  "routine": "thrust_integer_clamp",
+  "source": "Public cuda::minimum<int>, cuda::maximum<int>, and typed Thrust transform",
+  "adaptation": "Compose public min/max functors with runtime bounds and a fixed int8 output iterator; inline their source comparisons in the C import. The saturating instance specializes the two runtime bounds to the signed output type limits, derived from OUTPUT_BITS.",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/transform.h",
+      "sha256": "bc21381a849fada81ec0dbc4ff35a00aa400ef59bea14fc13452b16351682a75"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/__functional/minimum.h",
+      "sha256": "31165aa42761298bbbebd68e3dc778bd90b78db73d797707b45e6f2effb9d7dc"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/__functional/maximum.h",
+      "sha256": "5de98cb4112b0a88e27b453743e6ef6010f83fdf019db9a61846b429d2f77fc5"
+    }
+  ],
+  "specs": [
+    {
+      "name": "thrust_clamp_i32_to_i8",
+      "ref_c": "thrust_integer_clamp.c",
+      "args": [
+        "n",
+        "input",
+        "lower",
+        "upper",
+        "output"
+      ],
+      "defines": {},
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_clamp_i32_to_i8",
+          "arguments": [
+            "n",
+            "input",
+            "lower",
+            "upper",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lower": {
+              "min": -2147483648,
+              "max": 2147483647
+            },
+            "upper": {
+              "min": -2147483648,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; disjoint contiguous arrays",
+        "int32 and int8 use target two-complement storage; narrowing retains low bits"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "lower": -128,
+          "upper": 127
+        },
+        "array_values": {
+          "input": [
+            -2147483648,
+            -129,
+            -128,
+            -127,
+            -1,
+            0,
+            1,
+            126,
+            127,
+            128,
+            2147483647
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_saturate_i32_to_i8",
+      "ref_c": "thrust_integer_clamp.c",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "OUTPUT_BITS": 8
+      },
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_clamp_i32_to_i8",
+          "arguments": [
+            "n",
+            "input",
+            {
+              "configuration": "minimum",
+              "type": "int"
+            },
+            {
+              "configuration": "maximum",
+              "type": "int"
+            },
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "OUTPUT_BITS"
+            ],
+            "values": {
+              "minimum": "-(2 ** (OUTPUT_BITS - 1))",
+              "maximum": "2 ** (OUTPUT_BITS - 1) - 1"
+            },
+            "checks": [
+              "OUTPUT_BITS == 8"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; disjoint contiguous arrays",
+        "Clamp to signed output type limits before conversion; output is exact for every int32 input"
+      ],
+      "deviations": [],
+      "validation": {
+        "array_values": {
+          "input": [
+            -2147483648,
+            -129,
+            -128,
+            -127,
+            -1,
+            0,
+            1,
+            126,
+            127,
+            128,
+            2147483647
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -43,6 +43,14 @@ def program(body, argtype='memref<64xf64>'):
 
 
 class ScalarSemantics(unittest.TestCase):
+    def test_round_ties_away_is_not_round_ties_even(self):
+        away = KM.encode_body(scalar(['%v = math.round %in : f32'], 'f32'))
+        even = KM.encode_body(scalar(['%v = math.roundeven %in : f32'], 'f32'))
+        for model in ('strict','relaxed'):
+            with patch.dict(os.environ, POLYGEIST_NUMERIC_MODEL=model):
+                self.assertTrue(KM.equivalent(away,away))
+                self.assertFalse(KM.equivalent(away,even))
+
     def test_libm_gamma_is_not_an_uninterpreted_wildcard(self):
         gamma = KM.encode_body(scalar(['%v = func.call @lgammaf(%in) : (f32) -> f32'], 'f32'))
         logarithm = KM.encode_body(scalar(['%v = func.call @logf(%in) : (f32) -> f32'], 'f32'))

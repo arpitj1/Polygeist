@@ -1,0 +1,134 @@
+{
+  "routine": "thrust_ieee_binary",
+  "source": "Public cuda::std copysign and IEEE remainder primitives applied by Thrust transform",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__cmath/copysign.h",
+      "sha256": "fb4704767aa62faac6f6e7a792922bba67876edc5b151f4d523e0e65653b66b3"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__cmath/remainder.h",
+      "sha256": "96cf3b95bd2d9ed87b91acde6674c7bf7074a77ba4c860266004f8633bbbaf7e"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    }
+  ],
+  "adaptation": "Preserve the FP32 copysignf and remainderf calls and contiguous Thrust traversal. IEEE remainder is distinct from fmod and ATen signed-modulo remainder.",
+  "specs": [
+    {
+      "name": "thrust_copysign_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_copysign_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "copysignf",
+        "MATH_ARITY": 2
+      }
+    },
+    {
+      "name": "thrust_remainder_f32",
+      "args": [
+        "n",
+        "left",
+        "right",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_remainder_f32",
+          "arguments": [
+            "n",
+            "left",
+            "right",
+            "output"
+          ],
+          "arrays": {
+            "left": [
+              "n"
+            ],
+            "right": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "CUDA libdevice implements the same FP32 math primitive; numerical error is validated against C and native ATen; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "remainderf",
+        "MATH_ARITY": 2
+      }
+    }
+  ],
+  "ref_c": "thrust_pointwise_math.c"
+}

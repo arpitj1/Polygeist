@@ -1,0 +1,306 @@
+{
+  "routine": "thrust_typed_copy",
+  "source": "Public Thrust copy and counting_iterator implementations",
+  "adaptation": "Specialize generic identity traversal and destination assignment to fixed scalar types and contiguous arrays. Counting imports use the documented counting_iterator<int>(0) copy with n bounded by INT_MAX; no sequence multiply or add is introduced.",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/copy.h",
+      "sha256": "4e9d8d2a3424b30b89880db2cf78205a4caa26638723dbd1f6d2796b782b7009"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/copy.inl",
+      "sha256": "2642397da105e08e2da80f8c77f86031166c01f1203d7becbc3933f98800a660"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/iterator/counting_iterator.h",
+      "sha256": "499a249c3da1fd703ca0ca2629b925971fd8b74fb0f0c29d042dae681a724746"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/cuda/detail/copy.h",
+      "sha256": "397117ca81ff5a0ff73258666f0950051cb36de38d7bd233bd589aed9b1a31b8"
+    }
+  ],
+  "specs": [
+    {
+      "name": "thrust_index_i32",
+      "args": [
+        "n",
+        "output"
+      ],
+      "ref_c": "thrust_counting_copy.c",
+      "defines": {
+        "SCALAR_OUT": "int"
+      },
+      "target": {
+        "library": "Thrust",
+        "call": "copy",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_index_i32",
+          "arguments": [
+            "n",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "thrust_index_f32",
+      "args": [
+        "n",
+        "output"
+      ],
+      "ref_c": "thrust_counting_copy.c",
+      "defines": {
+        "SCALAR_OUT": "float"
+      },
+      "target": {
+        "library": "Thrust",
+        "call": "copy",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_index_f32",
+          "arguments": [
+            "n",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "thrust_copy_i32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "ref_c": "thrust_typed_copy.c",
+      "defines": {
+        "SCALAR_OUT": "int",
+        "SCALAR_IN": "int"
+      },
+      "target": {
+        "library": "Thrust",
+        "call": "copy",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_copy_i32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": [],
+      "validation": {
+        "array_values": {
+          "input": [
+            0,
+            1,
+            16777215,
+            16777216,
+            16777217,
+            2147483647
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_copy_u32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "ref_c": "thrust_typed_copy.c",
+      "defines": {
+        "SCALAR_OUT": "unsigned int",
+        "SCALAR_IN": "unsigned int"
+      },
+      "target": {
+        "library": "Thrust",
+        "call": "copy",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_copy_u32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": [],
+      "validation": {
+        "array_values": {
+          "input": [
+            0,
+            1,
+            2147483647,
+            2147483648,
+            4294967295
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_copy_i32_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "ref_c": "thrust_typed_copy.c",
+      "defines": {
+        "SCALAR_OUT": "float",
+        "SCALAR_IN": "int"
+      },
+      "target": {
+        "library": "Thrust",
+        "call": "copy",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_copy_i32_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": [],
+      "validation": {
+        "array_values": {
+          "input": [
+            0,
+            1,
+            16777215,
+            16777216,
+            16777217,
+            2147483647
+          ]
+        }
+      }
+    }
+  ]
+}

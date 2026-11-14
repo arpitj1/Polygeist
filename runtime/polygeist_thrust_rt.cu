@@ -1,13 +1,22 @@
+#include "polygeist_thrust_gather.h"
+#include <thrust/gather.h>
+#include <thrust/iterator/transform_iterator.h>
 // Fixed C ABI for the actual public Thrust transform/divides implementation.
 // Inputs/output are contiguous device-visible FP32 arrays; caller marshals views.
 #include <thrust/transform.h>
+#include <thrust/copy.h>
+#include <thrust/reverse.h>
+#include <cuda/std/iterator>
+#include <thrust/replace.h>
 #include <thrust/execution_policy.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/for_each.h>
 #include <thrust/fill.h>
+#include <thrust/sequence.h>
 #include <cuda/std/functional>
+#include <cuda/functional>
 #include <cuda_runtime.h>
 #include <cstdint>
 #include <cstdio>
@@ -85,6 +94,7 @@ POLYGEIST_UNARY_MATH(log2)
 POLYGEIST_UNARY_MATH(log10)
 POLYGEIST_UNARY_MATH(erfc)
 POLYGEIST_UNARY_MATH(lgamma)
+POLYGEIST_UNARY_MATH(round)
 #undef POLYGEIST_UNARY_MATH
 
 template<class Function>
@@ -115,6 +125,8 @@ POLYGEIST_BINARY_MATH(fmod)
 POLYGEIST_BINARY_MATH(fmax)
 POLYGEIST_BINARY_MATH(fmin)
 POLYGEIST_BINARY_MATH(nextafter)
+POLYGEIST_BINARY_MATH(copysign)
+POLYGEIST_BINARY_MATH(remainder)
 #undef POLYGEIST_BINARY_MATH
 extern "C" void polygeist_thrust_log1p_f32(int32_t n, const float *input,
                                          float *output) {
@@ -482,4 +494,306 @@ extern "C" void polygeist_thrust_multiplies_scalar_right_f32(int32_t n,const flo
 }
 extern "C" void polygeist_thrust_multiplies_scalars_f32(int32_t n,float x,float y,float*out) {
   thrust_arithmetic(n,thrust::make_constant_iterator(x),thrust::make_constant_iterator(y),out,cuda::std::multiplies<float>{},"multiplies_f32");
+}
+
+// Integer scalar functors from the public ATen CPU operators, instantiated
+// through Thrust. C's defined-domain requirements for signed shifts apply.
+#define POLYGEIST_INTEGER_TRANSFORM(NAME, EXPRESSION)                        \
+  struct Integer_##NAME {                                                  \
+    __host__ __device__ int32_t operator()(int32_t x, int32_t y) const {     \
+      return EXPRESSION;                                                   \
+    }                                                                      \
+  };                                                                       \
+  extern "C" void polygeist_thrust_##NAME##_i32(                           \
+      int32_t n, const int32_t *left, const int32_t *right, int32_t *output) {\
+    if (n <= 0 || !left || !right || !output) std::abort();                  \
+    auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream()); \
+    thrust::transform(thrust::cuda::par_nosync.on(stream), left, left + n,   \
+                      right, output, Integer_##NAME{});                   \
+    if (cudaGetLastError() != cudaSuccess) std::abort();                    \
+  }
+POLYGEIST_INTEGER_TRANSFORM(bit_and, x & y)
+POLYGEIST_INTEGER_TRANSFORM(bit_or, x | y)
+POLYGEIST_INTEGER_TRANSFORM(bit_xor, x ^ y)
+POLYGEIST_INTEGER_TRANSFORM(left_shift, x << y)
+POLYGEIST_INTEGER_TRANSFORM(right_shift, x >> y)
+#undef POLYGEIST_INTEGER_TRANSFORM
+struct IntegerBitNot {
+  __host__ __device__ int32_t operator()(int32_t x) const { return ~x; }
+};
+extern "C" void polygeist_thrust_bit_not_i32(int32_t n, const int32_t *input,
+                                             int32_t *output) {
+  if (n <= 0 || !input || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::transform(thrust::cuda::par_nosync.on(stream), input, input + n,
+                    output, IntegerBitNot{});
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+struct IntegerWhere {
+  template<class Tuple> __host__ __device__ void operator()(Tuple values) const {
+    thrust::get<3>(values) = thrust::get<0>(values) ? thrust::get<1>(values)
+                                                  : thrust::get<2>(values);
+  }
+};
+extern "C" void polygeist_thrust_where_i32_f32(
+    int32_t n, const int32_t *condition, const float *left, const float *right,
+    float *output) {
+  if (n <= 0 || !condition || !left || !right || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  auto begin = thrust::make_zip_iterator(thrust::make_tuple(condition, left, right, output));
+  thrust::for_each(thrust::cuda::par_nosync.on(stream), begin, begin + n, IntegerWhere{});
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+// Fixed ABI instantiations of the public generic copy and replace_if APIs.
+extern "C" void polygeist_thrust_copy_u64(int32_t n, const uint64_t *input,
+                                         uint64_t *output) {
+  if (n <= 0 || !input || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::copy(thrust::cuda::par_nosync.on(stream), input, input + n, output);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+extern "C" void polygeist_thrust_replace_if_i32_f32(
+    int32_t n, float *output, const int32_t *mask, float value) {
+  if (n <= 0 || !output || !mask) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::replace_if(thrust::cuda::par_nosync.on(stream), output, output + n,
+                     mask, ::cuda::std::identity{}, value);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+extern "C" void polygeist_thrust_multiplies_f64(int32_t n,const double*x,const double*y,double*out) {
+  thrust_arithmetic(n,x,y,out,cuda::std::multiplies<double>{},"multiplies_f64");
+}
+extern "C" void polygeist_thrust_plus_scalar_right_f64(int32_t n,const double*x,double y,double*out) {
+  thrust_arithmetic(n,x,thrust::make_constant_iterator(y),out,cuda::std::plus<double>{},"plus_f64");
+}
+extern "C" void polygeist_thrust_plus_scalar_right_i32(int32_t n,const int32_t*x,int32_t y,int32_t*out) {
+  thrust_arithmetic(n,x,thrust::make_constant_iterator(y),out,cuda::std::plus<uint32_t>{},"plus_i32");
+}
+extern "C" void polygeist_thrust_modulus_scalar_right_u32_to_i32(int32_t n,const uint32_t*x,uint32_t y,int32_t*out) {
+  if (!y) std::abort();
+  thrust_arithmetic(n,x,thrust::make_constant_iterator(y),out,cuda::std::modulus<uint32_t>{},"modulus_u32");
+}
+struct LdexpF32I32 {
+  __host__ __device__ float operator()(float x,int32_t exponent)const {return ::ldexpf(x,exponent);}
+};
+extern "C" void polygeist_thrust_ldexp_f32_i32(int32_t n,const float*input,const int32_t*exponent,float*out) {
+  thrust_arithmetic(n,input,exponent,out,LdexpF32I32{},"ldexp_f32_i32");
+}
+
+extern "C" void polygeist_thrust_sequence_f32(int32_t n,float init,float step,float*output) {
+  if(n<=0 || !output) std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::sequence(thrust::cuda::par_nosync.on(stream),output,output+n,init,step);
+  auto status=cudaGetLastError();
+  if(status!=cudaSuccess){
+    std::fprintf(stderr,"polygeist Thrust sequence: %s\n",cudaGetErrorString(status));
+    std::abort();
+  }
+}
+
+struct IntegerClampToI8 {
+  int32_t lower,upper;
+  __host__ __device__ int8_t operator()(int32_t x)const {
+    return static_cast<int8_t>(cuda::minimum<int32_t>{}(upper,cuda::maximum<int32_t>{}(x,lower)));
+  }
+};
+extern "C" void polygeist_thrust_clamp_i32_to_i8(int32_t n,const int32_t*input,int32_t lower,int32_t upper,int8_t*output) {
+  if(n<=0 || !input || !output)std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::transform(thrust::cuda::par_nosync.on(stream),input,input+n,output,IntegerClampToI8{lower,upper});
+  auto status=cudaGetLastError();
+  if(status!=cudaSuccess){
+    std::fprintf(stderr,"polygeist Thrust integer clamp: %s\n",cudaGetErrorString(status));
+    std::abort();
+  }
+}
+
+extern "C" void polygeist_thrust_index_i32(int32_t n, int32_t *output) {
+  if (n <= 0 || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  auto input = thrust::make_counting_iterator<int32_t>(0);
+  thrust::copy(thrust::cuda::par_nosync.on(stream), input, input + n, output);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+extern "C" void polygeist_thrust_index_f32(int32_t n, float *output) {
+  if (n <= 0 || !output) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  auto input = thrust::make_counting_iterator<int32_t>(0);
+  thrust::copy(thrust::cuda::par_nosync.on(stream), input, input + n, output);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+extern "C" void polygeist_thrust_copy_i32(int32_t n, const int32_t *input, int32_t *output) {
+  if (n <= 0 || !output || !input) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::copy(thrust::cuda::par_nosync.on(stream), input, input + n, output);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+extern "C" void polygeist_thrust_copy_u32(int32_t n, const uint32_t *input, uint32_t *output) {
+  if (n <= 0 || !output || !input) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::copy(thrust::cuda::par_nosync.on(stream), input, input + n, output);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+extern "C" void polygeist_thrust_copy_i32_f32(int32_t n, const int32_t *input, float *output) {
+  if (n <= 0 || !output || !input) std::abort();
+  auto stream = static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::copy(thrust::cuda::par_nosync.on(stream), input, input + n, output);
+  if (cudaGetLastError() != cudaSuccess) std::abort();
+}
+
+
+extern "C" void polygeist_thrust_minus_u32_to_i32(
+    int32_t n,const uint32_t*x,const uint32_t*y,int32_t*output) {
+  thrust_arithmetic(n,x,y,output,cuda::std::minus<uint32_t>{},"minus_u32");
+}
+extern "C" void polygeist_thrust_copy_f32(
+    int32_t n,const float*input,float*output) {
+  if(n<=0 || !input || !output) std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::copy(thrust::cuda::par_nosync.on(stream),input,input+n,output);
+  if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+
+extern "C" void polygeist_thrust_copy_window_f32(
+    int32_t n,int32_t offset,const float*input,float*output) {
+  if(n<=0 || offset<0 || !input || !output)std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::copy(thrust::cuda::par_nosync.on(stream),input,input+n,output+offset);
+  if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+extern "C" void polygeist_thrust_reverse_window_f32(
+    int32_t n,int32_t prefix,int32_t gap,float*buffer) {
+  if(n<=0 || prefix<0 || gap<0 || !buffer)std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  auto first=buffer+prefix;auto last=first+n;
+  thrust::reverse_copy(thrust::cuda::par_nosync.on(stream),first,last,last+gap);
+  if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+extern "C" void polygeist_thrust_reverse_negate_window_f32(
+    int32_t n,int32_t prefix,int32_t gap,float*buffer) {
+  if(n<=0 || prefix<0 || gap<0 || !buffer)std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  auto first=buffer+prefix;auto last=first+n;
+  thrust::transform(thrust::cuda::par_nosync.on(stream),
+                    cuda::std::make_reverse_iterator(last),
+                    cuda::std::make_reverse_iterator(first),last+gap,
+                    cuda::std::negate<float>{});
+  if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+
+// Counted scalar coordinates use public unsigned arithmetic at 64-bit width.
+template <class Operation>
+static void thrust_counting_quotient(int32_t n,uint32_t stride,int32_t* output,Operation op) {
+ if(n<=0 || stride==0 || !output)std::abort();
+ auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+ auto first=thrust::make_counting_iterator<uint64_t>(0);
+ thrust::transform(thrust::cuda::par_nosync.on(stream),first,first+n,
+   thrust::make_constant_iterator<uint64_t>(stride),output,op);
+ if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+extern "C" void polygeist_thrust_counting_divide_i32(int32_t n,uint32_t stride,int32_t* output) {
+ thrust_counting_quotient(n,stride,output,cuda::std::divides<uint64_t>{});
+}
+extern "C" void polygeist_thrust_counting_remainder_i32(int32_t n,uint32_t stride,int32_t* output) {
+ thrust_counting_quotient(n,stride,output,cuda::std::modulus<uint64_t>{});
+}
+extern "C" void polygeist_thrust_greater_equal_scalar_i32(int32_t n,const int32_t* x,int32_t y,int32_t* output) {
+ if(n<=0 || !x || !output)std::abort();
+ auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+ thrust::transform(thrust::cuda::par_nosync.on(stream),x,x+n,
+   thrust::make_constant_iterator<int32_t>(y),output,cuda::std::greater_equal<int32_t>{});
+ if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+extern "C" void polygeist_thrust_equal_i32_to_f32(int32_t n,const int32_t* x,const int32_t* y,float* output) {
+ if(n<=0 || !x || !y || !output)std::abort();
+ auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+ thrust::transform(thrust::cuda::par_nosync.on(stream),x,x+n,y,output,cuda::std::equal_to<int32_t>{});
+ if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+
+extern "C" void polygeist_thrust_negate_window_f32(
+    int32_t n,int32_t offset,const float*input,float*output) {
+  if(n<=0 || offset<0 || !input || !output)std::abort();
+  auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+  thrust::transform(thrust::cuda::par_nosync.on(stream),input,input+n,
+                    output+offset,cuda::std::negate<float>{});
+  if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+
+extern "C" void polygeist_thrust_equal_i32(int32_t n,const int32_t*x,const int32_t*y,int32_t*output) {
+  thrust_arithmetic(n,x,y,output,cuda::std::equal_to<int32_t>{},"thrust_equal_i32");
+}
+
+extern "C" void polygeist_thrust_less_i32(int32_t n,const int32_t*x,const int32_t*y,int32_t*output) {
+  thrust_arithmetic(n,x,y,output,cuda::std::less<int32_t>{},"thrust_less_i32");
+}
+
+extern "C" void polygeist_thrust_less_equal_scalar_i32(int32_t n,const int32_t*x,int32_t y,int32_t*output) {
+  thrust_arithmetic(n,x,thrust::make_constant_iterator(y),output,
+                    cuda::std::less_equal<int32_t>{},"less_equal_i32");
+}
+
+// Public gather over typed flat or multidimensional index-iterator views.
+template<int Mode, class Element>
+static void thrust_gather_indexed(int64_t n,int64_t columns,int64_t sourceColumns,
+                                 const int32_t*indices,const Element*input,Element*output,
+                                 const int32_t*secondary=nullptr) {
+ if(n<=0 || columns<=0 || sourceColumns<=0 || !indices || !input || !output)std::abort();
+ auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+ auto first=thrust::make_transform_iterator(thrust::make_counting_iterator<int64_t>(0),
+     PolygeistGatherIndex<Mode>{indices,columns,sourceColumns,secondary});
+ thrust::gather(thrust::cuda::par_nosync.on(stream),first,first+n,input,output);
+ if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+extern "C" void polygeist_thrust_gather_f32(int32_t n,int32_t m,const int32_t*index,const float*input,float*output) {
+ thrust_gather_indexed<0>(n,1,m,index,input,output);
+}
+extern "C" void polygeist_thrust_gather_rows_f32(int32_t rows,int32_t cols,int32_t source_rows,const int32_t*index,const float*input,float*output) {
+ if(rows<=0 || cols<=0 || source_rows<=0)std::abort();
+ thrust_gather_indexed<1>(int64_t(rows)*cols,cols,cols,index,input,output);
+}
+extern "C" void polygeist_thrust_gather_columns_f32(int32_t rows,int32_t cols,int32_t source_cols,const int32_t*index,const float*input,float*output) {
+ if(rows<=0 || cols<=0 || source_cols<=0)std::abort();
+ thrust_gather_indexed<2>(int64_t(rows)*cols,cols,source_cols,index,input,output);
+}
+extern "C" void polygeist_thrust_gather_elements_f32(int32_t rows,int32_t cols,int32_t source_cols,const int32_t*index,const float*input,float*output) {
+ if(rows<=0 || cols<=0 || source_cols<=0)std::abort();
+ thrust_gather_indexed<3>(int64_t(rows)*cols,cols,source_cols,index,input,output);
+}
+extern "C" void polygeist_thrust_gather_pairs_f32(int32_t rows,int32_t cols,const int32_t*index,const float*input,float*output) {
+ thrust_gather_indexed<4>(rows,cols,cols,index,input,output);
+}
+
+extern "C" void polygeist_thrust_plus_u32_to_i32(int32_t n,const uint32_t*x,const uint32_t*y,int32_t*output) {
+ thrust_arithmetic(n,x,y,output,cuda::std::plus<uint32_t>{},"plus_u32");
+}
+extern "C" void polygeist_thrust_multiplies_scalar_right_u32_to_i32(int32_t n,const uint32_t*x,uint32_t y,int32_t*output) {
+ thrust_arithmetic(n,x,thrust::make_constant_iterator(y),output,cuda::std::multiplies<uint32_t>{},"multiplies_u32");
+}
+extern "C" void polygeist_thrust_minimum_scalar_i32(int32_t n,const int32_t*input,int32_t bound,int32_t*output) {
+ thrust_arithmetic(n,input,thrust::make_constant_iterator(bound),output,cuda::minimum<int32_t>{},"minimum_i32");
+}
+extern "C" void polygeist_thrust_maximum_scalar_i32(int32_t n,const int32_t*input,int32_t bound,int32_t*output) {
+ thrust_arithmetic(n,input,thrust::make_constant_iterator(bound),output,cuda::maximum<int32_t>{},"maximum_i32");
+}
+extern "C" void polygeist_thrust_negate_u32_to_i32(int32_t n,const uint32_t*input,int32_t*output) {
+ if(n<=0 || !input || !output)std::abort();
+ auto stream=static_cast<cudaStream_t>(polygeist_cuda_graph_stream());
+ thrust::transform(thrust::cuda::par_nosync.on(stream),input,input+n,output,cuda::std::negate<uint32_t>{});
+ if(cudaGetLastError()!=cudaSuccess)std::abort();
+}
+
+extern "C" void polygeist_thrust_gather_rows_i32(int32_t rows,int32_t cols,int32_t source_rows,const int32_t*index,const int32_t*input,int32_t*output) {
+ if(rows<=0 || cols<=0 || source_rows<=0)std::abort();
+ thrust_gather_indexed<1>(int64_t(rows)*cols,cols,cols,index,input,output);
+}
+extern "C" void polygeist_thrust_gather_coordinates_f32(int32_t n,int32_t rows,int32_t cols,const int32_t*row,const int32_t*column,const float*input,float*output) {
+ if(rows<=0 || cols<=0 || !column)std::abort();
+ thrust_gather_indexed<5>(n,cols,cols,row,input,output,column);
 }

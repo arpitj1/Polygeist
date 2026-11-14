@@ -1,0 +1,9 @@
+{
+ "recipe": "production",
+ "commands": [
+  "build/bin/cgeist generic_solver/lib_v3/raised/aten_compare_lt_input_constant_scalar_f32.c --function=aten_compare_lt_input_constant_scalar_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/aten_compare_lt_input_constant_scalar_f32.mlir",
+  "build/bin/polygeist-opt '--select-func=func-name=aten_compare_lt_input_constant_scalar_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/aten_compare_lt_input_constant_scalar_f32.mlir -o generic_solver/lib_v3/raised/aten_compare_lt_input_constant_scalar_f32_linalg.mlir",
+  "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/aten_compare_lt_input_constant_scalar_f32_linalg.mlir -o generic_solver/lib_v3/raised/aten_compare_lt_input_constant_scalar_f32_debuf.mlir"
+ ],
+ "failure": null
+}

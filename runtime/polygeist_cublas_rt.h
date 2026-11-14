@@ -1209,6 +1209,164 @@ void polygeist_ordered_rows_nansum_f32(int32_t rows, int32_t cols,
 void polygeist_thrust_exp2_f32(int32_t n, const float *input, float *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_expm1_f32 */
 void polygeist_thrust_expm1_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_erfcx_f32 */
+void polygeist_thrust_calc_erfcx_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_i0e_f32 */
+void polygeist_thrust_calc_i0e_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_zeta_f32 */
+void polygeist_thrust_calc_zeta_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_polygamma_f32 */
+void polygeist_thrust_calc_polygamma_f32(int32_t n, const float *input, int32_t order, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_copy_u64 */
+void polygeist_thrust_copy_u64(int32_t n, const uint64_t *input, uint64_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust replace_if polygeist_thrust_replace_if_i32_f32 */
+void polygeist_thrust_replace_if_i32_f32(int32_t n, float *output, const int32_t *mask, float value);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_multiplies_f64 */
+void polygeist_thrust_multiplies_f64(int32_t n,const double*x,const double*y,double*out);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_plus_scalar_right_f64 */
+void polygeist_thrust_plus_scalar_right_f64(int32_t n,const double*x,double y,double*out);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_plus_scalar_right_i32 */
+void polygeist_thrust_plus_scalar_right_i32(int32_t n,const int32_t*x,int32_t y,int32_t*out);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_modulus_scalar_right_u32_to_i32 */
+void polygeist_thrust_modulus_scalar_right_u32_to_i32(int32_t n,const uint32_t*x,uint32_t y,int32_t*out);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_clamp_i32_to_i8 */
+void polygeist_thrust_clamp_i32_to_i8(int32_t n,const int32_t*input,int32_t lower,int32_t upper,int8_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_index_i32 */
+void polygeist_thrust_index_i32(int32_t n, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_index_f32 */
+void polygeist_thrust_index_f32(int32_t n, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_copy_i32 */
+void polygeist_thrust_copy_i32(int32_t n, const int32_t *input, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_copy_u32 */
+void polygeist_thrust_copy_u32(int32_t n, const uint32_t *input, uint32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_copy_i32_f32 */
+void polygeist_thrust_copy_i32_f32(int32_t n, const int32_t *input, float *output);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_trigamma_f32 */
+void polygeist_thrust_calc_trigamma_f32(int32_t n,const float *input,float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_minus_u32_to_i32 */
+void polygeist_thrust_minus_u32_to_i32(int32_t n,const uint32_t*x,const uint32_t*y,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_copy_f32 */
+void polygeist_thrust_copy_f32(int32_t n,const float*input,float*output);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_counting_divide_i32 */
+void polygeist_thrust_counting_divide_i32(int32_t n,uint32_t stride,int32_t* output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_counting_remainder_i32 */
+void polygeist_thrust_counting_remainder_i32(int32_t n,uint32_t stride,int32_t* output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_greater_equal_scalar_i32 */
+void polygeist_thrust_greater_equal_scalar_i32(int32_t n,const int32_t* x,int32_t y,int32_t* output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_equal_i32_to_f32 */
+void polygeist_thrust_equal_i32_to_f32(int32_t n,const int32_t* x,const int32_t* y,float* output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_negate_window_f32 */
+void polygeist_thrust_negate_window_f32(int32_t n,int32_t offset,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_equal_i32 */
+void polygeist_thrust_equal_i32(int32_t n,const int32_t*x,const int32_t*y,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_less_i32 */
+void polygeist_thrust_less_i32(int32_t n,const int32_t*x,const int32_t*y,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_less_equal_scalar_i32 */
+void polygeist_thrust_less_equal_scalar_i32(int32_t n,const int32_t*x,int32_t y,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_f32 */
+void polygeist_thrust_gather_f32(int32_t n,int32_t m,const int32_t*index,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_rows_f32 */
+void polygeist_thrust_gather_rows_f32(int32_t rows,int32_t cols,int32_t source_rows,const int32_t*index,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_columns_f32 */
+void polygeist_thrust_gather_columns_f32(int32_t rows,int32_t cols,int32_t source_cols,const int32_t*index,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_elements_f32 */
+void polygeist_thrust_gather_elements_f32(int32_t rows,int32_t cols,int32_t source_cols,const int32_t*index,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_pairs_f32 */
+void polygeist_thrust_gather_pairs_f32(int32_t rows,int32_t cols,const int32_t*index,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_plus_u32_to_i32 */
+void polygeist_thrust_plus_u32_to_i32(int32_t n,const uint32_t*x,const uint32_t*y,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_multiplies_scalar_right_u32_to_i32 */
+void polygeist_thrust_multiplies_scalar_right_u32_to_i32(int32_t n,const uint32_t*x,uint32_t y,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_minimum_scalar_i32 */
+void polygeist_thrust_minimum_scalar_i32(int32_t n,const int32_t*input,int32_t bound,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_maximum_scalar_i32 */
+void polygeist_thrust_maximum_scalar_i32(int32_t n,const int32_t*input,int32_t bound,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_negate_u32_to_i32 */
+void polygeist_thrust_negate_u32_to_i32(int32_t n,const uint32_t*input,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_rows_i32 */
+void polygeist_thrust_gather_rows_i32(int32_t rows,int32_t cols,int32_t source_rows,const int32_t*index,const int32_t*input,int32_t*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust gather polygeist_thrust_gather_coordinates_f32 */
+void polygeist_thrust_gather_coordinates_f32(int32_t n,int32_t rows,int32_t cols,const int32_t*row,const int32_t*column,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust copy polygeist_thrust_copy_window_f32 */
+void polygeist_thrust_copy_window_f32(int32_t n,int32_t offset,const float*input,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust reverse_copy polygeist_thrust_reverse_window_f32 */
+void polygeist_thrust_reverse_window_f32(int32_t n,int32_t prefix,int32_t gap,float*buffer);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_reverse_negate_window_f32 */
+void polygeist_thrust_reverse_negate_window_f32(int32_t n,int32_t prefix,int32_t gap,float*buffer);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust sequence polygeist_thrust_sequence_f32 */
+void polygeist_thrust_sequence_f32(int32_t n,float init,float step,float*output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_ldexp_f32_i32 */
+void polygeist_thrust_ldexp_f32_i32(int32_t n,const float*input,const int32_t*exponent,float*out);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_airy_ai_f32 */
+void polygeist_thrust_calc_airy_ai_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bessel_j0_forward_f32 */
+void polygeist_thrust_bessel_j0_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bessel_j1_forward_f32 */
+void polygeist_thrust_bessel_j1_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bessel_y0_forward_f32 */
+void polygeist_thrust_bessel_y0_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bessel_y1_forward_f32 */
+void polygeist_thrust_bessel_y1_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_chebyshev_t_f32 */
+void polygeist_thrust_calc_chebyshev_t_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_chebyshev_u_f32 */
+void polygeist_thrust_calc_chebyshev_u_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_chebyshev_v_f32 */
+void polygeist_thrust_calc_chebyshev_v_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_chebyshev_w_f32 */
+void polygeist_thrust_calc_chebyshev_w_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_hermite_h_f32 */
+void polygeist_thrust_calc_hermite_h_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_hermite_he_f32 */
+void polygeist_thrust_calc_hermite_he_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_laguerre_l_f32 */
+void polygeist_thrust_calc_laguerre_l_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_legendre_p_f32 */
+void polygeist_thrust_calc_legendre_p_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_modified_bessel_i0_forward_f32 */
+void polygeist_thrust_modified_bessel_i0_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_modified_bessel_i1_forward_f32 */
+void polygeist_thrust_modified_bessel_i1_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_modified_bessel_k0_forward_f32 */
+void polygeist_thrust_modified_bessel_k0_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_modified_bessel_k1_forward_f32 */
+void polygeist_thrust_modified_bessel_k1_forward_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_scaled_bessel_k0_f32 */
+void polygeist_thrust_calc_scaled_bessel_k0_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_scaled_bessel_k1_f32 */
+void polygeist_thrust_calc_scaled_bessel_k1_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_ndtri_f32 */
+void polygeist_thrust_calc_ndtri_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_log_ndtr_f32 */
+void polygeist_thrust_calc_log_ndtr_f32(int32_t n, const float *input, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_calc_spherical_bessel_j0_f32 */
+void polygeist_thrust_calc_spherical_bessel_j0_f32(int32_t n, const float *input, float *output);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bit_and_i32 */
+void polygeist_thrust_bit_and_i32(int32_t n, const int32_t *left, const int32_t *right, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bit_or_i32 */
+void polygeist_thrust_bit_or_i32(int32_t n, const int32_t *left, const int32_t *right, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bit_xor_i32 */
+void polygeist_thrust_bit_xor_i32(int32_t n, const int32_t *left, const int32_t *right, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_bit_not_i32 */
+void polygeist_thrust_bit_not_i32(int32_t n, const int32_t *left, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_left_shift_i32 */
+void polygeist_thrust_left_shift_i32(int32_t n, const int32_t *left, const int32_t *right, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_right_shift_i32 */
+void polygeist_thrust_right_shift_i32(int32_t n, const int32_t *left, const int32_t *right, int32_t *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust for_each polygeist_thrust_where_i32_f32 */
+void polygeist_thrust_where_i32_f32(int32_t n, const int32_t *condition, const float *left, const float *right, float *output);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_copysign_f32 */
+void polygeist_thrust_copysign_f32(int32_t n, const float *left, const float *right, float *output);
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_remainder_f32 */
+void polygeist_thrust_remainder_f32(int32_t n, const float *left, const float *right, float *output);
+
+/* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_round_f32 */
+void polygeist_thrust_round_f32(int32_t n, const float *input, float *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_log2_f32 */
 void polygeist_thrust_log2_f32(int32_t n, const float *input, float *output);
 /* POLYGEIST_TYPED_VENDOR_ENTRY Thrust transform polygeist_thrust_log10_f32 */

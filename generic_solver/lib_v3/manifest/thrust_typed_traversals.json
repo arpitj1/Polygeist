@@ -1,0 +1,142 @@
+{
+  "routine": "thrust_typed_traversals",
+  "source": "Public Thrust contiguous copy and stencilled replace_if implementations",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/copy.inl",
+      "sha256": "2642397da105e08e2da80f8c77f86031166c01f1203d7becbc3933f98800a660"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/replace.inl",
+      "sha256": "4fc257a99b9f67da2fc7badb011f7221136d71c51ffcfed14b7b9d3bee8fa217"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    }
+  ],
+  "adaptation": "Specialize public generic traversal to contiguous pointers and fixed scalar types; preserve identity copy and conditional in-place replacement.",
+  "specs": [
+    {
+      "name": "thrust_copy_u64",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "ref_c": "thrust_copy_u64.c",
+      "defines": {},
+      "target": {
+        "library": "Thrust",
+        "call": "copy",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_copy_u64",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": [],
+      "validation": {
+        "array_values": {
+          "input": [
+            0,
+            1,
+            4294967295,
+            4294967296,
+            9223372036854775808,
+            18446744073709551615
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_replace_if_i32_f32",
+      "args": [
+        "n",
+        "output",
+        "mask",
+        "value"
+      ],
+      "ref_c": "thrust_replace_if.c",
+      "defines": {},
+      "target": {
+        "library": "Thrust",
+        "call": "replace_if",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_replace_if_i32_f32",
+          "arguments": [
+            "n",
+            "output",
+            "mask",
+            "value"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ],
+            "mask": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint operands"
+      ],
+      "deviations": [],
+      "validation": {
+        "array_values": {
+          "mask": [
+            0,
+            1,
+            -1,
+            0,
+            2147483647,
+            -2147483648,
+            0
+          ]
+        }
+      }
+    }
+  ]
+}

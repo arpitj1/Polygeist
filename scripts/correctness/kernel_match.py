@@ -21,7 +21,8 @@ import sys
 import json
 import time
 import subprocess
-from collections import Counter
+from collections import Counter, OrderedDict
+from functools import lru_cache
 from itertools import product
 from dataclasses import dataclass
 from pathlib import Path
@@ -234,6 +235,20 @@ def exact_float_select_complements():
     return rules
 
 
+INTEGER_COMMUTATIVE = {
+    f'arith.{opcode}:i{width}'
+    for opcode in ('addi', 'muli') for width in (8, 16, 32, 64)
+}
+
+
+def exact_integer_arithmetic_rules():
+    # Exchanging operands preserves every bit, including modular overflow.
+    # Width/opcode remain part of the term; division, remainder and casts are
+    # never exchanged, and no real-number or floating-point identity applies.
+    return [rewrite(Term.Binary(opcode, a, b)).to(Term.Binary(opcode, b, a))
+            for opcode in sorted(INTEGER_COMMUTATIVE)]
+
+
 def algebra_rules(include_distributivity: bool = True):
     # Strict mode admits exact selection identities and multiplication operand
     # exchange, matching upstream arith.mulf/muli's Commutative trait. This does
@@ -241,7 +256,8 @@ def algebra_rules(include_distributivity: bool = True):
     # NaN payload identity is not part of the IR/backend numerical contract.
     # Relaxed mode also permits real-arithmetic identities; runtime error still
     # needs validation.
-    integer_rules = (exact_integer_selection_rules() +
+    integer_rules = (exact_integer_arithmetic_rules() +
+                     exact_integer_selection_rules() +
                      exact_conditional_selection_rules() +
                      exact_boolean_comparison_rules() +
                      exact_float_select_complements())
@@ -430,6 +446,9 @@ class GenericBody:
     # has an empty body after the parser removes `linalg.yield`, even though
     # its output block argument still establishes the element type.
     block_arg_types: list[str] = None  # type: ignore[assignment]
+    # Typed, explicitly pure scalar declarations from the enclosing module.
+    # These are opaque functions: only congruence, never algebraic identities.
+    scalar_calls: dict[str, str] = None  # type: ignore[assignment]
 
     @property
     def yield_value(self) -> str:
@@ -532,13 +551,27 @@ def _resolve_map_aliases(mlir_text: str) -> str:
     return mlir_text
 
 
+def pure_scalar_declarations(mlir_text: str) -> dict[str, str]:
+    result = {}
+    for name, args, ret, attrs in re.findall(
+            r'func\.func private @([\w.$-]+)\(([^()]*)\) -> ([fi]\d+) attributes \{([^{}]*)\}',
+            mlir_text):
+        types = [x.strip() for x in args.split(',')]
+        if ('polygeist.pure' in attrs and types and
+                all(re.fullmatch(r'[fi]\d+', t) for t in types)):
+            result[name] = '(' + ','.join(types) + ')->' + ret
+    return result
+
+
 def parse_generics(mlir_text: str,
                    constants: dict[str, float] | None = None,
-                   infer_outputs_from_yield: bool = False) -> list[GenericBody]:
+                   infer_outputs_from_yield: bool = False,
+                   scalar_calls: dict[str, str] | None = None) -> list[GenericBody]:
     """Extract every linalg.generic with its body."""
     if constants is None:
         constants = parse_constants(mlir_text)
     mlir_text = _resolve_map_aliases(mlir_text)
+    scalar_calls = pure_scalar_declarations(mlir_text) if scalar_calls is None else scalar_calls
     results = []
     for m in _GEN_RE.finditer(mlir_text):
         # SSA names are function-local.  Whole-module parsing used to let a
@@ -647,6 +680,7 @@ def parse_generics(mlir_text: str,
             },
             result_names=result_names,
             block_arg_types=block_arg_types,
+            scalar_calls=scalar_calls,
         ))
     return results
 
@@ -700,6 +734,7 @@ _OP_PATTERNS = {
     "math.trunc": "unary_trunc",
     "math.powf": "binary_pow",
     "math.atan2": "binary_atan2",
+    "math.copysign": "binary_copysign",
     "math.sin": "unary_sin",
     "math.sinh": "unary_sinh",
     "math.tan": "unary_tan",
@@ -832,6 +867,21 @@ def encode_body_yields(g: GenericBody) -> list[Term]:
                                       resolve(arg_toks[0]),
                                       resolve(arg_toks[1]))
         elif op_key == "call":
+            typed_call = re.fullmatch(
+                r'@([\w.$-]+)\(([^()]*)\)\s*:\s*(\([^()]*\)\s*->\s*[fi]\d+)',
+                line.split('func.call', 1)[1].strip())
+            if typed_call:
+                symbol, operands, signature = typed_call.groups()
+                signature = re.sub(r'\s+', '', signature)
+                if (g.scalar_calls or {}).get(symbol) == signature:
+                    values = [resolve(x) for x in operands.split(',')]
+                    identity = 'pure-call:' + symbol + ':' + signature
+                    if len(values) == 1:
+                        env[result] = Term.Unary(identity, values[0])
+                        continue
+                    if len(values) == 2:
+                        env[result] = Term.Binary(identity, *values)
+                        continue
             call = re.match(
                 r"@([\w.$-]+)\((%[\w_-]+)(?:,\s*(%[\w_-]+))?\)",
                 args_part.strip())
@@ -1126,8 +1176,11 @@ def _mlir_semantic_entries(path: Path | None = None) -> dict[str, CompositionEnt
     if not path.is_file():
         return {}
     result = {}
-    for symbol, region in _kernel_defn_regions(path.read_text()):
-        generics = parse_generics(region, infer_outputs_from_yield=True)
+    text = path.read_text()
+    declarations = pure_scalar_declarations(text)
+    for symbol, region in _kernel_defn_regions(text):
+        generics = parse_generics(region, infer_outputs_from_yield=True,
+                                  scalar_calls=declarations)
         if not generics:
             continue
         steps = []
@@ -1148,9 +1201,20 @@ def _mlir_semantic_entries(path: Path | None = None) -> dict[str, CompositionEnt
     return result
 
 
+_TERM_REPR_CACHE = OrderedDict()
+
+
 def _term_repr(t) -> str:
-    """Stable text repr of a Term (uses egglog's default __repr__)."""
-    return str(t)
+    """Reuse formatting of the same immutable Egglog expression declaration."""
+    expression = t.__egg_typed_expr__
+    key = id(expression)
+    if key not in _TERM_REPR_CACHE:
+        # Retain the declaration so its identity cannot be reused while cached.
+        _TERM_REPR_CACHE[key] = (expression, str(t))
+        if len(_TERM_REPR_CACHE) > 128:
+            _TERM_REPR_CACHE.popitem(last=False)
+    _TERM_REPR_CACHE.move_to_end(key)
+    return _TERM_REPR_CACHE[key][1]
 
 
 ## Egglog proofs in the production matcher use a bounded iteration count.
@@ -1170,6 +1234,7 @@ def _looks_like_float(s: str) -> bool:
         return False
 
 
+@lru_cache(maxsize=128)
 def _parse_term(s: str):
     """Parse the string repr of a Term back into a Python AST (tuples).
 
@@ -1392,6 +1457,19 @@ COMMUTATIVE_OPS = {"Add", "Mul"}
 
 
 def _unify(body, template, bindings: dict) -> Optional[dict]:
+    memo = {}
+    def recurse(left, right, captures):
+        state = tuple(sorted((name, _literal_identity(value))
+                             for name, value in captures.items()))
+        key = (id(left), id(right), state)
+        # Keep arguments alive: relaxed matching may create temporary literals.
+        if key not in memo:
+            memo[key] = (left, right, _unify_uncached(left, right, captures, recurse))
+        return memo[key][2]
+    return recurse(body, template, bindings)
+
+
+def _unify_uncached(body, template, bindings: dict, recurse) -> Optional[dict]:
     """Structural unification with commutativity. `template`'s Cap leaves
     are wildcards that bind to a Cap/Lit leaf in the body (i.e., a captured
     scalar — *not* a per-element tensor In/Out value).
@@ -1424,9 +1502,9 @@ def _unify(body, template, bindings: dict) -> Optional[dict]:
             cap = template[cap_idx]
             term = template[term_idx]
             if isinstance(cap, tuple) and cap[0] == "Cap":
-                bound = _unify(body, term, bindings)
+                bound = recurse(body, term, bindings)
                 if bound is not None:
-                    bound = _unify(("Lit", 1.0), cap, bound)
+                    bound = recurse(("Lit", 1.0), cap, bound)
                     if bound is not None:
                         return bound
     # Otherwise structural equality.
@@ -1444,20 +1522,20 @@ def _unify(body, template, bindings: dict) -> Optional[dict]:
     if (numeric_model() == "relaxed" and template[0] in COMMUTATIVE_OPS
             and len(children_t) == 2):
         # Try both orderings.
-        b1 = _unify(children_b[0], children_t[0], bindings)
+        b1 = recurse(children_b[0], children_t[0], bindings)
         if b1 is not None:
-            b1 = _unify(children_b[1], children_t[1], b1)
+            b1 = recurse(children_b[1], children_t[1], b1)
             if b1 is not None:
                 return b1
-        b2 = _unify(children_b[0], children_t[1], bindings)
+        b2 = recurse(children_b[0], children_t[1], bindings)
         if b2 is not None:
-            b2 = _unify(children_b[1], children_t[0], b2)
+            b2 = recurse(children_b[1], children_t[0], b2)
             if b2 is not None:
                 return b2
         return None
     # Non-commutative: zip-recurse.
     for tc, bc in zip(children_t, children_b):
-        bindings = _unify(bc, tc, bindings)
+        bindings = recurse(bc, tc, bindings)
         if bindings is None:
             return None
     return bindings
@@ -1494,20 +1572,24 @@ def _ast_to_term(node) -> Term:
 
 
 def _substitute_caps(node, bindings: dict):
-    if node[0] == "Cap" and node[1] in bindings:
-        return bindings[node[1]]
-    return (node[0], *(
-        _substitute_caps(child, bindings)
-        if isinstance(child, tuple) else child for child in node[1:]
-    ))
+    memo = {}
+    def visit(current):
+        if not isinstance(current, tuple):
+            return current
+        key = id(current)
+        if key not in memo:
+            memo[key] = (bindings[current[1]] if current[0] == "Cap" and current[1] in bindings
+                         else tuple(visit(child) for child in current))
+        return memo[key]
+    return visit(node)
 
 
 def _ordered_unique_ast_nodes(node, wanted: set[str]) -> list:
-    found = []
-    seen = set()
+    found, seen, visited = [], set(), set()
     def visit(current):
-        if not isinstance(current, tuple):
+        if not isinstance(current, tuple) or id(current) in visited:
             return
+        visited.add(id(current))
         if current[0] in wanted and current not in seen:
             found.append(current)
             seen.add(current)
@@ -1518,22 +1600,58 @@ def _ordered_unique_ast_nodes(node, wanted: set[str]) -> list:
 
 
 def _indexed_leaf_counts(node) -> Counter:
-    counts = Counter()
+    memo = {}
     def visit(current):
         if not isinstance(current, tuple):
-            return
-        if current[0] in {"In", "Out"}:
-            counts[current] += 1
-        for child in current[1:]:
-            visit(child)
-    visit(node)
-    return counts
+            return Counter()
+        key = id(current)
+        if key not in memo:
+            counts = Counter({current: 1}) if current[0] in {"In", "Out"} else Counter()
+            for child in current[1:]:
+                counts.update(visit(child))
+            memo[key] = counts
+        return memo[key]
+    return visit(node)
 
 
 def _ast_node_count(node) -> int:
-    if not isinstance(node, tuple):
-        return 0
-    return 1 + sum(_ast_node_count(child) for child in node[1:])
+    memo = {}
+    def visit(current):
+        if not isinstance(current, tuple):
+            return 0
+        if id(current) not in memo:
+            memo[id(current)] = 1 + sum(visit(child) for child in current[1:])
+        return memo[id(current)]
+    return visit(node)
+
+
+def _literal_dag_summaries(*roots):
+    """Exact structural identities and sizes without expanding shared SSA DAGs.
+
+    Flat intern keys preserve the existing literal identity, including signed
+    zero. Counts cover distinct structural nodes, not repeated tree occurrences.
+    """
+    intern = {}
+    results = []
+    for root in roots:
+        memo = {}
+        negative_zero = False
+        def visit(node):
+            nonlocal negative_zero
+            if not isinstance(node, tuple):
+                return ('value', node)
+            if id(node) not in memo:
+                if node[0] == 'Lit':
+                    value = float(node[1])
+                    negative_zero |= value == 0 and math.copysign(1., value) < 0
+                    key = ('LiteralBits', value.hex())
+                else:
+                    key = tuple(visit(child) for child in node)
+                memo[id(node)] = intern.setdefault(key, len(intern))
+            return ('node', memo[id(node)])
+        identity = visit(root)
+        results.append((identity, len(set(memo.values())), negative_zero))
+    return results
 
 
 def _ac_identity_fingerprint(node):
@@ -1546,6 +1664,9 @@ def _ac_identity_fingerprint(node):
     if not isinstance(node, tuple):
         return node
     op = node[0]
+    if op == 'Binary' and node[1] in INTEGER_COMMUTATIVE:
+        children = sorted((_ac_identity_fingerprint(x) for x in node[2:]), key=repr)
+        return (op, node[1], *children)
     if (op == "Select" and node[1][0] == "Cmp" and
             node[1][1] in {"slt", "sle", "ult", "ule"}):
         # This is only a necessary-condition filter: let Egglog decide
@@ -1625,12 +1746,17 @@ def _conditional_proof_candidate(left, right) -> bool:
 
 def _egglog_accepts_binding(body_ast, template_ast, bindings: dict) -> bool:
     instantiated = _substitute_caps(template_ast, bindings)
-    if (numeric_model() == "strict" and
-            (_has_negative_zero(body_ast) or _has_negative_zero(instantiated))):
-        matched = _literal_identity(body_ast) == _literal_identity(instantiated)
-        if matched:
-            _MATCHER_TELEMETRY["proofs_matched"] += 1
-        return matched
+    left, right = _literal_dag_summaries(body_ast, instantiated)
+    if left[0] == right[0]:
+        _MATCHER_TELEMETRY["proofs_matched"] += 1
+        return True
+    if numeric_model() == 'strict' and (left[2] or right[2]):
+        return False
+    # The existing search accepts at most 32 distinct conditional nodes (or
+    # 32 tree nodes otherwise). Reject larger nonidentical DAGs before the
+    # fingerprint walk; exact identities above need no saturation search.
+    if max(left[1], right[1]) > 32:
+        return False
     same_fingerprint = (_ac_identity_fingerprint(body_ast) ==
                         _ac_identity_fingerprint(instantiated))
     conditional_candidate = (not same_fingerprint and

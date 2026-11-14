@@ -36,6 +36,23 @@ class LiteralReadPolicy(unittest.TestCase):
         self.assertFalse(P.literal_ok({}, '%parameter', 0.0,
                                      zero_read_preserving=safe)[0])
 
+    def test_additive_zero_retains_the_typed_arithmetic(self):
+        sys.path.insert(0, str(HERE))
+        import kernel_match as K
+        from unittest.mock import patch
+        for opcode in ('arith.addf', 'arith.subf'):
+            for operands in ('%x, %parameter', '%parameter, %x'):
+                ops = self.uses(f'  %r = {opcode} {operands} : f32\n  return %r : f32')
+                self.assertTrue(P.zero_preserves_reads(ops, '%parameter'))
+        # Permitting a literal capture does not justify deleting the addition:
+        # +0 changes the sign of -0, and NaN/Inf inputs must still be read.
+        with patch.dict('os.environ', {'POLYGEIST_NUMERIC_MODEL': 'strict'}):
+            K.configure_matcher('egglog')
+            x = K.Term.In(0)
+            plus_zero = x + K.Term.Lit(0.0)
+            self.assertFalse(K.equivalent(plus_zero, x))
+            self.assertTrue(K.equivalent(plus_zero, plus_zero))
+
     def test_direct_scalar_result_does_not_annihilate_a_read(self):
         ops = self.uses('  return %parameter : f32')
         self.assertTrue(P.zero_preserves_reads(ops, '%parameter'))

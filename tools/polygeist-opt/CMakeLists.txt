@@ -8,6 +8,8 @@ set(LIBS
 		MLIRPolygeistKernel
 		MLIRPolygeistTransforms
 		MLIRFuncAllExtensions
+        MLIRControlFlowToSCF
+        MLIRUBToLLVM
         )
 add_llvm_executable(polygeist-opt polygeist-opt.cpp)
 

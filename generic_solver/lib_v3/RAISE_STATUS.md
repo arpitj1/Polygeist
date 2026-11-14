@@ -6,85 +6,196 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (total 286)
+Summary: NOT_RAISED: 23, PARTIAL: 56, RAISED: 377, UNSOUND: 2, UNVALIDATED: 16 (total 474)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
-| `aten_abs_f32` | aten_abs | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_acos_f32` | aten_acos | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `aten_abs_f32` | aten_abs | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_acos_f32` | aten_acos | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_acosh_f32` | aten_acosh | RAISED | 1 | - | EXACT / EXACT |  |
-| `aten_add_f32` | aten_add | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_addcdiv_f32` | aten_addcdiv | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_addcmul_f32` | aten_addcmul | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_addr_elementwise_f32` | aten_addr_elementwise | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_asin_f32` | aten_asin | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_asinh_f32` | aten_asinh | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_atan_f32` | aten_atan | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_atan2_f32` | aten_atan2 | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_atanh_f32` | aten_atanh | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_avg_pool2d_backward_k2_f32` | aten_avg_pool2d_backward | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `aten_avg_pool3d_backward_k2_f32` | aten_avg_pool3d_backward | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `aten_ceil_f32` | aten_ceil | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_clamp_max_f32` | aten_clamp_max | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_clamp_min_f32` | aten_clamp_min | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_clamp_scalar_f32` | aten_clamp_scalar | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_cos_f32` | aten_cos | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_cosh_f32` | aten_cosh | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_cross_component_f32` | aten_cross_component | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_div_f32` | aten_div | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_eq_f32` | aten_eq | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_erf_f32` | aten_erf | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_exp_f32` | aten_exp | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_floor_f32` | aten_floor | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_frac_f32` | aten_frac | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_ge_f32` | aten_ge | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_gelu_exact_f32` | aten_gelu_exact | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_gelu_tanh_f32` | aten_gelu_tanh | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_gt_f32` | aten_gt | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_hardsigmoid_f32` | aten_hardsigmoid | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_hardsigmoid_backward_f32` | aten_hardsigmoid_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_hardswish_f32` | aten_hardswish | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_hardswish_backward_f32` | aten_hardswish_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_hardtanh_backward_f32` | aten_hardtanh_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_le_f32` | aten_le | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_leaky_relu_f32` | aten_leaky_relu | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_log_f32` | aten_log | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_log_sigmoid_backward_f32` | aten_log_sigmoid_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_logical_and_f32` | aten_logical_and | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_logical_not_f32` | aten_logical_not | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_logical_or_f32` | aten_logical_or | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_logical_xor_f32` | aten_logical_xor | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_lt_f32` | aten_lt | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_mse_f32` | aten_mse | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_mse_backward_f32` | aten_mse | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_mul_f32` | aten_mul | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_nansum_ordered_f32` | aten_nansum | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `aten_ne_f32` | aten_ne | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_neg_f32` | aten_neg | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_pow_f32` | aten_pow | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_pow_uniform_f32` | aten_pow_uniform | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_reciprocal_f32` | aten_reciprocal | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_renorm_scale_f32` | aten_renorm_scale | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_rsqrt_f32` | aten_rsqrt | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `aten_add_f32` | aten_add | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_addcdiv_f32` | aten_addcdiv | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_addcmul_f32` | aten_addcmul | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_addr_elementwise_f32` | aten_addr_elementwise | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_asin_f32` | aten_asin | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_asinh_f32` | aten_asinh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_atan_f32` | aten_atan | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_atan2_f32` | aten_atan2 | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_atanh_f32` | aten_atanh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_avg_pool2d_backward_k2_f32` | aten_avg_pool2d_backward | RAISED | 2 | - | EXACT / EXACT |  |
+| `aten_avg_pool3d_backward_k2_f32` | aten_avg_pool3d_backward | RAISED | 2 | - | EXACT / EXACT |  |
+| `aten_ceil_f32` | aten_ceil | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_clamp_max_f32` | aten_clamp_max | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_clamp_min_f32` | aten_clamp_min | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_clamp_scalar_f32` | aten_clamp_scalar | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_bound_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_input_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_value_input_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_values_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_constant_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_input_bound_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_bound_input_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_lt_bound_value_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_bound_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_input_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_value_input_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_values_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_constant_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_input_bound_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_bound_input_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_le_bound_value_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_bound_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_input_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_value_input_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_values_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_constant_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_input_bound_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_bound_input_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_gt_bound_value_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_bound_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_input_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_value_input_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_values_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_constant_value_scalar_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_input_bound_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_bound_input_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_select_ge_bound_value_tensor_f32` | aten_compare_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_input_bound_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_bound_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_value_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_constant_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_input_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_constants_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_as_float_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_lt_as_float_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_input_bound_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_bound_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_value_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_constant_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_input_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_constants_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_as_float_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_le_as_float_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_input_bound_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_bound_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_value_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_constant_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_input_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_constants_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_as_float_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_gt_as_float_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_input_bound_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_bound_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_value_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_constant_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_input_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_constants_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_as_float_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ge_as_float_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_input_bound_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_input_bound_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_bound_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_bound_input_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_constant_value_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_constant_value_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_value_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_value_constant_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_constant_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_constant_input_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_input_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_input_constant_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_constants_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_constants_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_values_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_values_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_as_float_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_eq_as_float_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_input_bound_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_input_bound_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_bound_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_bound_input_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constant_value_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constant_value_self_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constant_value_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_value_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_value_constant_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constant_input_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constant_input_self_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constant_input_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_input_constant_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_input_constant_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constants_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_constants_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_values_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_values_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_as_float_scalar_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_compare_ne_as_float_tensor_f32` | aten_comparison_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_cos_f32` | aten_cos | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_cosh_f32` | aten_cosh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_cross_component_f32` | aten_cross_component | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_div_f32` | aten_div | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_eq_f32` | aten_eq | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_erf_f32` | aten_erf | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_exp_f32` | aten_exp | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_floor_f32` | aten_floor | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_frac_f32` | aten_frac | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_ge_f32` | aten_ge | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_gelu_exact_f32` | aten_gelu_exact | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_gelu_tanh_f32` | aten_gelu_tanh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_gt_f32` | aten_gt | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_hardsigmoid_f32` | aten_hardsigmoid | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_hardsigmoid_backward_f32` | aten_hardsigmoid_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_hardswish_f32` | aten_hardswish | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_hardswish_backward_f32` | aten_hardswish_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_hardtanh_backward_f32` | aten_hardtanh_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_outside_or_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_outside_and_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_outside_inclusive_or_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_outside_inclusive_and_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_inside_or_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_inside_and_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_inside_inclusive_or_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_interval_inside_inclusive_and_f32` | aten_interval_select | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_le_f32` | aten_le | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_leaky_relu_f32` | aten_leaky_relu | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_log_f32` | aten_log | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_log_sigmoid_backward_f32` | aten_log_sigmoid_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_logical_and_f32` | aten_logical_and | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_logical_not_f32` | aten_logical_not | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_logical_or_f32` | aten_logical_or | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_logical_xor_f32` | aten_logical_xor | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_lt_f32` | aten_lt | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_mse_f32` | aten_mse | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_mse_backward_f32` | aten_mse | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_mul_f32` | aten_mul | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_nansum_ordered_f32` | aten_nansum | RAISED | 2 | - | EXACT / EXACT |  |
+| `aten_ne_f32` | aten_ne | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_neg_f32` | aten_neg | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_pow_f32` | aten_pow | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_pow_uniform_f32` | aten_pow_uniform | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_pow_uniform_base_f32` | aten_pow_uniform_base | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_reciprocal_f32` | aten_reciprocal | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_renorm_scale_f32` | aten_renorm_scale | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_rsqrt_f32` | aten_rsqrt | RAISED | 1 | - | EXACT / EXACT |  |
 | `aten_sampled_addmm_csr_f32` | aten_sampled_addmm_csr | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
-| `aten_scaled_add_f32` | aten_scaled_add | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_shrink_backward_f32` | aten_shrink_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_sigmoid_f32` | aten_sigmoid | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_sigmoid_backward_f32` | aten_sigmoid_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_sign_f32` | aten_sign | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_silu_f32` | aten_silu | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_silu_backward_f32` | aten_silu_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_sin_f32` | aten_sin | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_sinh_f32` | aten_sinh | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_softmax_f32` | aten_softmax | RAISED | 3 | - | EXACT / LOWER_FAIL |  |
-| `aten_softmax_backward_f32` | aten_softmax_backward | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `aten_softshrink_f32` | aten_softshrink | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_sqrt_f32` | aten_sqrt | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_tan_f32` | aten_tan | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_tanh_f32` | aten_tanh | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_tanh_backward_f32` | aten_tanh_backward | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_threshold_f32` | aten_threshold | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `aten_trunc_f32` | aten_trunc | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `aten_scaled_add_f32` | aten_scaled_add | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_shrink_backward_f32` | aten_shrink_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sigmoid_f32` | aten_sigmoid | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sigmoid_backward_f32` | aten_sigmoid_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sign_f32` | aten_sign | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_silu_f32` | aten_silu | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_silu_backward_f32` | aten_silu_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sin_f32` | aten_sin | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sinh_f32` | aten_sinh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_softmax_f32` | aten_softmax | RAISED | 3 | - | EXACT / EXACT |  |
+| `aten_softmax_backward_f32` | aten_softmax_backward | RAISED | 2 | - | EXACT / EXACT |  |
+| `aten_softshrink_f32` | aten_softshrink | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_sqrt_f32` | aten_sqrt | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_tan_f32` | aten_tan | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_tanh_f32` | aten_tanh | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_tanh_backward_f32` | aten_tanh_backward | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_threshold_f32` | aten_threshold | RAISED | 1 | - | EXACT / EXACT |  |
+| `aten_trunc_f32` | aten_trunc | RAISED | 1 | - | EXACT / EXACT |  |
 | `numpy_bincount` | bincount | PARTIAL | 1 | affine.for | RUN_FAIL / RUN_FAIL | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `numpy_bincount_accumulate` | bincount | NOT_RAISED | 0 | affine.for | RUN_FAIL / RUN_FAIL | no linalg.generic after raising; residual affine.for |
 | `numpy_bincount_weights` | bincount | PARTIAL | 1 | affine.for | RUN_FAIL / RUN_FAIL | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
@@ -96,36 +207,36 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (
 | `scipy_csr_matvec_beta0` | csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | RUN_FAIL / RUN_FAIL | no linalg.generic after raising; residual affine.for, scf.for |
 | `scipy_csr_matvec_i64` | csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | UNSUPPORTED_SIGNATURE / UNSUPPORTED_SIGNATURE | no linalg.generic after raising; residual affine.for, scf.for |
 | `scipy_csr_matvec_beta0_i64` | csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | UNSUPPORTED_SIGNATURE / UNSUPPORTED_SIGNATURE | no linalg.generic after raising; residual affine.for, scf.for |
-| `cub_column_sum_i8_i32` | cub_column_sum | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `cub_column_sum_i8_i32` | cub_column_sum | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_histogram_even_i32` | cub_histogram_even | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `cub_inclusive_product_f32` | cub_inclusive_product | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `cub_inclusive_scan_f32` | cub_inclusive_scan | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `cub_inclusive_product_f32` | cub_inclusive_product | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_inclusive_scan_f32` | cub_inclusive_scan | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_and_i32` | cub_logical_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_or_i32` | cub_logical_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_and_i32` | cub_logical_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_or_i32` | cub_logical_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_ordered_row_prefix_sum_f32` | cub_ordered_row_prefix | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
-| `cub_ordered_rows_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cub_ordered_rows_scaled_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cub_ordered_rows_divided_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `cub_ordered_rows_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_ordered_rows_scaled_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_ordered_rows_divided_sum_f32` | cub_ordered_rows | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_ragged_reduce_and_i32` | cub_ragged_logical | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
-| `cub_reduce_sum_f32` | cub_reduce | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `cub_reduce_sum_f64` | cub_reduce | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `cub_reduce_product_f32` | cub_reduce | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `cub_reduce_sum_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_reduce_sum_f64` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_reduce_product_f32` | cub_reduce | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_max_abs_f32` | cub_reduce_max_abs_value | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_reduce_value_max_f32` | cub_reduce_max_value | RAISED | 1 | - | EXACT / EXACT |  |
-| `cub_reduce_value_sum_f32` | cub_reduce_value | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `cub_reduce_value_sum_f64` | cub_reduce_value | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `cub_reduce_value_sum_f32` | cub_reduce_value | RAISED | 1 | - | EXACT / EXACT |  |
+| `cub_reduce_value_sum_f64` | cub_reduce_value | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_row_product_scan_f32` | cub_row_product_scan | RAISED | 2 | - | EXACT / EXACT |  |
-| `cub_segmented_argmax_f32` | cub_segmented_arg_extrema | RAISED | 4 | - | EXACT / LOWER_FAIL |  |
-| `cub_segmented_argmin_f32` | cub_segmented_arg_extrema | RAISED | 4 | - | EXACT / LOWER_FAIL |  |
-| `cub_segmented_sum_f32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `cub_segmented_argmax_f32` | cub_segmented_arg_extrema | RAISED | 4 | - | EXACT / EXACT |  |
+| `cub_segmented_argmin_f32` | cub_segmented_arg_extrema | RAISED | 4 | - | EXACT / EXACT |  |
+| `cub_segmented_sum_f32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_sum_f64` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
-| `cub_segmented_xor_i32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cub_segmented_count_nonzero_f32` | cub_segmented_count_nonzero | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cub_segmented_reduce_and_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cub_segmented_reduce_or_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cub_segmented_logical_mode_i32` | cub_segmented_logical_mode | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `cub_segmented_xor_i32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_segmented_count_nonzero_f32` | cub_segmented_count_nonzero | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_segmented_reduce_and_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_segmented_reduce_or_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_segmented_logical_mode_i32` | cub_segmented_logical_mode | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_valid_d1_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_valid_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_valid_unbatched_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
@@ -137,17 +248,17 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (
 | `cudnn_conv3d_backward_filter_valid_f32` | cudnn_conv_backward_filter3d | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv1d_tbc_f32` | cudnn_conv_tbc | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_depthwise_conv2d_bias_f32` | cudnn_depthwise_conv2d | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses) |
-| `cusp_bsr_matvec_beta0_f32` | cusp_bsr_matvec | PARTIAL | 2 | affine.for, scf.while | UNSOUND / UNSOUND | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
-| `cusp_coo_matvecs_beta0_f32` | cusp_coo_matvecs | PARTIAL | 1 | affine.for | EXACT / UNSOUND | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `cusp_bsr_matvec_beta0_f32` | cusp_bsr_matvec | PARTIAL | 2 | affine.for, scf.while | UNSOUND / EXACT | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
+| `cusp_coo_matvecs_beta0_f32` | cusp_coo_matvecs | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `cusp_csr_matvec_beta0_f32` | cusp_csr_matvec | NOT_RAISED | 0 | affine.for, scf.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for |
-| `cusp_csr_matvecs_beta0_f32` | cusp_csr_matvecs | PARTIAL | 2 | affine.for, scf.while | UNSOUND / UNSOUND | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
+| `cusp_csr_matvecs_beta0_f32` | cusp_csr_matvecs | PARTIAL | 2 | affine.for, scf.while | UNSOUND / EXACT | 2 linalg.generic but residual affine.for, scf.while (2 loop ops, 5 scalar memory accesses) |
 | `cusp_expandptr_i32` | cusp_expandptr | NOT_RAISED | 0 | affine.for, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.while |
-| `cutlass_gemm_i8_i32` | cutlass_gemm_i8 | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cutlass_rmsnorm_f32` | cutlass_rmsnorm | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `cutlass_rmsnorm_parameterized_f32` | cutlass_rmsnorm_parameterized | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `darknet_maxpool2x2_f32` | darknet_maxpool | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `cutlass_gemm_i8_i32` | cutlass_gemm_i8 | RAISED | 2 | - | EXACT / EXACT |  |
+| `cutlass_rmsnorm_f32` | cutlass_rmsnorm | RAISED | 2 | - | EXACT / EXACT |  |
+| `cutlass_rmsnorm_parameterized_f32` | cutlass_rmsnorm_parameterized | RAISED | 2 | - | EXACT / EXACT |  |
+| `darknet_maxpool2x2_f32` | darknet_maxpool | RAISED | 2 | - | EXACT / EXACT |  |
 | `netlib_dpotf2_u` | dpotf2 | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dpotf2_l` | dpotf2 | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dpotf2_l` | dpotf2 | PARTIAL | 3 | affine.for | EXACT / LOWER_FAIL | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dsymm_lu_beta0` | dsymm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsymm_lu` | dsymm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsymm_ll_beta0` | dsymm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
@@ -156,36 +267,36 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dsymm_ru` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
 | `netlib_dsymm_rl_beta0` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
 | `netlib_dsymm_rl` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsymm_lu_alpha0_beta0` | dsymm | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsymm_lu_alpha0` | dsymm | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyr2k_un_beta0` | dsyr2k | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `netlib_dsyr2k_un_beta1` | dsyr2k | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyr2k_un` | dsyr2k | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `netlib_dsymm_lu_alpha0_beta0` | dsymm | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsymm_lu_alpha0` | dsymm | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_un_beta0` | dsyr2k | RAISED | 2 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_un_beta1` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_un` | dsyr2k | RAISED | 2 | - | EXACT / EXACT |  |
 | `netlib_dsyr2k_ut_beta0` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsyr2k_ut` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dsyr2k_ln_beta0` | dsyr2k | UNVALIDATED | 2 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyr2k_ln_beta1` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyr2k_ln` | dsyr2k | UNVALIDATED | 2 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
+| `netlib_dsyr2k_ln_beta0` | dsyr2k | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyr2k_ln_beta1` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyr2k_ln` | dsyr2k | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
 | `netlib_dsyr2k_lt_beta0` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsyr2k_lt` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dsyr2k_un_alpha0_beta0` | dsyr2k | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyr2k_un_alpha0` | dsyr2k | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyr2k_ln_alpha0_beta0` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyr2k_ln_alpha0` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_un_beta0` | dsyrk | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `netlib_dsyrk_un_beta1` | dsyrk | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyrk_un` | dsyrk | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `netlib_dsyrk_ut_beta0` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `netlib_dsyrk_ut` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `netlib_dsyrk_ln_beta0` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_ln_beta1` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_ln` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_lt_beta0` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_lt` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_un_alpha0_beta0` | dsyrk | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyrk_un_alpha0` | dsyrk | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `netlib_dsyrk_ln_alpha0_beta0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsyrk_ln_alpha0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / LOWER_FAIL | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL) |
+| `netlib_dsyr2k_un_alpha0_beta0` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_un_alpha0` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_ln_alpha0_beta0` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyr2k_ln_alpha0` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyrk_un_beta0` | dsyrk | RAISED | 2 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_un_beta1` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_un` | dsyrk | RAISED | 2 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_ut_beta0` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `netlib_dsyrk_ut` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `netlib_dsyrk_ln_beta0` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyrk_ln_beta1` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyrk_ln` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyrk_lt_beta0` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / WITHIN_1e-12 | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16) |
+| `netlib_dsyrk_lt` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / WITHIN_1e-12 | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16) |
+| `netlib_dsyrk_un_alpha0_beta0` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_un_alpha0` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_ln_alpha0_beta0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyrk_ln_alpha0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
 | `netlib_dtrmm_lunu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lunn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lutu` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
@@ -194,15 +305,15 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dtrmm_llnn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lltu` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lltn` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_runu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / UNSOUND | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_runn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / UNSOUND | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rutu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rutn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rlnu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rlnn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rltu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_rltn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_lunn_alpha0` | dtrmm | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `netlib_dtrmm_runu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_runn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rutu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rutn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rlnu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rlnn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rltu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_rltn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_lunn_alpha0` | dtrmm | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dtrsv_unn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_unu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_utn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
@@ -211,91 +322,168 @@ Summary: NOT_RAISED: 13, PARTIAL: 50, RAISED: 205, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dtrsv_lnu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_ltn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_ltu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `ggml_swiglu_f32` | ggml_swiglu | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_daxpby` | openblas_daxpby | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_daxpby_beta0` | openblas_daxpby | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_daxpby_geam_f64` | openblas_daxpby_geam_f64 | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_daxpy` | openblas_daxpy | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_dgemm_nn_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_nn` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_nt_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_nt` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_tn_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_tn` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_tt_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_tt` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemm_nn_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_dgemm_nt_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_dgemm_tn_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_dgemm_tt_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_dgemv_n_beta0` | openblas_dgemv | RAISED | 2 | - | EXACT / RUN_FAIL |  |
-| `openblas_dgemv_n_beta1` | openblas_dgemv | RAISED | 1 | - | EXACT / RUN_FAIL |  |
-| `openblas_dgemv_n` | openblas_dgemv | RAISED | 2 | - | EXACT / RUN_FAIL |  |
-| `openblas_dgemv_t_beta0` | openblas_dgemv | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemv_t_beta1` | openblas_dgemv | RAISED | 1 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dgemv_t` | openblas_dgemv | RAISED | 2 | - | WITHIN_1e-12 / UNSOUND |  |
-| `openblas_dger` | openblas_dger | RAISED | 1 | - | EXACT / RUN_FAIL |  |
-| `openblas_dscal` | openblas_dscal | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_sgemm_nn_mn1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_dgemm_nn_mn1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_sgemm_nn_k1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / RUN_FAIL |  |
-| `openblas_dgemm_nn_k1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / RUN_FAIL |  |
-| `openblas_sgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `openblas_dgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `openblas_scopy_f32` | openblas_scopy | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_sgemm_nn_m1_b0_alpha1` | openblas_sgemm | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `ggml_swiglu_f32` | ggml_swiglu | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_daxpby` | openblas_daxpby | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_daxpby_beta0` | openblas_daxpby | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_daxpby_geam_f64` | openblas_daxpby_geam_f64 | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_daxpy` | openblas_daxpy | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nn_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_nn` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_nt_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_nt` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_tn_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_tn` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_tt_b0` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_tt` | openblas_dgemm | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemm_nn_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nt_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_tn_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_tt_b1_alpha1` | openblas_dgemm_accumulate | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemv_n_beta0` | openblas_dgemv | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_n_beta1` | openblas_dgemv | RAISED | 1 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_n` | openblas_dgemv | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_t_beta0` | openblas_dgemv | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemv_t_beta1` | openblas_dgemv | RAISED | 1 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dgemv_t` | openblas_dgemv | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `openblas_dger` | openblas_dger | RAISED | 1 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dscal` | openblas_dscal | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_sgemm_nn_mn1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nn_mn1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_sgemm_nn_k1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nn_k1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_sgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_scopy_f32` | openblas_scopy | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_sgemm_nn_m1_b0_alpha1` | openblas_sgemm | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_sgemm_batched_nn_b0_alpha1` | openblas_sgemm_batched | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_sgemm_batched_shared_a_nn_b0_alpha1` | openblas_sgemm_batched | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_sgemm_nn_b0` | openblas_sgemm_general | UNSOUND | 2 | - | UNSOUND / UNSOUND | raised defn disagrees with the C transliteration (max abs err 2.38e-07; memref-Linalg route: UNSOUND) |
 | `openblas_sgemm_nn` | openblas_sgemm_general | UNSOUND | 2 | - | UNSOUND / UNSOUND | raised defn disagrees with the C transliteration (max abs err 4.77e-07; memref-Linalg route: UNSOUND) |
-| `openblas_sgemv_n_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / RUN_FAIL |  |
-| `openblas_sgemv_t_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / UNSOUND |  |
-| `openblas_somatcopy_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `openblas_somatcopy_transpose_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / UNSOUND |  |
+| `openblas_sgemv_n_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `openblas_sgemv_t_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_somatcopy_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_somatcopy_transpose_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / EXACT |  |
 | `opencv_bilinear2x_f32` | opencv_bilinear | RAISED | 1 | - | EXACT / EXACT |  |
-| `opencv_box3x3_u8` | opencv_box_fixed | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `opencv_gaussian3x3_u8` | opencv_gaussian_fixed | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `opencv_box3x3_u8` | opencv_box_fixed | RAISED | 2 | - | EXACT / EXACT |  |
+| `opencv_gaussian3x3_u8` | opencv_gaussian_fixed | RAISED | 2 | - | EXACT / EXACT |  |
 | `opencv_histogram_u8_u32` | opencv_histogram | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `opencv_histogram_u8_s32` | opencv_histogram | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `opencv_morphology_dilate_u8` | opencv_morphology | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `opencv_morphology_dilate_s8` | opencv_morphology | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `opencv_morphology_dilate_u16` | opencv_morphology | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `opencv_morphology_dilate_s16` | opencv_morphology | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
-| `pytorch_batchnorm_saved_f32` | pytorch_batchnorm | RAISED | 1 | - | EXACT / EXACT |  |
+| `opencv_morphology_dilate_u8` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
+| `opencv_morphology_dilate_s8` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
+| `opencv_morphology_dilate_u16` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
+| `opencv_morphology_dilate_s16` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
+| `pytorch_batchnorm_saved_f32` | pytorch_batchnorm | RAISED | 1 | - | EXACT / LOWER_FAIL |  |
 | `pytorch_kron_f32` | pytorch_kron | RAISED | 1 | - | EXACT / EXACT |  |
 | `sparskit_amux` | sparskit_amux | NOT_RAISED | 0 | affine.for, scf.for | RUN_FAIL / RUN_FAIL | no linalg.generic after raising; residual affine.for, scf.for |
 | `netlib_ssyr2k_ut` | ssyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `thrust_plus_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_plus_scalar_left_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_plus_scalar_right_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_plus_scalars_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_minus_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_minus_scalar_left_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_minus_scalar_right_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_minus_scalars_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_multiplies_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_multiplies_scalar_left_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_multiplies_scalar_right_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_multiplies_scalars_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_minus_scalar_right_i32` | thrust_arithmetic | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_divide_f32` | thrust_divide | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_divide_scalar_left_f32` | thrust_divide | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_divide_scalar_right_f32` | thrust_divide | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_divide_scalars_f32` | thrust_divide | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_fill_f32` | thrust_fill | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_log1p_f32` | thrust_log1p | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_exp2_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_expm1_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_log2_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_log10_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_erfc_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_lgamma_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_hypot_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_fmod_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_fmax_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_fmin_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_nextafter_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / UNSOUND |  |
-| `thrust_polar_components_f32` | thrust_polar_components | RAISED | 2 | - | EXACT / UNSOUND |  |
+| `thrust_plus_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_plus_scalar_left_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_plus_scalar_right_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_plus_scalars_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minus_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minus_scalar_left_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minus_scalar_right_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minus_scalars_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_multiplies_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_multiplies_scalar_left_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_multiplies_scalar_right_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_multiplies_scalars_f32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minus_scalar_right_i32` | thrust_arithmetic | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_trigamma_f32` | thrust_aten_cuda_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_airy_ai_f32` | thrust_aten_special | PARTIAL | 1 | scf.if, scf.while | EXACT / EXACT | 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses) |
+| `thrust_bessel_j0_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bessel_j1_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bessel_y0_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bessel_y1_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_chebyshev_t_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.if, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.if, scf.while |
+| `thrust_calc_chebyshev_u_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.if, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.if, scf.while |
+| `thrust_calc_chebyshev_v_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.if, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.if, scf.while |
+| `thrust_calc_chebyshev_w_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.if, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.if, scf.while |
+| `thrust_calc_hermite_h_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.for, scf.if | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for, scf.if |
+| `thrust_calc_hermite_he_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.for, scf.if | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.for, scf.if |
+| `thrust_calc_laguerre_l_f32` | thrust_aten_special | PARTIAL | 1 | scf.if, scf.while | EXACT / EXACT | 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses) |
+| `thrust_calc_legendre_p_f32` | thrust_aten_special | PARTIAL | 1 | scf.if, scf.while | EXACT / EXACT | 1 linalg.generic but residual scf.if, scf.while (3 loop ops, 0 scalar memory accesses) |
+| `thrust_modified_bessel_i0_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_modified_bessel_i1_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_modified_bessel_k0_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_modified_bessel_k1_forward_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_scaled_bessel_k0_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_scaled_bessel_k1_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_ndtri_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_log_ndtr_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.if | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.if |
+| `thrust_calc_spherical_bessel_j0_f32` | thrust_aten_special | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_calc_erfcx_f32` | thrust_aten_special | PARTIAL | 1 | scf.if | EXACT / EXACT | 1 linalg.generic but residual scf.if (5 loop ops, 0 scalar memory accesses) |
+| `thrust_calc_i0e_f32` | thrust_aten_special | NOT_RAISED | 0 | affine.for, scf.if, scf.while | EXACT / EXACT | no linalg.generic after raising; residual affine.for, scf.if, scf.while |
+| `thrust_calc_zeta_f32` | thrust_aten_special | PARTIAL | 1 | scf.if, scf.while | EXACT / EXACT | 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses) |
+| `thrust_calc_polygamma_f32` | thrust_aten_special | PARTIAL | 1 | scf.if, scf.while | EXACT / EXACT | 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses) |
+| `thrust_divide_f32` | thrust_divide | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_divide_scalar_left_f32` | thrust_divide | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_divide_scalar_right_f32` | thrust_divide | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_divide_scalars_f32` | thrust_divide | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_fill_f32` | thrust_fill | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copy_f32` | thrust_float_copy | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_f32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_rows_f32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_columns_f32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_elements_f32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_pairs_f32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_rows_i32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_gather_coordinates_f32` | thrust_gather | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copysign_f32` | thrust_ieee_binary | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_remainder_f32` | thrust_ieee_binary | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_counting_divide_i32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_counting_remainder_i32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_greater_equal_scalar_i32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_equal_i32_to_f32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_equal_i32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_less_i32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_less_equal_scalar_i32` | thrust_indexed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bit_and_i32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bit_or_i32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bit_xor_i32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_bit_not_i32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_left_shift_i32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_right_shift_i32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_where_i32_f32` | thrust_integer | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_clamp_i32_to_i8` | thrust_integer_clamp | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_saturate_i32_to_i8` | thrust_integer_clamp | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_plus_u32_to_i32` | thrust_integer_coordinate_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_multiplies_scalar_right_u32_to_i32` | thrust_integer_coordinate_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_maximum_scalar_i32` | thrust_integer_coordinate_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minimum_scalar_i32` | thrust_integer_coordinate_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_negate_u32_to_i32` | thrust_integer_coordinate_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_minus_u32_to_i32` | thrust_integer_difference | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copy_window_f32` | thrust_iterator_windows | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_reverse_window_f32` | thrust_iterator_windows | NOT_RAISED | 0 | affine.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for |
+| `thrust_reverse_negate_window_f32` | thrust_iterator_windows | NOT_RAISED | 0 | affine.for | EXACT / EXACT | no linalg.generic after raising; residual affine.for |
+| `thrust_negate_window_f32` | thrust_iterator_windows | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_log1p_f32` | thrust_log1p | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_exp2_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_expm1_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_log2_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_log10_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_erfc_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_lgamma_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_hypot_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_fmod_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_fmax_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_fmin_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_nextafter_f32` | thrust_pointwise_math | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_polar_components_f32` | thrust_polar_components | RAISED | 2 | - | EXACT / EXACT |  |
+| `thrust_round_f32` | thrust_round | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_sequence_f32` | thrust_sequence | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_index_i32` | thrust_typed_copy | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_index_f32` | thrust_typed_copy | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copy_i32` | thrust_typed_copy | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copy_u32` | thrust_typed_copy | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copy_i32_f32` | thrust_typed_copy | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_multiplies_f64` | thrust_typed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_plus_scalar_right_f64` | thrust_typed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_plus_scalar_right_i32` | thrust_typed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_modulus_scalar_right_u32_to_i32` | thrust_typed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_ldexp_f32_i32` | thrust_typed_primitives | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_copy_u64` | thrust_typed_traversals | RAISED | 1 | - | EXACT / EXACT |  |
+| `thrust_replace_if_i32_f32` | thrust_typed_traversals | RAISED | 1 | - | EXACT / EXACT |  |
 
 ## Minimal reproducers for non-RAISED specs
 
@@ -747,7 +935,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyr2k_ln_beta0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_beta0`.
 
@@ -759,7 +947,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyr2k_ln_beta1` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_beta1/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_beta1`.
 
@@ -771,7 +959,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyr2k_ln` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln`.
 
@@ -807,7 +995,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyr2k_ln_alpha0_beta0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_alpha0_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_alpha0_beta0`.
 
@@ -819,7 +1007,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyr2k_ln_alpha0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_alpha0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_alpha0`.
 
@@ -831,7 +1019,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_ln_beta0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_beta0`.
 
@@ -843,7 +1031,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_ln_beta1` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_beta1/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_beta1`.
 
@@ -855,7 +1043,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_ln` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln`.
 
@@ -867,7 +1055,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_lt_beta0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_lt_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_lt_beta0`.
 
@@ -879,7 +1067,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_lt` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_lt/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_lt`.
 
@@ -891,7 +1079,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_ln_alpha0_beta0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_alpha0_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_alpha0_beta0`.
 
@@ -903,7 +1091,7 @@ build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/
 
 ### `netlib_dsyrk_ln_alpha0` -- UNVALIDATED
 
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: LOWER_FAIL)
+Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
 
 Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_alpha0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_alpha0`.
 
@@ -1271,5 +1459,225 @@ Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_s
 build/bin/cgeist generic_solver/lib_v3/raised/netlib_ssyr2k_ut.c --function=netlib_ssyr2k_ut --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_ssyr2k_ut.mlir
 build/bin/polygeist-opt '--select-func=func-name=netlib_ssyr2k_ut externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_ssyr2k_ut.mlir -o generic_solver/lib_v3/raised/netlib_ssyr2k_ut_linalg.mlir
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_ssyr2k_ut_linalg.mlir -o generic_solver/lib_v3/raised/netlib_ssyr2k_ut_debuf.mlir
+```
+
+### `thrust_calc_airy_ai_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_airy_ai_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_airy_ai_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32.frontend.cpp --function=thrust_calc_airy_ai_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_airy_ai_f32 -o generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_inlined.mlir '--select-func=func-name=thrust_calc_airy_ai_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_airy_ai_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_airy_ai_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_chebyshev_t_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.if, scf.while
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_chebyshev_t_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_chebyshev_t_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32.frontend.cpp --function=thrust_calc_chebyshev_t_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_chebyshev_t_f32 -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_inlined.mlir '--select-func=func-name=thrust_calc_chebyshev_t_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_chebyshev_t_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_t_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_chebyshev_u_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.if, scf.while
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_chebyshev_u_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_chebyshev_u_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32.frontend.cpp --function=thrust_calc_chebyshev_u_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_chebyshev_u_f32 -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_inlined.mlir '--select-func=func-name=thrust_calc_chebyshev_u_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_chebyshev_u_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_u_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_chebyshev_v_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.if, scf.while
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_chebyshev_v_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_chebyshev_v_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32.frontend.cpp --function=thrust_calc_chebyshev_v_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_chebyshev_v_f32 -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_inlined.mlir '--select-func=func-name=thrust_calc_chebyshev_v_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_chebyshev_v_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_v_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_chebyshev_w_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.if, scf.while
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_chebyshev_w_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_chebyshev_w_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32.frontend.cpp --function=thrust_calc_chebyshev_w_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_chebyshev_w_f32 -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_inlined.mlir '--select-func=func-name=thrust_calc_chebyshev_w_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_chebyshev_w_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_chebyshev_w_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_hermite_h_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.for, scf.if
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_hermite_h_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_hermite_h_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32.frontend.cpp --function=thrust_calc_hermite_h_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_hermite_h_f32 -o generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_inlined.mlir '--select-func=func-name=thrust_calc_hermite_h_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_hermite_h_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_hermite_h_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_hermite_he_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.for, scf.if
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_hermite_he_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_hermite_he_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32.frontend.cpp --function=thrust_calc_hermite_he_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_hermite_he_f32 -o generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_inlined.mlir '--select-func=func-name=thrust_calc_hermite_he_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_hermite_he_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_hermite_he_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_laguerre_l_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_laguerre_l_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_laguerre_l_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32.frontend.cpp --function=thrust_calc_laguerre_l_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_laguerre_l_f32 -o generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_inlined.mlir '--select-func=func-name=thrust_calc_laguerre_l_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_laguerre_l_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_laguerre_l_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_legendre_p_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual scf.if, scf.while (3 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_legendre_p_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_legendre_p_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32.frontend.cpp --function=thrust_calc_legendre_p_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_legendre_p_f32 -o generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_inlined.mlir '--select-func=func-name=thrust_calc_legendre_p_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_legendre_p_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_legendre_p_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_log_ndtr_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.if
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_log_ndtr_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_log_ndtr_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32.frontend.cpp --function=thrust_calc_log_ndtr_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_log_ndtr_f32 -o generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_inlined.mlir '--select-func=func-name=thrust_calc_log_ndtr_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_log_ndtr_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_log_ndtr_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_erfcx_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual scf.if (5 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_erfcx_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_erfcx_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_erfcx_f32.frontend.cpp --function=thrust_calc_erfcx_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_erfcx_f32 -o generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_inlined.mlir '--select-func=func-name=thrust_calc_erfcx_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_erfcx_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_erfcx_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_erfcx_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_erfcx_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_i0e_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for, scf.if, scf.while
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_i0e_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_i0e_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_i0e_f32.frontend.cpp --function=thrust_calc_i0e_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_i0e_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_i0e_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_i0e_f32 -o generic_solver/lib_v3/raised/thrust_calc_i0e_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_i0e_f32_inlined.mlir '--select-func=func-name=thrust_calc_i0e_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_i0e_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_i0e_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_i0e_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_i0e_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_i0e_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_i0e_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_zeta_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_zeta_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_zeta_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_zeta_f32.frontend.cpp --function=thrust_calc_zeta_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_zeta_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_zeta_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_zeta_f32 -o generic_solver/lib_v3/raised/thrust_calc_zeta_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_zeta_f32_inlined.mlir '--select-func=func-name=thrust_calc_zeta_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_zeta_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_zeta_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_zeta_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_zeta_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_zeta_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_zeta_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_calc_polygamma_f32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual scf.if, scf.while (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_calc_polygamma_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_calc_polygamma_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_calc_polygamma_f32.frontend.cpp --function=thrust_calc_polygamma_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline -x c++ -std=c++17 --no-inline=false -Igeneric_solver/lib_v3/support -Ithird_party/pytorch -Ithird_party/pytorch/aten/src --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_frontend.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_frontend.mlir --lift-cf-to-scf --canonicalize-polygeist --inline --canonicalize-polygeist --cse --convert-ub-to-llvm --select-func=func-name=thrust_calc_polygamma_f32 -o generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_inlined.mlir
+build/bin/polygeist-opt generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_inlined.mlir '--select-func=func-name=thrust_calc_polygamma_f32 externalize-dependencies=true' --lower-affine --canonicalize-scf-for=unroll-threshold=32 --canonicalize-polygeist --cse --raise-scf-to-affine -o generic_solver/lib_v3/raised/thrust_calc_polygamma_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_calc_polygamma_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_calc_polygamma_f32.mlir -o generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_calc_polygamma_f32_debuf.mlir --canonicalize-polygeist
+```
+
+### `thrust_reverse_window_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_reverse_window_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_reverse_window_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_reverse_window_f32.c --function=thrust_reverse_window_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_reverse_window_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_reverse_window_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_reverse_window_f32.mlir -o generic_solver/lib_v3/raised/thrust_reverse_window_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_reverse_window_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_reverse_window_f32_debuf.mlir
+```
+
+### `thrust_reverse_negate_window_f32` -- NOT_RAISED
+
+Reason: no linalg.generic after raising; residual affine.for
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/thrust_reverse_negate_window_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only thrust_reverse_negate_window_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/thrust_reverse_negate_window_f32.c --function=thrust_reverse_negate_window_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/thrust_reverse_negate_window_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=thrust_reverse_negate_window_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/thrust_reverse_negate_window_f32.mlir -o generic_solver/lib_v3/raised/thrust_reverse_negate_window_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/thrust_reverse_negate_window_f32_linalg.mlir -o generic_solver/lib_v3/raised/thrust_reverse_negate_window_f32_debuf.mlir
 ```
 

@@ -141,7 +141,7 @@ def pass_pipeline(flags):
 
 
 def raise_c(recipe: Recipe, src: str, fn: str, out_prefix: str, cflags: list[str],
-            timeout: int = 300) -> dict:
+            timeout: int = 300, frontend_support: str | None = None) -> dict:
     """Run cgeist -> raise -> debufferize.  Returns a dict of StepResults and
     output paths: <out_prefix>.mlir, <out_prefix>_linalg.mlir,
     <out_prefix>_debuf.mlir (README layout)."""
@@ -159,11 +159,54 @@ def raise_c(recipe: Recipe, src: str, fn: str, out_prefix: str, cflags: list[str
     res["cgeist"] = r
     if not r.ok:
         return res
+    if frontend_support:
+        import frontend_support as F
+        prepared = F.prepare(src, out_prefix, frontend_support, Path(affine).read_text())
+        if prepared:
+            wrapper, extra, record = prepared
+            res['frontend_support'] = record
+            expanded = f'{out_prefix}_frontend.mlir'
+            res['paths']['frontend'] = expanded
+            r = run(recipe.cgeist_cmd(str(wrapper), fn, expanded, [*flags, *extra]), timeout)
+            frontend_result = r
+            if r.ok:
+                inlined = f'{out_prefix}_inlined.mlir'
+                # Upstream inlining cannot insert a multi-block switch body
+                # into a structured loop. Structure CFGs first, then retry;
+                # ordinary canonicalization removes unreachable recursion.
+                r = run([POLYGEIST_OPT, expanded, '--lift-cf-to-scf',
+                         '--canonicalize-polygeist', '--inline',
+                         '--canonicalize-polygeist', '--cse', '--convert-ub-to-llvm',
+                         f'--select-func=func-name={fn}', '-o', inlined], timeout)
+                res['inline_dependencies'] = r
+                res['paths']['inlined'] = inlined
+                if r.ok:
+                    expanded = inlined
+            if r.ok:
+                remaining = F.residual(Path(expanded).read_text(), record)
+                if remaining:
+                    r = StepResult(False, 1, r.cmd, 'required helper bodies were not inlined: ' + ', '.join(remaining))
+            res['cgeist'] = frontend_result if r.ok else r
+            if not r.ok:
+                return res
+            passes = [f'--select-func=func-name={fn} externalize-dependencies=true']
+            if record['unroll_threshold']:
+                passes += ['--lower-affine', '--canonicalize-scf-for=unroll-threshold=' + str(record['unroll_threshold'])]
+            passes += ['--canonicalize-polygeist', '--cse', '--raise-scf-to-affine']
+            r = run([POLYGEIST_OPT, expanded, *passes, '-o', affine], timeout)
+            res['inline_normalize'] = r
+            if not r.ok:
+                return res
     r = run_with_legal_input(recipe.raise_cmd(affine, fn, linalg), affine, linalg, timeout)
     res["raise"] = r
     if not r.ok:
         return res
-    r = run_with_legal_input(recipe.debuf_cmd(linalg, debuf), linalg, debuf, timeout)
+    debuf_cmd = recipe.debuf_cmd(linalg, debuf)
+    if 'frontend_support' in res:
+        # Raising early-return control flow creates nested selects. Resolve
+        # repeated predicates after that transformation, on both import sides.
+        debuf_cmd += ['--canonicalize-polygeist']
+    r = run_with_legal_input(debuf_cmd, linalg, debuf, timeout)
     res["debuf"] = r
     if r.ok and recipe is CAMPAIGN:
         t = Path(debuf).read_text()

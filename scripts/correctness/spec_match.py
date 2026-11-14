@@ -63,8 +63,8 @@ def registry():
     return rows
 
 
-def capabilities(rows, backend, disabled=(), only=None):
-    calls, bound, errors = ABI.build_table()
+def capabilities(rows, backend, disabled=(), only=None, *, table=None):
+    calls, bound, errors = ABI.build_table() if table is None else table
     policy = BACKEND.budgets()
     allowed = set()
     rejected = {}
@@ -113,14 +113,15 @@ def semantic_inputs():
         'polygeist_v2_matrix_layout.inc', 'polygeist_v2_memref_copy.inc',
         'polygeist_pointwise_partition.h', 'polygeist_pointwise_rounding.inc',
         'polygeist_pointwise_division.inc', 'polygeist_tensor_pointwise_rt.inc',
-        'polygeist_thrust_rt.cu')]
+        'polygeist_thrust_rt.cu', 'polygeist_aten_special_rt.cu',
+        'polygeist_aten_scalar_bindings.inc', 'polygeist_aten_scalar_support.cpp')]
     return PROVENANCE.record([path for path in paths if path.is_file()])
 
 
-def abi_digest():
+def abi_digest(table=None):
     # This includes the resolved vendor header types and Fortran prototypes,
     # even when their source headers live outside the repository.
-    return digest(json.dumps(ABI.table_json(*ABI.build_table()), sort_keys=True))
+    return digest(json.dumps(ABI.table_json(*(ABI.build_table() if table is None else table)), sort_keys=True))
 
 
 def semantic_configuration():
@@ -129,8 +130,8 @@ def semantic_configuration():
                 spec_suite=MATCH.SUITE, backend_error_budgets=BACKEND.budgets())
 
 
-def backend_evidence(names, rows):
-    calls, bound, _ = ABI.build_table()
+def backend_evidence(names, rows, *, table=None):
+    calls, bound, _ = ABI.build_table() if table is None else table
     result = {}
     policy = BACKEND.budgets()
     for name in sorted(set(names)):
@@ -233,7 +234,8 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
     if max_launches is not None and max_launches != 0:
         raise SpecificationError('partial launch limits are unsupported; filter specifications instead')
     rows = registry()
-    allowed, rejected = capabilities(rows, backend, disabled, only)
+    abi_table = ABI.build_table()
+    allowed, rejected = capabilities(rows, backend, disabled, only, table=abi_table)
     if max_launches == 0:
         allowed = set()
     started = time.monotonic()
@@ -342,14 +344,14 @@ def match(text, *, backend='cuda', disabled=(), only=None, max_launches=None,
     proof = dict(
         schema=2, pipeline='imported-specifications-only', backend=backend,
         semantic_inputs=semantic_inputs(), configuration=semantic_configuration(),
-        abi_sha256=abi_digest(),
+        abi_sha256=abi_digest(abi_table),
         input_sha256=digest(text), output_sha256=digest(output),
         library=str(MATCH.DEFAULT_LIB.relative_to(ROOT)),
         library_sha256=digest(MATCH.DEFAULT_LIB.read_text()),
         matcher_sha256=digest(Path(MATCH.__file__).read_text()),
         elapsed_ms=round((time.monotonic() - started) * 1000, 3),
         emitted=emitted, matches=evidence, rejected_specifications=rejected,
-        backend_contracts=backend_evidence(emitted, rows),
+        backend_contracts=backend_evidence(emitted, rows, table=abi_table),
         diagnostics=diagnostics,
         validation_stage='recognition-and-ABI-binding; vendor execution not yet checked')
     if normalization:
@@ -393,7 +395,8 @@ def verify(text, proof, *, backend=None):
         raise SpecificationError('stored evidence uses a different numerical model or ablation')
     if proof.get('semantic_inputs') != semantic_inputs():
         raise SpecificationError('stored evidence uses different matcher or import inputs')
-    if proof.get('abi_sha256') != abi_digest():
+    abi_table = ABI.build_table()
+    if proof.get('abi_sha256') != abi_digest(abi_table):
         raise SpecificationError('stored evidence uses different vendor ABI declarations')
     if proof.get('library_sha256') != digest(MATCH.DEFAULT_LIB.read_text()):
         raise SpecificationError('stored match evidence uses a different specification library')
@@ -412,10 +415,10 @@ def verify(text, proof, *, backend=None):
                     raise SpecificationError('stored reference inputs have changed')
     emitted = re.findall(r'\bkernel\.launch\s+@([\w.$-]+)', text)
     rows = registry()
-    allowed, _ = capabilities(rows, proof['backend'])
+    allowed, _ = capabilities(rows, proof['backend'], table=abi_table)
     if set(emitted) - allowed:
         raise SpecificationError('stored launch no longer has a valid reference import and ABI')
-    if proof.get('backend_contracts', {}) != backend_evidence(emitted, rows):
+    if proof.get('backend_contracts', {}) != backend_evidence(emitted, rows, table=abi_table):
         raise SpecificationError('stored backend configuration or numerical contract has changed')
     proved = {name for item in proof.get('matches', []) for name in item['specifications']}
     if emitted != proof.get('emitted') or set(emitted) - proved:

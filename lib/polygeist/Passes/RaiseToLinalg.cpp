@@ -18,6 +18,7 @@
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Operation.h"
+#include "mlir/Interfaces/SideEffectInterfaces.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -3012,19 +3013,20 @@ struct ScalarIfToSelectInLinalg : public OpRewritePattern<scf::IfOp> {
   LogicalResult matchAndRewrite(scf::IfOp ifOp,
                                 PatternRewriter &rewriter) const final {
     auto generic = ifOp->getParentOfType<linalg::GenericOp>();
-    if (!generic || ifOp.getNumResults() != 1 || !ifOp.elseBlock())
+    if (!generic || ifOp.getNumResults() == 0 || !ifOp.elseBlock())
       return failure();
-    Block *parent = ifOp->getBlock();
 
     auto findDominatingLoad = [&](memref::LoadOp nested) -> memref::LoadOp {
-      for (Operation &candidate : *parent) {
-        if (&candidate == ifOp.getOperation()) break;
+      // The closest identical read is reusable only if no intervening
+      // operation could have changed memory. Other reads are harmless.
+      for (Operation *candidate = ifOp->getPrevNode(); candidate;
+           candidate = candidate->getPrevNode()) {
         auto load = dyn_cast<memref::LoadOp>(candidate);
-        if (!load || load.getMemRef() != nested.getMemRef() ||
-            load.getIndices().size() != nested.getIndices().size())
-          continue;
-        if (llvm::equal(load.getIndices(), nested.getIndices()))
+        if (load && load.getMemRef() == nested.getMemRef() &&
+            llvm::equal(load.getIndices(), nested.getIndices()))
           return load;
+        if (!load && !isMemoryEffectFree(candidate))
+          return {};
       }
       return {};
     };
@@ -3035,7 +3037,8 @@ struct ScalarIfToSelectInLinalg : public OpRewritePattern<scf::IfOp> {
           if (!findDominatingLoad(load)) return false;
           continue;
         }
-        if (!isMemoryEffectFree(&op) || op.getNumRegions() != 0)
+        if (!isMemoryEffectFree(&op) || !isSpeculatable(&op) ||
+            op.getNumRegions() != 0)
           return false;
       }
       return true;
@@ -3043,7 +3046,7 @@ struct ScalarIfToSelectInLinalg : public OpRewritePattern<scf::IfOp> {
     if (!branchIsSafe(ifOp.thenBlock()) || !branchIsSafe(ifOp.elseBlock()))
       return failure();
 
-    auto cloneBranch = [&](Block *block) -> Value {
+    auto cloneBranch = [&](Block *block) -> SmallVector<Value> {
       IRMapping mapping;
       for (Operation &op : block->without_terminator()) {
         if (auto load = dyn_cast<memref::LoadOp>(op)) {
@@ -3053,14 +3056,20 @@ struct ScalarIfToSelectInLinalg : public OpRewritePattern<scf::IfOp> {
         rewriter.clone(op, mapping);
       }
       auto yield = cast<scf::YieldOp>(block->getTerminator());
-      return mapping.lookupOrDefault(yield.getResults().front());
+      SmallVector<Value> values;
+      for (Value value : yield.getResults())
+        values.push_back(mapping.lookupOrDefault(value));
+      return values;
     };
 
     rewriter.setInsertionPoint(ifOp);
-    Value trueValue = cloneBranch(ifOp.thenBlock());
-    Value falseValue = cloneBranch(ifOp.elseBlock());
-    rewriter.replaceOpWithNewOp<arith::SelectOp>(
-        ifOp, ifOp.getCondition(), trueValue, falseValue);
+    SmallVector<Value> trueValues = cloneBranch(ifOp.thenBlock());
+    SmallVector<Value> falseValues = cloneBranch(ifOp.elseBlock());
+    SmallVector<Value> selected;
+    for (auto [trueValue, falseValue] : llvm::zip(trueValues, falseValues))
+      selected.push_back(rewriter.create<arith::SelectOp>(
+          ifOp.getLoc(), ifOp.getCondition(), trueValue, falseValue));
+    rewriter.replaceOp(ifOp, selected);
     return success();
   }
 };
@@ -3080,6 +3089,10 @@ struct PromotePayloadLoadsToLinalgInputs
       loads.push_back(load);
     if (loads.empty()) return failure();
 
+    SmallVector<Value> loopSizes;
+    rewriter.setInsertionPoint(generic);
+    if (failed(collectNestedGenericLoopSizes(generic, rewriter, loopSizes)))
+      return failure();
     SmallVector<AffineMap> loadMaps;
     SmallVector<Value> loadMemrefs;
     for (memref::LoadOp load : loads) {
@@ -3092,7 +3105,19 @@ struct PromotePayloadLoadsToLinalgInputs
       }
       loadMaps.push_back(AffineMap::get(generic.getNumLoops(), 0, results,
                                         rewriter.getContext()));
-      loadMemrefs.push_back(load.getMemRef());
+      // A promoted input must describe the existing iteration domain. The
+      // backing allocation can be larger (e.g. a prefix of a vector); using
+      // its full shape would silently enlarge the Linalg iteration space.
+      SmallVector<Value> sizes;
+      for (AffineExpr expr : results)
+        sizes.push_back(loopSizes[expr.cast<AffineDimExpr>().getPosition()]);
+      auto type = MemRefType::get(
+          SmallVector<int64_t>(sizes.size(), ShapedType::kDynamic),
+          load.getMemRefType().getElementType());
+      auto view = rewriter.create<polygeist::SubmapOp>(
+          generic.getLoc(), type, load.getMemRef(), sizes,
+          rewriter.getMultiDimIdentityMap(sizes.size()));
+      loadMemrefs.push_back(view);
     }
 
     SmallVector<Value> inputs(generic.getDpsInputs());

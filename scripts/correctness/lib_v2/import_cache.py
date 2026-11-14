@@ -62,7 +62,8 @@ class ValidatedImports:
         here = Path(__file__).resolve().parent
         paths = [here / name for name in (
             'import_cache.py', 'build_lib_v2.py', 'spec_provenance.py', 'recipe.py',
-            'validate_specs.py', 'reference_execution.py', 'mlir_lite.py', 'legalize_tensor_submaps.py')]
+            'validate_specs.py', 'reference_execution.py', 'reference_support.py', 'frontend_support.py',
+            'mlir_lite.py', 'legalize_tensor_submaps.py')]
         tools = [B.R.CGEIST, B.R.POLYGEIST_OPT, E.CLANG, E.MLIR_OPT,
                  E.MLIR_TRANSLATE, sys.executable,
                  E.MLIR_LIBDIR / 'libmlir_c_runner_utils.so']
@@ -92,6 +93,10 @@ class ValidatedImports:
     def inputs(self, spec):
         manifest = json.loads(spec.fragment.read_text())
         sources = [spec.fragment, spec.ref_c]
+        if spec.raw.get('frontend_support'):
+            from frontend_support import load
+            config = P.input_path(spec.raw['frontend_support'])
+            sources += [config, *[P.input_path(p) for p in load(config)['inputs']]]
         upstreams = list(manifest.get('upstream_files', []))
         if manifest.get('upstream'):
             upstreams.append(manifest['upstream'])

@@ -1,0 +1,203 @@
+module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<!llvm.ptr, dense<64> : vector<4xi32>>, #dlti.dl_entry<f80, dense<128> : vector<2xi32>>, #dlti.dl_entry<i64, dense<64> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<271>, dense<32> : vector<4xi32>>, #dlti.dl_entry<!llvm.ptr<272>, dense<64> : vector<4xi32>>, #dlti.dl_entry<f64, dense<64> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<270>, dense<32> : vector<4xi32>>, #dlti.dl_entry<f128, dense<128> : vector<2xi32>>, #dlti.dl_entry<f16, dense<16> : vector<2xi32>>, #dlti.dl_entry<i32, dense<32> : vector<2xi32>>, #dlti.dl_entry<i16, dense<16> : vector<2xi32>>, #dlti.dl_entry<i8, dense<8> : vector<2xi32>>, #dlti.dl_entry<i1, dense<8> : vector<2xi32>>, #dlti.dl_entry<"dlti.stack_alignment", 128 : i32>, #dlti.dl_entry<"dlti.endianness", "little">>, llvm.data_layout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128", llvm.target_triple = "x86_64-unknown-linux-gnu", "polygeist.target-cpu" = "x86-64", "polygeist.target-features" = "+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87", "polygeist.tune-cpu" = "generic"} {
+  memref.global constant @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2RQ" : memref<8xf32> = dense<[499.563141, 173785.406, 0x4C38C9A1, 1.11855534E+10, 2.11277526E+12, 3.10518217E+14, 3.18121957E+16, 1.71086291E+18]>
+  memref.global constant @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2RP" : memref<4xf32> = dense<[-4.794432E+9, 1.95617489E+12, -2.49248344E+14, 9.70862217E+15]>
+  memref.global constant @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2QQ" : memref<7xf32> = dense<[64.3178253, 856.430054, 3882.40186, 7240.46777, 5930.72705, 2062.09326, 242.005737]>
+  memref.global constant @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2QP" : memref<8xf32> = dense<[-0.0113663841, -1.28252721, -19.5539551, -93.2060165, -177.681168, -147.077499, -51.4105339, -6.05014372]>
+  memref.global constant @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2PQ" : memref<7xf32> = dense<[9.24408785E-4, 0.0856288447, 1.2535274, 5.47097731, 8.76190853, 5.30605268, 1.000000e+00]>
+  memref.global constant @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2PP" : memref<7xf32> = dense<[7.96936743E-4, 0.0828352422, 1.23953366, 5.447250e+00, 8.74716472, 5.3032403, 1.000000e+00]>
+  func.func @thrust_bessel_j0_forward_f32(%arg0: i32, %arg1: memref<?xf32>, %arg2: memref<?xf32>) attributes {llvm.linkage = #llvm.linkage<external>} {
+    %c6 = arith.constant 6 : index
+    %c5 = arith.constant 5 : index
+    %c3 = arith.constant 3 : index
+    %c2 = arith.constant 2 : index
+    %c7 = arith.constant 7 : index
+    %c4 = arith.constant 4 : index
+    %c1 = arith.constant 1 : index
+    %c0 = arith.constant 0 : index
+    %cst = arith.constant 0.000000e+00 : f32
+    %cst_0 = arith.constant 5.000000e+00 : f32
+    %cst_1 = arith.constant 9.99999974E-6 : f32
+    %cst_2 = arith.constant 1.000000e+00 : f32
+    %cst_3 = arith.constant 4.000000e+00 : f32
+    %cst_4 = arith.constant 5.78318596 : f32
+    %cst_5 = arith.constant 30.471262 : f32
+    %cst_6 = arith.constant 2.500000e+01 : f32
+    %cst_7 = arith.constant 0.785398185 : f32
+    %cst_8 = arith.constant 0.797884583 : f32
+    %0 = arith.index_cast %arg0 : i32 to index
+    %1 = memref.get_global @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2RQ" : memref<8xf32>
+    %2 = memref.get_global @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2RP" : memref<4xf32>
+    %3 = memref.get_global @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2QQ" : memref<7xf32>
+    %4 = memref.get_global @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2QP" : memref<8xf32>
+    %5 = memref.get_global @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2PQ" : memref<7xf32>
+    %6 = memref.get_global @"_Z17bessel_j0_forwardIfET_S0_@static@_ZZ17bessel_j0_forwardIfET_S0_E2PP" : memref<7xf32>
+    affine.for %arg3 = 0 to %0 {
+      %7 = memref.load %arg1[%arg3] : memref<?xf32>
+      %8 = arith.cmpf olt, %7, %cst : f32
+      %9 = scf.if %8 -> (f32) {
+        %12 = arith.negf %7 : f32
+        scf.yield %12 : f32
+      } else {
+        scf.yield %7 : f32
+      }
+      %10 = arith.cmpf ole, %9, %cst_0 : f32
+      %11 = scf.if %10 -> (f32) {
+        %12 = arith.cmpf olt, %9, %cst_1 : f32
+        %13 = scf.if %12 -> (f32) {
+          %14 = arith.mulf %9, %9 : f32
+          %15 = arith.divf %14, %cst_3 : f32
+          %16 = arith.subf %cst_2, %15 : f32
+          scf.yield %16 : f32
+        } else {
+          %14 = arith.mulf %9, %9 : f32
+          %15 = arith.mulf %14, %cst : f32
+          %16 = memref.load %2[%c0] : memref<4xf32>
+          %17 = arith.addf %15, %16 : f32
+          %18 = arith.mulf %17, %14 : f32
+          %19 = memref.load %2[%c1] : memref<4xf32>
+          %20 = arith.addf %18, %19 : f32
+          %21 = arith.mulf %20, %14 : f32
+          %22 = memref.load %2[%c2] : memref<4xf32>
+          %23 = arith.addf %21, %22 : f32
+          %24 = arith.mulf %23, %14 : f32
+          %25 = memref.load %2[%c3] : memref<4xf32>
+          %26 = arith.addf %24, %25 : f32
+          %27 = memref.load %1[%c0] : memref<8xf32>
+          %28 = arith.addf %15, %27 : f32
+          %29 = arith.mulf %28, %14 : f32
+          %30 = memref.load %1[%c1] : memref<8xf32>
+          %31 = arith.addf %29, %30 : f32
+          %32 = arith.mulf %31, %14 : f32
+          %33 = memref.load %1[%c2] : memref<8xf32>
+          %34 = arith.addf %32, %33 : f32
+          %35 = arith.mulf %34, %14 : f32
+          %36 = memref.load %1[%c3] : memref<8xf32>
+          %37 = arith.addf %35, %36 : f32
+          %38 = arith.mulf %37, %14 : f32
+          %39 = memref.load %1[%c4] : memref<8xf32>
+          %40 = arith.addf %38, %39 : f32
+          %41 = arith.mulf %40, %14 : f32
+          %42 = memref.load %1[%c5] : memref<8xf32>
+          %43 = arith.addf %41, %42 : f32
+          %44 = arith.mulf %43, %14 : f32
+          %45 = memref.load %1[%c6] : memref<8xf32>
+          %46 = arith.addf %44, %45 : f32
+          %47 = arith.mulf %46, %14 : f32
+          %48 = memref.load %1[%c7] : memref<8xf32>
+          %49 = arith.addf %47, %48 : f32
+          %50 = arith.subf %14, %cst_4 : f32
+          %51 = arith.subf %14, %cst_5 : f32
+          %52 = arith.mulf %50, %51 : f32
+          %53 = arith.mulf %52, %26 : f32
+          %54 = arith.divf %53, %49 : f32
+          scf.yield %54 : f32
+        }
+        scf.yield %13 : f32
+      } else {
+        %12 = arith.mulf %9, %9 : f32
+        %13 = arith.divf %cst_6, %12 : f32
+        %14 = arith.mulf %13, %cst : f32
+        %15 = memref.load %6[%c0] : memref<7xf32>
+        %16 = arith.addf %14, %15 : f32
+        %17 = arith.mulf %16, %13 : f32
+        %18 = memref.load %6[%c1] : memref<7xf32>
+        %19 = arith.addf %17, %18 : f32
+        %20 = arith.mulf %19, %13 : f32
+        %21 = memref.load %6[%c2] : memref<7xf32>
+        %22 = arith.addf %20, %21 : f32
+        %23 = arith.mulf %22, %13 : f32
+        %24 = memref.load %6[%c3] : memref<7xf32>
+        %25 = arith.addf %23, %24 : f32
+        %26 = arith.mulf %25, %13 : f32
+        %27 = memref.load %6[%c4] : memref<7xf32>
+        %28 = arith.addf %26, %27 : f32
+        %29 = arith.mulf %28, %13 : f32
+        %30 = memref.load %6[%c5] : memref<7xf32>
+        %31 = arith.addf %29, %30 : f32
+        %32 = arith.mulf %31, %13 : f32
+        %33 = memref.load %6[%c6] : memref<7xf32>
+        %34 = arith.addf %32, %33 : f32
+        %35 = memref.load %5[%c0] : memref<7xf32>
+        %36 = arith.addf %14, %35 : f32
+        %37 = arith.mulf %36, %13 : f32
+        %38 = memref.load %5[%c1] : memref<7xf32>
+        %39 = arith.addf %37, %38 : f32
+        %40 = arith.mulf %39, %13 : f32
+        %41 = memref.load %5[%c2] : memref<7xf32>
+        %42 = arith.addf %40, %41 : f32
+        %43 = arith.mulf %42, %13 : f32
+        %44 = memref.load %5[%c3] : memref<7xf32>
+        %45 = arith.addf %43, %44 : f32
+        %46 = arith.mulf %45, %13 : f32
+        %47 = memref.load %5[%c4] : memref<7xf32>
+        %48 = arith.addf %46, %47 : f32
+        %49 = arith.mulf %48, %13 : f32
+        %50 = memref.load %5[%c5] : memref<7xf32>
+        %51 = arith.addf %49, %50 : f32
+        %52 = arith.mulf %51, %13 : f32
+        %53 = memref.load %5[%c6] : memref<7xf32>
+        %54 = arith.addf %52, %53 : f32
+        %55 = memref.load %4[%c0] : memref<8xf32>
+        %56 = arith.addf %14, %55 : f32
+        %57 = arith.mulf %56, %13 : f32
+        %58 = memref.load %4[%c1] : memref<8xf32>
+        %59 = arith.addf %57, %58 : f32
+        %60 = arith.mulf %59, %13 : f32
+        %61 = memref.load %4[%c2] : memref<8xf32>
+        %62 = arith.addf %60, %61 : f32
+        %63 = arith.mulf %62, %13 : f32
+        %64 = memref.load %4[%c3] : memref<8xf32>
+        %65 = arith.addf %63, %64 : f32
+        %66 = arith.mulf %65, %13 : f32
+        %67 = memref.load %4[%c4] : memref<8xf32>
+        %68 = arith.addf %66, %67 : f32
+        %69 = arith.mulf %68, %13 : f32
+        %70 = memref.load %4[%c5] : memref<8xf32>
+        %71 = arith.addf %69, %70 : f32
+        %72 = arith.mulf %71, %13 : f32
+        %73 = memref.load %4[%c6] : memref<8xf32>
+        %74 = arith.addf %72, %73 : f32
+        %75 = arith.mulf %74, %13 : f32
+        %76 = memref.load %4[%c7] : memref<8xf32>
+        %77 = arith.addf %75, %76 : f32
+        %78 = memref.load %3[%c0] : memref<7xf32>
+        %79 = arith.addf %14, %78 : f32
+        %80 = arith.mulf %79, %13 : f32
+        %81 = memref.load %3[%c1] : memref<7xf32>
+        %82 = arith.addf %80, %81 : f32
+        %83 = arith.mulf %82, %13 : f32
+        %84 = memref.load %3[%c2] : memref<7xf32>
+        %85 = arith.addf %83, %84 : f32
+        %86 = arith.mulf %85, %13 : f32
+        %87 = memref.load %3[%c3] : memref<7xf32>
+        %88 = arith.addf %86, %87 : f32
+        %89 = arith.mulf %88, %13 : f32
+        %90 = memref.load %3[%c4] : memref<7xf32>
+        %91 = arith.addf %89, %90 : f32
+        %92 = arith.mulf %91, %13 : f32
+        %93 = memref.load %3[%c5] : memref<7xf32>
+        %94 = arith.addf %92, %93 : f32
+        %95 = arith.mulf %94, %13 : f32
+        %96 = memref.load %3[%c6] : memref<7xf32>
+        %97 = arith.addf %95, %96 : f32
+        %98 = arith.divf %34, %54 : f32
+        %99 = arith.subf %9, %cst_7 : f32
+        %100 = math.cos %99 : f32
+        %101 = arith.mulf %98, %100 : f32
+        %102 = arith.divf %cst_0, %9 : f32
+        %103 = arith.divf %77, %97 : f32
+        %104 = arith.mulf %102, %103 : f32
+        %105 = math.sin %99 : f32
+        %106 = arith.mulf %104, %105 : f32
+        %107 = arith.subf %101, %106 : f32
+        %108 = arith.mulf %107, %cst_8 : f32
+        %109 = math.sqrt %9 : f32
+        %110 = arith.divf %108, %109 : f32
+        scf.yield %110 : f32
+      }
+      memref.store %11, %arg2[%arg3] : memref<?xf32>
+    }
+    return
+  }
+}
+

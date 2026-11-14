@@ -1,0 +1,82 @@
+{
+  "routine": "thrust_sequence",
+  "source": "Public Thrust sequence and compute_sequence_value<float>",
+  "adaptation": "Specialize iterator traversal and scalar functor to a contiguous float array with an int32-bounded length; preserve operation order.",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/sequence.h",
+      "sha256": "182cecb0386e6d5b7fcd1894de0a39296b3bd3aca108cd17e675b1a4c6fe8b86"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/sequence.inl",
+      "sha256": "54a2986955c10f340a8bf38e761bc924c10794fee69302c2eed641a9a7cbbb1a"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/sequence.h",
+      "sha256": "6031d913cd0f198d28292f279ab3aa456ebcb3361c8f7443f66bb35d14d795f0"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/tabulate.h",
+      "sha256": "b3128613267cda197a43b9c634fc4684e930c8c8282b87f98692a20fd95c49a3"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/cuda/detail/sequence.h",
+      "sha256": "5a5af136bf74dabf8acd735d8666dbb368be3872b33d14ee8b17a4813962a412"
+    }
+  ],
+  "specs": [
+    {
+      "name": "thrust_sequence_f32",
+      "args": [
+        "n",
+        "init",
+        "step",
+        "output"
+      ],
+      "ref_c": "thrust_sequence.c",
+      "defines": {},
+      "target": {
+        "library": "Thrust",
+        "call": "sequence",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_sequence_f32",
+          "arguments": [
+            "n",
+            "init",
+            "step",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous output",
+        "Separate FP32 multiplication and addition; compile CUDA with --fmad=false"
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "init": -1.25,
+          "step": 0.375
+        }
+      }
+    }
+  ]
+}

@@ -502,6 +502,19 @@ MLIRScanner::EmitClangBuiltinCallExpr(clang::CallExpr *expr) {
   auto failure = [&]() { return make_pair(ValueCategory(), false); };
   auto loc = getMLIRLocation(expr->getExprLoc());
 
+  // Follow Clang's EmitBuiltinExpr constant folding. This keeps floating
+  // constants such as infinity and NaN in IR instead of emitting unresolved
+  // calls to compiler-only builtins. Never discard argument side effects.
+  clang::Expr::EvalResult evaluated;
+  if (expr->getBuiltinCallee() && expr->isPRValue() &&
+      expr->EvaluateAsRValue(evaluated, Glob.CGM.getContext()) &&
+      !evaluated.hasSideEffects() && !evaluated.HasUndefinedBehavior &&
+      evaluated.Val.isFloat()) {
+    auto type = getMLIRType(expr->getType()).cast<mlir::FloatType>();
+    return success(ValueCategory(builder.create<arith::ConstantFloatOp>(
+        loc, evaluated.Val.getFloat(), type), false));
+  }
+
   switch (expr->getBuiltinCallee()) {
   case clang::Builtin::BImove:
   case clang::Builtin::BImove_if_noexcept:

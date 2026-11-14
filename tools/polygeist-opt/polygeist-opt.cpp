@@ -35,6 +35,7 @@
 #include "mlir/Dialect/MemRef/Transforms/AllocationOpInterfaceImpl.h"
 #include "mlir/Dialect/OpenMP/OpenMPDialect.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
+#include "mlir/Dialect/UB/IR/UBOps.h"
 #include "mlir/Dialect/SCF/Transforms/BufferizableOpInterfaceImpl.h"
 #include "mlir/Dialect/Tensor/IR/Tensor.h"
 #include "mlir/Dialect/Tensor/Transforms/BufferizableOpInterfaceImpl.h"
@@ -70,6 +71,7 @@ int main(int argc, char **argv) {
   registry.insert<mlir::func::FuncDialect>();
   registry.insert<mlir::arith::ArithDialect>();
   registry.insert<mlir::scf::SCFDialect>();
+  registry.insert<mlir::ub::UBDialect>();
   registry.insert<mlir::gpu::GPUDialect>();
   registry.insert<mlir::NVVM::NVVMDialect>();
   registry.insert<mlir::omp::OpenMPDialect>();
@@ -110,6 +112,8 @@ int main(int argc, char **argv) {
   mlir::registerSCFToControlFlowPass();
   mlir::registerSCCPPass();
   mlir::registerInlinerPass();
+  mlir::registerLiftControlFlowToSCFPass();
+  mlir::registerUBToLLVMConversionPass();
   mlir::registerCanonicalizerPass();
   mlir::registerSymbolDCEPass();
   mlir::registerLoopInvariantCodeMotionPass();

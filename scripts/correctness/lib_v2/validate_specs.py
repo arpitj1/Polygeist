@@ -36,6 +36,7 @@ sys.path.insert(0, str(HERE.parent))
 import recipe as R  # noqa: E402
 import reference_execution as E  # noqa: E402
 import mlir_lite as ML  # noqa: E402
+import reference_support
 
 REPO = R.REPO
 LIB = REPO / "generic_solver" / os.environ.get("POLYGEIST_SPEC_SUITE", "lib_v3")
@@ -287,7 +288,12 @@ def validate(spec_name: str, manifest_spec: dict, ref_c: Path, meta_lds: set[str
     refw.write_text(f"#define NETLIB_SPEC {spec_name}_ref\n{defs}#include \"{ref_c}\"\n")
     (d / "harness.c").write_text(harness(spec_name, params, ret))
     exe = d / "check"
+    try:
+        support = reference_support.objects(manifest_spec, WORK, E.CLANG)
+    except (ValueError, OSError) as error:
+        return {**res, "verdict": "BUILD_FAIL", "why": str(error)}
     if E.sh([E.CLANG, "-O0", "-ffp-contract=off", d / "harness.c", refw, ll, "-lm",
+             *support, *(['-lstdc++'] if support else []),
              f"-L{E.MLIR_LIBDIR}", f"-Wl,-rpath,{E.MLIR_LIBDIR}", "-lmlir_c_runner_utils",
              "-o", exe], log):
         return {**res, "verdict": "BUILD_FAIL"}
@@ -300,7 +306,9 @@ def validate(spec_name: str, manifest_spec: dict, ref_c: Path, meta_lds: set[str
     if not mm:
         return {**res, "verdict": "RUN_FAIL", "why": (p.stderr or out)[-300:]}
     maxabs, maxrel, bad = float(mm.group(1)), float(mm.group(2)), int(mm.group(3))
-    verdict = "EXACT" if maxabs == 0 else ("WITHIN_1e-12" if bad == 0 else "UNSOUND")
+    # Nonfinite mismatches increment bad without increasing maxabs. They must
+    # not qualify as exact merely because no finite difference was observed.
+    verdict = "UNSOUND" if bad else ("EXACT" if maxabs == 0 else "WITHIN_1e-12")
     return {**res, "verdict": verdict, "maxabs": maxabs, "maxrel": maxrel, "mismatches": bad}
 
 

@@ -21,7 +21,7 @@ class SignedZeroABI(unittest.TestCase):
    self.assertEqual(list(m.match_cap('%scale',('Lit',second),op,env)),[])
  def test_fixed_reference_constant_retains_sign(self):
   m=self.matcher();m.spec.params={};op=SimpleNamespace(idx=0)
-  m.sdef=lambda _: (SimpleNamespace(name='arith.constant',text='%c = arith.constant -0.000000e+00 : f32'),0)
+  m.sdef=lambda _: (SimpleNamespace(name='arith.constant',text='%c = arith.constant -0.000000e+00 : f32',result_types=['f32']),0)
   self.assertEqual(list(m.match_cap('%c',('Lit',0.0),op,M.Env())),[])
   self.assertEqual(len(list(m.match_cap('%c',('Lit',-0.0),op,M.Env()))),1)
 if __name__=='__main__':unittest.main()

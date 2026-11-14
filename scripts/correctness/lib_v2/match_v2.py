@@ -135,7 +135,8 @@ class Library:
         for order, f in enumerate(self.mod.funcs):
             gens = sorted((op for op in f.ops if op.name == "linalg.generic"),
                           key=lambda o: o.start)
-            gb_list = KM.parse_generics(regions[f.name], infer_outputs_from_yield=True)
+            gb_list = KM.parse_generics(regions[f.name], infer_outputs_from_yield=True,
+                                        scalar_calls=KM.pure_scalar_declarations(text))
             if len(gb_list) != len(gens):
                 raise RuntimeError(f"{f.name}: generic count mismatch")
             yop = next(op for op in reversed(f.ops) if op.name == "kernel.yield")
@@ -218,6 +219,7 @@ class Matcher:
         for op, gb in zip(gens, gbs):
             self.app_gbs[op.idx] = gb
         self._body_cache: dict = {}
+        self._encoded_body_cache: dict = {}
         self._trace_cache: dict = {}
         self.spec: Optional[Spec] = None
         # furthest stage reached per (spec, app generic) -- diagnostics only
@@ -415,7 +417,10 @@ class Matcher:
                 return None
             one = KM.CompositionEntry(name=self.spec.name, steps=[step], form="tensor")
             try:
-                term = KM.encode_body(perm)
+                key = (aop.idx, tuple(perm.ins_arg_names), tuple(perm.outs_arg_names))
+                if key not in self._encoded_body_cache:
+                    self._encoded_body_cache[key] = KM.encode_body(perm)
+                term = self._encoded_body_cache[key]
                 m = KM.match_composition([perm], [term], [one], start=0, body_forms=["tensor"])
             except Exception:
                 m = None
@@ -729,6 +734,25 @@ class Matcher:
                     yield e
                 return
             d = self.sdef(sname)
+            if d:
+                op, result = d
+                ty = op.result_types[result] if result < len(op.result_types) else None
+                # A captured integer expression can specialize to a literal,
+                # just as an extent can. Reuse the typed-DAG inference and
+                # verify every intermediate; do not treat a cast as opaque.
+                # Keep the proposed literal in the exact conservative index
+                # range (the scalar term representation uses a double).
+                if (ty in ('index', 'i32', 'i64') and value.is_integer()
+                        and -(1 << 31) <= value < (1 << 31)):
+                    target = int(value)
+                    known = self.bound_integer(sname, env)
+                    if known == target:
+                        yield env
+                        return
+                    inferred = self.infer_integer_parameter(sname, target, env)
+                    if inferred is not None:
+                        yield inferred
+                        return
             if d and d[0].name == "arith.constant":
                 m = re.search(r"constant\s+([^\s:]+)", d[0].text)
                 try:
@@ -909,7 +933,7 @@ class Matcher:
         values = [self.integer_polynomial(v, env, depth+1) for v in op.operands]
         if any(v is None for v in values):
             return None
-        if op.name == 'arith.index_cast' and len(values) == 1:
+        if op.name in ('arith.index_cast', 'arith.index_castui') and len(values) == 1:
             return values[0]
         if len(values) == 2:
             a, b = values
@@ -974,7 +998,12 @@ class Matcher:
             vals = [self.bound_integer(v, env, depth + 1) for v in op.operands]
             if any(v is None for v in vals):
                 return None
-            if op.name == "arith.index_cast" and len(vals) == 1:
+            if op.name in ("arith.index_cast", "arith.index_castui") and len(vals) == 1:
+                # Only the common nonnegative range is modeled for unsigned
+                # casts. Reject negative operands instead of dropping their
+                # zero-extension semantics during parameter inference.
+                if op.name == "arith.index_castui" and vals[0] < 0:
+                    return None
                 value = vals[0]
             elif len(vals) == 2 and op.name in ("arith.addi", "arith.subi", "arith.muli"):
                 a, b = vals
@@ -1812,6 +1841,18 @@ def diagnose(matcher: Matcher, lib: Library, consumed: set[int]) -> list[dict]:
 def run(text: str, lib_path: Path, region: bool = True, diag: bool = False,
         region_budget: int = 600, allowed_specs=None):
     import_kernel_match(lib_path)
+    structural_report = []
+    if region:
+        from region_match.structural import match_regions as exact_regions
+        for match in sorted(exact_regions(text, SPEC_DIR, allowed_specs),
+                            key=lambda item: -item.span[0]):
+            text = text[:match.span[0]] + match.launch_text + text[match.span[1]:]
+            structural_report.append(dict(region_match=match.spec,
+                binding=match.binding, evidence=match.evidence))
+        if structural_report and not re.search(
+                r'\b(?:linalg\.generic|affine\.for|affine\.parallel|scf\.for|scf\.while)\b', text):
+            return text, structural_report, dict(literal_policy_rejections=[],
+                                                alternatives=[], rejected=[])
     lib = Library(lib_path)
     if allowed_specs is not None:
         lib.specs = [s for s in lib.specs if s.name in allowed_specs]
@@ -1826,7 +1867,7 @@ def run(text: str, lib_path: Path, region: bool = True, diag: bool = False,
     proof_metrics.emit('linalg_match', **KM.matcher_telemetry(),
                        candidates=len(all_matches), external_matches=len(selected))
     out = Rewriter(matcher, lib).rewrite(selected) if selected else text
-    report: list = []
+    report: list = list(structural_report)
     for m in selected:
         report.append({
             "spec": m["spec"], "root": app.ops[m["root"]].results[0],

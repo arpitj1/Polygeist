@@ -1376,7 +1376,35 @@ def _is_identity(arr: str, f: F, rank: int) -> bool:
 # Entry point
 # ---------------------------------------------------------------------------
 
+def _check_scalar_expansion(prog: Program, window: set[int], limit=4096):
+    """Bound the tree representation used by this equation matcher.
+
+    Shared SSA recurrences can expand exponentially. Estimate their expanded
+    size over the DAG before dependence analysis or formula construction. A
+    declined region can still be proved by the Linalg matcher, which preserves
+    sharing; this bound never authorizes a library replacement.
+    """
+    memo = {}
+    def size(e):
+        if id(e) not in memo:
+            children = []
+            if isinstance(e, EBin):
+                children = [e.a, e.b]
+            elif isinstance(e, EUn):
+                children = [e.a]
+            elif isinstance(e, ESel):
+                children = [e.a, e.b]
+                if isinstance(e.cond, CondF):
+                    children += [e.cond.a, e.cond.b]
+            memo[id(e)] = min(limit + 1, 1 + sum(size(c) for c in children))
+        return memo[id(e)]
+    for stmt in prog.stmts:
+        if stmt.top in window and size(stmt.value) > limit:
+            raise Reject(f"expanded scalar expression exceeds region budget ({limit} nodes)")
+
+
 def build_system(prog: Program, window: set[int]) -> System:
+    _check_scalar_expansion(prog, window)
     b = Builder(prog, window)
     b.check_parallel()
     outputs = {}

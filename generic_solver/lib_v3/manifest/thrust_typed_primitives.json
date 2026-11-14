@@ -1,0 +1,372 @@
+{
+  "routine": "thrust_typed_primitives",
+  "source": "Public Thrust transform with typed public arithmetic functors and the ldexpf scalar primitive",
+  "adaptation": "Instantiate existing public arithmetic functors at float64 and integer types; preserve exact scalar casts and operation order",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/transform.h",
+      "sha256": "bc21381a849fada81ec0dbc4ff35a00aa400ef59bea14fc13452b16351682a75"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/sequential/for_each.h",
+      "sha256": "c9206514e44123c02f1f0e2f4231f26a162dab5ffde911d22a22a9d5a408cc82"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/detail/internal_functional.h",
+      "sha256": "7d472592e79aa32f8cfee7640df36e0eb299a41f101c31be82bdbe47306a7f5d"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/cuda/detail/transform.h",
+      "sha256": "19b5689d15473a6e6ae1a8343d89a43ce6cf83ba34e5bd0bdbeb556c29193d32"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__functional/operations.h",
+      "sha256": "8b201a02ba305dc0c882cda06680f5dbd77a0b5d65e5c9c7e23e745e78c0da98"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/iterator/constant_iterator.h",
+      "sha256": "892c21c08f279df8589ee91a17fb11e4e6bd90723faf4f0243444bccc0403ab7"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_crt/include/crt/math_functions.h",
+      "sha256": "55b221e8b11688ddf3cc72bd1fa4e6082ccc1dc2d54cf8c00774ac56a277cffd"
+    }
+  ],
+  "specs": [
+    {
+      "name": "thrust_multiplies_f64",
+      "defines": {
+        "LEFT_SCALAR": 0,
+        "RIGHT_SCALAR": 0,
+        "THRUST_OPERATION": 2,
+        "SCALAR": "double",
+        "SCALAR_OUT": "double"
+      },
+      "args": [
+        "n",
+        "x",
+        "y",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_multiplies_f64",
+          "arguments": [
+            "n",
+            "x",
+            "y",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ],
+            "x": [
+              "n"
+            ],
+            "y": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint output",
+        "Preserve the source language defined domain and exact typed operation; no reassociation"
+      ],
+      "deviations": [],
+      "ref_c": "thrust_arithmetic.c"
+    },
+    {
+      "name": "thrust_plus_scalar_right_f64",
+      "defines": {
+        "LEFT_SCALAR": 0,
+        "RIGHT_SCALAR": 1,
+        "THRUST_OPERATION": 0,
+        "SCALAR": "double",
+        "SCALAR_OUT": "double"
+      },
+      "args": [
+        "n",
+        "x",
+        "y",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_plus_scalar_right_f64",
+          "arguments": [
+            "n",
+            "x",
+            "y",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ],
+            "x": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint output",
+        "Preserve the source language defined domain and exact typed operation; no reassociation"
+      ],
+      "deviations": [],
+      "ref_c": "thrust_arithmetic.c"
+    },
+    {
+      "name": "thrust_plus_scalar_right_i32",
+      "defines": {},
+      "args": [
+        "n",
+        "x",
+        "y",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_plus_scalar_right_i32",
+          "arguments": [
+            "n",
+            "x",
+            "y",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ],
+            "x": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "y": {
+              "min": -2147483648,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint output",
+        "Preserve the source language defined domain and exact typed operation; no reassociation",
+        "uint32 addition wraps modulo 2^32; int32 output uses the target two-complement representation"
+      ],
+      "deviations": [],
+      "ref_c": "thrust_plus_i32.c",
+      "validation": {
+        "scalars": {
+          "y": 17
+        },
+        "array_values": {
+          "x": [
+            -2147483648,
+            -100,
+            -1,
+            0,
+            1,
+            100,
+            2147483647
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_modulus_scalar_right_u32_to_i32",
+      "defines": {
+        "LEFT_SCALAR": 0,
+        "RIGHT_SCALAR": 1,
+        "THRUST_OPERATION": 3,
+        "SCALAR": "unsigned int",
+        "SCALAR_OUT": "int"
+      },
+      "args": [
+        "n",
+        "x",
+        "y",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_modulus_scalar_right_u32_to_i32",
+          "arguments": [
+            "n",
+            "x",
+            "y",
+            "output"
+          ],
+          "arrays": {
+            "output": [
+              "n"
+            ],
+            "x": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "y": {
+              "min": 1,
+              "max": 4294967295
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous arrays; disjoint output",
+        "Preserve the source language defined domain and exact typed operation; no reassociation",
+        "uint32 to int32 conversion uses the target two-complement representation"
+      ],
+      "deviations": [],
+      "ref_c": "thrust_arithmetic.c",
+      "validation": {
+        "scalars": {
+          "y": 17
+        },
+        "array_values": {
+          "x": [
+            0,
+            1,
+            16,
+            17,
+            18,
+            2147483648,
+            4294967295
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_ldexp_f32_i32",
+      "ref_c": "thrust_ldexp.c",
+      "args": [
+        "n",
+        "input",
+        "exponent",
+        "output"
+      ],
+      "defines": {},
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_ldexp_f32_i32",
+          "arguments": [
+            "n",
+            "input",
+            "exponent",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "exponent": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "validation": {
+        "array_values": {
+          "exponent": [
+            -149,
+            -126,
+            -20,
+            -1,
+            0,
+            1,
+            20,
+            126,
+            128
+          ]
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; disjoint contiguous arrays",
+        "ldexpf scalar semantics; errno and floating exception flags are not observed"
+      ],
+      "deviations": []
+    }
+  ]
+}

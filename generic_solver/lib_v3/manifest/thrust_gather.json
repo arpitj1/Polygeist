@@ -1,0 +1,706 @@
+{
+  "routine": "thrust_gather",
+  "source": "Public Thrust gather and its permutation-iterator traversal",
+  "adaptation": "Expand the public identity transform over a permutation iterator into C. Multidimensional variants bind runtime row/column index views through the same typed index-iterator adapter used by the runtime. They retain index reads and every output element in the raised reference.",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/gather.inl",
+      "sha256": "892d95dd423e7eeabdbc0081b6b60de991e47919a6c347332142af86ae1de1d1"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/gather.h",
+      "sha256": "779e0b0eb7c3b65e505af1a53acb56406279709ee6e413a074f47bb9a449d2ac"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/iterator/permutation_iterator.h",
+      "sha256": "eab76df88c1edb47ef0e74470d2999bd68b7c1de331c88ca71e2ed9913180029"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/iterator/transform_iterator.h",
+      "sha256": "b9e07830b5a183b6b8c2c6ef1ae5ae04b2e3efd5750b3f5aeeddc74272f6b9a6"
+    }
+  ],
+  "specs": [
+    {
+      "name": "thrust_gather_f32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 0
+      },
+      "args": [
+        "n",
+        "m",
+        "index",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_f32",
+          "arguments": [
+            "n",
+            "m",
+            "index",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "index": [
+              "n"
+            ],
+            "input": [
+              "m"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "m": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "n": 7,
+          "m": 11
+        },
+        "arrays": {
+          "index": [
+            7
+          ],
+          "input": [
+            11
+          ],
+          "output": [
+            7
+          ]
+        },
+        "array_values": {
+          "index": [
+            0,
+            10,
+            3,
+            3,
+            7,
+            1,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_gather_rows_f32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 1
+      },
+      "args": [
+        "rows",
+        "cols",
+        "source_rows",
+        "index",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_rows_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "source_rows",
+            "index",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "index": [
+              "rows"
+            ],
+            "input": [
+              "source_rows",
+              "cols"
+            ],
+            "output": [
+              "rows",
+              "cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "source_rows": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 4,
+          "source_rows": 5
+        },
+        "arrays": {
+          "index": [
+            3
+          ],
+          "input": [
+            5,
+            4
+          ],
+          "output": [
+            3,
+            4
+          ]
+        },
+        "array_values": {
+          "index": [
+            4,
+            0,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_gather_columns_f32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 2
+      },
+      "args": [
+        "rows",
+        "cols",
+        "source_cols",
+        "index",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_columns_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "source_cols",
+            "index",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "index": [
+              "cols"
+            ],
+            "input": [
+              "rows",
+              "source_cols"
+            ],
+            "output": [
+              "rows",
+              "cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "source_cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 4,
+          "source_cols": 7
+        },
+        "arrays": {
+          "index": [
+            4
+          ],
+          "input": [
+            3,
+            7
+          ],
+          "output": [
+            3,
+            4
+          ]
+        },
+        "array_values": {
+          "index": [
+            6,
+            0,
+            3,
+            3
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_gather_elements_f32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 3
+      },
+      "args": [
+        "rows",
+        "cols",
+        "source_cols",
+        "index",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_elements_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "source_cols",
+            "index",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "index": [
+              "rows",
+              "cols"
+            ],
+            "input": [
+              "rows",
+              "source_cols"
+            ],
+            "output": [
+              "rows",
+              "cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "source_cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 4,
+          "source_cols": 7
+        },
+        "arrays": {
+          "index": [
+            3,
+            4
+          ],
+          "input": [
+            3,
+            7
+          ],
+          "output": [
+            3,
+            4
+          ]
+        },
+        "array_values": {
+          "index": [
+            6,
+            0,
+            3,
+            3,
+            1,
+            4,
+            0,
+            6,
+            5,
+            2,
+            2,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_gather_pairs_f32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 4
+      },
+      "args": [
+        "rows",
+        "cols",
+        "index",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_pairs_f32",
+          "arguments": [
+            "rows",
+            "cols",
+            "index",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "index": [
+              "rows"
+            ],
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "rows"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 4
+        },
+        "arrays": {
+          "index": [
+            3
+          ],
+          "input": [
+            3,
+            4
+          ],
+          "output": [
+            3
+          ]
+        },
+        "array_values": {
+          "index": [
+            3,
+            0,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_gather_rows_i32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 1,
+        "DATA_TYPE": "int"
+      },
+      "args": [
+        "rows",
+        "cols",
+        "source_rows",
+        "index",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_rows_i32",
+          "arguments": [
+            "rows",
+            "cols",
+            "source_rows",
+            "index",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "index": [
+              "rows"
+            ],
+            "input": [
+              "source_rows",
+              "cols"
+            ],
+            "output": [
+              "rows",
+              "cols"
+            ]
+          },
+          "bounds": {
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "source_rows": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "rows": 3,
+          "cols": 4,
+          "source_rows": 5
+        },
+        "arrays": {
+          "index": [
+            3
+          ],
+          "input": [
+            5,
+            4
+          ],
+          "output": [
+            3,
+            4
+          ]
+        },
+        "array_values": {
+          "index": [
+            4,
+            0,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "name": "thrust_gather_coordinates_f32",
+      "ref_c": "thrust_gather.c",
+      "defines": {
+        "MODE": 5
+      },
+      "args": [
+        "n",
+        "rows",
+        "cols",
+        "row",
+        "column",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "gather",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_gather_coordinates_f32",
+          "arguments": [
+            "n",
+            "rows",
+            "cols",
+            "row",
+            "column",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "row": [
+              "n"
+            ],
+            "column": [
+              "n"
+            ],
+            "input": [
+              "rows",
+              "cols"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "rows": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "Positive dimensions; contiguous arrays; disjoint output; indices within the input extent, as required for defined source accesses."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "n": 7,
+          "rows": 3,
+          "cols": 5
+        },
+        "arrays": {
+          "row": [
+            7
+          ],
+          "column": [
+            7
+          ],
+          "input": [
+            3,
+            5
+          ],
+          "output": [
+            7
+          ]
+        },
+        "array_values": {
+          "row": [
+            2,
+            0,
+            1,
+            1,
+            2,
+            0,
+            1
+          ],
+          "column": [
+            4,
+            0,
+            3,
+            3,
+            0,
+            1,
+            2
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -51,4 +51,32 @@ class IntegerParameterInference(unittest.TestCase):
         self.assertIsNone(m.infer_integer_parameter('%out',1,M.Env()))
 
 
+    def test_unsigned_index_cast_inference_is_nonnegative_and_exact(self):
+        m=matcher('%out=arith.index_castui %n : i32 to index')
+        result=m.infer_integer_parameter('%out',31,M.Env())
+        self.assertIsNotNone(result)
+        self.assertEqual(result.vals['%n'],('int',31,'i32'))
+        self.assertIsNone(m.infer_integer_parameter('%out',-1,M.Env()))
+        self.assertIsNone(m.infer_integer_parameter('%out',2147483648,M.Env()))
+        env=M.Env();env.vals['%n']=('int',-1,'i32')
+        self.assertIsNone(m.bound_integer('%out',env))
+
+
+    def test_captured_casted_integer_literal_uses_same_typed_solver(self):
+        m=matcher('%out=arith.index_castui %n : i32 to index')
+        results=list(m.match_cap('%out',('Lit',64),None,M.Env()))
+        self.assertEqual(len(results),1)
+        self.assertEqual(results[0].vals['%n'],('int',64,'i32'))
+        for value in [-1,2147483648,float('inf'),float('nan')]:
+            self.assertEqual(list(m.match_cap('%out',('Lit',value),None,M.Env())),[])
+
+    def test_captured_expression_retains_existing_binding_and_overflow_checks(self):
+        m=matcher('%out=arith.addi %ni,%two : index')
+        env=M.Env();env.vals['%n']=('int',5,'i32')
+        self.assertEqual(len(list(m.match_cap('%out',('Lit',7),None,env))),1)
+        self.assertEqual(list(m.match_cap('%out',('Lit',8),None,env)),[])
+        m=matcher('%large=arith.addi %ni,%two : index\n %out=arith.subi %large,%two : index')
+        self.assertEqual(list(m.match_cap('%out',('Lit',2147483647),None,M.Env())),[])
+
+
 if __name__=='__main__':unittest.main()

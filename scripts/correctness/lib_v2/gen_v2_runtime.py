@@ -34,7 +34,7 @@ def c_params(ca: A.CallAbi) -> list[str]:
     out = []
     for p in ca.params:
         if p.tkind in ("enum", "int"):
-            out.append(f"int32_t {p.name}")
+            out.append(f"{'uint32_t' if p.tkind == 'int' and p.elem == 'unsigned int' else 'int32_t'} {p.name}")
         elif p.tkind == "scalar":
             out.append(f"{p.elem} {p.name}")
         elif p.tkind == "array":

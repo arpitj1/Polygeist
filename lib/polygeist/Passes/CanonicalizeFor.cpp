@@ -5,6 +5,7 @@
 #include "mlir/Dialect/Math/IR/Math.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Dialect/SCF/Transforms/Passes.h"
+#include "mlir/Dialect/SCF/Utils/Utils.h"
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Matchers.h"
@@ -19,6 +20,13 @@ using namespace polygeist;
 
 namespace {
 struct CanonicalizeFor : public SCFCanonicalizeForBase<CanonicalizeFor> {
+  CanonicalizeFor() = default;
+  CanonicalizeFor(const CanonicalizeFor &other)
+      : SCFCanonicalizeForBase(other) {}
+  Option<unsigned> unrollThreshold{
+      *this, "unroll-threshold",
+      llvm::cl::desc("Fully unroll constant SCF loops up to this trip count"),
+      llvm::cl::init(0)};
   void runOnOperation() override;
 };
 } // namespace
@@ -684,10 +692,16 @@ struct WhileToForHelper {
     auto condOp = loop.getConditionOp();
     indVar = dyn_cast<BlockArgument>(cmpIOp.getLhs());
     Type extType = nullptr;
+    bool zeroExtended = false;
     // todo handle ext
     if (auto ext = cmpIOp.getLhs().getDefiningOp<ExtSIOp>()) {
       indVar = dyn_cast<BlockArgument>(ext.getIn());
       extType = ext.getType();
+    }
+    if (auto ext = cmpIOp.getLhs().getDefiningOp<ExtUIOp>()) {
+      indVar = dyn_cast<BlockArgument>(ext.getIn());
+      extType = ext.getType();
+      zeroExtended = true;
     }
     // Condition is not the same as an induction variable
     {
@@ -850,6 +864,27 @@ struct WhileToForHelper {
       ub_cloneMove = true;
     }
 
+    if (zeroExtended) {
+      // A promoted unsigned counter may wrap before the widened comparison
+      // becomes false. Only convert a statically bounded, positive traversal
+      // whose counter (including the final increment) stays in the signed
+      // range used by the index casts below.
+      APInt initial, bound, increment;
+      auto type = dyn_cast<IntegerType>(indVar.getType());
+      if (!type || type.getWidth() > 32 || negativeStep || !lb || !ub ||
+          ub_cloneMove || lb_addOne ||
+          !matchPattern(loop.getOperand(indVar.getArgNumber()), m_ConstantInt(&initial)) ||
+          !matchPattern(ub, m_ConstantInt(&bound)) ||
+          !matchPattern(step, m_ConstantInt(&increment)) ||
+          initial.isNegative() || bound.isNegative() || increment.isNegative() ||
+          increment.isZero())
+        return false;
+      uint64_t maximum = (uint64_t(1) << (type.getWidth() - 1)) - 1;
+      uint64_t start = initial.getZExtValue(), end = bound.getZExtValue();
+      uint64_t stride = increment.getZExtValue();
+      if (start > maximum || stride > maximum || end > maximum - stride)
+        return false;
+    }
     return lb && ub;
   }
 
@@ -2272,6 +2307,30 @@ void CanonicalizeFor::runOnOperation() {
   GreedyRewriteConfig config;
   config.maxIterations = 247;
   (void)applyPatternsAndFoldGreedily(getOperation(), std::move(rpl), config);
+  if (unrollThreshold) {
+    // Use upstream SCF unrolling, which remaps both operation results and
+    // forwarded block arguments for every iteration of a coupled recurrence.
+    getOperation()->walk<WalkOrder::PostOrder>([&](scf::ForOp loop) {
+      APInt lower, upper, step;
+      if (!matchPattern(loop.getLowerBound(), m_ConstantInt(&lower)) ||
+          !matchPattern(loop.getUpperBound(), m_ConstantInt(&upper)) ||
+          !matchPattern(loop.getStep(), m_ConstantInt(&step)) ||
+          lower.isNegative() || upper.isNegative() || step.isNegative() ||
+          step.isZero() || upper.getZExtValue() <= lower.getZExtValue())
+        return;
+      uint64_t distance = upper.getZExtValue() - lower.getZExtValue();
+      uint64_t stride = step.getZExtValue();
+      uint64_t count = distance / stride + (distance % stride != 0);
+      if (count > unrollThreshold)
+        return;
+      // The pinned upstream utility requires yielded values in its mapping.
+      // Invariant values outside the body should be canonicalized first.
+      for (Value value : loop.getBody()->getTerminator()->getOperands())
+        if (value.getParentBlock() != loop.getBody())
+          return;
+      (void)mlir::loopUnrollByFactor(loop, count);
+    });
+  }
 }
 
 std::unique_ptr<Pass> mlir::polygeist::createCanonicalizeForPass() {

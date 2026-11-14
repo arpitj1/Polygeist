@@ -55,6 +55,14 @@ bitwise agreement with a vendor library's internal reduction order. Both
 models retain numeric cast operations and their types; an error
 budget alone does not justify a match.
 
+Comparison/selection graph references compose the public ATen scalar
+comparison and `where` definitions before importing them through the same
+raising pipeline. Their scalar broadcasting and read-only operand reuse are
+explicit specializations in `aten_compare_select.json`. The generic view
+normalizer can expose pure conditional prefixes without changing predicates,
+branch order, or arithmetic order. The graph emitter reads the imported
+reference; application names do not authorize a replacement.
+
 PVA API parameters may be derived from checked reference specializations.
 Quantized backend implementations require an explicit numerical contract and
 per-specification error budget, separately from source/reference equivalence.
@@ -127,3 +135,52 @@ from strides and forwards proven bindings to external library calls. Generated
 runtime adapters are written inside the build directory, leaving the checked-in
 runtime templates untouched. Reference-body inlining tests validate import or
 binding mechanics only; they do not establish vendor execution or performance.
+
+### Pure scalar functions and additional pointwise references
+
+`thrust_aten_special.json` imports contiguous Thrust traversals over 26 public
+ATen scalar templates. The typed C aliases in
+`runtime/polygeist_aten_scalar_bindings.inc` connect extracted scalar declarations
+to the actual pinned host/device templates in `ATen/native/Math.h`. Both the
+reference-validation support and CUDA wrappers instantiate these definitions.
+`support/aten_scalar_frontend.json` additionally supplies the real definitions
+to the raising frontend, on both the application and specification sides.
+The common recipe preserves the original C source in a generated C++ translation
+unit, enables the upstream inliner, then uses upstream bounded unrolling before
+raising. Constant coefficient tables retain their Clang-evaluated values.
+Transitive public headers and the standalone configuration are pinned inputs.
+
+Remaining calls to required helpers or their implementation bodies are rejected,
+including recursive calls left after an alias was expanded. Opaque-call identity
+is not sufficient evidence for these special-function imports. Ordinary scalar
+math primitives remain explicit operations. A helper that cannot be completely
+expanded or matched stays incomplete; there is no wrapper-only fallback.
+
+`aten_comparison_primitives.json` imports comparison/where compositions with
+explicit scalar broadcasting and Boolean-to-FP32 conversion. Branch direction,
+NaN comparison behavior and selected values remain explicit. `thrust_integer.json`
+imports integer bit operations, shifts and int32-conditioned FP32 selection.
+Shift references retain the original C defined-domain requirements. The
+`thrust_ieee_binary.json` references distinguish IEEE `remainderf` from `fmodf`
+and native ATen's signed-modulo operation.
+
+Manifest `validation.support` entries may supply pinned C++ scalar definitions
+for CPU import execution. These provide the original C reference with its actual scalar implementations;
+the frontend separately imports and inlines them into the raised program. They
+do not authorize matches by helper name.
+Standalone scalar builds disable optional ATen libraries using public configuration
+templates, without modifying the upstream source tree.
+
+With pointwise input splitting enabled, the shared normalization pass may
+materialize a straight-line explicitly pure scalar call once per element, then
+split independent tensor outputs. Output splitting requires full permutation
+output maps, unused output initializer values, and speculatable effect-free
+payload operations. It does not duplicate opaque calls or apply to reductions.
+Both applications and imported specifications undergo this normalization.
+Scalar capture substitution and structural proof preparation preserve shared
+SSA expressions, including coupled recurrences. Bounded caches reuse expression
+encoding and formatting without changing the matching rules. The separate
+region equation matcher currently uses trees: it declines scalar expressions
+whose estimated expansion exceeds 4096 nodes before dependence analysis. This
+resource bound does not authorize a replacement; the Linalg matcher can still
+prove those computations using shared expressions.

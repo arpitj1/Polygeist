@@ -5,7 +5,13 @@
 #ifndef NETLIB_SPEC
 #error "NETLIB_SPEC must name the imported function"
 #endif
-#if MATH_ARITY == 1
+#if MATH_SCALAR_INT
+extern __attribute__((const)) float MATH_FUNCTION(int, float);
+void NETLIB_SPEC(int n, float input[n], int order, float output[n]) {
+  for (int i = 0; i < n; ++i)
+    output[i] = MATH_FUNCTION(order, input[i]);
+}
+#elif MATH_ARITY == 1
 extern __attribute__((const)) float MATH_FUNCTION(float);
 void NETLIB_SPEC(int n, float input[n], float output[n]) {
   for (int i = 0; i < n; ++i)

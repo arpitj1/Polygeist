@@ -2205,14 +2205,24 @@ struct IfAndLazy : public OpRewritePattern<scf::IfOp> {
           return failure();
     }
 
+    // The else values on the bypassed outer branch differ from those on the
+    // selected branch. Record the bypass values before moving/remapping the
+    // nested conditional; its own else must use the selected branch's values.
+    SmallVector<Value> bypassElseValues;
+    if (!nextIf.getElseRegion().empty()) {
+      IRMapping bypass;
+      bypass.map(prevIf.getResults(), otherYield.getOperands());
+      for (Value value : nextIf.elseYield().getOperands())
+        bypassElseValues.push_back(bypass.lookupOrDefault(value));
+    }
+
     rewriter.startRootUpdate(nextIf);
     nextIf->moveBefore(yield);
     nextIf.getConditionMutable().assign(nextIfCondition);
     for (auto it : llvm::zip(prevIf.getResults(), yield.getOperands())) {
       for (OpOperand &use :
            llvm::make_early_inc_range(std::get<0>(it).getUses()))
-        if (nextIf.getThenRegion().isAncestor(
-                use.getOwner()->getParentRegion())) {
+        if (nextIf->isProperAncestor(use.getOwner())) {
           rewriter.startRootUpdate(use.getOwner());
           use.set(std::get<1>(it));
           rewriter.finalizeRootUpdate(use.getOwner());
@@ -2230,14 +2240,8 @@ struct IfAndLazy : public OpRewritePattern<scf::IfOp> {
 
       {
         SmallVector<Value> elseVals = otherYield.getOperands();
-        IRMapping elseMapping;
-        elseMapping.map(prevIf.getResults(), otherYield.getOperands());
-        SmallVector<Value> nextElseVals;
-        for (auto v : nextIf.elseYield().getOperands())
-          nextElseVals.push_back(elseMapping.lookupOrDefault(v));
-        elseVals.append(nextElseVals);
+        elseVals.append(bypassElseValues);
         otherYield->setOperands(elseVals);
-        nextIf.elseYield()->setOperands(nextElseVals);
       }
 
       SmallVector<Type> postTys;
@@ -2540,6 +2544,212 @@ public:
         lhs.getPredicate() != arith::invertPredicate(rhs.getPredicate()))
       return failure();
     rewriter.replaceOpWithNewOp<ConstantIntOp>(op, true, 1);
+    return success();
+  }
+};
+
+// Resolve a repeated scalar predicate, including C/C++ boolean promotion.
+// This only chooses an arm whose condition is already known at the enclosing
+// select. It does not change floating-point comparisons or arithmetic.
+static std::pair<Value, bool> booleanIdentity(Value value) {
+  bool negated = false;
+  while (true) {
+    if (auto invert = value.getDefiningOp<arith::XOrIOp>()) {
+      if (value.getType().isInteger(1) &&
+          matchPattern(invert.getRhs(), m_One())) {
+        negated = !negated;
+        value = invert.getLhs();
+        continue;
+      }
+    }
+    auto compare = value.getDefiningOp<arith::CmpIOp>();
+    if (!compare || !matchPattern(compare.getRhs(), m_Zero()) ||
+        (compare.getPredicate() != arith::CmpIPredicate::eq &&
+         compare.getPredicate() != arith::CmpIPredicate::ne))
+      break;
+    Value input = compare.getLhs();
+    if (auto extend = input.getDefiningOp<arith::ExtUIOp>())
+      input = extend.getIn();
+    else if (auto extend = input.getDefiningOp<arith::ExtSIOp>())
+      input = extend.getIn();
+    if (!input.getType().isInteger(1))
+      break;
+    negated ^= compare.getPredicate() == arith::CmpIPredicate::eq;
+    value = input;
+  }
+  return {value, negated};
+}
+
+// IEEE comparisons have four possible outcomes: less, equal, greater, unordered.
+// Use those outcomes to eliminate comparisons contradicted by an enclosing
+// branch. No finite-input assumption or floating-point reassociation is needed.
+static unsigned comparisonOutcomes(arith::CmpFPredicate p) {
+  using P = arith::CmpFPredicate;
+  switch (p) {
+  case P::AlwaysFalse: return 0;
+  case P::OEQ: return 2;
+  case P::OGT: return 4;
+  case P::OGE: return 6;
+  case P::OLT: return 1;
+  case P::OLE: return 3;
+  case P::ONE: return 5;
+  case P::ORD: return 7;
+  case P::UEQ: return 10;
+  case P::UGT: return 12;
+  case P::UGE: return 14;
+  case P::ULT: return 9;
+  case P::ULE: return 11;
+  case P::UNE: return 13;
+  case P::UNO: return 8;
+  case P::AlwaysTrue: return 15;
+  }
+  llvm_unreachable("unknown floating-point predicate");
+}
+
+static unsigned reverseComparisonOutcomes(unsigned mask) {
+  return (mask & 10) | ((mask & 1) << 2) | ((mask & 4) >> 2);
+}
+
+struct CompareKnownCondition : OpRewritePattern<arith::CmpFOp> {
+  using OpRewritePattern<arith::CmpFOp>::OpRewritePattern;
+  LogicalResult matchAndRewrite(arith::CmpFOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!isa<FloatType>(op.getLhs().getType()))
+      return failure();
+    auto describe = [](arith::CmpFOp cmp) {
+      Value lhs = cmp.getLhs(), rhs = cmp.getRhs();
+      unsigned mask = comparisonOutcomes(cmp.getPredicate());
+      // Negation reverses ordering, preserves unorderedness and maps either
+      // signed zero to an equal zero. Restrict to comparisons against zero.
+      if (auto neg = lhs.getDefiningOp<arith::NegFOp>()) {
+        if (matchPattern(rhs, m_AnyZeroFloat())) {
+          lhs = neg.getOperand();
+          mask = reverseComparisonOutcomes(mask);
+        }
+      }
+      return std::make_tuple(lhs, rhs, mask);
+    };
+    auto same = [](Value a, Value b) {
+      return a == b || (a.getType() == b.getType() &&
+                       matchPattern(a, m_AnyZeroFloat()) &&
+                       matchPattern(b, m_AnyZeroFloat()));
+    };
+    auto [lhs, rhs, wanted] = describe(op);
+    unsigned possible = 15;
+    Operation *child = op;
+    for (Operation *parent = op->getParentOp(); parent;
+         child = parent, parent = parent->getParentOp()) {
+      auto branch = dyn_cast<scf::IfOp>(parent);
+      if (!branch)
+        continue;
+      auto [condition, inverted] = booleanIdentity(branch.getCondition());
+      auto cmp = condition.getDefiningOp<arith::CmpFOp>();
+      if (!cmp)
+        continue;
+      auto [a, b, allowed] = describe(cmp);
+      if (same(lhs, b) && same(rhs, a))
+        allowed = reverseComparisonOutcomes(allowed);
+      else if (!same(lhs, a) || !same(rhs, b))
+        continue;
+      bool thenRegion = child->getParentRegion() == &branch.getThenRegion();
+      if (inverted == thenRegion)
+        allowed ^= 15;
+      possible &= allowed;
+    }
+    if (possible && (possible & wanted) != 0 &&
+        (possible & wanted) != possible)
+      return failure();
+    rewriter.replaceOpWithNewOp<arith::ConstantIntOp>(
+        op, (possible & wanted) != 0, 1);
+    return success();
+  }
+};
+
+// At most six independent predicates (64 valuations) are considered. Treat
+// comparisons as opaque Boolean values: no floating-point identities are used.
+struct SelectKnownCondition : OpRewritePattern<arith::SelectOp> {
+  using OpRewritePattern<arith::SelectOp>::OpRewritePattern;
+  LogicalResult matchAndRewrite(arith::SelectOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!op.getCondition().getType().isInteger(1))
+      return failure();
+    llvm::SmallDenseMap<Value, uint64_t> masks;
+    unsigned atoms = 0;
+    bool overflow = false;
+    std::function<uint64_t(Value, unsigned)> mask = [&](Value v, unsigned depth) {
+      if (auto found = masks.find(v); found != masks.end())
+        return found->second;
+      if (depth > 16) {
+        overflow = true;
+        return uint64_t(0);
+      }
+      auto identity = booleanIdentity(v);
+      uint64_t bits;
+      if (identity.first != v) {
+        bits = mask(identity.first, depth + 1);
+        if (identity.second)
+          bits = ~bits;
+      } else if (matchPattern(v, m_Zero())) {
+        bits = 0;
+      } else if (matchPattern(v, m_One())) {
+        bits = ~uint64_t(0);
+      } else if (auto binary = v.getDefiningOp<arith::AndIOp>()) {
+        bits = mask(binary.getLhs(), depth + 1) & mask(binary.getRhs(), depth + 1);
+      } else if (auto binary = v.getDefiningOp<arith::OrIOp>()) {
+        bits = mask(binary.getLhs(), depth + 1) | mask(binary.getRhs(), depth + 1);
+      } else if (auto binary = v.getDefiningOp<arith::XOrIOp>()) {
+        bits = mask(binary.getLhs(), depth + 1) ^ mask(binary.getRhs(), depth + 1);
+      } else {
+        if (atoms == 6) {
+          overflow = true;
+          return uint64_t(0);
+        }
+        bits = 0;
+        for (unsigned i = 0; i < 64; ++i)
+          if (i & (1u << atoms))
+            bits |= uint64_t(1) << i;
+        ++atoms;
+      }
+      masks[v] = bits;
+      return bits;
+    };
+    // Gather before rewriting so exceeding the bound cannot leave partial IR.
+    std::function<void(Value, unsigned)> gather = [&](Value v, unsigned depth) {
+      auto select = v.getDefiningOp<arith::SelectOp>();
+      if (!select || depth == 8)
+        return;
+      mask(select.getCondition(), 0);
+      gather(select.getTrueValue(), depth + 1);
+      gather(select.getFalseValue(), depth + 1);
+    };
+    gather(op.getResult(), 0);
+    if (overflow)
+      return failure();
+    std::function<Value(Value, uint64_t, unsigned)> simplify =
+        [&](Value v, uint64_t possible, unsigned depth) -> Value {
+      auto select = v.getDefiningOp<arith::SelectOp>();
+      if (!select || depth == 8)
+        return v;
+      uint64_t predicate = masks.lookup(select.getCondition());
+      uint64_t yesCases = possible & predicate;
+      uint64_t noCases = possible & ~predicate;
+      if (!yesCases)
+        return simplify(select.getFalseValue(), noCases, depth + 1);
+      if (!noCases)
+        return simplify(select.getTrueValue(), yesCases, depth + 1);
+      Value yes = simplify(select.getTrueValue(), yesCases, depth + 1);
+      Value no = simplify(select.getFalseValue(), noCases, depth + 1);
+      if (yes == no)
+        return yes;
+      if (yes == select.getTrueValue() && no == select.getFalseValue())
+        return v;
+      return rewriter.create<arith::SelectOp>(select.getLoc(),
+                                              select.getCondition(), yes, no);
+    };
+    Value result = simplify(op.getResult(), ~uint64_t(0), 0);
+    if (result == op.getResult())
+      return failure();
+    rewriter.replaceOp(op, result);
     return success();
   }
 };
@@ -6432,7 +6642,8 @@ static llvm::cl::opt<bool>
 void TypeAlignOp::getCanonicalizationPatterns(RewritePatternSet &results,
                                               MLIRContext *context) {
   results.insert<
-      TypeAlignCanonicalize, OrIExcludedMiddle, SelectOfExt,
+      TypeAlignCanonicalize, OrIExcludedMiddle, SelectOfExt, SelectKnownCondition,
+      CompareKnownCondition,
       UndefProp<ExtUIOp, LLVM::UndefOp>, UndefProp<ExtUIOp, polygeist::UndefOp>,
       UndefProp<ExtSIOp, LLVM::UndefOp>, UndefProp<ExtSIOp, polygeist::UndefOp>,
       UndefProp<TruncIOp, LLVM::UndefOp>,
@@ -6670,6 +6881,25 @@ public:
 struct LinalgGenericEliminateSubmaps : public OpRewritePattern<linalg::GenericOp> {
   using OpRewritePattern<linalg::GenericOp>::OpRewritePattern;
 
+  static bool preservesDomain(SubmapOp view) {
+    auto base = dyn_cast<MemRefType>(view.getBase().getType());
+    if (!base || !view.getMap().isIdentity() ||
+        view.getSizes().size() != static_cast<size_t>(base.getRank()))
+      return false;
+    for (auto [i, size] : llvm::enumerate(view.getSizes())) {
+      APInt value;
+      if (!base.isDynamicDim(i) && matchPattern(size, m_ConstantInt(&value)) &&
+          value.getSExtValue() == base.getDimSize(i))
+        continue;
+      auto dim = size.getDefiningOp<memref::DimOp>();
+      if (dim && dim.getSource() == view.getBase() &&
+          dim.getConstantIndex() == static_cast<int64_t>(i))
+        continue;
+      return false;
+    }
+    return true;
+  }
+
   LogicalResult matchAndRewrite(linalg::GenericOp genericOp, PatternRewriter &rewriter) const override {
     // A tensor output submap defines both the result shape and the active
     // iteration domain. Replacing it by the base changes those contracts;
@@ -6691,7 +6921,7 @@ struct LinalgGenericEliminateSubmaps : public OpRewritePattern<linalg::GenericOp
     for (auto [input, map] : llvm::zip(genericOp.getInputs(), indexingMaps)) {
       if (auto submapOp = input.getDefiningOp<SubmapOp>()) {
         // Skip submaps with symbols for now to avoid invalid map composition
-        if (submapOp.getMap().getNumSymbols() > 0) {
+        if (!preservesDomain(submapOp)) {
           newInputs.push_back(input);
           newIndexingMaps.push_back(map);
           continue;
@@ -6713,7 +6943,7 @@ struct LinalgGenericEliminateSubmaps : public OpRewritePattern<linalg::GenericOp
     for (auto [output, map] : llvm::zip(genericOp.getOutputs(), outputMaps)) {
       if (auto submapOp = output.getDefiningOp<SubmapOp>()) {
         // Skip submaps with symbols for now to avoid invalid map composition
-        if (submapOp.getMap().getNumSymbols() > 0) {
+        if (!preservesDomain(submapOp)) {
           newOutputs.push_back(output);
           newIndexingMaps.push_back(map);
           continue;

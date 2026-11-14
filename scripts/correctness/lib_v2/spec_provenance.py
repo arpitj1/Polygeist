@@ -75,7 +75,8 @@ def write(path, specs, results, recipe, library, compiler_paths):
     here = Path(__file__).resolve().parent
     common = record([here / name for name in (
         'recipe.py', 'build_lib_v2.py', 'validate_specs.py', 'spec_provenance.py',
-        'reference_execution.py', 'legalize_tensor_submaps.py', 'mlir_lite.py', 'import_cache.py')]
+        'reference_execution.py', 'reference_support.py', 'frontend_support.py', 'legalize_tensor_submaps.py',
+        'mlir_lite.py', 'import_cache.py')]
                     + list(compiler_paths))
     rows = {}
     by_name = {r['spec']: r for r in results}
@@ -84,6 +85,10 @@ def write(path, specs, results, recipe, library, compiler_paths):
         prefix = path.parent / 'raised' / spec.name
         artifacts = [Path(str(prefix) + ext) for ext in ('.mlir', '_linalg.mlir', '_debuf.mlir')]
         inputs = [spec.fragment, spec.ref_c]
+        if spec.raw.get('frontend_support'):
+            config = input_path(spec.raw['frontend_support'])
+            from frontend_support import load
+            inputs += [config, *[input_path(p) for p in load(config)['inputs']]]
         manifest = json.loads(spec.fragment.read_text())
         upstreams = list(manifest.get('upstream_files', []))
         if manifest.get('upstream'):

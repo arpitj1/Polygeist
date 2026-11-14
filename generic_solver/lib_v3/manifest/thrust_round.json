@@ -1,0 +1,69 @@
+{
+  "routine": "thrust_round",
+  "ref_c": "thrust_pointwise_math.c",
+  "source": "Public cuda::std::round FP32 primitive applied by Thrust transform",
+  "upstream_files": [
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/cuda/std/__cmath/rounding_functions.h",
+      "sha256": "d7e8ad421ee30dc3c045d707786c20fc142e82eae5336957d07610822acedda0"
+    },
+    {
+      "path": "third_party/cuda_headers/cuda_cccl/include/cccl/thrust/system/detail/generic/transform.h",
+      "sha256": "cb292d966450a3c374326ffe8febdcff144244440a691772aca8ba446e8f61e5"
+    }
+  ],
+  "adaptation": "Specialize the public round(float) primitive to its roundf call and expand Thrust traversal to a contiguous C loop. Preserve ties-away rounding; this is not the ATen round API.",
+  "specs": [
+    {
+      "name": "thrust_round_f32",
+      "args": [
+        "n",
+        "input",
+        "output"
+      ],
+      "target": {
+        "library": "Thrust",
+        "call": "transform",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_thrust_round_f32",
+          "arguments": [
+            "n",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "n"
+            ],
+            "output": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX; contiguous disjoint FP32 arrays",
+        "errno and floating exception flags are not observed",
+        "C/CUDA roundf semantics (ties away from zero), not ATen nearbyint ties-to-even semantics; no fast math or FTZ"
+      ],
+      "deviations": [],
+      "defines": {
+        "MATH_FUNCTION": "roundf",
+        "MATH_ARITY": 1
+      }
+    }
+  ]
+}

@@ -337,11 +337,28 @@ def spec_c_prototype(spec: str) -> tuple[str, list[SpecArg]]:
     if p.returncode:
         raise AbiError(f"preprocessing {src} failed: {p.stderr[-400:]}")
     text = re.sub(r"\s+", " ", p.stdout)
-    m = re.search(rf"\b(void|double|float|int)\s+{re.escape(spec)}\s*\(([^)]*)\)\s*\{{", text)
-    if not m:
+    # VLA extents may contain casts, sizeof, or parenthesized expressions.
+    # Find the complete parameter list before checking for a definition;
+    # stopping at its first ')' confuses these extents with declarations.
+    signature = None
+    for start in re.finditer(rf"\b(void|double|float|int)\s+{re.escape(spec)}\s*\(", text):
+        depth = 1
+        for token in re.finditer(r'"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[()]', text[start.end():]):
+            if token[0] == '(':
+                depth += 1
+            elif token[0] == ')':
+                depth -= 1
+            if depth == 0:
+                end = start.end() + token.start()
+                if text[end + 1:].lstrip().startswith('{'):
+                    signature = start[1], text[start.end():end]
+                break
+        if signature is not None:
+            break
+    if signature is None:
         raise AbiError(f"no definition of {spec} in preprocessed {src}")
     args = []
-    for prm in _split_top(m.group(2)):
+    for prm in _split_top(signature[1]):
         try:
             nm, ty, dl = parse_parameter(prm, text)
         except ValueError as error:
@@ -351,7 +368,7 @@ def spec_c_prototype(spec: str) -> tuple[str, list[SpecArg]]:
             args.append(SpecArg(nm, "array", len(dl), ld, ctype=ty))
         else:
             args.append(SpecArg(nm, "int" if ty in INTEGER_TYPES else "scalar", ctype=ty))
-    return m.group(1), args
+    return signature[0], args
 
 
 _VIEW_OPS = ("polygeist.subindex", "memref.subview", "memref.cast",

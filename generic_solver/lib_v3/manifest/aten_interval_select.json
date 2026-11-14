@@ -1,0 +1,297 @@
+{
+  "routine": "aten_interval_select",
+  "source": "Composition of pinned public ATen comparison and where scalar implementations",
+  "upstream_files": [
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cpu/BinaryOpsKernel.cpp",
+      "sha256": "debaeadf5a64ee11090b2baff9fc1086775c8761f316965c819d95da77cb8269"
+    },
+    {
+      "path": "third_party/pytorch/aten/src/ATen/native/cpu/TensorCompareKernel.cpp",
+      "sha256": "b5186ed76ffb42e1a93f8958f3c100bd7cc12ec26cd0f7aa21cd2a0788c96699"
+    }
+  ],
+  "adaptation": "Specialize lt/le/gt/ge scalar comparison and where_kernel_impl to FP32, compose their boolean edge without materializing TensorIterator storage, and specialize scalar broadcasting and read-only aliases. Preserve comparisons, branch operands, NaNs and signed-zero selection. These are reusable compositions of public scalar references, not imported proprietary cuDNN source. The existing adapter mechanically emits their cuDNN operation graphs. Compose two comparisons through explicit Boolean logic before selection; no range-order or finiteness assumption.",
+  "specs": [
+    {
+      "name": "aten_interval_outside_or_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": "<",
+        "UPPER_COMPARE": ">",
+        "LOGICAL": "||"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_outside_and_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": "<",
+        "UPPER_COMPARE": ">",
+        "LOGICAL": "&&"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_outside_inclusive_or_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": "<=",
+        "UPPER_COMPARE": ">=",
+        "LOGICAL": "||"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_outside_inclusive_and_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": "<=",
+        "UPPER_COMPARE": ">=",
+        "LOGICAL": "&&"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_inside_or_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": ">",
+        "UPPER_COMPARE": "<",
+        "LOGICAL": "||"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_inside_and_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": ">",
+        "UPPER_COMPARE": "<",
+        "LOGICAL": "&&"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_inside_inclusive_or_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": ">=",
+        "UPPER_COMPARE": "<=",
+        "LOGICAL": "||"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    },
+    {
+      "name": "aten_interval_inside_inclusive_and_f32",
+      "args": [
+        "n",
+        "input",
+        "value",
+        "output",
+        "lower",
+        "upper",
+        "selected"
+      ],
+      "defines": {
+        "LOWER_COMPARE": ">=",
+        "UPPER_COMPARE": "<=",
+        "LOGICAL": "&&"
+      },
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnBackendExecute",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "pointwise_reference",
+          "extent_arg": "n"
+        }
+      },
+      "assumptions": [
+        "positive n <= INT_MAX",
+        "contiguous FP32 arrays; output disjoint from inputs",
+        "floating exception flags are not observed"
+      ],
+      "deviations": []
+    }
+  ]
+}

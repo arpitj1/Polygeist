@@ -47,11 +47,14 @@ def zero_preserves_reads(operations, ssa_name: str) -> bool:
     Comparison operands, selected values, and direct results cannot annihilate
     tensor reads. A constant returned or stored by a fill still performs the
     same assignments; this does not justify a zero multiplying an input read.
-    Unknown uses, arithmetic, and forwarding through other operations reject.
+    Addition and subtraction retain the other operand, including NaN, infinity
+    and signed zero; equality still has to preserve the arithmetic operation.
+    Other arithmetic, unknown uses and forwarding reject.
     Container free uses are represented by their nested direct users.
     """
     users = [op for op in operations if ssa_name in op.operands]
     return bool(users) and all(op.name in ("arith.cmpf", "arith.select",
+                                         "arith.addf", "arith.subf",
                                          "linalg.yield", "kernel.yield",
                                          "func.return", "return")
                                for op in users)

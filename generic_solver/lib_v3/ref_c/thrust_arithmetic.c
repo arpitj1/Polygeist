@@ -6,6 +6,9 @@
 #ifndef SCALAR
 #define SCALAR float
 #endif
+#ifndef SCALAR_OUT
+#define SCALAR_OUT SCALAR
+#endif
 #ifndef NETLIB_SPEC
 #error "NETLIB_SPEC must name the imported function"
 #endif
@@ -20,7 +23,7 @@ SCALAR y,
 #else
 SCALAR y[],
 #endif
-SCALAR output[]) {
+SCALAR_OUT output[]) {
  for(int i=0;i<n;++i){
 #if LEFT_SCALAR
   SCALAR left=x;
@@ -38,6 +41,8 @@ SCALAR output[]) {
   output[i] = left - right;
 #elif THRUST_OPERATION == 2
   output[i] = left * right;
+#elif THRUST_OPERATION == 3
+  output[i] = left % right;
 #else
 #error "unsupported public functor"
 #endif

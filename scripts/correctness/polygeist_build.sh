@@ -846,6 +846,21 @@ if [ "$TARGET" = jetson ] && [ "$ABI_BACKEND" = cuda ]; then
     -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
     -c "$RT/polygeist_thrust_rt.cu" -o "$WORK/thrust_runtime.o"
   SPEC_RUNTIME_OBJECTS+=("$WORK/thrust_runtime.o")
+  # Link the actual ATen scalar templates only when an imported special-function
+  # ABI entry is referenced. Other GPU builds do not require PyTorch headers.
+  if grep -Eq '@polygeist_v2_transform_thrust_(calc_|bessel_|modified_bessel_)' "$WORK/kernel.ll"; then
+    "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
+      -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
+      -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
+      --fmad=false --ftz=false --prec-div=true --expt-relaxed-constexpr \
+      -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
+      -I"$REPO_ROOT/generic_solver/lib_v3/support" \
+      -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/pytorch" \
+      -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/pytorch/aten/src" \
+      -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
+      -c "$RT/polygeist_aten_special_rt.cu" -o "$WORK/aten_special_runtime.o"
+    SPEC_RUNTIME_OBJECTS+=("$WORK/aten_special_runtime.o")
+  fi
   RT_LIBS="-lstdc++ $RT_LIBS"
 fi
 

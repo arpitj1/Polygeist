@@ -436,11 +436,17 @@ def build_one(spec: Spec, rec: R.Recipe, timeout: int, do_raise: bool) -> dict:
     if do_raise:
         for suffix in (".mlir", "_linalg.mlir", "_debuf.mlir"):
             Path(f"{prefix}{suffix}").unlink(missing_ok=True)
-        res = R.raise_c(rec, str(wrapper), spec.name, str(prefix), [], timeout)
+        frontend = spec.raw.get('frontend_support')
+        res = R.raise_c(rec, str(wrapper), spec.name, str(prefix), [], timeout,
+                        frontend_support=str(spec_provenance.input_path(frontend)) if frontend else None)
         steps = {"recipe": rec.name, "commands": [], "failure": None}
-        for step in ("cgeist", "raise", "debuf"):
+        if res.get('frontend_support'):
+            steps['frontend_support'] = res['frontend_support']
+        for step in ("cgeist", "inline_dependencies", "inline_normalize", "raise", "debuf"):
             r = res.get(step)
             if r is None:
+                if step in ('inline_dependencies', 'inline_normalize'):
+                    continue
                 break
             steps["commands"].append(R.shell_line(r.cmd).replace(str(REPO) + "/", ""))
             if r.recovery:

@@ -987,6 +987,24 @@ mlir::Attribute MLIRScanner::InitializeValueByInitListExpr(mlir::Value toInit,
 
 ValueCategory MLIRScanner::VisitVarDecl(clang::VarDecl *decl) {
   decl = decl->getCanonicalDecl();
+  auto result = VisitVarDeclImpl(decl);
+  if (auto *decomposition = dyn_cast<DecompositionDecl>(decl)) {
+    for (auto *binding : decomposition->bindings()) {
+      // Tuple-like bindings have a hidden variable initialized by get<I>.
+      // Initialize it here, once and in declaration order, even when the
+      // corresponding binding is never referenced by the source program.
+      if (auto *holding = binding->getHoldingVar())
+        VisitVarDecl(holding);
+      auto value = Visit(binding->getBinding());
+      assert(value.val && "structured binding must have a value");
+      params[binding] = value;
+    }
+  }
+  return result;
+}
+
+ValueCategory MLIRScanner::VisitVarDeclImpl(clang::VarDecl *decl) {
+  decl = decl->getCanonicalDecl();
   auto varLoc = getMLIRLocation(decl->getBeginLoc());
   mlir::Type subType = getMLIRType(decl->getType());
   ValueCategory inite = nullptr;
@@ -1069,6 +1087,44 @@ ValueCategory MLIRScanner::VisitVarDecl(clang::VarDecl *decl) {
     } else {
       auto gv = Glob.GetOrCreateGlobal(
           decl, (function.getName() + "@static@").str(), /*tryInit*/ false);
+      // Constant-initialized scalar/array objects need no first-use guard.
+      // Use Clang's evaluated values so casts, expressions and implicit array
+      // fillers are preserved, including the target floating-point rounding.
+      if (decl->getType().isConstQualified() &&
+          !decl->getType().isVolatileQualified() &&
+          decl->hasConstantInitialization()) {
+        auto mt = gv.first.getType();
+        SmallVector<mlir::Attribute> values;
+        std::function<bool(const APValue &)> flatten = [&](const APValue &v) {
+          if (v.isInt() && isa<mlir::IntegerType>(mt.getElementType())) {
+            values.push_back(builder.getIntegerAttr(
+                mt.getElementType(), v.getInt().extOrTrunc(
+                                         mt.getElementType().getIntOrFloatBitWidth())));
+            return true;
+          }
+          if (v.isFloat() && isa<FloatType>(mt.getElementType())) {
+            values.push_back(builder.getFloatAttr(mt.getElementType(), v.getFloat()));
+            return true;
+          }
+          if (!v.isArray())
+            return false;
+          for (unsigned i = 0; i < v.getArraySize(); ++i)
+            if (!flatten(i < v.getArrayInitializedElts()
+                             ? v.getArrayInitializedElt(i)
+                             : v.getArrayFiller()))
+              return false;
+          return true;
+        };
+        if (auto value = decl->evaluateValue())
+          if (flatten(*value) && mt.hasStaticShape() &&
+              values.size() == static_cast<size_t>(mt.getNumElements())) {
+            gv.first->setAttr("initial_value", DenseElementsAttr::get(
+                RankedTensorType::get(mt.getShape(), mt.getElementType()), values));
+            gv.first->setAttr("constant", builder.getUnitAttr());
+            op = abuilder.create<memref::GetGlobalOp>(varLoc, mt, gv.first.getName());
+            return params[decl] = ValueCategory(op, /*isReference*/ true);
+          }
+      }
       op = abuilder.create<memref::GetGlobalOp>(varLoc, gv.first.getType(),
                                                 gv.first.getName());
       auto mt = gv.first.getType().cast<MemRefType>();
@@ -3512,7 +3568,7 @@ ValueCategory MLIRScanner::VisitDeclRefExpr(DeclRefExpr *E) {
     }
   }
 
-  if (auto PD = dyn_cast<VarDecl>(E->getDecl())) {
+  if (auto PD = dyn_cast<ValueDecl>(E->getDecl())) {
     auto found = params.find(PD);
     if (found != params.end()) {
       auto res = found->second;

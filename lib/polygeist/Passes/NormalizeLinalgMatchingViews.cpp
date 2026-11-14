@@ -5,6 +5,7 @@
 #include "PassDetails.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Bufferization/IR/Bufferization.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/Linalg/Transforms/Transforms.h"
 #include "mlir/Dialect/Linalg/Transforms/TilingInterfaceImpl.h"
@@ -15,6 +16,7 @@
 #include "mlir/IR/Matchers.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
+#include "mlir/Interfaces/DataLayoutInterfaces.h"
 #include "mlir/Dialect/Utils/StaticValueUtils.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "polygeist/Passes/Passes.h"
@@ -24,6 +26,57 @@ using namespace mlir;
 using namespace mlir::polygeist;
 
 namespace {
+
+// Index casts at the native index width preserve every bit. A quotient or
+// remainder followed by truncation can therefore use index arithmetic directly
+// when its dividend came from an index. This makes flattened coordinates and
+// imported counting-iterator implementations use the same typed scalar IR.
+// Never cross a different-width index layout or change a signed operation.
+struct NormalizeIndexQuotient : OpRewritePattern<arith::TruncIOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(arith::TruncIOp trunc,
+                                PatternRewriter &rewriter) const override {
+    Operation *operation = trunc.getIn().getDefiningOp();
+    if (!operation ||
+        !isa<arith::DivUIOp, arith::RemUIOp>(operation) ||
+        !trunc->getParentOfType<linalg::GenericOp>())
+      return failure();
+    auto integer = dyn_cast<IntegerType>(trunc.getIn().getType());
+    auto result = dyn_cast<IntegerType>(trunc.getType());
+    Type index = rewriter.getIndexType();
+    if (!integer || !result ||
+        DataLayout::closest(trunc).getTypeSizeInBits(index) != integer.getWidth())
+      return failure();
+    Value dividend;
+    Operation *cast = operation->getOperand(0).getDefiningOp();
+    if (cast && isa<arith::IndexCastOp, arith::IndexCastUIOp>(cast) &&
+        cast->getOperand(0).getType().isIndex())
+      dividend = cast->getOperand(0);
+    if (!dividend)
+      return failure();
+    Location loc = trunc.getLoc();
+    Value divisor = operation->getOperand(1);
+    // Preserve zero extension when the source divisor is narrower than index.
+    {
+      OpBuilder::InsertionGuard guard(rewriter);
+      if (auto extension = divisor.getDefiningOp<arith::ExtUIOp>()) {
+        rewriter.setInsertionPoint(extension);
+        divisor = rewriter.create<arith::IndexCastUIOp>(loc, index,
+                                                       extension.getIn());
+      } else {
+        rewriter.setInsertionPointAfterValue(divisor);
+        divisor = rewriter.create<arith::IndexCastOp>(loc, index, divisor);
+      }
+    }
+    Value value;
+    if (isa<arith::DivUIOp>(operation))
+      value = rewriter.create<arith::DivUIOp>(loc, dividend, divisor);
+    else
+      value = rewriter.create<arith::RemUIOp>(loc, dividend, divisor);
+    rewriter.replaceOpWithNewOp<arith::IndexCastOp>(trunc, result, value);
+    return success();
+  }
+};
 
 static bool isScalarInitializer(Value value);
 
@@ -1215,6 +1268,73 @@ static void exposeStaticSliceBounds(Operation *root, bool scalarViews) {
 // Materialize pure scalar producers that do not depend on the reduction state.
 // This changes storage only: the residual iterators, initializer and operation
 // order are retained. No arithmetic identity or reduction reassociation is used.
+// A straight-line pure scalar call already executes once per pointwise element.
+// Materializing that same traversal neither speculates it across a conditional
+// nor changes its call count. Do not infer purity from a callee spelling.
+static bool movableScalar(Operation *op, bool allowPureCalls) {
+  if (isMemoryEffectFree(op) && isSpeculatable(op))
+    return true;
+  auto call = dyn_cast<func::CallOp>(op);
+  if (!allowPureCalls || !call || call.getNumResults() != 1 ||
+      call.getNumOperands() == 0)
+    return false;
+  auto scalar = [](Type type) { return isa<FloatType, IntegerType>(type); };
+  if (!scalar(call.getResult(0).getType()) ||
+      !llvm::all_of(call.getOperandTypes(), scalar))
+    return false;
+  auto declaration = SymbolTable::lookupNearestSymbolFrom<func::FuncOp>(
+      call, call.getCalleeAttr());
+  return declaration && declaration->hasAttr("polygeist.pure");
+}
+
+// Independent outputs of a parallel tensor operation can use separate
+// traversals. Clone only total, effect-free scalar instructions; shared opaque
+// calls must first be materialized by SplitReductionInputs, exactly once.
+struct SplitPointwiseOutputs : OpRewritePattern<linalg::GenericOp> {
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(linalg::GenericOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!op.hasTensorSemantics() || op.getNumReductionLoops() ||
+        op.getNumDpsInits() < 2)
+      return failure();
+    Block *body = op.getBody();
+    unsigned inputs = op.getNumDpsInputs();
+    if (llvm::any_of(body->getArguments().drop_front(inputs),
+                     [](BlockArgument arg) { return !arg.use_empty(); }) ||
+        llvm::any_of(body->without_terminator(), [](Operation &nested) {
+          return nested.getNumRegions() || !movableScalar(&nested, false);
+        }))
+      return failure();
+    auto maps = op.getIndexingMapsArray();
+    // Every output spans the complete original iteration domain. Thus each
+    // clone has identical bounds and unique writes, including empty domains.
+    if (llvm::any_of(llvm::drop_begin(maps, inputs),
+                     [](AffineMap map) { return !map.isPermutation(); }))
+      return failure();
+    auto yield = cast<linalg::YieldOp>(body->getTerminator());
+    SmallVector<Value> results;
+    for (unsigned i = 0; i < op.getNumDpsInits(); ++i) {
+      SmallVector<AffineMap> selected(maps.begin(), maps.begin() + inputs);
+      selected.push_back(maps[inputs + i]);
+      auto part = rewriter.create<linalg::GenericOp>(
+          op.getLoc(), TypeRange{op.getResult(i).getType()}, op.getInputs(),
+          ValueRange{op.getOutputs()[i]}, selected, op.getIteratorTypesArray(),
+          [&](OpBuilder &builder, Location loc, ValueRange arguments) {
+            IRMapping mapping;
+            for (unsigned j = 0; j < inputs; ++j)
+              mapping.map(body->getArgument(j), arguments[j]);
+            for (Operation &nested : body->without_terminator())
+              builder.clone(nested, mapping);
+            builder.create<linalg::YieldOp>(loc,
+                mapping.lookupOrDefault(yield.getOperand(i)));
+          });
+      results.push_back(part.getResult(0));
+    }
+    rewriter.replaceOp(op, results);
+    return success();
+  }
+};
+
 struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
   SplitReductionInputs(MLIRContext *context, bool reductions, bool pointwise)
       : OpRewritePattern(context), reductions(reductions), pointwise(pointwise) {}
@@ -1233,17 +1353,21 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
     unsigned inputs = op.getNumDpsInputs();
     Operation *root = &body->front();
     SmallVector<Operation *> expression;
-    bool firstFloat = root->getNumResults() == 1 &&
-                      isa<FloatType>(root->getResult(0).getType());
-    if (op.getNumReductionLoops() && !firstFloat) {
-      // Find the pure input-only DAG feeding the state update. Its first
-      // instruction may produce a predicate rather than a float. Moving the
+    auto scalarData = [](Type type) {
+      if (auto integer = dyn_cast<IntegerType>(type))
+        return integer.getWidth() > 1;
+      return isa<FloatType>(type);
+    };
+    bool firstScalar = root->getNumResults() == 1 &&
+                       scalarData(root->getResult(0).getType());
+    if (!firstScalar) {
+      // Find a pure input-only DAG feeding the remaining computation. Its first
+      // instruction may produce a predicate rather than a data value. Moving the
       // whole expression preserves that predicate and avoids materializing
       // an intermediate that has no corresponding library specification.
       llvm::SmallPtrSet<Operation *, 16> independent;
       for (Operation &candidate : body->without_terminator()) {
-        if (candidate.getNumRegions() || !isMemoryEffectFree(&candidate) ||
-            !isSpeculatable(&candidate))
+        if (candidate.getNumRegions() || !movableScalar(&candidate, false))
           continue;
         bool inputOnly = llvm::all_of(candidate.getOperands(), [&](Value v) {
           if (auto arg = dyn_cast<BlockArgument>(v))
@@ -1257,12 +1381,12 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
       root = nullptr;
       for (Operation &candidate : body->without_terminator()) {
         if (!independent.contains(&candidate) || candidate.getNumResults() != 1 ||
-            !isa<FloatType>(candidate.getResult(0).getType()) ||
+            !scalarData(candidate.getResult(0).getType()) ||
             isa<arith::ConstantOp>(candidate))
           continue;
         if (llvm::any_of(candidate.getResult(0).getUsers(), [&](Operation *user) {
               return user->getBlock() == body && !isa<linalg::YieldOp>(user) &&
-                     !independent.contains(user);
+                     (!op.getNumReductionLoops() || !independent.contains(user));
             })) {
           root = &candidate;
           break;
@@ -1283,9 +1407,9 @@ struct SplitReductionInputs : OpRewritePattern<linalg::GenericOp> {
           expression.push_back(&candidate);
     } else {
       if (root->getNumResults() != 1 ||
-          !isa<FloatType>(root->getResult(0).getType()) || root->getNumRegions() ||
-          isa<arith::ConstantOp>(root) || !isMemoryEffectFree(root) ||
-          !isSpeculatable(root))
+          !scalarData(root->getResult(0).getType()) || root->getNumRegions() ||
+          isa<arith::ConstantOp>(root) ||
+          !movableScalar(root, !op.getNumReductionLoops()))
         return failure();
       for (Value operand : root->getOperands())
         if (auto arg = dyn_cast<BlockArgument>(operand))
@@ -1415,6 +1539,13 @@ struct NormalizeLinalgMatchingViewsPass
   }
 
   void runOnOperation() override {
+    RewritePatternSet indexArithmetic(&getContext());
+    indexArithmetic.add<NormalizeIndexQuotient>(&getContext());
+    if (failed(applyPatternsAndFoldGreedily(getOperation(),
+                                           std::move(indexArithmetic)))) {
+      signalPassFailure();
+      return;
+    }
     if (maxParallelDims || maxOperandRank || splitReductionInputs ||
         splitPointwiseInputs) {
       RewritePatternSet outputs(&getContext());
@@ -1428,6 +1559,8 @@ struct NormalizeLinalgMatchingViewsPass
       RewritePatternSet split(&getContext());
       split.add<SplitReductionInputs>(&getContext(), splitReductionInputs,
                                       splitPointwiseInputs);
+      if (splitPointwiseInputs)
+        split.add<SplitPointwiseOutputs>(&getContext());
       linalg::populateEraseUnusedOperandsAndResultsPatterns(split);
       if (failed(applyPatternsAndFoldGreedily(getOperation(), std::move(split)))) {
         signalPassFailure();
