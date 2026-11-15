@@ -127,7 +127,8 @@ def abi_digest(table=None):
 def semantic_configuration():
     return dict(numeric_model=os.environ.get('POLYGEIST_NUMERIC_MODEL', 'strict'),
                 eqsat_ablation=os.environ.get('EQSAT_ABLATION', 'full'),
-                spec_suite=MATCH.SUITE, backend_error_budgets=BACKEND.budgets())
+                spec_suite=MATCH.SUITE, backend_error_budgets=BACKEND.budgets(),
+                backend_approximations=BACKEND.approximations())
 
 
 def backend_evidence(names, rows, *, table=None):

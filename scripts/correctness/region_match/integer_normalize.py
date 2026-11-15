@@ -140,4 +140,11 @@ def normalize(f,ctx):
     try: expanded=expand(f,ctx,[4096])
     except ValueError: return f
     result=bounded(expanded,[4096])
-    return FUn('integer.value',result.expression()) if result else f
+    # Finite expansion preserves the original order and every typed operation,
+    # even when range analysis cannot justify algebraic integer normalization.
+    if result:
+        return FUn('integer.value',result.expression())
+    # Keep standalone recurrences compact (especially guarded scatter updates).
+    # Expansion underneath a typed scalar operation exposes shifted bounds
+    # while leaving the arithmetic and execution order unchanged.
+    return f if isinstance(f, FFold) else expanded

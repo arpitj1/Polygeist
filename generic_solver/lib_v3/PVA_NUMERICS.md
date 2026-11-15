@@ -38,7 +38,7 @@ check alone is not a proof of a closed vendor implementation.
 ## Quantized backends
 
 `target.numerical_contract` describes backend differences separately from
-reference `deviations`. Currently the supported contract is a normalized linear
+reference `deviations`. A bounded contract describes a normalized linear
 filter with integer coefficients, rational scales, a bounded input interval,
 and explicit rounding-error bounds. The shared implementation uses rational
 interval arithmetic to bound the difference. The bound is conditional on the
@@ -69,8 +69,23 @@ only marshals the selected API and checked parameters.
 
 Bilateral's square/circular neighborhood difference and histogram equalization's
 constant-image behavior are not modeled by this linear quantization contract.
-Those operators remain unavailable through this route. Raising a tolerance
-does not turn them into specification matches.
+Their public reference variants declare these differences and use a separate
+`recorded_approximation` contract. Typed integer Box and Gaussian reference
+variants use the same policy where no numerical error bound has been established.
+These variants require relaxed reference semantics and explicit per-specification
+acceptance, for example:
+
+```sh
+export POLYGEIST_NUMERIC_MODEL=relaxed
+export POLYGEIST_BACKEND_APPROXIMATIONS='["opencv_bilateral3x3_square_u8"]'
+```
+
+This policy does not assert numerical equivalence to the vendor implementation.
+The application must still match the complete imported reference. Execution
+records output differences separately from input preservation, guard regions,
+border handling and the selected vendor call. A numerical error budget cannot
+enable an unbounded approximation. Saved proof verification includes the exact
+list of accepted specifications.
 
 Public sources:
 

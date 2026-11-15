@@ -212,7 +212,7 @@ def _elem_of(ty: str) -> str:
     m = re.match(r"\s*(?:memref|tensor)<(.*)>\s*$", ty)
     if m:                         # first top-level component (drop any layout)
         ty = _split_top(m.group(1))[0].strip() + ">"
-    m = re.search(r"x?(f64|f32|f16|bf16|i64|i32|i8|i1|index)>", ty)
+    m = re.search(r"x?(f64|f32|f16|bf16|i\d+|index)>", ty)
     return m.group(1) if m else ty
 
 
@@ -550,7 +550,12 @@ class Executor:
                     if not (implies(facts, ge(v.aff, low)) and
                             implies(facts, le(v.aff, high))):
                         raise Unsupported('narrowing index conversion may truncate')
-                self.env[res[0]] = v
+                # Keep the typed conversion when the integer is also data.
+                # Its affine value is unchanged, but erasing the cast here
+                # made scalar loads disagree with the same Linalg operands.
+                self.env[res[0]] = (IdxVal(v.aff, EUn(n + ':' + src + ' to ' + dst,
+                    self.fval(m.group(1)))) if n == 'arith.extsi' and
+                    (v.data is not None or atoms_in(v.aff.vars())) else v)
             else:
                 raise Unsupported('unsupported integer conversion operand')
             return
@@ -581,7 +586,10 @@ class Executor:
                     data = EBin(opn, self.fval(m.group(1)), self.fval(m.group(2)))
                 self.env[res[0]] = IdxVal(r, data)
             except NonAffine:
-                self.env[res[0]] = Undef()
+                # Non-affine integer arithmetic is still a valid data value.
+                # If it is later used as an index, idx() rejects it there.
+                opn = n + ':' + rest.rsplit(':', 1)[1].strip()
+                self.env[res[0]] = FVal(EBin(opn, self.fval(m.group(1)), self.fval(m.group(2))))
             return
         if n in ("arith.divsi", "arith.divui", "arith.floordivsi", "arith.ceildivsi"):
             # exact only: the divisor is a constant that divides every
@@ -685,8 +693,32 @@ class Executor:
         if n in ("arith.shli", "arith.shrsi", "arith.shrui", "arith.ori", "arith.xori"):
             m = re.match(r"\S+\s+(%[\w$.#-]+),\s*(%[\w$.#-]+)", rest)
             ty = rest.rsplit(':', 1)[1].strip()
-            self.env[res[0]] = FVal(EBin(n + ':' + ty,
-                self.fval(m.group(1)), self.fval(m.group(2))))
+            data = EBin(n + ':' + ty, self.fval(m.group(1)), self.fval(m.group(2)))
+            a, b = self.get(m.group(1)), self.get(m.group(2))
+            # A constant right shift of a nonnegative loaded integer is an
+            # opaque, typed indirect index. Keep the full conversion identity;
+            # two different shifts must never denote the same memory access.
+            if n in ('arith.shrsi', 'arith.shrui') and isinstance(a, IdxVal) and isinstance(b, IdxVal):
+                from .affine import implies
+                bits = int(ty[1:]) if re.fullmatch(r'i\d+', ty) else 0
+                name = (a.aff.terms[0][0] if a.aff.const == 0 and
+                        len(a.aff.terms) == 1 and a.aff.terms[0][1] == 1 else None)
+                facts = self.domain + self.integer_type_facts
+                if (bits and b.aff.is_const() and 0 <= b.aff.const < bits and
+                        name is not None and is_atom(name) and
+                        implies(facts, ge(a.aff, 0)) and
+                        implies(facts, le(a.aff, (1 << (bits - 1)) - 1))):
+                    arr, coords = atom_info(name)
+                    conversion = n + ':' + ty + ':' + str(b.aff.const) + '(' + atom_conversion(name) + ')'
+                    shifted = atom(arr, coords, conversion)
+                    shifted_name = shifted.terms[0][0]
+                    self.atom_reads[shifted_name] = data
+                    bounds = [ge(shifted, 0), le(shifted, ((1 << (bits - 1)) - 1) >> b.aff.const)]
+                    self.integer_type_facts.extend(bounds)
+                    self.index_atom_ranges[shifted_name] = bounds
+                    self.env[res[0]] = IdxVal(shifted, data)
+                    return
+            self.env[res[0]] = FVal(data)
             return
         if n == "arith.andi":
             m = re.match(r"\S+\s+(%[\w$.#-]+),\s*(%[\w$.#-]+)", rest)
@@ -708,8 +740,8 @@ class Executor:
             m = re.match(r"arith\.select\s+(%[\w$.#-]+),\s*(%[\w$.#-]+),\s*(%[\w$.#-]+)\s*:\s*(\S+)", rest)
             c = self.get(m.group(1))
             a, b = self.get(m.group(2)), self.get(m.group(3))
-            if isinstance(a, FVal) and isinstance(b, FVal) and isinstance(c, (CondAff, CondF)):
-                self.env[res[0]] = FVal(ESel(c, a.e, b.e))
+            if isinstance(a, (FVal, IdxVal)) and isinstance(b, (FVal, IdxVal)) and isinstance(c, (CondAff, CondF)):
+                self.env[res[0]] = FVal(ESel(c, self.fval(m.group(2)), self.fval(m.group(3))))
             else:
                 self.env[res[0]] = Undef()
             return
@@ -1462,7 +1494,34 @@ class Executor:
 
     def _if(self, op: Op, prefix, pos):
         if op.results:
-            raise Unsupported("if with results")
+            # Pure value-producing conditionals are typed selects. Do not
+            # speculate memory accesses or branch-local side effects.
+            if op.name != 'scf.if' or len(op.regions) != 2:
+                raise Unsupported('non-scalar if with results')
+            def pure(ops):
+                return all((o.name.startswith(('arith.', 'math.')) or
+                            o.name in ('scf.if', 'scf.yield')) and
+                           all(pure(region) for region in o.regions) for o in ops)
+            if not all(pure(region) for region in op.regions):
+                raise Unsupported('effectful if with results')
+            condition = self.get(re.match(r'.*?scf\.if\s+(%[\w$.#-]+)', op.line).group(1))
+            if not isinstance(condition, (CondAff, CondF)):
+                raise Unsupported('unsupported scalar if condition')
+            incoming = dict(self.env)
+            values = []
+            for branch, region in enumerate(op.regions):
+                if not region or region[-1].name != 'scf.yield':
+                    raise Unsupported('missing scalar if yield')
+                self.env = dict(incoming)
+                self.exec_block(region[:-1], prefix + [Aff.cst(pos), Aff.cst(branch)])
+                operands = re.findall(r'%[\w$.#-]+', region[-1].line.split(':', 1)[0])
+                if len(operands) != len(op.results):
+                    raise Unsupported('scalar if result arity')
+                values.append([self.fval(value) for value in operands])
+            self.env = incoming
+            for result, left, right in zip(op.results, *values):
+                self.env[result] = FVal(ESel(condition, left, right))
+            return
         line = op.line
         if op.name == "affine.if":
             m = re.match(r".*?affine\.if\s+(#[\w$.-]+|affine_set<.*?>)\s*\(([^)]*)\)(?:\[([^\]]*)\])?", line)

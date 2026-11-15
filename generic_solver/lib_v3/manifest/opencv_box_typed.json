@@ -1,0 +1,258 @@
+{
+  "routine": "opencv_box_typed",
+  "source": "Public OpenCV RowSum/ColumnSum, explicitly adapted integer-normalized reference variants",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/box_filter.simd.hpp",
+      "sha256": "d18696d999c76bbbf746dc6935f069043b9679a8370502c4828f164c022d9f03"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_box3x3_s8",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "PIXEL_TYPE": "int8_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaBoxFilterSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_boxfilter_3x3_s8",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              "h",
+              "w"
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        },
+        "numerical_contract": {
+          "schema": 1,
+          "kind": "recorded_approximation",
+          "source": "https://docs.nvidia.com/pva/solutions/0.4.0/impl/operator/boxfilter.html",
+          "assumptions": [
+            "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+          ]
+        }
+      },
+      "assumptions": [
+        "Contiguous disjoint single-channel images; preserve untouched output borders.",
+        "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+      ],
+      "deviations": [
+        "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+      ],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            5,
+            6
+          ]
+        }
+      }
+    },
+    {
+      "name": "opencv_box3x3_u16",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "PIXEL_TYPE": "uint16_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaBoxFilterSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_boxfilter_3x3_u16",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              "h",
+              "w"
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        },
+        "numerical_contract": {
+          "schema": 1,
+          "kind": "recorded_approximation",
+          "source": "https://docs.nvidia.com/pva/solutions/0.4.0/impl/operator/boxfilter.html",
+          "assumptions": [
+            "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+          ]
+        }
+      },
+      "assumptions": [
+        "Contiguous disjoint single-channel images; preserve untouched output borders.",
+        "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+      ],
+      "deviations": [
+        "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+      ],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            5,
+            6
+          ]
+        }
+      }
+    },
+    {
+      "name": "opencv_box3x3_s16",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "PIXEL_TYPE": "int16_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaBoxFilterSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_boxfilter_3x3_s16",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              "h",
+              "w"
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        },
+        "numerical_contract": {
+          "schema": 1,
+          "kind": "recorded_approximation",
+          "source": "https://docs.nvidia.com/pva/solutions/0.4.0/impl/operator/boxfilter.html",
+          "assumptions": [
+            "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+          ]
+        }
+      },
+      "assumptions": [
+        "Contiguous disjoint single-channel images; preserve untouched output borders.",
+        "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+      ],
+      "deviations": [
+        "Integer-normalized reference variant; PVA uses quantized coefficients and rounding. Signed pixel instantiations extend the public template. Output errors are recorded without an asserted bound."
+      ],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            5,
+            6
+          ]
+        }
+      }
+    }
+  ]
+}

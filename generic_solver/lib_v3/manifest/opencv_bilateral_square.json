@@ -1,0 +1,108 @@
+{
+  "routine": "opencv_bilateral_square",
+  "source": "Public OpenCV bilateral algorithm, explicitly declared square-window arithmetic reference variant",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/opencl/bilateral.cl",
+      "sha256": "f216b666e2d0c9e655433e2df0899f791224aa83bbbaca70e8c6c97e50b92694"
+    },
+    {
+      "path": "third_party/opencv/modules/imgproc/src/bilateral_filter.dispatch.cpp",
+      "sha256": "e398164395de07e3476079869f91b3334548f378a2931f7b7edf6f79cd0dfd4c"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_bilateral3x3_square_u8",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output",
+        "sigma_r",
+        "sigma_s"
+      ],
+      "defines": {},
+      "target": {
+        "library": "PVA",
+        "call": "pvaBilateralFilterSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_bilateral_3x3_u8",
+          "arguments": [
+            "h",
+            "w",
+            "sigma_r",
+            "sigma_s",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              {
+                "product": [
+                  "h",
+                  "w"
+                ]
+              }
+            ],
+            "output": [
+              {
+                "product": [
+                  "h",
+                  "w"
+                ]
+              }
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        },
+        "numerical_contract": {
+          "schema": 1,
+          "kind": "recorded_approximation",
+          "source": "https://docs.nvidia.com/pva/solutions/0.4.0/impl/operator/bilateralfilter.html",
+          "assumptions": [
+            "Reference variant uses square rather than circular support and direct FP32 exponential arithmetic. PVA uses circular support and Q1.7 weights. Accepted as an approximate backend binding; no universal small error bound."
+          ]
+        }
+      },
+      "assumptions": [
+        "Contiguous disjoint single-channel images; preserve untouched output borders.",
+        "Reference variant uses square rather than circular support and direct FP32 exponential arithmetic. PVA uses circular support and Q1.7 weights. Accepted as an approximate backend binding; no universal small error bound."
+      ],
+      "deviations": [
+        "Reference variant uses square rather than circular support and direct FP32 exponential arithmetic. PVA uses circular support and Q1.7 weights. Accepted as an approximate backend binding; no universal small error bound."
+      ],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6,
+          "sigma_r": 25.0,
+          "sigma_s": 1.5
+        },
+        "arrays": {
+          "input": [
+            30
+          ],
+          "output": [
+            30
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -708,6 +708,16 @@ void polygeist_pva_conv2d_3x3_i16(
 // pva*Create/pva*Submit entry points. Image-filter adapters preserve the
 // caller's one-pixel border because the matched C regions update only the
 // complete 3x3 interior.
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaBoxFilterSubmit polygeist_pva_boxfilter_3x3_s8 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaGaussianFilterSubmit polygeist_pva_gaussian_3x3_s8 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaBoxFilterSubmit polygeist_pva_boxfilter_3x3_u16 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaGaussianFilterSubmit polygeist_pva_gaussian_3x3_u16 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaBoxFilterSubmit polygeist_pva_boxfilter_3x3_s16 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaGaussianFilterSubmit polygeist_pva_gaussian_3x3_s16 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaImageHistogramSubmit polygeist_pva_histogram_256_u16_u32 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaImageHistogramSubmit polygeist_pva_histogram_256_u16_s32 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaBilateralFilterSubmit polygeist_pva_bilateral_3x3_u8 */
+/* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaHistogramEqualizationSubmit polygeist_pva_histeq_u8 */
 /* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaMorphologySubmit polygeist_pva_morphology_dilate_3x3_u8 */
 /* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaMorphologySubmit polygeist_pva_morphology_dilate_3x3_s8 */
 /* POLYGEIST_TYPED_VENDOR_ENTRY PVA pvaMorphologySubmit polygeist_pva_morphology_dilate_3x3_u16 */

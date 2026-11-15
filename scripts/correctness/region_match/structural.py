@@ -110,18 +110,21 @@ def _catalog(spec_dir, allowed):
     for path in sorted((root/'manifest').glob('*.json')):
         for entry in json.loads(path.read_text()).get('specs', []):
             name = entry['name']
-            if name not in allowed or 'debufferized' not in validated_stages(imported.get(name, {})):
+            if name not in allowed:
                 continue
-            source = root/'raised'/(name+'_debuf.mlir')
-            if not source.exists():
-                continue
-            text = source.read_text()
-            # Existing Linalg body matching covers straight-line computations.
-            if not re.search(r'\b(?:scf.while|scf.for|affine.for|scf.index_switch)\b', text):
-                continue
-            for function in ML.Module(text).funcs:
-                if function.name == name and function.ops:
-                    yield entry, text, function
+            permitted = validated_stages(imported.get(name, {}))
+            for stage, suffix in [('debufferized', '_debuf'), ('linalg', '_linalg'),
+                                  ('cgeist-affine', '')]:
+                source = root/'raised'/(name+suffix+'.mlir')
+                if stage not in permitted or not source.exists():
+                    continue
+                text = source.read_text()
+                # Existing Linalg body matching covers straight-line computations.
+                if not re.search(r'\b(?:scf.while|scf.for|affine.for|scf.index_switch)\b', text):
+                    continue
+                for function in ML.Module(text).funcs:
+                    if function.name == name and function.ops:
+                        yield entry, text, function
 
 
 def match_regions(text, spec_dir, allowed_specs):
@@ -146,7 +149,7 @@ def match_regions(text, spec_dir, allowed_specs):
         if len(bounds) > 32:
             continue
         for entry, source, ref in catalog:
-            if len(app.args) > 5 or len(entry.get('args',[])) != len(ref.args):
+            if len(app.args) > 6 or len(entry.get('args',[])) != len(ref.args):
                 continue
             extra = len(ref.args) - len(app.args)
             if extra not in (0, 1):

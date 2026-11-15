@@ -1,0 +1,150 @@
+{
+  "routine": "opencv_histogram_u16",
+  "source": "Public OpenCV calcHist_<ushort>, 256 uniform bins",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/histogram.cpp",
+      "sha256": "558d93aeede8956b89f74d56e4575e4e663cc010e7751f43b5fece362ec9a0a7"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_histogram_u16_u32",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "OUTPUT_TYPE": "uint32_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaImageHistogramSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_histogram_256_u16_u32",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              256
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "256 uniform bins over uint16 range; h*w fits signed int32; contiguous disjoint input/output."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            256
+          ]
+        }
+      }
+    },
+    {
+      "name": "opencv_histogram_u16_s32",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {
+        "OUTPUT_TYPE": "int32_t"
+      },
+      "target": {
+        "library": "PVA",
+        "call": "pvaImageHistogramSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_histogram_256_u16_s32",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "h",
+              "w"
+            ],
+            "output": [
+              256
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        }
+      },
+      "assumptions": [
+        "256 uniform bins over uint16 range; h*w fits signed int32; contiguous disjoint input/output."
+      ],
+      "deviations": [],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            5,
+            6
+          ],
+          "output": [
+            256
+          ]
+        }
+      }
+    }
+  ]
+}

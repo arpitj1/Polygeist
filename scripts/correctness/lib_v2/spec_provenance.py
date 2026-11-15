@@ -115,7 +115,8 @@ def write(path, specs, results, recipe, library, compiler_paths):
 def validated_stages(row):
     validation = row.get('numerical_validation') or {}
     good = {'EXACT', 'WITHIN_1e-12'}
-    return [stage for stage, key in [('cgeist-affine', 'affine'), ('debufferized', 'defn')]
+    return [stage for stage, key in [('cgeist-affine', 'affine'), ('linalg', 'linalg'),
+                                   ('debufferized', 'defn')]
             if validation.get(key) in good]
 
 

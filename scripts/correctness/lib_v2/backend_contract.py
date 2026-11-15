@@ -21,7 +21,26 @@ def budgets():
     return result
 
 
+def approximations():
+    """Explicitly accepted backend approximations with measured, unbounded error."""
+    try:
+        value = json.loads(os.environ.get('POLYGEIST_BACKEND_APPROXIMATIONS', '[]'))
+    except (ValueError, TypeError) as error:
+        raise ValueError('backend approximations must be a JSON list of specification names') from error
+    if not isinstance(value, list) or any(not isinstance(x, str) or not x for x in value):
+        raise ValueError('backend approximations must be a JSON list of specification names')
+    return sorted(set(value))
+
+
 def analyze(contract):
+    if isinstance(contract, dict) and contract.get('kind') == 'recorded_approximation':
+        if (set(contract) != {'schema', 'kind', 'source', 'assumptions'} or
+                contract['schema'] != 1 or not isinstance(contract['source'], str) or
+                not contract['source'].startswith('https://') or
+                not isinstance(contract['assumptions'], list) or not contract['assumptions'] or
+                any(not isinstance(x, str) or not x for x in contract['assumptions'])):
+            raise ValueError('invalid recorded approximation contract')
+        return dict(contract, basis='explicit backend approximation; no numerical error bound asserted')
     fields = {'schema', 'kind', 'source_weights', 'source_denominator',
               'backend_weights', 'backend_denominator', 'input_range',
               'source_rounding_error', 'backend_rounding_error', 'assumptions', 'source'}
@@ -71,6 +90,8 @@ def rejection(name, target, policy):
         info = analyze(contract)
     except ValueError as error:
         return str(error)
+    if info['kind'] == 'recorded_approximation':
+        return None if name in approximations() else 'backend approximation requires explicit acceptance'
     if name not in policy:
         return 'approximate backend requires an explicit error budget'
     if policy[name] < info['max_abs_error_bound']:
@@ -84,6 +105,9 @@ def evidence(name, target, policy):
     reason = rejection(name, target, policy)
     if reason:
         raise ValueError(reason)
-    return dict(analyze(target['numerical_contract']), accepted_error_budget=policy[name],
+    info = analyze(target['numerical_contract'])
+    acceptance = (dict(accepted_approximation=True) if info['kind'] == 'recorded_approximation'
+                  else dict(accepted_error_budget=policy[name]))
+    return dict(info, **acceptance,
                 source_reference_match='exact under the selected scalar arithmetic model',
                 vendor_execution='requires independent validation')

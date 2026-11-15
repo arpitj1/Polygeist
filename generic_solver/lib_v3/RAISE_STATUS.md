@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 23, PARTIAL: 56, RAISED: 377, UNSOUND: 2, UNVALIDATED: 16 (total 474)
+Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 377, UNSOUND: 2, UNVALIDATED: 16 (total 484)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -363,11 +363,21 @@ Summary: NOT_RAISED: 23, PARTIAL: 56, RAISED: 377, UNSOUND: 2, UNVALIDATED: 16 (
 | `openblas_sgemv_t_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_somatcopy_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_somatcopy_transpose_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / EXACT |  |
+| `opencv_bilateral3x3_square_u8` | opencv_bilateral_square | PARTIAL | 4 | affine.for | LOWER_FAIL / EXACT | 4 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses) |
 | `opencv_bilinear2x_f32` | opencv_bilinear | RAISED | 1 | - | EXACT / EXACT |  |
 | `opencv_box3x3_u8` | opencv_box_fixed | RAISED | 2 | - | EXACT / EXACT |  |
+| `opencv_box3x3_s8` | opencv_box_typed | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `opencv_box3x3_u16` | opencv_box_typed | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `opencv_box3x3_s16` | opencv_box_typed | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `opencv_equalize_integer_u8` | opencv_equalize_integer | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `opencv_gaussian3x3_u8` | opencv_gaussian_fixed | RAISED | 2 | - | EXACT / EXACT |  |
+| `opencv_gaussian3x3_s8` | opencv_gaussian_typed | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `opencv_gaussian3x3_u16` | opencv_gaussian_typed | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `opencv_gaussian3x3_s16` | opencv_gaussian_typed | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `opencv_histogram_u8_u32` | opencv_histogram | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `opencv_histogram_u8_s32` | opencv_histogram | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `opencv_histogram_u16_u32` | opencv_histogram_u16 | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `opencv_histogram_u16_s32` | opencv_histogram_u16 | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `opencv_morphology_dilate_u8` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
 | `opencv_morphology_dilate_s8` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
 | `opencv_morphology_dilate_u16` | opencv_morphology | RAISED | 2 | - | EXACT / EXACT |  |
@@ -1413,6 +1423,102 @@ build/bin/polygeist-opt '--select-func=func-name=openblas_sgemm_nn externalize-d
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_sgemm_nn_linalg.mlir -o generic_solver/lib_v3/raised/openblas_sgemm_nn_debuf.mlir
 ```
 
+### `opencv_bilateral3x3_square_u8` -- PARTIAL
+
+Reason: 4 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_bilateral3x3_square_u8/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_bilateral3x3_square_u8`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_bilateral3x3_square_u8.c --function=opencv_bilateral3x3_square_u8 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_bilateral3x3_square_u8.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_bilateral3x3_square_u8 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_bilateral3x3_square_u8.mlir -o generic_solver/lib_v3/raised/opencv_bilateral3x3_square_u8_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_bilateral3x3_square_u8_linalg.mlir -o generic_solver/lib_v3/raised/opencv_bilateral3x3_square_u8_debuf.mlir
+```
+
+### `opencv_box3x3_s8` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_box3x3_s8/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_box3x3_s8`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_box3x3_s8.c --function=opencv_box3x3_s8 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_box3x3_s8.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_box3x3_s8 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_box3x3_s8.mlir -o generic_solver/lib_v3/raised/opencv_box3x3_s8_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_box3x3_s8_linalg.mlir -o generic_solver/lib_v3/raised/opencv_box3x3_s8_debuf.mlir
+```
+
+### `opencv_box3x3_u16` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_box3x3_u16/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_box3x3_u16`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_box3x3_u16.c --function=opencv_box3x3_u16 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_box3x3_u16.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_box3x3_u16 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_box3x3_u16.mlir -o generic_solver/lib_v3/raised/opencv_box3x3_u16_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_box3x3_u16_linalg.mlir -o generic_solver/lib_v3/raised/opencv_box3x3_u16_debuf.mlir
+```
+
+### `opencv_box3x3_s16` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_box3x3_s16/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_box3x3_s16`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_box3x3_s16.c --function=opencv_box3x3_s16 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_box3x3_s16.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_box3x3_s16 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_box3x3_s16.mlir -o generic_solver/lib_v3/raised/opencv_box3x3_s16_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_box3x3_s16_linalg.mlir -o generic_solver/lib_v3/raised/opencv_box3x3_s16_debuf.mlir
+```
+
+### `opencv_equalize_integer_u8` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_equalize_integer_u8/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_equalize_integer_u8`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_equalize_integer_u8.c --function=opencv_equalize_integer_u8 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_equalize_integer_u8.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_equalize_integer_u8 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_equalize_integer_u8.mlir -o generic_solver/lib_v3/raised/opencv_equalize_integer_u8_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_equalize_integer_u8_linalg.mlir -o generic_solver/lib_v3/raised/opencv_equalize_integer_u8_debuf.mlir
+```
+
+### `opencv_gaussian3x3_s8` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_gaussian3x3_s8/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_gaussian3x3_s8`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_gaussian3x3_s8.c --function=opencv_gaussian3x3_s8 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_gaussian3x3_s8.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_gaussian3x3_s8 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_gaussian3x3_s8.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_s8_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_gaussian3x3_s8_linalg.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_s8_debuf.mlir
+```
+
+### `opencv_gaussian3x3_u16` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_gaussian3x3_u16/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_gaussian3x3_u16`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_gaussian3x3_u16.c --function=opencv_gaussian3x3_u16 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_gaussian3x3_u16.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_gaussian3x3_u16 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_gaussian3x3_u16.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_u16_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_gaussian3x3_u16_linalg.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_u16_debuf.mlir
+```
+
+### `opencv_gaussian3x3_s16` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_gaussian3x3_s16/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_gaussian3x3_s16`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_gaussian3x3_s16.c --function=opencv_gaussian3x3_s16 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_gaussian3x3_s16.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_gaussian3x3_s16 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_gaussian3x3_s16.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_s16_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_gaussian3x3_s16_linalg.mlir -o generic_solver/lib_v3/raised/opencv_gaussian3x3_s16_debuf.mlir
+```
+
 ### `opencv_histogram_u8_u32` -- PARTIAL
 
 Reason: 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
@@ -1435,6 +1541,30 @@ Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_h
 build/bin/cgeist generic_solver/lib_v3/raised/opencv_histogram_u8_s32.c --function=opencv_histogram_u8_s32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_histogram_u8_s32.mlir
 build/bin/polygeist-opt '--select-func=func-name=opencv_histogram_u8_s32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_histogram_u8_s32.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u8_s32_linalg.mlir
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_histogram_u8_s32_linalg.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u8_s32_debuf.mlir
+```
+
+### `opencv_histogram_u16_u32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_histogram_u16_u32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_histogram_u16_u32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_histogram_u16_u32.c --function=opencv_histogram_u16_u32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_histogram_u16_u32.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_histogram_u16_u32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_histogram_u16_u32.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u16_u32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_histogram_u16_u32_linalg.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u16_u32_debuf.mlir
+```
+
+### `opencv_histogram_u16_s32` -- PARTIAL
+
+Reason: 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/opencv_histogram_u16_s32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only opencv_histogram_u16_s32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/opencv_histogram_u16_s32.c --function=opencv_histogram_u16_s32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/opencv_histogram_u16_s32.mlir
+build/bin/polygeist-opt '--select-func=func-name=opencv_histogram_u16_s32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/opencv_histogram_u16_s32.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u16_s32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/opencv_histogram_u16_s32_linalg.mlir -o generic_solver/lib_v3/raised/opencv_histogram_u16_s32_debuf.mlir
 ```
 
 ### `sparskit_amux` -- NOT_RAISED

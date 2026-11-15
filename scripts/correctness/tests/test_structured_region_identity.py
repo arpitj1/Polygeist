@@ -37,16 +37,20 @@ APPLICATION = REFERENCE.replace('@reference(%n: i32, ', '@application(').replace
 
 
 class StructuredRegionIdentity(unittest.TestCase):
-    def match(self, application=APPLICATION, reference=REFERENCE, validated=True, args=None):
+    def match(self, application=APPLICATION, reference=REFERENCE, validated=True, args=None, stage="debufferized"):
         with tempfile.TemporaryDirectory() as tmp:
             d=Path(tmp);(d/'manifest').mkdir();(d/'raised').mkdir()
             (d/'manifest/spec.json').write_text(json.dumps({'specs':[{
                 'name':'reference','args':args or ['n','x','y'],
                 'assumptions':['positive n <= INT_MAX'], 'deviations':[]}]}))
             (d/'import_manifest.json').write_text(json.dumps({'specifications':{
-                'reference':{'numerical_validation':{'defn':'EXACT' if validated else 'UNSOUND'}}}}))
-            (d/'raised/reference_debuf.mlir').write_text(reference)
+                'reference':{'numerical_validation':{('linalg' if stage=='linalg' else 'defn'):'EXACT' if validated else 'UNSOUND'}}}}))
+            (d/('raised/reference_linalg.mlir' if stage=='linalg' else 'raised/reference_debuf.mlir')).write_text(reference)
             return match_regions(application,str(d),{'reference'})
+
+    def test_only_independently_validated_stages_are_accepted(self):
+        self.assertTrue(self.match(stage='linalg'))
+        self.assertFalse(self.match(stage='linalg',validated=False))
 
     def test_exact_nested_recurrence(self):
         matches=self.match()

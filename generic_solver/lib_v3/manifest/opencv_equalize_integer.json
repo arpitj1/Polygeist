@@ -1,0 +1,102 @@
+{
+  "routine": "opencv_equalize_integer",
+  "source": "Public OpenCV histogram/CDF/LUT algorithm, explicitly declared integer arithmetic and constant-image reference variant",
+  "upstream_files": [
+    {
+      "path": "third_party/opencv/modules/imgproc/src/histogram.cpp",
+      "sha256": "558d93aeede8956b89f74d56e4575e4e663cc010e7751f43b5fece362ec9a0a7"
+    },
+    {
+      "path": "third_party/opencv/modules/imgproc/test/test_histograms.cpp",
+      "sha256": "17da799a51c4c5aaf39bc3c6f72e4bdbf28f14147efa47a1a2ad744371ab0443"
+    }
+  ],
+  "specs": [
+    {
+      "name": "opencv_equalize_integer_u8",
+      "args": [
+        "h",
+        "w",
+        "input",
+        "output"
+      ],
+      "defines": {},
+      "target": {
+        "library": "PVA",
+        "call": "pvaHistogramEqualizationSubmit",
+        "backends": [
+          "pva"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_pva_histeq_u8",
+          "arguments": [
+            "h",
+            "w",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              {
+                "product": [
+                  "h",
+                  "w"
+                ]
+              }
+            ],
+            "output": [
+              {
+                "product": [
+                  "h",
+                  "w"
+                ]
+              }
+            ]
+          },
+          "bounds": {
+            "h": {
+              "min": 3,
+              "max": 46340
+            },
+            "w": {
+              "min": 3,
+              "max": 46340
+            }
+          },
+          "alias_policy": "disjoint"
+        },
+        "numerical_contract": {
+          "schema": 1,
+          "kind": "recorded_approximation",
+          "source": "https://docs.nvidia.com/pva/solutions/0.4.0/impl/operator/histogramequalization.html",
+          "assumptions": [
+            "Integer CDF normalization reference variant maps constant input to zero. PVA preserves constant values and uses Q15 LUT scaling; explicit approximate binding with observed differences retained."
+          ]
+        }
+      },
+      "assumptions": [
+        "Contiguous disjoint single-channel images; preserve untouched output borders.",
+        "Integer CDF normalization reference variant maps constant input to zero. PVA preserves constant values and uses Q15 LUT scaling; explicit approximate binding with observed differences retained."
+      ],
+      "deviations": [
+        "Integer CDF normalization reference variant maps constant input to zero. PVA preserves constant values and uses Q15 LUT scaling; explicit approximate binding with observed differences retained."
+      ],
+      "validation": {
+        "scalars": {
+          "h": 5,
+          "w": 6
+        },
+        "arrays": {
+          "input": [
+            30
+          ],
+          "output": [
+            30
+          ]
+        }
+      }
+    }
+  ]
+}
