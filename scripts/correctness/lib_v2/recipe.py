@@ -136,7 +136,8 @@ def pass_pipeline(flags):
     for flag in flags:
         name, sep, options = flag.removeprefix('--').partition('=')
         item = name + ('{' + options + '}' if sep else '')
-        passes.append('func.func(' + item + ')' if name == 'affine-parallelize' else item)
+        function_passes = {'affine-parallelize', 'affine-loop-normalize'}
+        passes.append('func.func(' + item + ')' if name in function_passes else item)
     return ','.join(passes)
 
 

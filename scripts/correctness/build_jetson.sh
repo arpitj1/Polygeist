@@ -349,16 +349,16 @@ echo "  [5/6] cross-compile runtime shim + any harness .c files"
 # aarch64 cross-dev location, separate from CUDA's include path.
 CUDNN_INC=${CUDNN_INC:-/usr/include/aarch64-linux-gnu}
 CUDNN_LIB=${CUDNN_LIB:-/usr/lib/aarch64-linux-gnu}
-RT_EXTRA_CFLAGS=()
+RT_EXTRA_CFLAGS=(-ffunction-sections -fdata-sections)
 RT_EXTRA_LIBS=()
-RT_LINK_FLAGS=()
+# Imported specifications share one runtime. Keep only entries reached by the
+# program, so unused wrappers do not require their optional companion objects.
+RT_LINK_FLAGS=(-Wl,--gc-sections)
 ACCEL_LIBS=(-lcudnn -lcublasLt -lcublas -lcufft -lcusparse -lcusolver)
 if [ "${POLYGEIST_MINIMAL_RUNTIME:-0}" != "0" ]; then
   # Put every runtime entry point in its own ELF section and discard entries
   # unreachable from this executable. This lets a cuTensorNet-only binary run
   # on minimal JetPack images that do not install cuDNN/cuFFT.
-  RT_EXTRA_CFLAGS+=("-ffunction-sections" "-fdata-sections")
-  RT_LINK_FLAGS+=("-Wl,--gc-sections")
   ACCEL_LIBS=(-lcublasLt -lcublas -lcusolver)
   echo "       minimal runtime: dead-strip unused library shims"
 fi
@@ -432,10 +432,5 @@ $AARCH64_READELF -d "$OUT_EXE" | grep -E 'NEEDED|RUNPATH'
 echo ""
 echo "Binary size: $(stat -c '%s bytes' "$OUT_EXE")"
 echo ""
-echo "Ship to Jetson with:"
-echo "  scp '$OUT_EXE' nvidia@<jetson>:/tmp/"
-echo "  ssh nvidia@<jetson> 'chmod +x /tmp/$(basename "$OUT_EXE") && /tmp/$(basename "$OUT_EXE")'"
-echo ""
-echo "Or profile on Jetson with nsys:"
-echo "  ssh nvidia@<jetson> 'nsys profile -o /tmp/trace /tmp/$(basename "$OUT_EXE")'"
+echo "Run this executable locally on a compatible AArch64 CUDA system."
 echo "═══════════════════════════════════════════════════════════════════════"

@@ -1,8 +1,29 @@
 """Whole entry wrappers can preserve real callees through the common recipe."""
-import subprocess,sys,tempfile,unittest
+import json,subprocess,sys,tempfile,unittest
 from pathlib import Path
 HERE=Path(__file__).resolve().parents[1]
 class RecipeScope(unittest.TestCase):
+ def test_whole_program_raises_selected_function_without_recovery(self):
+  source="""module {
+ func.func @entry(%a: memref<4xf32>) {
+  %v = arith.constant 1.0 : f32
+  affine.for %i = 0 to 4 {
+   affine.store %v, %a[%i] : memref<4xf32>
+  }
+  return
+ }
+ func.func @other() { return }
+}
+"""
+  with tempfile.TemporaryDirectory() as tmp:
+   d=Path(tmp);(d/'in.mlir').write_text(source)
+   cmd=[sys.executable,str(HERE/'lib_v2/recipe.py'),'--stage','raise','--whole-program','--function','entry','--input',str(d/'in.mlir'),'--output',str(d/'out.mlir')]
+   r=subprocess.run(cmd,capture_output=True,text=True,timeout=60)
+   self.assertEqual(r.returncode,0,r.stdout+r.stderr)
+   self.assertIsNone(json.loads(r.stdout)['recovery'],r.stdout)
+   output=(d/'out.mlir').read_text()
+   self.assertIn('linalg.generic',output)
+   self.assertIn('func.func @other',output)
  def test_dependency_scope_does_not_drop_callee_computation(self):
   source="""module {
  func.func @helper(%a: memref<4xf32>) {
