@@ -300,12 +300,12 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dsyrk_ln_alpha0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
 | `netlib_dtrmm_lunu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lunn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_lutu` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_lutn` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_lutu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_lutn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_llnu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_llnn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_lltu` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrmm_lltn` | dtrmm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_lltu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrmm_lltn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_runu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_runn` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_rutu` | dtrmm | PARTIAL | 2 | affine.for | EXACT / LOWER_FAIL | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
@@ -317,11 +317,11 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dtrmm_lunn_alpha0` | dtrmm | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dtrsv_unn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_unu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrsv_utn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrsv_utu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrsv_utn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrsv_utu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_lnn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_lnu` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
-| `netlib_dtrsv_ltn` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `netlib_dtrsv_ltn` | dtrsv | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrsv_ltu` | dtrsv | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `ggml_swiglu_f32` | ggml_swiglu | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_daxpby` | openblas_daxpby | RAISED | 1 | - | EXACT / EXACT |  |

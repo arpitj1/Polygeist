@@ -47,9 +47,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e3815d97816ac1d02a16062f02571b846ac73ef810b0363bed34d0fc9d8b7eca"
   }
  },
  {
@@ -102,9 +99,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ab40cf7baa1f6589e751a3faf326aa48c69317d9c11cfb11388dd335602103aa"
   }
  },
  {
@@ -157,9 +151,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d5de8c61fcd363cd6277d087251d9d75521e3db4d6c0a5baa31a5cb8857dce14"
   }
  },
  {
@@ -211,9 +202,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "aaad547dd60ce355dab49f3c178464b712f519dbe02b79b26992d30640b954e4"
   }
  },
  {
@@ -267,9 +255,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3bd6329c088e1d175cb343061d8cdd6d5e8d531fa398b42c99866682dcaf44e0"
   }
  },
  {
@@ -323,9 +308,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ad0332a632d6dbc62da3381c408fd7b1beb38ec298ec5f7a925f003e393973da"
   }
  },
  {
@@ -380,9 +362,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3091626fa4dac5575e8db592f79d692d7734e5d57e42807d46a2f0bb2f8ad7da"
   }
  },
  {
@@ -435,9 +414,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "12092c95c871a012fc4e685f59bb23693f1c3d9fc59aff4e4d363faf95903791"
   }
  },
  {
@@ -490,9 +466,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "99659720846a430b0cceee2fd12f26ed261a88fbd59cdee56ffdb20cb66e015b"
   }
  },
  {
@@ -543,9 +516,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "137be9a779b576c89900ca1c281e159beb3470c31800693844d4821ff61cd881"
   }
  },
  {
@@ -597,9 +567,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e1055663519a73d7891e0834b68b5e4d1181dfac88df87eae653e0c590835b72"
   }
  },
  {
@@ -652,9 +619,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c11643e19f393ccdfbd5a6bd204cded112d117d8dc934f452224303905f3069b"
   }
  },
  {
@@ -723,9 +687,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6b4617e257dd8de0a01407309bba8e992072374e8cf778a4aa7c42100d5aa99e"
   }
  },
  {
@@ -802,9 +763,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8147550d61d02b33a1dc5efaf2fba74ba9dd2234f0dd3b45bfed68fd7ab0f14b"
   }
  },
  {
@@ -855,9 +813,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "826d95badb81c3df8f5edcca129378eabfef2ed809785c153be2b0ab19a9473f"
   }
  },
  {
@@ -909,9 +864,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d8e52ef416d456af235ce5195b5e7b8b8d558eb968cb9cf9ce02fd857f21a9f6"
   }
  },
  {
@@ -963,9 +915,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e035ebfdfbccd28649bb85933d22fedc97519bf3f7472cf5fbb901f4a3981457"
   }
  },
  {
@@ -1018,9 +967,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "75591d44944d49cbc9eba5b9d25e9cca915bc3957ee5b760acad8e84b07746e1"
   }
  },
  {
@@ -1073,9 +1019,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b52a5c5ea2b45b7038983dfbb20959d58d975045ca2725b6b087bf872001314d"
   }
  },
  {
@@ -1128,9 +1071,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4a432d1a2195d4e60d91145042e9eb6f2ff26ee9eaf2110d890a55daebb46fa1"
   }
  },
  {
@@ -1183,9 +1123,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0bdab95ab87895e501a8741883dc8919a39cbe44ac8f19ad337ffe6bc5614f18"
   }
  },
  {
@@ -1239,9 +1176,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7b8003bde76cf422e684f1338cb6dc463b6adabe479096fe89d611e359261d5d"
   }
  },
  {
@@ -1295,9 +1229,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4df12c7ff7ca0b9a2bc91dbca82c9ca474f4b278aeed0b1bb6064331a2aecf73"
   }
  },
  {
@@ -1349,9 +1280,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "edd9131443b517143ebf84e01daf3330296c3a67b5507696a24abab2aefeb3fa"
   }
  },
  {
@@ -1403,9 +1331,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d61125e40c91c69a2fe90f8eba0b5e567cfa5bb224469dda5563480587d0430a"
   }
  },
  {
@@ -1458,9 +1383,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e173cf532c53983fad18a63c78327808d8d08e4fb6bb6744f6441c80a646fde3"
   }
  },
  {
@@ -1513,9 +1435,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9cd3eaacd979bd15f92430bf73d4ae03ce3e9f61935b3fdf5e43aacaf82ac47c"
   }
  },
  {
@@ -1568,9 +1487,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3b12387988fce52f0bf321724ec3dee2ab50f2e81b245e921d10c4f16a59fb2b"
   }
  },
  {
@@ -1623,9 +1539,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6d988c87a1f5375c2fb77c0953265a5860627e8f155a5d42a6e9790105be0893"
   }
  },
  {
@@ -1679,9 +1592,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "756e64b3ea3827d8e2a1886ca6b4224e3cdcce8930d85107495b3d6edd8f3122"
   }
  },
  {
@@ -1735,9 +1645,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "088d34a5295ac31089f3cd92e5fe612b08c330348c5a5c651fba9442fb99fa29"
   }
  },
  {
@@ -1789,9 +1696,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a77d880f7a51d31fe0509f0b9c6754ee2359fa9c9b00949af68d07d7d5653071"
   }
  },
  {
@@ -1843,9 +1747,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "057789a61d4f0764b571a6333a8d6e979f025d61a0cbca173bbe0c7da132f54f"
   }
  },
  {
@@ -1898,9 +1799,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c6b566440577da220d330ff14ac1ebc7c18c2891ee5d5c5e8e16fed9a0b1e045"
   }
  },
  {
@@ -1953,9 +1851,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fbfc60f2e5c9518abd213aa345a168a5bda7af31e2e0dea598ad760ac5a2d2bd"
   }
  },
  {
@@ -2008,9 +1903,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6b71d30547825a453c665cfb40cbedfed7e82391c2f661ddfc5d368b3222c5f8"
   }
  },
  {
@@ -2063,9 +1955,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3d7676000c54a4dcf267f605727389e22f9374fcdc3bef5c96b7712de64d8f32"
   }
  },
  {
@@ -2119,9 +2008,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b85f5a563e0749e1e9a8a74d04656c5c8ff139c9bee263adde4996726d5ad440"
   }
  },
  {
@@ -2175,9 +2061,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a8631b399f93db617b8d909144e7db840b4ebc0e32464e1d31d0f115f7dd7971"
   }
  },
  {
@@ -2229,9 +2112,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5401fed6377c4d370cea40261587151b276d8f1f3ef9b4ddfca17995f0ba34a9"
   }
  },
  {
@@ -2283,9 +2163,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f188a28fff5f233c200fecd66d523e0a594a6107ef25ae6a18e2ef50132ecde8"
   }
  },
  {
@@ -2338,9 +2215,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1705568fc20cbfc6093fa297f057a22b5663d1cef55c03b6c3cfa9d8198ce130"
   }
  },
  {
@@ -2393,9 +2267,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "633d28127099965099d9a97f71f06cdf56a05daf9073a3c7b98f3b8176676785"
   }
  },
  {
@@ -2448,9 +2319,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c13cf5c93d316babaf4b969a85d6689e3c46a27488a61f73ec68285e3798e7b2"
   }
  },
  {
@@ -2503,9 +2371,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dd5d86fb78a87c96080b00b12f6f60e6dfc2dd40599de72417308700b0a69b53"
   }
  },
  {
@@ -2559,9 +2424,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4edca86a50df3e8ab2671b0cf1dc249d867b61c9719dcb3bd5991f533eae402b"
   }
  },
  {
@@ -2615,9 +2477,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "924d277f6ef1389abafbc25e24411c2076d9ffab0b82f9ec2016aaaac17d1661"
   }
  },
  {
@@ -2669,9 +2528,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "063b915edeab5984569eae586882808c0f4db2d949ca32e670be48fa836ffa57"
   }
  },
  {
@@ -2723,9 +2579,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5397d5a436dfef2793b0dc556551fedd968867dbd63a837ec4d06e590892682e"
   }
  },
  {
@@ -2778,9 +2631,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "86cb71050d0d11d71b062d7e1c621b72824b068b659260dd1b79d869d7021eaf"
   }
  },
  {
@@ -2832,9 +2682,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e1848b861076dba3a4eb12f167a453bd7ff71de193fe8c756fc929754ab1a35c"
   }
  },
  {
@@ -2886,9 +2733,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3b5a64c6ab84988e339e96e4439dd1def5899cc91c4b5ab9fcb26a79f17f6ad7"
   }
  },
  {
@@ -2942,9 +2786,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6a820fd09e4ccf01f0664b72b0ce5d186f36d703fbbe653b25e06ff9435659c2"
   }
  },
  {
@@ -2997,9 +2838,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "90dff957bc2d0d7d9bed929fa52326a11e5f60ba480d3296d53b694beda7e640"
   }
  },
  {
@@ -3052,9 +2890,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6bc2dcf0869e212aa267b92f513cd8a7382e033039848c53a519eabaf8eae564"
   }
  },
  {
@@ -3108,9 +2943,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "18d112bcd6066a6951304c8d03347bd5f5d67d5f847e6006d33351042e5164ec"
   }
  },
  {
@@ -3162,9 +2994,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "56744a7ebb22c185161ca826844afd021b3ba2701fa0cd203cf5e80f96e2b8ef"
   }
  },
  {
@@ -3216,9 +3045,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0eab52bd6e148619a671392eaa2e490522a48582e32bcdc8fc9b52b5a6476cb7"
   }
  },
  {
@@ -3270,9 +3096,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1a8f215117945300797901299393eec6fddddfbaea0f0f5a5eebbf36be67783a"
   }
  },
  {
@@ -3324,9 +3147,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "45304d56d45f5706590b399fd350c2105ebf8ff578db02f845a04b18d07c4760"
   }
  },
  {
@@ -3380,9 +3200,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c3a69dc33cda78151d904ff561bf5c301911c2975b89a0f00c0bf869094710dd"
   }
  },
  {
@@ -3435,9 +3252,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4a43d07c590725c210fdfa09b60c3a871e58552163f596fb3d8dbd9405678867"
   }
  },
  {
@@ -3490,9 +3304,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c8e3d2a9b1b8c452160d75b24daa614581816449616f6ac131b6dbf6128f0837"
   }
  },
  {
@@ -3546,9 +3357,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a42f72e012e82da42b899ebeb09c26f88c4679053335a0fdd4d849774ecc530c"
   }
  },
  {
@@ -3600,9 +3408,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "850e1e49323fccf98ae09a28572e90a90cb8f90ac90f5f3a32d445d389a21bd2"
   }
  },
  {
@@ -3654,9 +3459,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "44b2e7d183d4b095a97428c00181f0b5a02fd82ef86fbd0c7c7500ab43f0e261"
   }
  },
  {
@@ -3708,9 +3510,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cc2cd7e5d5c1bb04791c26fb2b1e16b33711eea1abb58893acc841e3e53474a2"
   }
  },
  {
@@ -3762,9 +3561,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5196c7f74f6fc7d82254ee4c4877a90170a4fac3f109bad471bde7058daa5b5a"
   }
  },
  {
@@ -3818,9 +3614,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "08460d1254376726d2fd44fb84a14cd82b66b698ae0175f3c34600e7bcb18b3a"
   }
  },
  {
@@ -3873,9 +3666,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e15faad69246c88f0f47669f02ca71ce13f8d52bb83f9a736b7d95edf131abd7"
   }
  },
  {
@@ -3928,9 +3718,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fddfcb9759af7afafe472f186a1532e6c3dd331dddeeaca166634c8eba2fff2e"
   }
  },
  {
@@ -3984,9 +3771,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a4ea4302bc1e6520b933be5735811c0c982fe9561e60444580e63835e6065eee"
   }
  },
  {
@@ -4038,9 +3822,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c2f5f68cd4b29c0a39ad623e4130f6ec5b0e9b0e5932aa7c58a3d76d61e48716"
   }
  },
  {
@@ -4092,9 +3873,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9bffb4623413f7d8beb6ab5884e6092e3e304069eb6205c8fa1c766e0df165a3"
   }
  },
  {
@@ -4146,9 +3924,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "05826ddbbb89b440cf68003308869d93e919f30970c0da285c74aaba19f2a135"
   }
  },
  {
@@ -4200,9 +3975,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a4258cc4262e7d654acb425ab2ca7b57bcb55f929817aa775ad7f9f5e4e0b683"
   }
  },
  {
@@ -4256,9 +4028,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f2018c681994bfff86f46305d66f9fe5c9ce7b7758ca96c9076e4c7a60c8461c"
   }
  },
  {
@@ -4311,9 +4080,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "70c845fdc79f4c6f927953e36018316ee59d55f8f786d602998d4887dbb03fb9"
   }
  },
  {
@@ -4366,9 +4132,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a9ded6523f079e7c6e1cfe6c7f1f88ef91e196a5e40bc491128b8b901625e024"
   }
  },
  {
@@ -4422,9 +4185,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "eace1813fb110c3d50de9f32bd95192a2dc3d7b2c98d514c66d5f2f7bfa98853"
   }
  },
  {
@@ -4476,9 +4236,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "58e97f3bdb14584560f21f17cd6b9295483638401896b210df3e65da54e37f70"
   }
  },
  {
@@ -4530,9 +4287,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a5ed8dcbee7bc4468d97557e8e9b7c08740b61130bbbd56faa6cc9082ad301d2"
   }
  },
  {
@@ -4584,9 +4338,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8d56d1efda34909af67c8a9fdec806ed6050e1dabb9e9c2890226f5b3c6a9b3b"
   }
  },
  {
@@ -4638,9 +4389,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c90bbeb2765a05b0c41ff21e4a19e6fcbbbfef395454b692f29dcdbbfbad45c9"
   }
  },
  {
@@ -4692,9 +4440,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d08e67ed48ec7248a49831cbeb0715ec172758677bb9356e3251de2511976293"
   }
  },
  {
@@ -4746,9 +4491,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "51bf9679902453e79f72dd61105a20fe1032e459ed1fe789102fd9e9943f96d3"
   }
  },
  {
@@ -4802,9 +4544,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9ad2c67eaa642c80caa589620caabaa0a5ffb7d9e8167db26f26cf2c23802af8"
   }
  },
  {
@@ -4858,9 +4597,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6d72a5647e73a122045f1d9959cbf06c906d1627d97d5932f04228c637f67cd2"
   }
  },
  {
@@ -4914,9 +4650,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ca5036cbccdb1ccaade6758dae6b05cf792150e7bfd558ef6e0ef32b61042205"
   }
  },
  {
@@ -4970,9 +4703,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "78b1384e751c9ad3c02c74c34fab68bf53f92230c4d40afc4e89814fb0bbcfd4"
   }
  },
  {
@@ -5025,9 +4755,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "28f5ef49f14dccda87d1aa4c5d16adfe30665645f891c0244364e30d44a43c58"
   }
  },
  {
@@ -5080,9 +4807,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d9917aa0d9f78ecc578589015fed76934f46e24f2185ab9a9997b48a80b91bd3"
   }
  },
  {
@@ -5135,9 +4859,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ff26a038c59bd79f7432a111beb6ecc681a0af93c7588cd3f8ca7bdfa5c5d04d"
   }
  },
  {
@@ -5190,9 +4911,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a9f602fef64524503a029c89c06580900aa4ffd0c7a589af3d4bd0c1d7b6cf8f"
   }
  },
  {
@@ -5246,9 +4964,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7b17e4a0ca3a965fe8f1d470d253f1bbfd535fbfc73044d8b997e96cc964d820"
   }
  },
  {
@@ -5302,9 +5017,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "690684624221e1d55f4c761ebb76bb6c0a2c6a05c63ea4662769ca38e86e96b4"
   }
  },
  {
@@ -5358,9 +5070,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a6897d994dfa652714c0e7ad5eaf7062196196a208091dbef63b35123c3ebbf9"
   }
  },
  {
@@ -5414,9 +5123,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "95e70a618a99ef45e076fcbf14558282f396237ce48f81943c3172dcacc19304"
   }
  },
  {
@@ -5468,9 +5174,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "35661133db9fc2ea2c492d18f8806a8988c7fa48fa184a607af748e88da5d9d0"
   }
  },
  {
@@ -5522,9 +5225,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "00266d98de47ba5fbe2e966e5b258454a43366ad5954a39a36a00f45cc693d7e"
   }
  },
  {
@@ -5576,9 +5276,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "686883047eb90eb50f5c646570f6580b4ad08b122511c6a1b3e05b1758dcae74"
   }
  },
  {
@@ -5630,9 +5327,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d9b811bea4cb2cf8595784f513a6c39bc0895b17272784f5231c0086c5deace9"
   }
  },
  {
@@ -5684,9 +5378,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "24cbe1ea4d1d3f2f3d9df18572492d27eb3b82f7004cada91ab567c36380c8bd"
   }
  },
  {
@@ -5738,9 +5429,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "bc26b9491cdad5c1b5bae8620ee90e5f42ef7ae6d41284cb47d9f0498df08a31"
   }
  },
  {
@@ -5794,9 +5482,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e4fd7218d505ebe28ee27d1b5b4ca53bf1da1803b34576fb26ac72a3ed42a7c2"
   }
  },
  {
@@ -5849,9 +5534,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d82c4002062468ab447c0b12f3386801f3ecb0600d88c74c4cb2e4a4516732aa"
   }
  },
  {
@@ -5905,9 +5587,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "78c12e958afba9c1e49773bf7557f8a48d6ec1db6945a9ff0743de639f1e1482"
   }
  },
  {
@@ -5961,9 +5640,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "06447f618e617663f598027bde74099517acd7c4e0ff068310be00aa45281e52"
   }
  },
  {
@@ -6017,9 +5693,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a6a794116e6e72b6a886dc108e334e01b87d5e4515032c1d07e99fc1134a6799"
   }
  },
  {
@@ -6072,9 +5745,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8edf4abfffe82cd00c36ed8e88d86b0e879428aa109110393aa523ba78d5d9b0"
   }
  },
  {
@@ -6126,9 +5796,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "403a3a438fc99a02c01971403943a1ef3ffeefe5956e53e3213575fc788f7639"
   }
  },
  {
@@ -6181,9 +5848,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "44f459ea945a0e73e1fa64b6851b06092544b834c41c7ab1db47d4080e6942af"
   }
  },
  {
@@ -6236,9 +5900,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8c09ce073385dc0df35a4d023e0b9fadf7e7db2b309b0cd8eecbb31ce67d659a"
   }
  },
  {
@@ -6291,9 +5952,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2bead7c3171239a5348107714e2940172503b0708e91642e9d5b3e54bc123af7"
   }
  },
  {
@@ -6347,9 +6005,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "75cba59e3117b6ca315b1469e1c5b546d70071b819d1fc8bde79790458a424c2"
   }
  },
  {
@@ -6403,9 +6058,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d61ac55fb9cf0d2780ef493b695e0b645ccdab06e8f42e514c7c47d3350fe6e4"
   }
  },
  {
@@ -6459,9 +6111,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b7d32e65a6b0a000b7aa9133c4756b5ea6ae842a1d7f4cf7786365b9c4b70933"
   }
  },
  {
@@ -6515,9 +6164,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e0b45cc94a6af137cf94092a350ab7a1c8c1fd0c6ba11d640e6bfaab0dbd58f6"
   }
  },
  {
@@ -6569,9 +6215,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "039af476e15f80bc0aa6f0c53aeacfbbcdee54b3356fb860ea52a588349d66b8"
   }
  },
  {
@@ -6623,9 +6266,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6f761341d134b94b5e33c000a1a2fd445c144a762b86eee937b09a80e751676d"
   }
  },
  {
@@ -6676,9 +6316,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "18c4f204c40e36cbc835e2cd4e9887b7dafed6ec12dc2983be9620f80c955965"
   }
  },
  {
@@ -6731,9 +6368,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b7b880291a33db78607ed291a726d524bfeb3836bda4a8ddbe92bf0c906607ae"
   }
  },
  {
@@ -6787,9 +6421,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8472545a175998c1ea3b58af0538acdc306735d06bd3e72887de983a588e3f1e"
   }
  },
  {
@@ -6841,9 +6472,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "76aef71cfb9977720ee303156494617ba1f135ba5df569271961cd320f1b985b"
   }
  },
  {
@@ -6895,9 +6523,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "065748c7dac9890b74c46a3ed593adc3d1a43ae467bb0a1631deb9e678681aa2"
   }
  },
  {
@@ -6948,9 +6573,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e4f267fbafad4ca59ee229062425e2ccf98734f62fa5c474dc787828750451c6"
   }
  },
  {
@@ -7001,9 +6623,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "603cc2794ee8202949b5f685fc2e8d68a0b93766086e5ab57db00df5f54e1e73"
   }
  },
  {
@@ -7054,9 +6673,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "be52730ac4384ee4decbb121736735811d72653f9d67c43300da063c9e6be0ec"
   }
  },
  {
@@ -7107,9 +6723,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "87873ec40c19e0f62c37cf8a8552ce36868566a0eb3f99b1f99aa2870b2af241"
   }
  },
  {
@@ -7161,9 +6774,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f2dbac62e5e44fed8784393e6c119afc712e6988e91fa82be7482e95a7aaeb94"
   }
  },
  {
@@ -7214,9 +6824,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9cef4174523e7ad476289fd085afa31cedccb5b30b0f40b15766df733fd02a44"
   }
  },
  {
@@ -7267,9 +6874,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e63787a4eff51b10ec5a43e24f2e7f096ea67b539b03eb1018f7c5212feebfd0"
   }
  },
  {
@@ -7321,9 +6925,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "046e602ae657c122996454b7d7998ba5d24e8094b96884e813fe9d6917d62ed9"
   }
  },
  {
@@ -7374,9 +6975,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ecb7e50ae1f02e95f91935d569e2c36214e080a7caa9ef42dda43384777237dd"
   }
  },
  {
@@ -7428,9 +7026,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ab1b41b371bf4c9f6ff90000e8ad397336cb81c1ebdf1b3b7f511a37be265f4a"
   }
  },
  {
@@ -7481,9 +7076,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5371651997bdad9e9f60ea1b55ac5693e3ce2fd50983a061a323a42c94caf96b"
   }
  },
  {
@@ -7535,9 +7127,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b402321dcde2ac9add616e828ea48fca171ece83d1d262b6ba3196e638957dc1"
   }
  },
  {
@@ -7591,9 +7180,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d46c31e4a562a92f374a7e96bf8c01a8db8c3f561489025ae057b9179815daf9"
   }
  },
  {
@@ -7648,9 +7234,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b2de84b106afedd5d915a9ea068675411742d8901bbed34cc556c28aa0b4719b"
   }
  },
  {
@@ -7705,9 +7288,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0e7718a465984ff2c3090d1f4fb530eb2386c94537fb2f156ae66633b7493537"
   }
  },
  {
@@ -7762,9 +7342,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5e4490b5a3f7a875fb838528417b7a9069b1f976fc1846f9a3c2c6c7082e4b01"
   }
  },
  {
@@ -7819,9 +7396,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "96dd7916bdd7c4853fa47b1a5c8f1a499b2e055f92dd2edee29a0674055f277b"
   }
  },
  {
@@ -7876,9 +7450,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "aae0b010af728064f3d30ca19555a2912b687b4a96eeeb9512723dc8457b5781"
   }
  },
  {
@@ -7933,9 +7504,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6fb8609302e87ddc9533752cf8d891b311ccec59f5167518950d0a492bd66896"
   }
  },
  {
@@ -7990,9 +7558,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1a5b800d6a5c75c27a9f88c41b5f4a189e096fc2d3c3ec927406451eda3beeb9"
   }
  },
  {
@@ -8047,9 +7612,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "11d38a4a2e0adc6d394bbe00abea9caeb2efeecbac7c4cecb1c25e0d6a9bb33c"
   }
  },
  {
@@ -8101,9 +7663,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "74a04ebce8fa892b3cbd4d25a992018f6c59813be743c4bd772a9ef6dd6149d4"
   }
  },
  {
@@ -8155,9 +7714,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9eb07b8973096cca1e5f1f841af6ae77ba71427edc6fc0c8ddc5af82350cf277"
   }
  },
  {
@@ -8208,9 +7764,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5400b2d5fcd291c4251c47eb470b6fb5b2fa18daf98c7e9ee4ae8748d51409c9"
   }
  },
  {
@@ -8263,9 +7816,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "34f348b5fd260477bf85fea8774c7e0a04450cd03c474db24f83ec363426c73a"
   }
  },
  {
@@ -8317,9 +7867,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "783e3c2fa15e99114936eb5dcb17b256bbae50963ca47ad8a0a59f8b6c6cfb45"
   }
  },
  {
@@ -8370,9 +7917,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c61f2a6f61edee96c6e1ed3ddc3a664258e5d88b446930dcbb5ea298bf787036"
   }
  },
  {
@@ -8424,9 +7968,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d42145a17e0163006e0c61db00463e9b1fcaae4de86f5a1f575a3f91673d8f26"
   }
  },
  {
@@ -8478,9 +8019,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6b3145476040630f63cc7d7dabcdb025b80140c7e9887360fa632120492f3c17"
   }
  },
  {
@@ -8532,9 +8070,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3ce108e485025796ab86f23314b9a2f821ceb0bf9126cc7c51358fe0e34de19c"
   }
  },
  {
@@ -8586,9 +8121,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9d51ab175777957e16be66452423a67d0c6674d01977c6242d5743af640affc2"
   }
  },
  {
@@ -8641,9 +8173,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9bd00d0072cfb3fba5722ce654da6ee000483fafd7d0979627ae5e73b1f1664a"
   }
  },
  {
@@ -8695,9 +8224,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3dafd916aee1144e7ea11824b2261e5a40b53ac600ae7f49998363ed632de073"
   }
  },
  {
@@ -8751,9 +8277,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d82f627c1d8efb9cd80369f34ae2fb587694d00c659407b2acf911b65f992e40"
   }
  },
  {
@@ -8805,9 +8328,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "158e2d9ca13504129de4611632b92f8edbaf25e5d8aba5302f3aa84bf951a25b"
   }
  },
  {
@@ -8858,9 +8378,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dafb7ac474791b6e7ac07ac4b3f02639fdaf07998ac39733583d1b43914dd4c5"
   }
  },
  {
@@ -8912,9 +8429,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9db87b14d30b7a099c8b4d665758f94e77c21a6562999a7571d73c2e91b59562"
   }
  },
  {
@@ -8966,9 +8480,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c8826d8e3287473fd89b38f70469b703f59d2b00ce1fa9c923574caed65fe7a0"
   }
  },
  {
@@ -9020,9 +8531,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fb0a96c92efa1a09054bc4db8d0a89f088d2e8b144f1de4e47e459afe7789782"
   }
  },
  {
@@ -9073,9 +8581,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4d17a1ecad23f7d45bb10960b9327afe26428f3fd9f6bc60fccdf9ebac83c5cc"
   }
  },
  {
@@ -9127,9 +8632,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ae3ec857796698630a4f52704669c51409da05ec0b36946698462d9b4b135e45"
   }
  },
  {
@@ -9180,9 +8682,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7321d6c482c74d9ab3dada62da2fae2d4ebc95d31bd415b37fde47394bf1f242"
   }
  },
  {
@@ -9276,9 +8775,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7caddca0b1e311718db96571d9a6057816a3a014c978907a8fb065224dbae90d"
   }
  },
  {
@@ -9331,9 +8827,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ecd12b079a42669d96da52ea47035cd186cee13a31e34ef643ddbf298d433e2e"
   }
  },
  {
@@ -9384,9 +8877,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0be4e5720639a11662ce06bc28e8ddee2aac80d9522c13cb9cf0dc2be1dfb645"
   }
  },
  {
@@ -9438,9 +8928,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1f490be90033938c3fbf74e2f892f46d264e9fe2c6fe315c5d7cbb29fb931429"
   }
  },
  {
@@ -9491,9 +8978,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6c9f5928d0be3ca7c3f9cc352f6b53234ba4db0ef263e837ae42b084bf52fa67"
   }
  },
  {
@@ -9544,9 +9028,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4caa2aaa56451c7dd068063761d8501b6eb0b5ceafa5d59c6feee3eeda1fae11"
   }
  },
  {
@@ -9598,9 +9079,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a07f01352c156efdcbeb04d0014db11209449aba3419a8672f3b7197c48eb06b"
   }
  },
  {
@@ -9651,9 +9129,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c8618398915a5d00ae1b1dc4e914a6fd574f894fa19f87f1b36800235561e834"
   }
  },
  {
@@ -9706,9 +9181,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "314c04cd80bd100c60b7d6682a1413f1b96a8868df4c9b749ac7e56e7648b5d6"
   }
  },
  {
@@ -9759,9 +9231,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f2bfec4c9399c9b093dbfab0fce5a07e65c32eefba06f49f68a4f1b6a10bd5c9"
   }
  },
  {
@@ -9813,9 +9282,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "00bfcf6bf39d927b5b8d52629dae69ee0d52ed2f47d507ff89c8a2dec045dc8f"
   }
  },
  {
@@ -9867,9 +9333,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "396af806202d75e1d1c98905f31e9d15c9b47b1f344759e5967660305a251fb5"
   }
  },
  {
@@ -9920,9 +9383,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2ed6d25bef52d4f864d930af507d1a3b900cf41b0c0f73eefb72438da78a8173"
   }
  },
  {
@@ -9973,9 +9433,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6b70bb42337cdd8bb98d86e1ebdbc484042ef0835e20ecdb88eb6e2b08144953"
   }
  },
  {
@@ -10026,9 +9483,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "243553d8c815f620f94cc7b7f5714e859a96c6e5e522e913200d45010d01cebb"
   }
  },
  {
@@ -10080,9 +9534,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "36149ab6424fa5fffc7fc00f1103881aba7fa9f182d970870524e71669c842c9"
   }
  },
  {
@@ -10136,9 +9587,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c12b203be927713f830120ee65a8c89a4969e69624efaff93b05b2811a0c113b"
   }
  },
  {
@@ -10189,9 +9637,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e5860b3de0c56d51c25dbeeda37fb77b16125f6c934b2e44578dba7943459b1a"
   }
  },
  {
@@ -10691,9 +10136,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3c95940e49f0122c028e64135790fab970d6a48a2bc89f775e7be1d57e080a1f"
   }
  },
  {
@@ -10784,9 +10226,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "856f1fb8cc3311eac4e749c6e39db6fd5d5cc137996475ecde4b24663ca5af84"
   }
  },
  {
@@ -10838,9 +10277,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "248b21a35652a9732c5e86102ee18ad118abd2784eb8817da487e7677b3fc56f"
   }
  },
  {
@@ -10891,9 +10327,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d39048a87c8b7a60bbca0a794c0a661fdb2934ce4f01633f9cfccc3301f06f75"
   }
  },
  {
@@ -10944,9 +10377,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e77e3d37a6da0fbfcf5b88d0e81651cc4c825232b6e8f5a08e19b431859ff600"
   }
  },
  {
@@ -10998,9 +10428,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "abb63f4356233670009cf19935dcd7b0a1d6c94db1ca19dacabce4ce33176da5"
   }
  },
  {
@@ -11052,9 +10479,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "015995627a43b9fdd359984a69e97c43cf34a9fa145e6bb8d88988ce2e095c3f"
   }
  },
  {
@@ -11150,9 +10574,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d18ea49e1334512e53a42ed034fcd320e5bc3c6be7574e798c1de85751efd6af"
   }
  },
  {
@@ -11208,9 +10629,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5a0d188ad510044f3a6aa3ac416bf6bae6c6aad95c602fbb5063b6f213a43643"
   }
  },
  {
@@ -11266,9 +10684,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c880acb830bd7a5359a66c1e2326c27b43bcfb24c2bc482b99c0b38571ff7123"
   }
  },
  {
@@ -11361,9 +10776,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cfe19329e91116ce6c9f1effeb4688be6ae0a4b15df108e0cbe6ba00786bd43f"
   }
  },
  {
@@ -11415,9 +10827,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a9a67c3dc59267cc6afaebd29c9962f50bfdae04d99ab35f2aa626a1e0ef4353"
   }
  },
  {
@@ -11469,9 +10878,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "074a370965bbf308a13fcfa2a3850d8ec017ec81f2d950e8e8dbb9c1fd29d793"
   }
  },
  {
@@ -11524,9 +10930,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "820a1ea37206af62a1768ad201a7d079ded9fa30cff784c38552258760d079e8"
   }
  },
  {
@@ -11579,9 +10982,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ddb5bd810cd15c0d611c8f2498c9135bb59ef5e5ea1a1a67506b0c4f76c71b31"
   }
  },
  {
@@ -11632,9 +11032,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c2dda34ba2e8a0d5f685da72579e932130a84964d26d93cdf866bdc46715836f"
   }
  },
  {
@@ -11685,9 +11082,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "94c2a514e744bb4d76a04c50d4d442d503dbfd1e96f3528ea8206b3be84e4c0b"
   }
  },
  {
@@ -11742,9 +11136,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "94e9cd25e052662b82ca44512c25cc54cbce8c56a24e980c5e69c355ff04c9ed"
   }
  },
  {
@@ -11798,9 +11189,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "42eccdc911d22e225d42714ba3da00201c3a4e51ace7103c8e84b67c3df94e27"
   }
  },
  {
@@ -11854,9 +11242,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5af0954f4e757b1dec91a594fbeb74ffd615ec6daef89dc4b586328c4b62342c"
   }
  },
  {
@@ -11911,9 +11296,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7f28a71ce2d28bf8b69eeddde845003026325a97801b43ea9946d5b915c74ddd"
   }
  },
  {
@@ -11968,9 +11350,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dc1970471eed42e6efc2ba4246699392d22a9464947c657144a659011cdfdacf"
   }
  },
  {
@@ -12025,9 +11404,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f30782442d8ee462c561378d0be8e1eb6def659c74604fc18502bc1a47973460"
   }
  },
  {
@@ -12079,9 +11455,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b030d00f8206705379e29eae5f6afa26f2c70e117e246a711eb8fcfd7f59738c"
   }
  },
  {
@@ -12132,9 +11505,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4a846171ce261b23baad8701f063631bc8cefabcf595b9499ae08da69412a941"
   }
  },
  {
@@ -12189,9 +11559,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cccabe2fe814624c463ad07a01ae225cb09e61a72a0f2005d8cb01c8067eb220"
   }
  },
  {
@@ -12246,9 +11613,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c1cf9b294ee118340f9f9e4daa38b172c1e8b617a8427cf7315cd16ed0065fbc"
   }
  },
  {
@@ -12303,9 +11667,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1cc0873181fe8dc7404d8771d519d57ccf4f158bb5db4412c2aba17a7be415db"
   }
  },
  {
@@ -12422,9 +11783,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ef836e743d3ac3597bc84b0b7bf07cdace80c8bc1015f6c4c6687d814b0c25b2"
   }
  },
  {
@@ -12541,9 +11899,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8a048f6c09aae8179b3205f6c0ae703efe92f2073f8313f0e9acc1196d702273"
   }
  },
  {
@@ -12649,9 +12004,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cad75ca25250adbb29af7b8503e052bb1bf921e2ab76a9bef6741517f048c0bc"
   }
  },
  {
@@ -12818,9 +12170,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "67f330c4d1ddb87be34f104fc368edc5b68dfcbfd27bb5d4d53d4ec04ef60054"
   }
  },
  {
@@ -13065,9 +12414,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "aef4767d7afef06b3d596df98e2fe3c4699ccb12ea293be5bb21bfef900a8d7a"
   }
  },
  {
@@ -13155,9 +12501,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b075ae54be9e23d97ee8c21c68a7fae15b11b002b7b23bba12e091aa8f9a9c62"
   }
  },
  {
@@ -13456,9 +12799,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "79537d301eb5ff828ecc957ef581351a442d63c31a1ed0d9935966a4d7bd295b"
   }
  },
  {
@@ -13510,9 +12850,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a895403063d13a366b834dac0cf6214654d8e9380cbd3dba6cb647a943ad9102"
   }
  },
  {
@@ -13565,9 +12902,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "85ffef523537e5c846503bbcd18e43e60cd13d95bb18bda3a5600e5100046543"
   }
  },
  {
@@ -13645,9 +12979,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8c6354fd88ec403c2c5729bc776714a6586916686b387901fda7685afcae572f"
   }
  },
  {
@@ -14205,9 +13536,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e3e484541721a32ae800a47e98405d0bc20f1fa4e8f7849c383e664379a27dd7"
   }
  },
  {
@@ -14274,9 +13602,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "673d6a0f8f92ea94a344836f4e22b5d756fc940bce0a14a5d5aef428b28b2a64"
   }
  },
  {
@@ -14341,9 +13666,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "122b2c034d618b1c9e73032a13de851189f1476c8146e2dc603ed72d143bd1db"
   }
  },
  {
@@ -14408,9 +13730,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7060c01dac38c1da87e09bc3ad56c27556aa4b94ce2eacb289247efe0187b9e7"
   }
  },
  {
@@ -14476,9 +13795,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "865e2e1b87a325b7ae244726c5445ee4053e4df5e019382d6af31af7d8315754"
   }
  },
  {
@@ -14894,9 +14210,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "468d3883dd1239d62f0302a242c891b4e53574015e7fcb5c9e6debfa1ca0d407"
   }
  },
  {
@@ -14964,9 +14277,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ffb55d071994daed2e8d6d51eacdbfa46ea33755818b84ad709f3b3cc4e4cf2b"
   }
  },
  {
@@ -15160,9 +14470,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "902002433675893b8d30ae7d76b124a9c25a2199f9858356a8e10ebb9839bc82"
   }
  },
  {
@@ -15223,9 +14530,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d0753f580c3e451e5d627dbc131eb792f18aec1f9c959629fd8193097f7af8e2"
   }
  },
  {
@@ -15287,9 +14591,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "efe718e53f31e32db5e1124889f5aa68e26e262da4c1703ee387cc437de59d01"
   }
  },
  {
@@ -15350,9 +14651,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "bdad4f6e15e9afaa6ac1ceda7ef4ee23aef13d285c66e8e8adb8e7e8d75a88b6"
   }
  },
  {
@@ -15414,9 +14712,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dc26fb2439fbd5fb0fbff40a7e701f3119095d5b145a39a22e3952102504a01e"
   }
  },
  {
@@ -15780,9 +15075,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "12b6ad7a672bd77e54643d9f9a489084c5f0841311a7c2851c73f7e5f8eec6f3"
   }
  },
  {
@@ -15845,9 +15137,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4ea623cf6a0d4324467a8740ce1b2033946afc87e35464d9dc8e92981f1f7af3"
   }
  },
  {
@@ -16082,8 +15371,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -16121,8 +15410,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -16238,8 +15527,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -16277,8 +15566,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -16655,9 +15944,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "82ebb9e94953ea56a5c2031223db7ac9eaf403be617c544a741fb60a120f66d0"
   }
  },
  {
@@ -16769,8 +16055,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -16808,8 +16094,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -16925,8 +16211,8 @@
   "status": "PARTIAL",
   "reason": "1 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -17021,9 +16307,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "df7d87669ee013d37a177ed3efb36766face4659b88cff49481a59035b4802c5"
   }
  },
  {
@@ -17076,9 +16359,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b0967c71ced958d5458240f808ceacc80407b679656d44e4535da72a4b8d659f"
   }
  },
  {
@@ -17130,9 +16410,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "02956b0518826922019cacd178aa9536df954b169a35f6884111cd90301477c2"
   }
  },
  {
@@ -17185,9 +16462,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "73334e0a12c7b459428457af4969cfe3b6d1a47fe9c241ab95f92a4fa87c9c46"
   }
  },
  {
@@ -17239,9 +16513,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7f7b8a320702aafcf1c0fd67e91c3639b4d0f5eaa73c04bfb62062a304e82df2"
   }
  },
  {
@@ -17307,9 +16578,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ffe66807a2d425577735e0dc5acfda14bfca1b37ac50f48457362c47e563c4fd"
   }
  },
  {
@@ -17376,9 +16644,6 @@
    "linalg_maxabs": 8.882e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d81213bda97abde577a33d77b2b6338c22b9cf6cc3de577e8d637c08dc93d1ef"
   }
  },
  {
@@ -17444,9 +16709,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "40fd51cb81a6cc9bf88930105b4741272cf0b3fb1a45ebf577cd96804f0e2c67"
   }
  },
  {
@@ -17513,9 +16775,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f0c7b56505a371a291f44d019073ee5c658a02b8f195088c5c2662a294f8f20b"
   }
  },
  {
@@ -17581,9 +16840,6 @@
    "linalg_maxabs": 2.776e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a6e8a5965e243101a86a0405eb515637f850383484261fd4b1a5b108877fb528"
   }
  },
  {
@@ -17650,9 +16906,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5d63d5fc6891aafbe38d397041aaf09133522cf41e5874cead9d3ca5925d243b"
   }
  },
  {
@@ -17718,9 +16971,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1cc77bfcff057b2d3e9df2e34f85b4333bed1594980e83179b8e716d19d12b23"
   }
  },
  {
@@ -17787,9 +17037,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ac49860100735b0d330866731e7ad1dbfe8f5e1fedc7268145d8a7c8c7413f7d"
   }
  },
  {
@@ -17854,9 +17101,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "097006b765b79049764c275cf85e44fcdb29aead8c5a984e8e8ecfaf38c72171"
   }
  },
  {
@@ -17921,9 +17165,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6ab74d8679c848df73eb7479d908025c84df09edab43e04f92713dff3f01cfae"
   }
  },
  {
@@ -17988,9 +17229,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6302ef6c09740b0c403de9ab1ffeb8aa228dffae89009fb9f0c42ab00eedb735"
   }
  },
  {
@@ -18055,9 +17293,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "361561fc2fdaacf592cd6bba44b96324f3f0462da3eeed3929051fb93716724c"
   }
  },
  {
@@ -18291,9 +17526,6 @@
    "linalg_maxabs": 2.22e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8d667f3c358c9dc433bf84c69b9143f3851138912045380ecbd2468535e27ac8"
   }
  },
  {
@@ -18352,9 +17584,6 @@
    "linalg_maxabs": 2.22e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9942afdd566fc034a3448c19c8263c71cb2ab361bdf5b0accc7887626602719d"
   }
  },
  {
@@ -18414,9 +17643,6 @@
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f2a636352c1da66025ca096e6b2b7dfbdd4c1603d62f7cf4a5b69474983122ef"
   }
  },
  {
@@ -18525,9 +17751,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "459ee7e50b1c9d64f1356ced524b97f4fb88aed64a0c7e2c67b9b72f32461dc9"
   }
  },
  {
@@ -18579,9 +17802,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "460771558f009a20d2cf799f7319edbcf5cd83a4bab522192c0d0d241f87efd8"
   }
  },
  {
@@ -18633,9 +17853,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c72231894721bff3091c10ec7ebb7ec0ae78895fdd15ce7a75a93d2397c3a5d8"
   }
  },
  {
@@ -18693,9 +17910,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fc515870f2519e940268ab8ed152ac76ae0520e4ffe9e0c192a8914c5f0c65ac"
   }
  },
  {
@@ -18753,9 +17967,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a72f196f759f19dd5705587062720341d7d679336bf307436add26b10febad6f"
   }
  },
  {
@@ -18820,9 +18031,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fbd759f65edec9501781c4997026f969e1ead14c78681f76fe412ea9b3a4b5fe"
   }
  },
  {
@@ -18887,9 +18095,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9ce9dc7ee29424f9a9e52aee25e09d8daf6c17d273e8b7c4642b611bb911e5b7"
   }
  },
  {
@@ -18940,9 +18145,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ac4855c2088a091e7b9ed7a53cc9036014f5eaf7aae27000237b8ca4b22af3e8"
   }
  },
  {
@@ -19000,9 +18202,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "499f7099063e88e20ffbab513e0f3d83e56c7e5212c0bd542e5dcaa0ed30a813"
   }
  },
  {
@@ -19091,9 +18290,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "3b0a6de870c000cdaee5730e23df516db2f0ec87eaec4dad89fb7c74e6d8e0aa"
   }
  },
  {
@@ -19178,9 +18374,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4cc9a29f1f6f72c6733749cbbc027048cb4494d0691206759d996ea963686677"
   }
  },
  {
@@ -19426,9 +18619,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4616470f3b37dda37e4b5f9dafb748f89c9f842fb266719568a462447cfac1a5"
   }
  },
  {
@@ -19488,9 +18678,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5605f96ec437b22f3721108046dfdb847522fac34cc53bc1acb3cdf912171162"
   }
  },
  {
@@ -19550,9 +18737,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5e4c680bb19a48c329bc3de8d3ffceab0eb5fde2cd912a8fbf1ec3c670cab5eb"
   }
  },
  {
@@ -19669,9 +18853,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0cd4d4c6da75535be23900f7348286907641aed44014f7ca67d5d2108ea3006d"
   }
  },
  {
@@ -19725,9 +18906,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "46ad54eaffd41b924564adb10ab0fd2a795c70f35ce342d792f723f7df74961f"
   }
  },
  {
@@ -19937,9 +19115,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ab57deda31a75bbcd0e55331cee4fb438790c07d138a09e8459f8ad3cbd2b39f"
   }
  },
  {
@@ -20266,9 +19441,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9ec7316277c6366a80ae5cf77f7533be41a1c18823d619e66904bcbc6dbebc14"
   }
  },
  {
@@ -20322,9 +19494,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5b960e71a671220cd9f567abc16739f2e30d17200fc677fe2ccb2d68acf3f62b"
   }
  },
  {
@@ -20378,9 +19547,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8c5bde30e3814b3226b0ad2582f2336b79658ac5bd117abfcd82725c7d06187b"
   }
  },
  {
@@ -20434,9 +19600,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dde42bd4a8260e78180d7351847728b7a39f694ff276ff7d7a5639aa72650ea4"
   }
  },
  {
@@ -20583,9 +19746,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2a89df2852e3808b84582601f74ddcee1e2efb6f02ac79d7221d10cb7d58ffac"
   }
  },
  {
@@ -21381,9 +20541,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d12f8cf900d3bef1703027c01b84b6034a1910f3cb6cbe5de129083ef70fddc8"
   }
  },
  {
@@ -21479,9 +20636,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "065e881188e64dbc7d4692cea2f088e9f4c2b3be25488250cea418e84dfbe786"
   }
  },
  {
@@ -21534,9 +20688,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f22e3992b025ceeb651319969d7eda3ad881daddd96b407dc0cb3d496a2d63b9"
   }
  },
  {
@@ -21589,9 +20740,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "009dd519927f284c3afd44a7162a1a06e5ad7ec1168700b128fa1c1d2f61ec79"
   }
  },
  {
@@ -21644,9 +20792,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "20d14abd2e055bf23ecf2c99fcb53e044c60e5cccf6eeb21b9be47d0773551a0"
   }
  },
  {
@@ -22055,9 +21200,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "aad6425248e4ea82f6f7f6710dba3142c917710d5d54e940038813fbf95dc347"
   }
  },
  {
@@ -22110,9 +21252,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "bf7dd4ed1876b295ec441fab842fa87a0a74c153ddb80f1708f622a7a5b84b60"
   }
  },
  {
@@ -22165,9 +21304,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "e58140775be825dca3ded26704f207e588e1a22d2d4a80b0422ba1c11c712202"
   }
  },
  {
@@ -22220,9 +21356,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "903b683279725c199271be609e2605cbb0122bf8c7e800a0732461a96552a572"
   }
  },
  {
@@ -22275,9 +21408,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "031b0ee50ec350be30597b0796930c0be59335847a03aba9f41994d54ac48a06"
   }
  },
  {
@@ -22330,9 +21460,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ec9da61f5d3d00ae554a0094e3cfa25f773b2bbc3b6d9edc254bf5b9a0dd509f"
   }
  },
  {
@@ -22385,9 +21512,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ecf586882d6ba1b8c4b13a8d4147d808598e846d0e3b54b17f100b48c4ae359b"
   }
  },
  {
@@ -22483,9 +21607,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0b4860201d00b5cbfa31ec6b9aefc0ee7e8795f8053d849909fb3ed4f54e3fa2"
   }
  },
  {
@@ -22709,9 +21830,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "928052b111d8aff874f5e8d56ec98e2b69bf9327b3edefc28d13837de0e4e58c"
   }
  },
  {
@@ -22763,9 +21881,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7a8348c8f03536d115d1e07030374d93f670c1e785c19cc803b8474d64d574d4"
   }
  },
  {
@@ -22817,9 +21932,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "881ebb70eae461f15616d630b87d50a55ffa0847e104c485ec5ab16cc9c6f97f"
   }
  },
  {
@@ -22871,9 +21983,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "65ec6e99b7f6af478a767047e9480c26ff4091f04533bdf8a644b4d2c51bdb71"
   }
  },
  {
@@ -22924,9 +22033,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "672ac823fb157c6375cc062c2fefcba7e3b46f53b058e08c125ce9ec0fdeef62"
   }
  },
  {
@@ -22977,9 +22083,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "14b91d83228bdeb7bf4b18905e65879d194bb4790b2020a02a10c086a3bf0a6f"
   }
  },
  {
@@ -23034,9 +22137,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "85c8a5061d74b4beec130fb93580b49179389df6d5b388dfd9fd946fc85f321f"
   }
  },
  {
@@ -23094,9 +22194,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8ec3072740627f63b8372919d5ca729873c2d430a4710ec180733f0aa2b0debc"
   }
  },
  {
@@ -23155,9 +22252,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fcfff482267a87a86fafca39b74223331fcca0fe7b355ad8aa044bc6f576533b"
   }
  },
  {
@@ -23216,9 +22310,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4c3e0b09ff914001c7f641eba6fac2eba5a3a045110b76879156bba741577d71"
   }
  },
  {
@@ -23275,9 +22366,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b3aeb0547ebb673fe1efdd7b55156637317910e4d8d727b58a0331dc5dda585f"
   }
  },
  {
@@ -23335,9 +22423,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9f6d424e37365e10c2909a5f7e333af3718635faeb154b3ba2c711403fd78595"
   }
  },
  {
@@ -23397,9 +22482,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0244f31598edc2fcc91d9137298dfa0a29202f9079739ef9defb2f8e4222e050"
   }
  },
  {
@@ -23451,9 +22533,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ff5d10e52693525fac9cfcd8c4caef08116a507764cfc2c4170fa6b6c852b16c"
   }
  },
  {
@@ -23507,9 +22586,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c4b05a92978d8e282dcaa4c9d0812abe2ec337cf43f4c3ba4c050b9e04f9f257"
   }
  },
  {
@@ -23560,9 +22636,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4855a52ad7c0728ee3b0d7a1c330a91589eaee5b76652d7831786fb69cb71c78"
   }
  },
  {
@@ -23613,9 +22686,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cb885fb0384ee56dbd2f17abfe23a70c351df961a712b1a968ee6e65ca76b327"
   }
  },
  {
@@ -23667,9 +22737,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "640d69c84ab322cdb7716bf6c9cad66e44b10441e82320070eed4cf62e3936da"
   }
  },
  {
@@ -23721,9 +22788,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0eac8674882b63264ef13c14828a5fc2d5fcba2c69ea67378d6a86db17abbc09"
   }
  },
  {
@@ -23775,9 +22839,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c0156a2d1c111333930e3f608fc7e33d830180229104102ec213633fa455c274"
   }
  },
  {
@@ -23829,9 +22890,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "21c79f8950d7ed5b6900c90ee4773bd43bfa937ef395c2ac9512fff0458df57b"
   }
  },
  {
@@ -23883,9 +22941,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c32cbd978fde5224dad9e878f0bb14cdd43053a78836c77ea2a7047cb72970bb"
   }
  },
  {
@@ -23937,9 +22992,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2b6e5b4c6d3be103b13b618702c50129e60dcf3ff5346c0e87f606b5528303ca"
   }
  },
  {
@@ -23991,9 +23043,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "c8b5d03b6c9c448da55e94048e3866e10bad1331ec6480a04906b0c2687bc79a"
   }
  },
  {
@@ -24045,9 +23094,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f573228e03b9e90682425a42323ec718856b6bf0ed5af37d3a4ac99761f7dc1b"
   }
  },
  {
@@ -24098,9 +23144,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6966ad634caa9acc5e048fb9d54677c92ae88b4ed398fdc0c1b200a830be9ba5"
   }
  },
  {
@@ -24152,9 +23195,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1b80531b779100baca2db8c023bb9cf653c8d6e35e13bfbbf488fdcecffde5c3"
   }
  },
  {
@@ -24206,9 +23246,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f7774c9529cc91c369148eac6dda8057b35c73ef17945c4afdb5e97214ac6a3c"
   }
  },
  {
@@ -24261,9 +23298,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "48f2b2207265f707c0cff3403146712ee8c4ee9bfe53957b91e14656eec61e3c"
   }
  },
  {
@@ -24316,9 +23350,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "83f3e12f58f32e0af343324e2251f1d5d86a386617d51114e4d7e21b020a68ed"
   }
  },
  {
@@ -24369,9 +23400,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "f5792b9ae61c37e3eb6f44a0350a07911cadbdd9759edca148545537dfe00c25"
   }
  },
  {
@@ -24423,9 +23451,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "76c418532909440ae26d60f62bddf049d278ef9e74048e9152e47032463572b7"
   }
  },
  {
@@ -24477,9 +23502,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "675c69e4fcb715a494550eb4dce8ee672a748e303d057ae8400efa5d65743620"
   }
  },
  {
@@ -24531,9 +23553,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "32bcb0c33b4976ad1e3f0e23d58b8768b593442a7d4aaaec474a70728be94d71"
   }
  },
  {
@@ -24585,9 +23604,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "27d214105c7ef2b81a6bb69c72918b16edbce9292521fcbf192e1b6770682e9c"
   }
  },
  {
@@ -24638,9 +23654,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fdf8804159507a6d7f9fef488013957f0d18fa233e11d73cccfddea08195bc4b"
   }
  },
  {
@@ -24692,9 +23705,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b71e800893f7a756fdd194dd6a056b41ed6d2e3a2c208a98d8079e998d35e452"
   }
  },
  {
@@ -24746,9 +23756,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "67f4a6a1b4e19bf1ef086132ca5f0e38a9af27e8fb199a54f78134d898417fbd"
   }
  },
  {
@@ -24878,9 +23885,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d26dffa2a20039c810dcdddd5f45bd629f3204c9d37b932dc23f0bed3c5335dd"
   }
  },
  {
@@ -24931,9 +23935,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "06c4891364da6e507b896f06a695b98bf56f5bf757b05eaba87897383eda61ba"
   }
  },
  {
@@ -24984,9 +23985,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "893cb66d5cbf74429bbe581169f3fbba566585373dcd1fc81a285788376f1fba"
   }
  },
  {
@@ -25037,9 +24035,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d33592431ddbf32bc0568ea08ecbe4c910b7f497ce1919b050e4bab62f4b858a"
   }
  },
  {
@@ -25090,9 +24085,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8e01a13a6f1f5a8a608f86d600eb4c5e164054a73c4bf5a907684887370611f3"
   }
  },
  {
@@ -25143,9 +24135,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b326245e4b3de33da5c458f33acdd21cb0be5ee71faa46602ab231524237786a"
   }
  },
  {
@@ -25198,9 +24187,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "904400593065749bda42266a64c2e2f33040d38cfcd78afa70eb8844a4469113"
   }
  },
  {
@@ -25253,9 +24239,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "fbd971789da93c3e756aa85fb46667d9401f1903c15a6a57a89dd0ea0bd854c1"
   }
  },
  {
@@ -25309,9 +24292,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "404705396b7ae53ef83070a90d22fa1b38b428c5e2310c802756a9ddede17f92"
   }
  },
  {
@@ -25365,9 +24345,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0993637a2b7ac3f76f918d2cc1e7f91794b81007f204f47c951db9bfe3c4cf0b"
   }
  },
  {
@@ -25421,9 +24398,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "79651f59f8177a95b92e632e749428cb79fa560af12597962ed6dde287a9491e"
   }
  },
  {
@@ -25477,9 +24451,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "92ddb6f845fe27da2f7650a5c3a93cf9429cea024afbc652b07373a4cc42d1b8"
   }
  },
  {
@@ -25533,9 +24504,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "653f94cd6280fa59797d17a0e4c7b6806d0f104f21a18418fd7994309db70c96"
   }
  },
  {
@@ -25589,9 +24557,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "cf385ff6658fc10b878befb1f841e393f65cc5a19ed1c392c50469d5bfa326a0"
   }
  },
  {
@@ -25642,9 +24607,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "0dca50b2d5241a2ec01670587ce931fd3acfaaa06335c77b029abe02124c810a"
   }
  },
  {
@@ -25696,9 +24658,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "91a19fe592e742d43bea623d0ca4fb267d76c78e9d334cca56fac3b7d08deb45"
   }
  },
  {
@@ -25748,9 +24707,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "58e3049a9c261eb5608d1c316676efa5eb70e581d82ed102563018d6cd1365d3"
   }
  },
  {
@@ -25800,9 +24756,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "9ad2b0928e486a8d638e0c37317b3936f4de6f7e264f4b07603f28f596a47754"
   }
  },
  {
@@ -25853,9 +24806,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6df426046c91d655b9f02a81aa3b437f68427721e82147881a63ad3f9c34d88e"
   }
  },
  {
@@ -25906,9 +24856,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7e103854a38346ea0ca895903db3eb1f70b9f21a00511ac7498df3d10a2d027a"
   }
  },
  {
@@ -25959,9 +24906,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "dce9b667bf64935277d30ffbb62fae1094b9bee684fed7caf3d839637b83a554"
   }
  },
  {
@@ -26013,9 +24957,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "d1a2315e1ef394d74e7db3057a51f166ad8ec3df3ba8dbdc9862c950c0bf20f9"
   }
  },
  {
@@ -26067,9 +25008,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "5c3053c86e8c5f02b4aa4e19eb07e270e77c945f45b811bd6f88cdcf48f4c68f"
   }
  },
  {
@@ -26121,9 +25059,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "328fd1b34de4c2c9fd4adf158b51ee9e2baaa019c53c236ab6a8903b589cc153"
   }
  },
  {
@@ -26175,9 +25110,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ae884a196b11c84021f220571259aab30e34ecf4c3fce00aa898a1d20fa594e8"
   }
  },
  {
@@ -26231,9 +25163,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2df3028e9163ffaad7e4856af37ec0d8c74717eed5d68922f0567e5235291735"
   }
  },
  {
@@ -26284,9 +25213,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a51841b430494e63a4db2d04ccdc2dc23a9f752b88333acfb2eb60190db0b7fb"
   }
  },
  {
@@ -26338,9 +25264,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "8d1c0b8a4d8828f59312310669840ba076d3e05a6ddc5c6e989627606bc49b26"
   }
  }
 ]

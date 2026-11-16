@@ -531,8 +531,8 @@ struct ComposeAffineSubmapIntoLinalgGeneric
 // indexing map that projects out q. The generic then carries the reduction
 // itself, and LowerSubmapInverse can lower the remaining injective write-back.
 // Keep the first implementation narrow: one tensor output, a matching
-// terminal inverse, symbol-free maps, static sizes, and a proven-injective
-// reduced destination.
+// terminal inverse and a proven-injective reduced destination. Symbols in
+// the output view select a slice or scalar within the physical destination.
 struct NormalizeTensorReductionOutputSubmap
     : public OpRewritePattern<linalg::GenericOp> {
   NormalizeTensorReductionOutputSubmap(MLIRContext *context)
@@ -558,7 +558,7 @@ struct NormalizeTensorReductionOutputSubmap
   LogicalResult normalizeOutput(linalg::GenericOp generic, unsigned output,
                                 PatternRewriter &rewriter) const {
     auto submap = generic.getOutputs()[output].getDefiningOp<SubmapOp>();
-    if (!submap || submap.getMap().getNumSymbols() != 0 ||
+    if (!submap ||
         !isa<RankedTensorType>(submap.getBase().getType()) ||
         !isa<RankedTensorType>(submap.getType()))
       return failure();
@@ -660,17 +660,22 @@ struct NormalizeTensorReductionOutputSubmap
             generic, "output submap size disagrees with inferred loop bound");
     }
 
+    SmallVector<AffineExpr> symbolReplacements;
+    for (unsigned symbol = 0; symbol < submapMap.getNumSymbols(); ++symbol)
+      symbolReplacements.push_back(getAffineSymbolExpr(symbol, context));
     SmallVector<AffineExpr> reducedBaseResults;
     for (AffineExpr result : composed.getResults())
       reducedBaseResults.push_back(
-          result.replaceDimsAndSymbols(loopReplacements, {}));
+          result.replaceDimsAndSymbols(loopReplacements, symbolReplacements));
     AffineMap reducedSubmapMap = AffineMap::get(
-        retainedLoops.size(), 0, reducedBaseResults, context);
+        retainedLoops.size(), submapMap.getNumSymbols(), reducedBaseResults,
+        context);
     // A rectangular slice/permutation is injective for every extent when
     // each view dimension appears in at least one base coordinate. This
     // structural proof also covers dynamic dimensions and translated slices.
     std::optional<bool> reducedInjective;
-    if (auto rectangular = decomposeMapForLowering(reducedSubmapMap, {}, rewriter)) {
+    if (auto rectangular = decomposeMapForLowering(
+            reducedSubmapMap, submap.getSymbols(), rewriter)) {
       SmallVector<bool> represented(retainedLoops.size(), false);
       for (const PerBaseDim &baseDim : rectangular->base)
         if (baseDim.live)
@@ -726,16 +731,20 @@ struct NormalizeTensorReductionOutputSubmap
       }
       reducedSubmapMap = AffineMap::getMultiDimIdentityMap(
           retainedLoops.size(), context);
-      newOutputMap = composed;
+      newOutputMap = AffineMap::get(numLoops, 0, composed.getResults(), context);
     }
     maps[outputOperandNumber] = newOutputMap;
     auto oldOutputType = cast<RankedTensorType>(submap.getType());
     auto reducedType = RankedTensorType::get(
         reducedShape, oldOutputType.getElementType());
+    SmallVector<Value> indicesAndSizes;
+    if (reducedSubmapMap.getNumSymbols())
+      llvm::append_range(indicesAndSizes, submap.getSymbols());
+    llvm::append_range(indicesAndSizes, reducedSizes);
 
     rewriter.setInsertionPoint(generic);
     auto reducedSubmap = rewriter.create<SubmapOp>(
-        submap.getLoc(), reducedType, submap.getBase(), reducedSizes,
+        submap.getLoc(), reducedType, submap.getBase(), indicesAndSizes,
         reducedSubmapMap);
     StringAttr empty = StringAttr::get(context);
     SmallVector<Type> resultTypes(generic.getResultTypes());
@@ -752,7 +761,7 @@ struct NormalizeTensorReductionOutputSubmap
       rewriter.setInsertionPointAfter(newGeneric);
       auto newInverse = rewriter.create<SubmapInverseOp>(
           inverse.getLoc(), inverse.getType(), inverse.getBaseOriginal(),
-          newGeneric.getResult(output), reducedSizes, reducedSubmapMap);
+          newGeneric.getResult(output), indicesAndSizes, reducedSubmapMap);
       rewriter.replaceOp(inverse, newInverse.getResult());
     }
     for (unsigned index = 0; index < generic.getNumResults(); ++index)

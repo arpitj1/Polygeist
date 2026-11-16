@@ -1859,10 +1859,10 @@ struct PrivatizeScratchAllocaForLoop
 
     // Filter candidates: first in-body use is a write, all in-loop users are
     // among the rewriteable set, no uses after loop, and the alloca lives
-    // in some ancestor block of `forOp` so we can place the sized
-    // replacement at the same scope (and have AffineForOpRaising later
-    // lift enclosing loops without dominance issues).
-    SmallVector<memref::AllocaOp> good;
+    // in some ancestor block of `forOp`. The expanded allocation's size
+    // must also be available at that scope.
+    SmallVector<std::pair<memref::AllocaOp, Operation *>> good;
+    DominanceInfo dominance;
     for (memref::AllocaOp a : candidates) {
       Operation *firstUse = firstUseInBody(a, body);
       if (!firstUse) continue;
@@ -1879,7 +1879,21 @@ struct PrivatizeScratchAllocaForLoop
         }
       }
       if (!allHandled) continue;
-      good.push_back(a);
+
+      Operation *insertionAnchor = forOp.getOperation();
+      if (a->getBlock() != body)
+        while (insertionAnchor && insertionAnchor->getBlock() != a->getBlock())
+          insertionAnchor = insertionAnchor->getParentOp();
+      if (!insertionAnchor)
+        continue;
+      // A nested loop's bound may depend on an enclosing induction variable
+      // or a value computed inside that loop. Keep the scalar scratch when
+      // expanding it at the original scope would move its size out of scope.
+      if (!llvm::all_of(forOp.getUpperBoundOperands(), [&](Value bound) {
+            return dominance.properlyDominates(bound, insertionAnchor);
+          }))
+        continue;
+      good.emplace_back(a, insertionAnchor);
     }
     if (good.empty()) return failure();
 
@@ -1887,18 +1901,11 @@ struct PrivatizeScratchAllocaForLoop
                                       rewriter.getAffineDimExpr(0),
                                       rewriter.getContext());
 
-    for (memref::AllocaOp oldAlloca : good) {
+    for (auto [oldAlloca, insertionAnchor] : good) {
       // Loop-local scratch must be hoisted immediately before the loop so the
       // expanded buffer dominates it.  For an already-enclosing allocation,
       // retain the original scope and insert before the outermost loop at that
       // scope.
-      Block *allocaBlock = oldAlloca->getBlock();
-      Operation *insertionAnchor = forOp.getOperation();
-      bool loopLocal = allocaBlock == body;
-      if (!loopLocal)
-        while (insertionAnchor && insertionAnchor->getBlock() != allocaBlock)
-          insertionAnchor = insertionAnchor->getParentOp();
-      if (!insertionAnchor) continue; // shouldn't happen given precondition
       rewriter.setInsertionPoint(insertionAnchor);
       AffineMap ubMap = forOp.getUpperBoundMap();
       Value tripCount;
