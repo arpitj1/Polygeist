@@ -12281,8 +12281,8 @@
   "status": "PARTIAL",
   "reason": "2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses)",
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -13239,8 +13239,8 @@
    "memref_access": 0,
    "submaps": 10
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsymm_ru_beta0",
    "declarations": [],
@@ -13271,8 +13271,8 @@
    ]
   },
   "validation": {
-   "defn": "RUN_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -13303,8 +13303,8 @@
    "memref_access": 0,
    "submaps": 10
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsymm_ru",
    "declarations": [],
@@ -13336,8 +13336,8 @@
    ]
   },
   "validation": {
-   "defn": "RUN_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -13368,8 +13368,8 @@
    "memref_access": 0,
    "submaps": 10
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsymm_rl_beta0",
    "declarations": [],
@@ -13400,8 +13400,8 @@
    ]
   },
   "validation": {
-   "defn": "RUN_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -13432,8 +13432,8 @@
    "memref_access": 0,
    "submaps": 10
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsymm_rl",
    "declarations": [],
@@ -13465,8 +13465,8 @@
    ]
   },
   "validation": {
-   "defn": "RUN_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "LOWER_FAIL",
    "linalg_maxabs": null,
    "affine": "EXACT",
@@ -13899,8 +13899,8 @@
    "memref_access": 0,
    "submaps": 6
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyr2k_ln_beta0",
    "declarations": [],
@@ -13931,8 +13931,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -13963,8 +13963,8 @@
    "memref_access": 0,
    "submaps": 5
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyr2k_ln_beta1",
    "declarations": [],
@@ -13995,8 +13995,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14027,8 +14027,8 @@
    "memref_access": 0,
    "submaps": 6
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyr2k_ln",
    "declarations": [],
@@ -14060,8 +14060,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14303,8 +14303,8 @@
    "memref_access": 0,
    "submaps": 1
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyr2k_ln_alpha0_beta0",
    "declarations": [],
@@ -14337,8 +14337,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14369,8 +14369,8 @@
    "memref_access": 0,
    "submaps": 1
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyr2k_ln_alpha0",
    "declarations": [],
@@ -14404,8 +14404,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14738,8 +14738,8 @@
    "memref_access": 0,
    "submaps": 4
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_ln_beta0",
    "declarations": [],
@@ -14766,8 +14766,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14798,8 +14798,8 @@
    "memref_access": 0,
    "submaps": 3
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_ln_beta1",
    "declarations": [],
@@ -14826,8 +14826,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14858,8 +14858,8 @@
    "memref_access": 0,
    "submaps": 4
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_ln",
    "declarations": [],
@@ -14887,8 +14887,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -14919,8 +14919,8 @@
    "memref_access": 0,
    "submaps": 4
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_lt_beta0",
    "declarations": [],
@@ -14947,8 +14947,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "WITHIN_1e-12",
+   "defn_maxabs": 4.441e-16,
    "linalg": "WITHIN_1e-12",
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
@@ -14979,8 +14979,8 @@
    "memref_access": 0,
    "submaps": 4
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_lt",
    "declarations": [],
@@ -15008,8 +15008,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "WITHIN_1e-12",
+   "defn_maxabs": 4.441e-16,
    "linalg": "WITHIN_1e-12",
    "linalg_maxabs": 4.441e-16,
    "affine": "EXACT",
@@ -15163,8 +15163,8 @@
    "memref_access": 0,
    "submaps": 1
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_ln_alpha0_beta0",
    "declarations": [],
@@ -15192,8 +15192,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
@@ -15224,8 +15224,8 @@
    "memref_access": 0,
    "submaps": 1
   },
-  "status": "UNVALIDATED",
-  "reason": "defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)",
+  "status": "RAISED",
+  "reason": "",
   "meta": {
    "spec": "netlib_dsyrk_ln_alpha0",
    "declarations": [],
@@ -15254,8 +15254,8 @@
    ]
   },
   "validation": {
-   "defn": "LOWER_FAIL",
-   "defn_maxabs": null,
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
    "linalg": "EXACT",
    "linalg_maxabs": 0.0,
    "affine": "EXACT",

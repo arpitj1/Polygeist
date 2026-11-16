@@ -168,8 +168,10 @@ static bool accumulateLinearDimCoefficients(
 // two points in the domain. The difference domain is symmetric, so checking
 // delta_i >= 1 for each dimension covers every nonzero solution. This uses
 // MLIR's exact integer solver without enumerating the tensor's elements.
+// Unknown extents leave the corresponding difference unbounded. A successful
+// proof then holds for every runtime extent (including empty domains).
 static std::optional<bool>
-isInjectiveOnStaticDomain(AffineMap map, ArrayRef<int64_t> sizes) {
+isInjectiveOnDomain(AffineMap map, ArrayRef<int64_t> sizes) {
   if (map.getNumDims() != sizes.size())
     return std::nullopt;
 
@@ -177,6 +179,10 @@ isInjectiveOnStaticDomain(AffineMap map, ArrayRef<int64_t> sizes) {
   presburger::IntegerRelation differences(
       presburger::PresburgerSpace::getSetSpace(rank));
   for (auto [dim, size] : llvm::enumerate(sizes)) {
+    if (ShapedType::isDynamic(size))
+      continue;
+    if (size == 0)
+      return true;
     if (size <= 0)
       return std::nullopt;
     differences.addBound(presburger::BoundType::LB, dim, -(size - 1));
@@ -184,6 +190,14 @@ isInjectiveOnStaticDomain(AffineMap map, ArrayRef<int64_t> sizes) {
   }
 
   for (AffineExpr result : map.getResults()) {
+    // Runtime translations cancel too. Reject nonlinear expressions through
+    // the coefficient parser; replacing symbols is only valid for pure
+    // affine expressions, where they cannot multiply a dimension.
+    if (!result.isPureAffine())
+      return std::nullopt;
+    SmallVector<AffineExpr> symbols(
+        map.getNumSymbols(), getAffineConstantExpr(0, map.getContext()));
+    result = result.replaceSymbols(symbols);
     SmallVector<int64_t> coefficients(rank, 0);
     int64_t constant = 0;
     if (!accumulateLinearDimCoefficients(result, coefficients, constant))
@@ -336,6 +350,21 @@ static Value stripTensorCasts(Value v) {
   while (auto cast = v.getDefiningOp<tensor::CastOp>())
     v = cast.getSource();
   return v;
+}
+
+// Raised non-rectangular loops use a rectangular logical view and mask off
+// inactive positions. Materializing that view must not speculate an invalid
+// physical access. Unsigned comparison rejects negative indices as well.
+static Value tensorIndicesInBounds(OpBuilder &builder, Location loc,
+                                   Value tensor, ValueRange indices) {
+  Value inBounds = builder.create<arith::ConstantIntOp>(loc, 1, 1);
+  for (auto [axis, index] : llvm::enumerate(indices)) {
+    Value extent = builder.create<tensor::DimOp>(loc, tensor, axis);
+    Value valid = builder.create<arith::CmpIOp>(
+        loc, arith::CmpIPredicate::ult, index, extent);
+    inBounds = builder.create<arith::AndIOp>(loc, inBounds, valid);
+  }
+  return inBounds;
 }
 
 struct FoldIdentitySubmapInverse : public OpRewritePattern<SubmapInverseOp> {
@@ -685,7 +714,7 @@ struct NormalizeTensorReductionOutputSubmap
     }
     if (!reducedInjective)
       reducedInjective =
-          isInjectiveOnStaticDomain(reducedSubmapMap, reducedShape);
+          isInjectiveOnDomain(reducedSubmapMap, reducedShape);
     if (!reducedInjective || !*reducedInjective)
       return rewriter.notifyMatchFailure(
           generic, "reduced tensor destination is not proven injective");
@@ -940,6 +969,13 @@ struct ComposeTensorInputSubmapIntoLinalgGeneric
       if (!submap || submap.getMap().getNumSymbols() != 0 ||
           !isa<RankedTensorType>(submap.getBase().getType()) ||
           !isa<RankedTensorType>(submap.getType()))
+        continue;
+      // A rectangular logical domain can include masked-out positions of a
+      // triangular or shifted view. Keep dynamic non-permutation gathers
+      // explicit so their physical reads can be guarded before the scalar
+      // Linalg body is evaluated.
+      if (!getStaticSizeOperands(submap.getSizes()) &&
+          !submap.getMap().isProjectedPermutation())
         continue;
       AffineMap operandMap = maps[operand.getOperandNumber()];
       if (operandMap.getNumSymbols() != 0 ||
@@ -1593,64 +1629,6 @@ struct LowerSymbolBearingSubmapToExtractSlice
     ValueRange sizes = submap.getSizes();
     unsigned numViewDims = submapMap.getNumDims();
 
-    // A symbol-bearing tensor map cannot be represented directly by a
-    // linalg.generic indexing map because Linalg maps have no runtime symbol
-    // operands.  Materialize the logical view explicitly.  This covers both
-    // gathers (a repeated view dimension, commonly a diagonal) and broadcasts
-    // such as (d0, d1)[s0] -> (s0, d1), where d0 intentionally does not
-    // participate in the physical read.
-    if (submapMap.getNumSymbols() != 0 &&
-        outTy.getRank() == (int64_t)numViewDims && numViewDims != 0) {
-      auto mixedSizes = getMixedSizeOperands(sizes, numViewDims, rewriter);
-      if (!mixedSizes)
-        return failure();
-      Value empty = rewriter.create<tensor::EmptyOp>(
-          loc, *mixedSizes, outTy.getElementType());
-      Value zero = rewriter.create<arith::ConstantIndexOp>(loc, 0);
-      Value one = rewriter.create<arith::ConstantIndexOp>(loc, 1);
-      SmallVector<Value> inductionVars;
-      auto emitLoopNest = [&](auto &self, unsigned depth,
-                              Value destination) -> Value {
-        auto loop = rewriter.create<scf::ForOp>(
-            loc, zero, sizes[depth], one, ValueRange{destination});
-        if (!loop.getBody()->empty())
-          rewriter.eraseOp(loop.getBody()->getTerminator());
-
-        OpBuilder::InsertionGuard guard(rewriter);
-        rewriter.setInsertionPointToStart(loop.getBody());
-        inductionVars.push_back(loop.getInductionVar());
-        Value updated;
-        if (depth + 1 < numViewDims) {
-          updated = self(self, depth + 1, loop.getRegionIterArg(0));
-        } else {
-          SmallVector<Value> mapOperands(inductionVars.begin(),
-                                         inductionVars.end());
-          mapOperands.append(symbols.begin(), symbols.end());
-          SmallVector<Value> baseIndices;
-          baseIndices.reserve(submapMap.getNumResults());
-          for (AffineExpr resultExpr : submapMap.getResults()) {
-            AffineMap resultMap = AffineMap::get(
-                numViewDims, submapMap.getNumSymbols(), resultExpr,
-                rewriter.getContext());
-            baseIndices.push_back(rewriter.create<affine::AffineApplyOp>(
-                loc, resultMap, mapOperands));
-          }
-          Value element = rewriter.create<tensor::ExtractOp>(
-              loc, submap.getBase(), baseIndices);
-          updated = rewriter.create<tensor::InsertOp>(
-              loc, element, loop.getRegionIterArg(0), inductionVars);
-        }
-        inductionVars.pop_back();
-        rewriter.create<scf::YieldOp>(loc, updated);
-        return loop.getResult(0);
-      };
-      Value result = emitLoopNest(emitLoopNest, 0, empty);
-      if (result.getType() != outTy)
-        result = rewriter.create<tensor::CastOp>(loc, outTy, result);
-      rewriter.replaceOp(submap, result);
-      return success();
-    }
-
     // Do not represent a rank-expanding DPS output view as tensor.expand_shape.
     // Canonicalizing that reshape through linalg.generic can replace the
     // output operand with its rank-1 base while leaving the generic's ranked
@@ -1737,6 +1715,88 @@ struct LowerSymbolBearingSubmapToExtractSlice
           return success();
         }
       }
+    }
+
+    // A symbol-bearing tensor map cannot be represented directly by a
+    // linalg.generic indexing map because Linalg maps have no runtime symbol
+    // operands.  Materialize the logical view explicitly.  This covers both
+    // gathers (a repeated view dimension, commonly a diagonal) and broadcasts
+    // such as (d0, d1)[s0] -> (s0, d1), where d0 intentionally does not
+    // participate in the physical read.
+    bool dynamicGather = !getStaticSizeOperands(sizes) &&
+                         !submapMap.isProjectedPermutation();
+    if ((submapMap.getNumSymbols() != 0 || dynamicGather) &&
+        outTy.getRank() == (int64_t)numViewDims && numViewDims != 0) {
+      auto mixedSizes = getMixedSizeOperands(sizes, numViewDims, rewriter);
+      if (!mixedSizes)
+        return failure();
+      auto zeroAttr = rewriter.getZeroAttr(outTy.getElementType());
+      if (dynamicGather && !zeroAttr)
+        return failure();
+      Value empty = rewriter.create<tensor::EmptyOp>(
+          loc, *mixedSizes, outTy.getElementType());
+      Value zero = rewriter.create<arith::ConstantIndexOp>(loc, 0);
+      Value one = rewriter.create<arith::ConstantIndexOp>(loc, 1);
+      SmallVector<Value> inductionVars;
+      auto emitLoopNest = [&](auto &self, unsigned depth,
+                              Value destination) -> Value {
+        auto loop = rewriter.create<scf::ForOp>(
+            loc, zero, sizes[depth], one, ValueRange{destination});
+        if (!loop.getBody()->empty())
+          rewriter.eraseOp(loop.getBody()->getTerminator());
+
+        OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointToStart(loop.getBody());
+        inductionVars.push_back(loop.getInductionVar());
+        Value updated;
+        if (depth + 1 < numViewDims) {
+          updated = self(self, depth + 1, loop.getRegionIterArg(0));
+        } else {
+          SmallVector<Value> mapOperands(inductionVars.begin(),
+                                         inductionVars.end());
+          mapOperands.append(symbols.begin(), symbols.end());
+          SmallVector<Value> baseIndices;
+          baseIndices.reserve(submapMap.getNumResults());
+          for (AffineExpr resultExpr : submapMap.getResults()) {
+            AffineMap resultMap = AffineMap::get(
+                numViewDims, submapMap.getNumSymbols(), resultExpr,
+                rewriter.getContext());
+            baseIndices.push_back(rewriter.create<affine::AffineApplyOp>(
+                loc, resultMap, mapOperands));
+          }
+          Value element;
+          if (dynamicGather) {
+            Value inBounds = tensorIndicesInBounds(
+                rewriter, loc, submap.getBase(), baseIndices);
+            auto read = rewriter.create<scf::IfOp>(
+                loc, inBounds,
+                [&](OpBuilder &builder, Location nested) {
+                  Value value = builder.create<tensor::ExtractOp>(
+                      nested, submap.getBase(), baseIndices);
+                  builder.create<scf::YieldOp>(nested, value);
+                },
+                [&](OpBuilder &builder, Location nested) {
+                  Value value = builder.create<arith::ConstantOp>(
+                      nested, zeroAttr);
+                  builder.create<scf::YieldOp>(nested, value);
+                });
+            element = read.getResult(0);
+          } else {
+            element = rewriter.create<tensor::ExtractOp>(
+                loc, submap.getBase(), baseIndices);
+          }
+          updated = rewriter.create<tensor::InsertOp>(
+              loc, element, loop.getRegionIterArg(0), inductionVars);
+        }
+        inductionVars.pop_back();
+        rewriter.create<scf::YieldOp>(loc, updated);
+        return loop.getResult(0);
+      };
+      Value result = emitLoopNest(emitLoopNest, 0, empty);
+      if (result.getType() != outTy)
+        result = rewriter.create<tensor::CastOp>(loc, outTy, result);
+      rewriter.replaceOp(submap, result);
+      return success();
     }
 
     // Materialize any symbol-free affine gather that could not be represented
@@ -2033,9 +2093,6 @@ struct LowerSubmapInverse : public OpRewritePattern<SubmapInverseOp> {
     auto lowerElementwiseAffineWriteback = [&]() -> LogicalResult {
       if (sizes.size() != numViewDims)
         return failure();
-      if (!staticSizes)
-        return rewriter.notifyMatchFailure(
-            inv, "affine write-back injectivity is unknown for dynamic sizes");
 
       // A reduction result is compact: its tensor rank contains only affine
       // map dimensions that reach the physical base.  Recover that ordered
@@ -2067,25 +2124,28 @@ struct LowerSubmapInverse : public OpRewritePattern<SubmapInverseOp> {
       for (auto [sourceDim, mapDim] : llvm::enumerate(sourceToMapDim)) {
         compactReplacements[mapDim] =
             getAffineDimExpr(sourceDim, rewriter.getContext());
-        compactSizes.push_back((*staticSizes)[mapDim]);
+        auto size = getConstantIndex(sizes[mapDim]);
+        compactSizes.push_back(size ? *size : ShapedType::kDynamic);
       }
       SmallVector<AffineExpr> compactResults;
-      SmallVector<AffineExpr> symbolReplacements(
-          m.getNumSymbols(),
-          getAffineConstantExpr(0, rewriter.getContext()));
+      SmallVector<AffineExpr> symbolReplacements;
+      for (unsigned symbol = 0; symbol < m.getNumSymbols(); ++symbol)
+        symbolReplacements.push_back(
+            getAffineSymbolExpr(symbol, rewriter.getContext()));
       for (AffineExpr result : m.getResults())
         compactResults.push_back(
             result.replaceDimsAndSymbols(compactReplacements,
                                          symbolReplacements));
       AffineMap compactMap = AffineMap::get(
-          sourceToMapDim.size(), 0, compactResults, rewriter.getContext());
+          sourceToMapDim.size(), m.getNumSymbols(), compactResults,
+          rewriter.getContext());
       std::optional<bool> isInjective =
-          isInjectiveOnStaticDomain(compactMap, compactSizes);
+          isInjectiveOnDomain(compactMap, compactSizes);
       if (!isInjective || !*isInjective)
         return rewriter.notifyMatchFailure(
             inv, "affine write-back map is not proven injective");
 
-      if (affineCopyWriteback && !m.getNumSymbols() &&
+      if (affineCopyWriteback && staticSizes && !m.getNumSymbols() &&
           !sourceToMapDim.empty()) {
         // The writeback domain may be a prefix of a larger source tensor.
         // Preserve the explicit bounds instead of letting Linalg infer a
@@ -2136,7 +2196,7 @@ struct LowerSubmapInverse : public OpRewritePattern<SubmapInverseOp> {
         inductionVars.push_back(loop.getInductionVar());
 
         Value updated;
-        if (depth + 1 < numViewDims) {
+        if (depth + 1 < sourceToMapDim.size()) {
           updated = self(self, depth + 1, loop.getRegionIterArg(0));
         } else {
           Value element = rewriter.create<tensor::ExtractOp>(
@@ -2154,8 +2214,24 @@ struct LowerSubmapInverse : public OpRewritePattern<SubmapInverseOp> {
             baseIndices.push_back(rewriter.create<affine::AffineApplyOp>(
                 loc, resultMap, mapOperands));
           }
-          updated = rewriter.create<tensor::InsertOp>(
-              loc, element, loop.getRegionIterArg(0), baseIndices);
+          if (staticSizes) {
+            updated = rewriter.create<tensor::InsertOp>(
+                loc, element, loop.getRegionIterArg(0), baseIndices);
+          } else {
+            Value inBounds = tensorIndicesInBounds(
+                rewriter, loc, base, baseIndices);
+            auto write = rewriter.create<scf::IfOp>(
+                loc, inBounds,
+                [&](OpBuilder &builder, Location nested) {
+                  Value inserted = builder.create<tensor::InsertOp>(
+                      nested, element, loop.getRegionIterArg(0), baseIndices);
+                  builder.create<scf::YieldOp>(nested, inserted);
+                },
+                [&](OpBuilder &builder, Location nested) {
+                  builder.create<scf::YieldOp>(nested, loop.getRegionIterArg(0));
+                });
+            updated = write.getResult(0);
+          }
         }
 
         inductionVars.pop_back();

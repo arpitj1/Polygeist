@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (total 485)
+Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 394, UNSOUND: 2 (total 485)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -245,7 +245,7 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (
 | `cudnn_conv3d_valid_f32` | cudnn_conv3d | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv2d_backward_data_valid_f32` | cudnn_conv_backward_data2d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_backward_data_valid_f32` | cudnn_conv_backward_data3d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (5 loop ops, 0 scalar memory accesses) |
-| `cudnn_conv1d_backward_data_tbc_f32` | cudnn_conv_backward_data_tbc | PARTIAL | 2 | affine.for | LOWER_FAIL / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
+| `cudnn_conv1d_backward_data_tbc_f32` | cudnn_conv_backward_data_tbc | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_backward_filter_valid_f32` | cudnn_conv_backward_filter3d | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv1d_tbc_f32` | cudnn_conv_tbc | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_depthwise_conv2d_bias_f32` | cudnn_depthwise_conv2d | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses) |
@@ -264,10 +264,10 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dsymm_lu` | dsymm | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsymm_ll_beta0` | dsymm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsymm_ll` | dsymm | PARTIAL | 1 | affine.for | LOWER_FAIL / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dsymm_ru_beta0` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsymm_ru` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsymm_rl_beta0` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
-| `netlib_dsymm_rl` | dsymm | UNVALIDATED | 3 | - | RUN_FAIL / LOWER_FAIL | defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL) |
+| `netlib_dsymm_ru_beta0` | dsymm | RAISED | 3 | - | EXACT / LOWER_FAIL |  |
+| `netlib_dsymm_ru` | dsymm | RAISED | 3 | - | EXACT / LOWER_FAIL |  |
+| `netlib_dsymm_rl_beta0` | dsymm | RAISED | 3 | - | EXACT / LOWER_FAIL |  |
+| `netlib_dsymm_rl` | dsymm | RAISED | 3 | - | EXACT / LOWER_FAIL |  |
 | `netlib_dsymm_lu_alpha0_beta0` | dsymm | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dsymm_lu_alpha0` | dsymm | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dsyr2k_un_beta0` | dsyr2k | RAISED | 2 | - | EXACT / EXACT |  |
@@ -275,29 +275,29 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (
 | `netlib_dsyr2k_un` | dsyr2k | RAISED | 2 | - | EXACT / EXACT |  |
 | `netlib_dsyr2k_ut_beta0` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsyr2k_ut` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
-| `netlib_dsyr2k_ln_beta0` | dsyr2k | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyr2k_ln_beta1` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyr2k_ln` | dsyr2k | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyr2k_ln_beta0` | dsyr2k | RAISED | 2 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_ln_beta1` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_ln` | dsyr2k | RAISED | 2 | - | EXACT / EXACT |  |
 | `netlib_dsyr2k_lt_beta0` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsyr2k_lt` | dsyr2k | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dsyr2k_un_alpha0_beta0` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dsyr2k_un_alpha0` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
-| `netlib_dsyr2k_ln_alpha0_beta0` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyr2k_ln_alpha0` | dsyr2k | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyr2k_ln_alpha0_beta0` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyr2k_ln_alpha0` | dsyr2k | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dsyrk_un_beta0` | dsyrk | RAISED | 2 | - | EXACT / EXACT |  |
 | `netlib_dsyrk_un_beta1` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dsyrk_un` | dsyrk | RAISED | 2 | - | EXACT / EXACT |  |
 | `netlib_dsyrk_ut_beta0` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
 | `netlib_dsyrk_ut` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
-| `netlib_dsyrk_ln_beta0` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyrk_ln_beta1` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyrk_ln` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyrk_lt_beta0` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / WITHIN_1e-12 | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16) |
-| `netlib_dsyrk_lt` | dsyrk | UNVALIDATED | 2 | - | LOWER_FAIL / WITHIN_1e-12 | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16) |
+| `netlib_dsyrk_ln_beta0` | dsyrk | RAISED | 2 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_ln_beta1` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_ln` | dsyrk | RAISED | 2 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_lt_beta0` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
+| `netlib_dsyrk_lt` | dsyrk | RAISED | 2 | - | WITHIN_1e-12 / WITHIN_1e-12 |  |
 | `netlib_dsyrk_un_alpha0_beta0` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dsyrk_un_alpha0` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
-| `netlib_dsyrk_ln_alpha0_beta0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
-| `netlib_dsyrk_ln_alpha0` | dsyrk | UNVALIDATED | 1 | - | LOWER_FAIL / EXACT | defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT) |
+| `netlib_dsyrk_ln_alpha0_beta0` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
+| `netlib_dsyrk_ln_alpha0` | dsyrk | RAISED | 1 | - | EXACT / EXACT |  |
 | `netlib_dtrmm_lunu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lunn` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `netlib_dtrmm_lutu` | dtrmm | PARTIAL | 1 | affine.for | EXACT / EXACT | 1 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
@@ -872,54 +872,6 @@ build/bin/polygeist-opt '--select-func=func-name=netlib_dsymm_ll externalize-dep
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsymm_ll_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_ll_debuf.mlir
 ```
 
-### `netlib_dsymm_ru_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsymm_ru_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsymm_ru_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsymm_ru_beta0.c --function=netlib_dsymm_ru_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsymm_ru_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsymm_ru_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsymm_ru_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_ru_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsymm_ru_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_ru_beta0_debuf.mlir
-```
-
-### `netlib_dsymm_ru` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsymm_ru/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsymm_ru`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsymm_ru.c --function=netlib_dsymm_ru --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsymm_ru.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsymm_ru externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsymm_ru.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_ru_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsymm_ru_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_ru_debuf.mlir
-```
-
-### `netlib_dsymm_rl_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsymm_rl_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsymm_rl_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsymm_rl_beta0.c --function=netlib_dsymm_rl_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsymm_rl_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsymm_rl_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsymm_rl_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_rl_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsymm_rl_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_rl_beta0_debuf.mlir
-```
-
-### `netlib_dsymm_rl` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (RUN_FAIL; memref-Linalg route: LOWER_FAIL)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsymm_rl/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsymm_rl`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsymm_rl.c --function=netlib_dsymm_rl --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsymm_rl.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsymm_rl externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsymm_rl.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_rl_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsymm_rl_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsymm_rl_debuf.mlir
-```
-
 ### `netlib_dsyr2k_ut_beta0` -- PARTIAL
 
 Reason: 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
@@ -944,42 +896,6 @@ build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_ut externalize-de
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_ut_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ut_debuf.mlir
 ```
 
-### `netlib_dsyr2k_ln_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta0.c --function=netlib_dsyr2k_ln_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_ln_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta0_debuf.mlir
-```
-
-### `netlib_dsyr2k_ln_beta1` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_beta1/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_beta1`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta1.c --function=netlib_dsyr2k_ln_beta1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta1.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_ln_beta1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta1.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta1_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta1_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_beta1_debuf.mlir
-```
-
-### `netlib_dsyr2k_ln` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyr2k_ln.c --function=netlib_dsyr2k_ln --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_ln externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyr2k_ln.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_ln_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_debuf.mlir
-```
-
 ### `netlib_dsyr2k_lt_beta0` -- PARTIAL
 
 Reason: 2 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses)
@@ -1002,114 +918,6 @@ Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_d
 build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyr2k_lt.c --function=netlib_dsyr2k_lt --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyr2k_lt.mlir
 build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_lt externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyr2k_lt.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_lt_linalg.mlir
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_lt_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_lt_debuf.mlir
-```
-
-### `netlib_dsyr2k_ln_alpha0_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_alpha0_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_alpha0_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_beta0.c --function=netlib_dsyr2k_ln_alpha0_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_ln_alpha0_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_beta0_debuf.mlir
-```
-
-### `netlib_dsyr2k_ln_alpha0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyr2k_ln_alpha0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyr2k_ln_alpha0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0.c --function=netlib_dsyr2k_ln_alpha0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyr2k_ln_alpha0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyr2k_ln_alpha0_debuf.mlir
-```
-
-### `netlib_dsyrk_ln_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta0.c --function=netlib_dsyrk_ln_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_ln_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta0_debuf.mlir
-```
-
-### `netlib_dsyrk_ln_beta1` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_beta1/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_beta1`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta1.c --function=netlib_dsyrk_ln_beta1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta1.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_ln_beta1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta1.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta1_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta1_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_beta1_debuf.mlir
-```
-
-### `netlib_dsyrk_ln` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_ln.c --function=netlib_dsyrk_ln --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_ln.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_ln externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_ln.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_ln_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_debuf.mlir
-```
-
-### `netlib_dsyrk_lt_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_lt_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_lt_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_lt_beta0.c --function=netlib_dsyrk_lt_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_lt_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_lt_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_lt_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_lt_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_lt_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_lt_beta0_debuf.mlir
-```
-
-### `netlib_dsyrk_lt` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: WITHIN_1e-12, max abs err 4.44e-16)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_lt/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_lt`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_lt.c --function=netlib_dsyrk_lt --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_lt.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_lt externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_lt.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_lt_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_lt_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_lt_debuf.mlir
-```
-
-### `netlib_dsyrk_ln_alpha0_beta0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_alpha0_beta0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_alpha0_beta0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_beta0.c --function=netlib_dsyrk_ln_alpha0_beta0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_beta0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_ln_alpha0_beta0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_beta0.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_beta0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_beta0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_beta0_debuf.mlir
-```
-
-### `netlib_dsyrk_ln_alpha0` -- UNVALIDATED
-
-Reason: defn could not be executed for validation (LOWER_FAIL; memref-Linalg route: EXACT)
-
-Validation harness (defn route): `generic_solver/lib_v2/raised/validate/netlib_dsyrk_ln_alpha0/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only netlib_dsyrk_ln_alpha0`.
-
-```sh
-build/bin/cgeist generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0.c --function=netlib_dsyrk_ln_alpha0 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0.mlir
-build/bin/polygeist-opt '--select-func=func-name=netlib_dsyrk_ln_alpha0 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_linalg.mlir
-build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_linalg.mlir -o generic_solver/lib_v3/raised/netlib_dsyrk_ln_alpha0_debuf.mlir
 ```
 
 ### `netlib_dtrmm_lunu` -- PARTIAL
