@@ -275,6 +275,17 @@ def algebra_rules(include_distributivity: bool = True):
     c1, c2 = vars_("c1 c2", f64)
     rules = [
         *integer_rules,
+        # Pure declarations retain their typed identity in strict mode. In
+        # the relaxed finite-real model, standard C extrema have the same
+        # arithmetic meaning as the corresponding MLIR compare/select. Do
+        # not apply these identities to user helpers or other signatures.
+        *[
+            rewrite(Term.Binary(f"pure-call:{symbol}:({ty},{ty})->{ty}", a, b))
+            .to(Term.Binary(operation, a, b))
+            for symbol, ty, operation in (
+                ("fmaxf", "f32", "max"), ("fmax", "f64", "max"),
+                ("fminf", "f32", "min"), ("fmin", "f64", "min"))
+        ],
         # Finite real-valued ordering identities. These are deliberately
         # absent in strict mode: fmax handles NaNs differently from ordered
         # select, and conditional negation preserves a negative zero.

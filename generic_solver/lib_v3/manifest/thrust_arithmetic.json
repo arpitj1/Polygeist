@@ -79,13 +79,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -133,13 +133,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -187,13 +187,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -238,13 +238,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -295,13 +295,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -349,13 +349,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -403,13 +403,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -454,13 +454,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -511,13 +511,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -565,13 +565,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -619,13 +619,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -670,13 +670,13 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },
       "assumptions": [
         "positive n <= INT_MAX",
-        "contiguous FP32 arrays; output disjoint from input arrays",
+        "contiguous FP32 arrays; output disjoint from or exactly aliasing an equal-sized input; no partial overlap",
         "CUDA compilation preserves FP32 subnormals and explicit operation rounding"
       ],
       "deviations": []
@@ -729,7 +729,7 @@
               "max": 2147483647
             }
           },
-          "alias_policy": "disjoint",
+          "alias_policy": "exact_or_disjoint",
           "linkage": "required"
         }
       },

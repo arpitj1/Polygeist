@@ -67,8 +67,8 @@ def contract(A, spec, target, ret, args):
     backend = target.get('backends')
     if backend not in (['cuda'], ['pva']):
         raise A.AbiError('typed C-wrapper requires one supported backend')
-    if cfg.get('alias_policy', 'disjoint') != 'disjoint':
-        raise A.AbiError('typed C-wrapper requires disjoint outputs')
+    if cfg.get('alias_policy', 'disjoint') not in ('disjoint', 'exact_or_disjoint'):
+        raise A.AbiError('unsupported typed C-wrapper alias policy')
     entry = cfg.get('entry', '')
     family, call = target['library'], target['call']
     if not all(isinstance(v, str) and re.fullmatch(r'[A-Za-z_]\w*', v)
@@ -120,9 +120,33 @@ def contract(A, spec, target, ret, args):
                                 (arg.kind == 'scalar' and element in ('float', 'double'))):
             raise A.AbiError('wrapper scalar requires exact int32, uint32, FP32, or FP64 storage')
     params, binding, validated = geometry(A, target, args, cfg, resolved)
+    if cfg.get('alias_policy') == 'exact_or_disjoint':
+        validate_exact_alias(A, spec, ret, args, cfg)
+        validated['elementwise_exact_alias'] = True
     if configured:
         validated['resolved_configuration'] = configured
     return params, binding, validated
+
+
+def validate_exact_alias(A, spec, ret, args, cfg):
+    """Check the imported reference before accepting the vendor alias contract."""
+    import runtime_adapter as R
+    arrays = [arg for arg in args if arg.kind == 'array']
+    shape = cfg['arrays'][arrays[0].name] if arrays else []
+    if (ret != 'void' or len(shape) != 1 or not isinstance(shape[0], str)
+            or len({arg.ctype for arg in arrays}) != 1
+            or any(cfg['arrays'][arg.name] != shape for arg in arrays)):
+        raise A.AbiError('exact aliasing requires equal rank-one element arrays')
+    function, _, _, _, _ = R.reference_region(A, spec, args, shape[0])
+    outer = {'arith.constant', 'arith.index_cast', 'polygeist.submap',
+             'polygeist.submapInverse', 'linalg.generic', 'kernel.yield'}
+    for op in function.ops:
+        if op.parent is None:
+            safe = op.name in outer
+        else:
+            safe = op.name.startswith(('arith.', 'math.')) or op.name == 'linalg.yield'
+        if not safe:
+            raise A.AbiError('exact aliasing requires a pure per-element reference')
 
 
 def geometry(A, target, args, cfg, ordered):
@@ -257,7 +281,11 @@ def generate(ca, prototype, emit_call=None):
     for i, p in enumerate(arrays):
         for q in arrays[i + 1:]:
             if p.written or q.written:
-                body.append(f'  if (polygeist_v2_overlaps({p.name}, {p.name}_bytes, {q.name}, {q.name}_bytes))\n'
+                exception = ''
+                if cfg.get('elementwise_exact_alias'):
+                    exception = (f' && ({p.name} != {q.name} || '
+                                 f'{p.name}_bytes != {q.name}_bytes)')
+                body.append(f'  if (polygeist_v2_overlaps({p.name}, {p.name}_bytes, {q.name}, {q.name}_bytes){exception})\n'
                             f'    polygeist_v2_fatal("{ca.call}", "unsupported output overlap");\n')
     if cuda:
         body += ['  polygeist_v2_map_t pv2_map;\n',

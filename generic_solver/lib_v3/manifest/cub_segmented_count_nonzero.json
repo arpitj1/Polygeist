@@ -77,6 +77,69 @@
         "FP32 not-equal treats NaN as nonzero; signed zeros compare equal to zero"
       ],
       "deviations": []
+    },
+    {
+      "name": "cub_count_nonzero_f32",
+      "target": {
+        "library": "CUB",
+        "call": "DeviceSegmentedReduce",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cub_segmented_count_nonzero_f32",
+          "arguments": [
+            {
+              "configuration": "segment_count",
+              "type": "int"
+            },
+            "cols",
+            "input",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "cols"
+            ],
+            "output": [
+              1
+            ]
+          },
+          "bounds": {
+            "cols": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "optional",
+          "configuration": {
+            "schema": 1,
+            "inputs": [],
+            "values": {
+              "segment_count": "1"
+            },
+            "checks": [
+              "segment_count == 1"
+            ]
+          }
+        }
+      },
+      "args": [
+        "cols",
+        "input",
+        "output"
+      ],
+      "assumptions": [
+        "One segment of positive length <= INT_MAX; disjoint contiguous FP32 input and one int32 output",
+        "FP32 not-equal treats NaN as nonzero; signed zeros compare equal to zero"
+      ],
+      "deviations": [],
+      "defines": {
+        "NETLIB_SINGLE_SEGMENT": "1"
+      }
     }
   ]
 }

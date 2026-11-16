@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 377, UNSOUND: 2, UNVALIDATED: 16 (total 484)
+Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 378, UNSOUND: 2, UNVALIDATED: 16 (total 485)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -234,6 +234,7 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 377, UNSOUND: 2, UNVALIDATED: 16 (
 | `cub_segmented_sum_f64` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_xor_i32` | cub_segmented_arithmetic | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_count_nonzero_f32` | cub_segmented_count_nonzero | RAISED | 2 | - | EXACT / EXACT |  |
+| `cub_count_nonzero_f32` | cub_segmented_count_nonzero | RAISED | 1 | - | EXACT / EXACT |  |
 | `cub_segmented_reduce_and_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_reduce_or_i32` | cub_segmented_logical | RAISED | 2 | - | EXACT / EXACT |  |
 | `cub_segmented_logical_mode_i32` | cub_segmented_logical_mode | RAISED | 2 | - | EXACT / EXACT |  |

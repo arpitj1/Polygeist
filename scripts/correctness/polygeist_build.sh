@@ -5,7 +5,7 @@
 # file (main, init, print, etc.) is compiled normally.
 #
 # Usage:
-#   polygeist_build.sh [--target=host|jetson-cpu|jetson] [--function=NAME] [-o OUT]
+#   polygeist_build.sh [--target=host|cuda|jetson-cpu|jetson] [--function=NAME] [-o OUT]
 #                      [--harness=HARNESS.c] [--whole-program] [--no-debuf]
 #                      [--semantic-mlir=COMPOSED.mlir]
 #                      <kernel.c> [gcc-passthrough-flags...]
@@ -16,6 +16,7 @@
 #                       the binary still runs (CPU-only, for correctness).
 #                       On a Jetson (aarch64 + JetPack CUDA), links cuDNN/
 #                       cuBLAS and the binary runs on the GPU.
+#   --target=cuda       Build for a local x86-64 NVIDIA GPU.
 #   --target=jetson     Cross-compile from this x86 VM to aarch64 + bundle
 #                       the cross-CUDA libs. The resulting binary is an
 #                       aarch64 ELF you can scp to a Jetson and run there.
@@ -191,24 +192,31 @@ done
 [ -z "$SEMANTIC_MLIR" ] || [ -f "$SEMANTIC_MLIR" ] || {
   echo "ERROR: semantic MLIR file $SEMANTIC_MLIR not found" >&2; exit 1;
 }
-case "$TARGET" in host|jetson-cpu|jetson) ;; *)
-  echo "ERROR: --target must be 'host', 'jetson-cpu', or 'jetson' (got '$TARGET')" >&2; exit 1 ;;
+case "$TARGET" in host|cuda|jetson-cpu|jetson) ;; *)
+  echo "ERROR: --target must be 'host', 'cuda', 'jetson-cpu', or 'jetson' (got '$TARGET')" >&2; exit 1 ;;
 esac
-if [ -z "${POLYGEIST_ABI_BACKEND:-}" ] && [ "$TARGET" != jetson ]; then
+if [ -z "${POLYGEIST_ABI_BACKEND:-}" ] && [ "$TARGET" != jetson ] && [ "$TARGET" != cuda ]; then
   ABI_BACKEND=cpu
 fi
 case "$ABI_BACKEND" in cpu|cuda|pva) ;; *)
   echo "ERROR: POLYGEIST_ABI_BACKEND must be 'cpu', 'cuda', or 'pva'" >&2; exit 1 ;;
 esac
-if { [ "$ABI_BACKEND" = cpu ] && [ "$TARGET" = jetson ]; } ||
-   { [ "$ABI_BACKEND" != cpu ] && [ "$TARGET" != jetson ]; }; then
+if { [ "$ABI_BACKEND" = cpu ] && { [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; }; } ||
+   { [ "$ABI_BACKEND" != cpu ] && [ "$TARGET" != jetson ] && [ "$TARGET" != cuda ]; }; then
   echo "ERROR: backend $ABI_BACKEND does not match execution target $TARGET" >&2; exit 1
 fi
 if [ "$ABI_BACKEND" = pva ] && [ "$TARGET" != jetson ]; then
   echo "ERROR: PVA ABI lowering requires --target=jetson" >&2; exit 1
 fi
 CROSS_AARCH64=0
-if [ "$TARGET" != "host" ]; then CROSS_AARCH64=1; fi
+if [ "$TARGET" = jetson ] || [ "$TARGET" = jetson-cpu ]; then CROSS_AARCH64=1; fi
+if [ "$TARGET" = cuda ] || [ "$TARGET" = jetson ]; then
+  source "$SCRIPTS/gpu_target.sh"
+  if [ "$TARGET" = cuda ]; then configure_gpu_target x86_64; else configure_gpu_target jetson; fi
+  CUDA_CROSS=$CUDA
+  CUDNN_CROSS_INC=$CUDNN_INC
+  CUDNN_CROSS_LIB=$CUDNN_LIB
+fi
 [ -z "$OUT" ] && OUT="$(basename "$INPUT" .c)"
 
 WHOLE_PROGRAM_ENTRY=main
@@ -436,8 +444,8 @@ if [ "${POLYGEIST_ALLOW_TF32:-0}" != 0 ]; then
   echo "ERROR: precision transformations require specification evidence integration" >&2
   exit 1
 fi
-if [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ] && [ "$TARGET" != jetson ]; then
-  echo "ERROR: device workspace planning requires --target=jetson" >&2
+if [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ] && [ "$TARGET" != jetson ] && [ "$TARGET" != cuda ]; then
+  echo "ERROR: device workspace planning requires --target=cuda or --target=jetson" >&2
   exit 1
 fi
 
@@ -521,7 +529,7 @@ fi
 # move only workspaces with a completely device/descriptor-only use graph into
 # cudaMalloc storage.  Host-observable globals remain on the mapped-host path.
 DEVICE_WORKSPACE_PLANNED=0
-if [ "$TARGET" = jetson ] && \
+if { [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; } && \
    [ -n "${POLYGEIST_PERSISTENT_WORKSPACE_FUNCTION:-}" ]; then
   $PYTHON "$SCRIPTS/lib_v2/lower_v2.py" "$WORK/abi_canon.mlir" \
     --backend cuda --memory-copies-only -o "$WORK/abi_workspace_input.mlir"
@@ -547,7 +555,7 @@ sed -i 's|bufferization\.to_tensor \(%[^ ]*\) :|bufferization.to_tensor \1 restr
 BUFFER_DEALLOC=${POLYGEIST_BUFFER_DEALLOC:-auto}
 if [ "${#ABI_DEALLOC_ARGS[@]}" -ne 0 ]; then BUFFER_DEALLOC=0; fi
 if [ "$BUFFER_DEALLOC" = auto ]; then
-  if [ "$TARGET" = jetson ]; then BUFFER_DEALLOC=0; else BUFFER_DEALLOC=1; fi
+  if [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; then BUFFER_DEALLOC=0; else BUFFER_DEALLOC=1; fi
 fi
 if [ "$BUFFER_DEALLOC" != 0 ]; then
   # Same tool as the lowering below (see the C-pointer ABI branch).
@@ -687,15 +695,13 @@ elif [ "$TARGET" = "jetson-cpu" ]; then
     echo "         + optimized AArch64 CPU CBLAS runtime enabled"
   fi
 else
-  # aarch64-linux-gnu-gcc is already configured for aarch64 — no --target arg.
-  # Clang (used for kernel.ll → kernel.o only) does need --target=aarch64-linux-gnu.
-  CC=$AARCH64_CC
-  CLANG_TARGET_ARGS="--target=aarch64-linux-gnu --gcc-toolchain=/usr"
+  CC=$GPU_CC
+  CLANG_TARGET_ARGS="${GPU_CLANG_ARGS[*]}"
   RT_SRC=$RT/polygeist_cublas_rt_cuda.c
-  RT_LIBS="-L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs -L$CUDNN_CROSS_LIB \
+  RT_LIBS="-L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs -L$CUDNN_CROSS_LIB \
            -lcudnn -lcublasLt -lcublas -lcufft -lcusparse -lcusolver \
            -lcudart -lm -lpthread -ldl \
-           -Wl,-rpath,/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu"
+           -Wl,-rpath,$GPU_RPATH"
   if [ "$ABI_BACKEND" = pva ]; then
     PVA_CUPVA_ROOT="${CUPVA_SDK_ROOT:?set CUPVA_SDK_ROOT for PVA builds}"
     PVA_STAGED_LIBS="${PVA_LIB_STAGE:?set PVA_LIB_STAGE for PVA builds}"
@@ -721,7 +727,7 @@ else
     RT_SRC=$RT/polygeist_pva_image_rt.c
     RT_CFLAGS+=("-I$PVA_OPERATOR_INC" "-I$PVA_NVCV_INC"
                "-I$PVA_CUPVA_ROOT/include")
-    RT_LIBS="-L$PVA_STAGED_LIBS -L$CUDA_CROSS/lib \
+    RT_LIBS="-L$PVA_STAGED_LIBS -L$CUDA_LIBDIR \
              -lpva_operator -lnvcv_types -lcupva_host -lcudart \
              -lm -lpthread -ldl -Wl,--allow-shlib-undefined \
              -Wl,-rpath,$PVA_TARGET_RPATH"
@@ -731,27 +737,27 @@ else
     RT_CFLAGS+=("-DPOLYGEIST_DISABLE_CUSPARSE"
                "-DPOLYGEIST_DISABLE_CUSOLVER"
                "-DPOLYGEIST_DISABLE_CUDNN_CLEANUP")
-    RT_LIBS="-L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs \
+    RT_LIBS="-L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs \
              -lcublas -lcudart -lm -lpthread -ldl \
-             -Wl,-rpath,/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu"
+             -Wl,-rpath,$GPU_RPATH"
     echo "         + minimal cuBLAS/CUDA runtime linkage"
   fi
   if [ "${POLYGEIST_MINIMAL_CUDNN_RUNTIME:-0}" != "0" ]; then
     RT_CFLAGS+=("-DPOLYGEIST_DISABLE_CUSPARSE"
                "-DPOLYGEIST_DISABLE_CUSOLVER")
-    RT_LIBS="-L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs \
-             -L/usr/lib/aarch64-linux-gnu \
+    RT_LIBS="-L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs \
+             -L$CUDNN_CROSS_LIB \
              -lcudnn -lcublasLt -lcublas -lcudart -lm -lpthread -ldl \
-             -Wl,-rpath,/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu:/home/nvidia/polygeist_cuda_libs"
+             -Wl,-rpath,$GPU_RPATH"
     echo "         + minimal cuDNN/cuBLAS/CUDA runtime linkage"
   fi
   if [ "${POLYGEIST_MINIMAL_CUSPARSE_RUNTIME:-0}" != "0" ]; then
     RT_CFLAGS+=("-DPOLYGEIST_DISABLE_CUFFT"
                "-DPOLYGEIST_DISABLE_CUSOLVER")
-    RT_LIBS="-L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs -L$CUDNN_CROSS_LIB \
+    RT_LIBS="-L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs -L$CUDNN_CROSS_LIB \
              -lcudnn -lcusparse -lcusolver -lcublasLt -lcublas -lcudart \
              -lm -lpthread -ldl \
-             -Wl,-rpath,/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu"
+             -Wl,-rpath,$GPU_RPATH"
     echo "         + minimal cuSPARSE/cuBLAS/CUDA runtime linkage"
   fi
   if [ -n "${POLYGEIST_CUTENSORNET_ROOT:-}" ]; then
@@ -777,9 +783,9 @@ else
                  "-DPOLYGEIST_DISABLE_CUFFT"
                  "-DPOLYGEIST_DISABLE_CUDNN_CLEANUP")
       RT_LIBS="-L$CUTENSORNET_ROOT/lib -lcutensornet -lcutensor \
-               -L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs \
+               -L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs \
                -lcusolver -lcusparse -lcublasLt -lcublas -lcudart -lm -lpthread -ldl \
-               -Wl,-rpath,/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu"
+               -Wl,-rpath,$GPU_RPATH"
       echo "         + contraction-only runtime linkage"
     fi
   elif [ -n "${POLYGEIST_CUTENSOR_ROOT:-}" ]; then
@@ -806,7 +812,7 @@ else
     CUSTEN_LINK_NAME="${CUSTEN_LIB_NAME#lib}"
     CUSTEN_LINK_NAME="${CUSTEN_LINK_NAME%.so}"
     RT_LIBS="-L$CUSTEN_LIB_DIR -l$CUSTEN_LINK_NAME $RT_LIBS \
-             -Wl,-rpath,$CUSTEN_LIB_DIR:/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu"
+             -Wl,-rpath,$CUSTEN_LIB_DIR:$GPU_RPATH"
     echo "         + external cuSten backend from $POLYGEIST_CUSTEN_LIB"
   fi
 fi
@@ -819,13 +825,13 @@ if [ "$N_RUNTIME_CALL" -gt 0 ]; then
   if [ "$ABI_BACKEND" = pva ]; then
     $CC -O2 -ffunction-sections -fdata-sections -I"$REPO_ROOT/runtime" \
       -c "$WORK/spec_runtime/polygeist_v2_rt_pva.c" -o "$WORK/spec_runtime.o"
-  elif [ "$TARGET" = jetson ]; then
+  elif [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; then
     $CC -O2 -ffunction-sections -fdata-sections -I"$CUDA_CROSS/include" \
       -I"$REPO_ROOT/runtime" \
       -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cusolver/include" \
       -I"$CUDNN_CROSS_INC" \
       -c "$WORK/spec_runtime/polygeist_v2_rt_cuda.c" -o "$WORK/spec_runtime.o"
-    RT_LIBS="-L$CUDA_CROSS/lib -L$CUDA_CROSS/lib/stubs -L$CUDNN_CROSS_LIB -lcudnn -lcublas -lcusolver -lcudart $RT_LIBS"
+    RT_LIBS="-L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs -L$CUDNN_CROSS_LIB -lcudnn -lcublas -lcusolver -lcudart $RT_LIBS"
   else
     $CC -O2 -ffunction-sections -fdata-sections \
       -I"$REPO_ROOT/runtime" \
@@ -837,10 +843,10 @@ fi
 
 # Pointwise DIV stages use the actual Thrust FP32 transform implementation.
 # Precise division and subnormal support are part of this backend's contract.
-if [ "$TARGET" = jetson ] && [ "$ABI_BACKEND" = cuda ]; then
+if { [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; } && [ "$ABI_BACKEND" = cuda ]; then
   "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
-    -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
-    -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
+    -arch="$GPU_ARCH" \
+    "${GPU_NVCC_ARGS[@]}" \
     --fmad=false --ftz=false --prec-div=true \
     -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
     -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
@@ -850,8 +856,8 @@ if [ "$TARGET" = jetson ] && [ "$ABI_BACKEND" = cuda ]; then
   # ABI entry is referenced. Other GPU builds do not require PyTorch headers.
   if grep -Eq '@polygeist_v2_transform_thrust_(calc_|bessel_|modified_bessel_)' "$WORK/kernel.ll"; then
     "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
-      -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
-      -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
+      -arch="$GPU_ARCH" \
+      "${GPU_NVCC_ARGS[@]}" \
       --fmad=false --ftz=false --prec-div=true --expt-relaxed-constexpr \
       -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
       -I"$REPO_ROOT/generic_solver/lib_v3/support" \
@@ -871,14 +877,14 @@ fi
 # same CUB companion object.
 NEEDS_CUB=$(grep -cE 'call @polygeist_v2_(Device(Reduce|Scan|SegmentedReduce|Histogram)[[:alnum:]]*|ThreadReduce)_' "$WORK/abi_canon.mlir" || true)
 if [ "${POLYGEIST_ENABLE_CUB:-0}" != "0" ] || [ "$NEEDS_CUB" -gt 0 ]; then
-  if [ "$TARGET" != jetson ] || [ "$ABI_BACKEND" != cuda ]; then
-    echo "ERROR: CUB runtime requires the Jetson CUDA backend" >&2
+  if [ "$TARGET" != jetson ] && [ "$TARGET" != cuda ] || [ "$ABI_BACKEND" != cuda ]; then
+    echo "ERROR: CUB runtime requires a CUDA target" >&2
     exit 1
   fi
   "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
     --fmad=false --ftz=false --prec-div=true \
-    -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
-    -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
+    -arch="$GPU_ARCH" \
+    "${GPU_NVCC_ARGS[@]}" \
     -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
     -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
     -c "$RT/polygeist_cub_scan_rt.cu" -o "$WORK/cub_runtime.o"
@@ -986,7 +992,7 @@ if [ "$WHOLE_PROGRAM" -ne 0 ]; then
 fi
 
 # Runtime shim. For jetson target we also need cuda + cudnn headers.
-if [ "$TARGET" != "jetson" ]; then
+if [ "$ABI_BACKEND" = cpu ]; then
   $CC -O2 -ffunction-sections -fdata-sections "${RT_CFLAGS[@]}" \
     -c $RT_SRC -o $WORK/rt.o
   $CC -O2 -c $RT/polygeist_mlir_runner_utils.c -o $WORK/mlir_runner_utils.o

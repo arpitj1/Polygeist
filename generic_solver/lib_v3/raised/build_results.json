@@ -12069,9 +12069,7 @@
     "output"
    ],
    "returns": [],
-   "leading_dims": {
-    "cols": "input"
-   },
+   "leading_dims": {},
    "unreferenced": []
   },
   "validation": {
@@ -12083,7 +12081,60 @@
    "affine_maxabs": 0.0
   },
   "validation_reuse": {
-   "input_sha256": "48600a369a5efaac3cf9bb1378a38c62d0ec50daf858beba9424970a81daf119"
+   "input_sha256": "b030d00f8206705379e29eae5f6afa26f2c70e117e246a711eb8fcfd7f59738c"
+  }
+ },
+ {
+  "spec": "cub_count_nonzero_f32",
+  "routine": "cub_segmented_count_nonzero",
+  "wrapper": "generic_solver/lib_v3/raised/cub_count_nonzero_f32.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/cub_count_nonzero_f32.c --function=cub_count_nonzero_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cub_count_nonzero_f32.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=cub_count_nonzero_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cub_count_nonzero_f32.mlir -o generic_solver/lib_v3/raised/cub_count_nonzero_f32_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cub_count_nonzero_f32_linalg.mlir -o generic_solver/lib_v3/raised/cub_count_nonzero_f32_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 2
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 1,
+   "submaps": 2
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "cub_count_nonzero_f32",
+   "declarations": [],
+   "params": [
+    "cols",
+    "input",
+    "output"
+   ],
+   "outputs": [
+    "output"
+   ],
+   "returns": [],
+   "leading_dims": {},
+   "unreferenced": []
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "4a846171ce261b23baad8701f063631bc8cefabcf595b9499ae08da69412a941"
   }
  },
  {
@@ -20666,9 +20717,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "2126f2531156f7ad24753faf23b0b016f13967e252858c0d23fff2ad7f12b9d9"
   }
  },
  {
@@ -20720,9 +20768,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "72e66701aae5a4d2f9a2d74d1a9556c315d7b2f6e533c1398620ded01a3bb020"
   }
  },
  {
@@ -20774,9 +20819,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "6836ef53d64137020af2a7d3b16064e35a3abdf875c007002da2883f4f6057d0"
   }
  },
  {
@@ -20828,9 +20870,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "4814130f33b5ccc96d66a159cac65f84f3a59df8330f382d8970aa244682dc1b"
   }
  },
  {
@@ -20882,9 +20921,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "930b9e6250815731ea15ba52fc8bce74d8aea224078ba3afd3f94b7ca4a7546b"
   }
  },
  {
@@ -20936,9 +20972,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "292d681197373ccbdfdb764bd69ffc5310aa0366fdca1917eb2667d29edce943"
   }
  },
  {
@@ -20990,9 +21023,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "1879d4bf661543f1c508b2e5a81431c211e3ffa5daf4a6af922ecf9682a694e9"
   }
  },
  {
@@ -21044,9 +21074,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a9ff101b1bf316f9faabe0da27848fb90a02e8c4b17957fb72cf8ea671286734"
   }
  },
  {
@@ -21098,9 +21125,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "7c2c0058ad623c323ea57b7db08dba2d98dc14cec1b7da67381447ea2171fc61"
   }
  },
  {
@@ -21152,9 +21176,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "ac2a5a9a0c6e367aa19f9c3b6b9d05b1d94bff8f74efea00353f97103758e724"
   }
  },
  {
@@ -21206,9 +21227,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "b094e0b95ad5d1c2c9a868df9ac80184189d65a024954b7c8782701ca6129295"
   }
  },
  {
@@ -21260,9 +21278,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "715adc4a38da74150395251a799a085549517f62c43adb88a8ec4f14a8210ce3"
   }
  },
  {
@@ -21314,9 +21329,6 @@
    "linalg_maxabs": 0.0,
    "affine": "EXACT",
    "affine_maxabs": 0.0
-  },
-  "validation_reuse": {
-   "input_sha256": "a76750c430a9900d65fb02f4c759f25086b00ccb01f35742ad0c17c0aee28416"
   }
  },
  {

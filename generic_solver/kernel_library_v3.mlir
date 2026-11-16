@@ -3647,7 +3647,7 @@ module {
     kernel.yield %10 : tensor<?xi32>
   }
 
-  // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "input", "output"], "returns": [], "spec": "cub_segmented_count_nonzero_f32", "unreferenced": []}
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["rows", "cols", "input", "output"], "returns": [], "spec": "cub_segmented_count_nonzero_f32", "unreferenced": []}
   kernel.defn @cub_segmented_count_nonzero_f32(%rows: i32, %cols: i32, %input: tensor<?x?xf32>, %output: tensor<?xi32>) -> tensor<?xi32> {
     %c0_i32 = arith.constant 0 : i32
     %cst = arith.constant 0.000000e+00 : f32
@@ -3670,6 +3670,26 @@ module {
     } -> tensor<?x?xi32>
     %10 = polygeist.submapInverse(%6, %9, %2, %3) {map = affine_map<(d0, d1) -> (d0)>} : (tensor<?xi32>, tensor<?x?xi32>, index, index) -> tensor<?xi32>
     kernel.yield %10 : tensor<?xi32>
+  }
+
+  // lib_v2-meta: {"declarations": [], "leading_dims": {}, "outputs": ["output"], "params": ["cols", "input", "output"], "returns": [], "spec": "cub_count_nonzero_f32", "unreferenced": []}
+  kernel.defn @cub_count_nonzero_f32(%cols: i32, %input: tensor<?xf32>, %output: tensor<?xi32>) -> tensor<?xi32> {
+    %c0_i32 = arith.constant 0 : i32
+    %cst = arith.constant 0.000000e+00 : f32
+    %c0 = arith.constant 0 : index
+    %2 = arith.index_cast %cols : i32 to index
+    %inserted = tensor.insert %c0_i32 into %output[%c0] : tensor<?xi32>
+    %3 = polygeist.submap(%input, %2) {map = affine_map<(d0) -> (d0)>} : (tensor<?xf32>, index) -> tensor<?xf32>
+    %4 = polygeist.submap(%inserted, %2) {map = affine_map<(d0) -> (0)>} : (tensor<?xi32>, index) -> tensor<?xi32>
+    %5 = linalg.generic {doc = "", indexing_maps = [affine_map<(d0) -> (d0)>, affine_map<(d0) -> (d0)>], iterator_types = ["reduction"], library_call = ""} ins(%3 : tensor<?xf32>) outs(%4 : tensor<?xi32>) {
+    ^bb0(%in: f32, %out: i32):
+      %8 = arith.cmpf une, %in, %cst : f32
+      %9 = arith.extui %8 : i1 to i32
+      %10 = arith.addi %out, %9 : i32
+      linalg.yield %10 : i32
+    } -> tensor<?xi32>
+    %6 = polygeist.submapInverse(%inserted, %5, %2) {map = affine_map<(d0) -> (0)>} : (tensor<?xi32>, tensor<?xi32>, index) -> tensor<?xi32>
+    kernel.yield %6 : tensor<?xi32>
   }
 
   // lib_v2-meta: {"declarations": [], "leading_dims": {"cols": "input"}, "outputs": ["output"], "params": ["rows", "cols", "seed", "input", "output"], "returns": [], "spec": "cub_segmented_reduce_and_i32", "unreferenced": []}

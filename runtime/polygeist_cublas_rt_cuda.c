@@ -358,6 +358,7 @@ typedef struct {
 static PolygeistCutensorPermuteCacheEntry
     g_cutensor_permute_cache[POLYGEIST_CUTENSOR_PERMUTE_CACHE_CAP];
 static void destroy_cutensor_permute_cache(void);
+static void destroy_cutensor_binary_cache(void);
 #endif
 
 #define CUDA_CHECK(call) do {                                                \
@@ -1572,6 +1573,7 @@ void polygeist_cublas_destroy(void) {
   destroy_generated_module_cache();
 #if POLYGEIST_HAS_CUTENSOR
   destroy_cutensor_permute_cache();
+  destroy_cutensor_binary_cache();
 #endif
 #if POLYGEIST_HAS_CUTENSORNET
   destroy_cutensornet_contraction_cache();
@@ -7367,7 +7369,7 @@ void polygeist_cudnn_conv1d_bias_f32(
   PolygeistCudnnConvFwdPlan *cachedPlan = get_cudnn_conv_fwd_plan(
       4, inputDims, inputStrides, filterDims, outputDims, outputStrides, 2,
       padding, strides, dilations, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
-      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, 1, CUDNN_DEFAULT_MATH);
+      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, 1, CUDNN_FMA_MATH);
   cudnnTensorDescriptor_t inputDesc = NULL, outputDesc = NULL, biasDesc = NULL;
   cudnnFilterDescriptor_t filterDesc = NULL;
   cudnnConvolutionDescriptor_t convDesc = NULL;
@@ -7399,6 +7401,9 @@ void polygeist_cudnn_conv1d_bias_f32(
     CUDNN_CHECK(cudnnSetConvolution2dDescriptor(
         convDesc, 0, 0, 1, 1, 1, 1,
         CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
+    // The FP32 reference contract does not authorize TF32 input rounding.
+    // cuDNN's default math mode permits it on Ampere and newer devices.
+    CUDNN_CHECK(cudnnSetConvolutionMathType(convDesc, CUDNN_FMA_MATH));
     cudnnConvolutionFwdAlgoPerf_t perf;
     int returned = 0;
     CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(
@@ -8016,6 +8021,104 @@ void polygeist_cudnn_depthwise_conv2d_f32(
   }
 }
 
+#if POLYGEIST_HAS_CUTENSOR
+#define POLYGEIST_CUTENSOR_BINARY_CACHE_CAP 16
+typedef struct {
+  int device, input_rank, output_rank;
+  cutensorOperator_t operation;
+  int64_t input_extents[64], input_strides[64];
+  int64_t output_extents[64], output_strides[64];
+  int32_t input_modes[64], output_modes[64];
+} PolygeistCutensorBinaryKey;
+
+typedef struct {
+  int valid;
+  PolygeistCutensorBinaryKey key;
+  cutensorHandle_t handle;
+  cutensorTensorDescriptor_t input_desc, output_desc;
+  cutensorOperationDescriptor_t operation;
+  cutensorPlanPreference_t preference;
+  cutensorPlan_t plan;
+} PolygeistCutensorBinaryPlan;
+
+static PolygeistCutensorBinaryPlan
+    g_cutensor_binary_cache[POLYGEIST_CUTENSOR_BINARY_CACHE_CAP];
+static unsigned g_cutensor_binary_next_slot;
+
+static void release_cutensor_binary_plan(PolygeistCutensorBinaryPlan *entry) {
+  if (!entry->valid) return;
+  CUTENSOR_CHECK(cutensorDestroyPlan(entry->plan));
+  CUTENSOR_CHECK(cutensorDestroyPlanPreference(entry->preference));
+  CUTENSOR_CHECK(cutensorDestroyOperationDescriptor(entry->operation));
+  CUTENSOR_CHECK(cutensorDestroyTensorDescriptor(entry->input_desc));
+  CUTENSOR_CHECK(cutensorDestroyTensorDescriptor(entry->output_desc));
+  CUTENSOR_CHECK(cutensorDestroy(entry->handle));
+  memset(entry, 0, sizeof(*entry));
+}
+
+static void destroy_cutensor_binary_cache(void) {
+  for (int i = 0; i < POLYGEIST_CUTENSOR_BINARY_CACHE_CAP; ++i)
+    release_cutensor_binary_plan(&g_cutensor_binary_cache[i]);
+  g_cutensor_binary_next_slot = 0;
+}
+
+// Reuse FP32 binary plans independently of the data pointers. The second
+// operand has the output layout, as required by cuTENSOR's binary API.
+// These bindings pass 128-byte-aligned allocations and identity unary ops.
+static PolygeistCutensorBinaryPlan *get_cutensor_binary_f32_plan(
+    int input_rank, const int64_t *input_extents, const int64_t *input_strides,
+    const int32_t *input_modes, int output_rank, const int64_t *output_extents,
+    const int64_t *output_strides, const int32_t *output_modes,
+    cutensorOperator_t operation) {
+  if (input_rank < 1 || input_rank > 64 || output_rank < 1 || output_rank > 64)
+    abort();
+  PolygeistCutensorBinaryKey key;
+  memset(&key, 0, sizeof(key));
+  CUDA_CHECK(cudaGetDevice(&key.device));
+  key.input_rank = input_rank;
+  key.output_rank = output_rank;
+  key.operation = operation;
+  memcpy(key.input_extents, input_extents, input_rank * sizeof(int64_t));
+  memcpy(key.input_strides, input_strides, input_rank * sizeof(int64_t));
+  memcpy(key.input_modes, input_modes, input_rank * sizeof(int32_t));
+  memcpy(key.output_extents, output_extents, output_rank * sizeof(int64_t));
+  memcpy(key.output_strides, output_strides, output_rank * sizeof(int64_t));
+  memcpy(key.output_modes, output_modes, output_rank * sizeof(int32_t));
+  for (int i = 0; i < POLYGEIST_CUTENSOR_BINARY_CACHE_CAP; ++i) {
+    PolygeistCutensorBinaryPlan *entry = &g_cutensor_binary_cache[i];
+    if (entry->valid && memcmp(&key, &entry->key, sizeof(key)) == 0)
+      return entry;
+  }
+  PolygeistCutensorBinaryPlan *entry =
+      &g_cutensor_binary_cache[g_cutensor_binary_next_slot++ %
+                              POLYGEIST_CUTENSOR_BINARY_CACHE_CAP];
+  if (entry->valid) {
+    CUDA_CHECK(cudaStreamSynchronize(g_stream));
+    release_cutensor_binary_plan(entry);
+  }
+  entry->key = key;
+  CUTENSOR_CHECK(cutensorCreate(&entry->handle));
+  CUTENSOR_CHECK(cutensorCreateTensorDescriptor(
+      entry->handle, &entry->input_desc, input_rank, entry->key.input_extents,
+      entry->key.input_strides, CUDA_R_32F, 128));
+  CUTENSOR_CHECK(cutensorCreateTensorDescriptor(
+      entry->handle, &entry->output_desc, output_rank, entry->key.output_extents,
+      entry->key.output_strides, CUDA_R_32F, 128));
+  CUTENSOR_CHECK(cutensorCreateElementwiseBinary(
+      entry->handle, &entry->operation, entry->input_desc, entry->key.input_modes,
+      CUTENSOR_OP_IDENTITY, entry->output_desc, entry->key.output_modes,
+      CUTENSOR_OP_IDENTITY, entry->output_desc, entry->key.output_modes, operation,
+      CUTENSOR_COMPUTE_DESC_32F));
+  CUTENSOR_CHECK(cutensorCreatePlanPreference(
+      entry->handle, &entry->preference, CUTENSOR_ALGO_DEFAULT,
+      CUTENSOR_JIT_MODE_NONE));
+  CUTENSOR_CHECK(cutensorCreatePlan(
+      entry->handle, &entry->plan, entry->operation, entry->preference, 0));
+  entry->valid = 1;
+  return entry;
+}
+#endif
+
 void polygeist_cutensor_kronecker_product2d_f32(
     int32_t A, int32_t B, int32_t C, int32_t D,
     const float *x, const float *y, float *output) {
@@ -8027,24 +8130,14 @@ void polygeist_cutensor_kronecker_product2d_f32(
       (void *)y, (size_t)C * D * sizeof(float));
   float *deviceOutput = (float *)register_host_safe(
       output, (size_t)A * B * C * D * sizeof(float));
-  cutensorHandle_t handle = NULL;
-  cutensorTensorDescriptor_t xDesc = NULL, yDesc = NULL, outputDesc = NULL;
-  cutensorOperationDescriptor_t operation = NULL;
-  cutensorPlanPreference_t preference = NULL;
-  cutensorPlan_t plan = NULL;
   int64_t xExtents[2] = {A, B}, xStrides[2] = {B, 1};
-  int64_t yExtents[2] = {C, D}, yStrides[2] = {D, 1};
   int64_t outExtents[4] = {A, C, B, D};
   int64_t outStrides[4] = {(int64_t)C * B * D, (int64_t)B * D, D, 1};
-  int32_t xModes[2] = {'a', 'b'}, yModes[2] = {'c', 'd'};
+  int32_t xModes[2] = {'a', 'b'};
   int32_t outModes[4] = {'a', 'c', 'b', 'd'};
-  CUTENSOR_CHECK(cutensorCreate(&handle));
-  CUTENSOR_CHECK(cutensorCreateTensorDescriptor(
-      handle, &xDesc, 2, xExtents, xStrides, CUDA_R_32F, 128));
-  CUTENSOR_CHECK(cutensorCreateTensorDescriptor(
-      handle, &yDesc, 2, yExtents, yStrides, CUDA_R_32F, 128));
-  CUTENSOR_CHECK(cutensorCreateTensorDescriptor(
-      handle, &outputDesc, 4, outExtents, outStrides, CUDA_R_32F, 128));
+  PolygeistCutensorBinaryPlan *plan = get_cutensor_binary_f32_plan(
+      2, xExtents, xStrides, xModes, 4, outExtents, outStrides, outModes,
+      CUTENSOR_OP_MUL);
   // cuTENSOR's binary API requires its second operand to have the output
   // descriptor. Materialize that broadcast directly in the destination; no
   // arithmetic is performed by the layout copy. A trinary MUL+ADD with gamma
@@ -8059,25 +8152,10 @@ void polygeist_cutensor_kronecker_product2d_f32(
     fprintf(stderr, "unsupported Kronecker broadcast layout\n");
     abort();
   }
-  CUTENSOR_CHECK(cutensorCreateElementwiseBinary(
-      handle, &operation, xDesc, xModes, CUTENSOR_OP_IDENTITY,
-      outputDesc, outModes, CUTENSOR_OP_IDENTITY,
-      outputDesc, outModes, CUTENSOR_OP_MUL, CUTENSOR_COMPUTE_DESC_32F));
-  CUTENSOR_CHECK(cutensorCreatePlanPreference(
-      handle, &preference, CUTENSOR_ALGO_DEFAULT, CUTENSOR_JIT_MODE_NONE));
-  CUTENSOR_CHECK(cutensorCreatePlan(
-      handle, &plan, operation, preference, 0));
   float one = 1.0f;
   CUTENSOR_CHECK(cutensorElementwiseBinaryExecute(
-      handle, plan, &one, deviceX, &one, deviceOutput, deviceOutput, g_stream));
+      plan->handle, plan->plan, &one, deviceX, &one, deviceOutput, deviceOutput, g_stream));
   sync_stream_if_outside_pipeline();
-  CUTENSOR_CHECK(cutensorDestroyPlan(plan));
-  CUTENSOR_CHECK(cutensorDestroyPlanPreference(preference));
-  CUTENSOR_CHECK(cutensorDestroyOperationDescriptor(operation));
-  CUTENSOR_CHECK(cutensorDestroyTensorDescriptor(xDesc));
-  CUTENSOR_CHECK(cutensorDestroyTensorDescriptor(yDesc));
-  CUTENSOR_CHECK(cutensorDestroyTensorDescriptor(outputDesc));
-  CUTENSOR_CHECK(cutensorDestroy(handle));
 #else
   (void)A; (void)B; (void)C; (void)D; (void)x; (void)y; (void)output;
   fprintf(stderr, "Kronecker product requires cuTENSOR\n");
@@ -9300,7 +9378,10 @@ static int build_pointwise_affine_relu_plan(
   while (channels > 1 && p->N % channels != 0) --channels;
   int64_t batches = p->N / channels;
   int64_t dims[4] = {batches, channels, 1, 1};
-  int64_t strides[4] = {channels, 1, 1, 1};
+  // Use canonical NHWC strides even for the unit spatial dimensions. These
+  // strides address the same vector elements, but cuDNN's packed-layout checks
+  // also inspect the strides of dimensions whose extent is one.
+  int64_t strides[4] = {channels, 1, channels, channels};
   int64_t scalar_dims[4] = {1, 1, 1, 1};
   int64_t scalar_strides[4] = {1, 1, 1, 1};
   int64_t uid_x = 'x';
@@ -10070,7 +10151,9 @@ static int build_pointwise_graph_plan(struct pointwise_graph_plan *p) {
       // Cached variant packs outlive the pipeline's reusable temporary pool.
       size_t footprint = ((size_t)(p->N - 1) * p->layout_strides[i] + 1) * sizeof(float);
       CUDA_CHECK(cudaMalloc((void **)&p->d_inputs[i], footprint));
-      int64_t input_strides[4] = {channels * p->layout_strides[i], p->layout_strides[i], 1, 1};
+      int64_t input_strides[4] = {
+          channels * p->layout_strides[i], p->layout_strides[i],
+          channels * p->layout_strides[i], channels * p->layout_strides[i]};
       if (!make_f32_backend_tensor_ex(
               &p->input_descs[i], 100 + i, dims, input_strides, 4, false, false,
               "pointwise.generic.input", &status))
@@ -10084,7 +10167,9 @@ static int build_pointwise_graph_plan(struct pointwise_graph_plan *p) {
   }
   size_t output_footprint = ((size_t)(p->N - 1) * p->layout_strides[4] + 1) * sizeof(float);
   CUDA_CHECK(cudaMalloc((void **)&p->d_out, output_footprint));
-  int64_t output_strides[4] = {channels * p->layout_strides[4], p->layout_strides[4], 1, 1};
+  int64_t output_strides[4] = {
+      channels * p->layout_strides[4], p->layout_strides[4],
+      channels * p->layout_strides[4], channels * p->layout_strides[4]};
   if (!make_f32_backend_tensor_ex(
           &p->out_desc, 400, dims, output_strides, 4, false, false,
           "pointwise.generic.output", &status))

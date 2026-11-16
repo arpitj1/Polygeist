@@ -101,12 +101,12 @@ fi
 
 # ─── Cross toolchain (host: x86_64; target: aarch64 + Jetson CUDA) ─────────
 # Override these via env vars if the cross-toolkit lives elsewhere.
-CUDA_CROSS_VER=${CUDA_CROSS_VER:-12.6}
-CUDA=${CUDA:-/usr/local/cuda-${CUDA_CROSS_VER}/targets/sbsa-linux}
-CUDA_ROOT=$(dirname "$(dirname "$CUDA")")
+source "$_CORRECTNESS_DIR/gpu_target.sh"
+configure_gpu_target "${POLYGEIST_GPU_TARGET:-jetson}"
+CUDA_ROOT=$GPU_CUDA_TOOLKIT_ROOT
 CUDA_LIBDEVICE=${POLYGEIST_CUDA_LIBDEVICE:-$CUDA_ROOT/nvvm/libdevice/libdevice.10.bc}
-AARCH64_CC=${AARCH64_CC:-aarch64-linux-gnu-gcc}
-AARCH64_READELF=${AARCH64_READELF:-aarch64-linux-gnu-readelf}
+AARCH64_CC=$GPU_CC
+AARCH64_READELF=$GPU_READELF
 MLIR_OPT=$REPO_ROOT/llvm-project/build/bin/mlir-opt
 MLIR_TRANSLATE=$REPO_ROOT/llvm-project/build/bin/mlir-translate
 POLYGEIST_OPT=$REPO_ROOT/build/bin/polygeist-opt
@@ -121,7 +121,7 @@ for tool in "$AARCH64_CC" "$AARCH64_READELF"; do
     exit 1
   fi
 done
-if [ ! -d "$CUDA/include" ] || [ ! -d "$CUDA/lib" ]; then
+if [ ! -d "$CUDA/include" ] || [ ! -d "$CUDA_LIBDIR" ]; then
   echo "ERROR: CUDA cross-toolkit not found at $CUDA" >&2
   echo "       Install cuda-cudart-cross-sbsa-* + libcublas-cross-sbsa-* +" >&2
   echo "       cuda-nvcc-cross-sbsa-* (for crt/ headers)." >&2
@@ -193,7 +193,6 @@ if [ -n "${POLYGEIST_GPU_RESIDUAL_FUNCTION:-}" ]; then
   if [ "${POLYGEIST_GPU_DATA_RESIDENCY_ASSUME_NO_ALIAS:-0}" != "0" ]; then
     GPU_PREPARE_ARGS="$GPU_PREPARE_ARGS assume-no-alias=true"
   fi
-  GPU_ARCH=${POLYGEIST_GPU_ARCH:-sm_87}
   $MLIR_OPT --empty-tensor-to-alloc-tensor \
     --one-shot-bufferize=bufferize-function-boundaries \
     --canonicalize --promote-buffers-to-stack \
@@ -314,12 +313,12 @@ else
     $WORK/abi.mlir -o $WORK/llvm.mlir
 fi
 
-echo "  [3/6] translate to LLVM IR, then retarget x86 → aarch64"
+echo "  [3/6] translate to LLVM IR for $GPU_TRIPLE"
 $MLIR_TRANSLATE --mlir-to-llvmir $WORK/llvm.mlir -o $WORK/kernel.ll
 # Rewrite the embedded target triple so clang doesn't think this is x86
 # when we feed it through with --target=aarch64. Drop the datalayout
 # line entirely; clang will re-derive an aarch64 layout.
-sed -i 's|target triple = "x86_64.*"|target triple = "aarch64-linux-gnu"|' \
+sed -i "s|target triple = \".*\"|target triple = \"$GPU_TRIPLE\"|" \
     $WORK/kernel.ll
 sed -i '/^target datalayout/d' $WORK/kernel.ll
 # `kernel_gemm` is what the polybench harness will call — rename so the
@@ -340,8 +339,8 @@ if [ -n "${POLYGEIST_GPU_RESIDUAL_FUNCTION:-}" ]; then
   fi
 fi
 
-echo "  [4/6] cross-compile .ll → aarch64 .o via Polygeist clang"
-$CLANG --target=aarch64-linux-gnu --gcc-toolchain=/usr \
+echo "  [4/6] compile .ll for $GPU_TRIPLE via Polygeist clang"
+$CLANG "${GPU_CLANG_ARGS[@]}" \
        -O3 -c $WORK/kernel.ll -o $WORK/kernel.o
 
 echo "  [5/6] cross-compile runtime shim + any harness .c files"
@@ -382,8 +381,8 @@ $AARCH64_CC -O3 -I$CUDA/include -I$CUDNN_INC "${RT_EXTRA_CFLAGS[@]}" \
             -c $RT/polygeist_cublas_rt_cuda.c -o $WORK/rt.o
 # The CUDA runtime's FP32 DIV stages require the real Thrust template backend.
 "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
-  -arch="${POLYGEIST_GPU_ARCH:-sm_87}" \
-  -ccbin="${POLYGEIST_CROSS_CXX:-aarch64-linux-gnu-g++}" -target-dir sbsa-linux \
+  -arch="$GPU_ARCH" \
+  "${GPU_NVCC_ARGS[@]}" \
   --fmad=false --ftz=false --prec-div=true \
   -Xcompiler=-fPIC,-ffunction-sections,-fdata-sections \
   -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cuda_cccl/include/cccl" -I"$RT" \
@@ -408,23 +407,23 @@ for item in "${HARNESS[@]}"; do
   esac
 done
 
-echo "  [6/6] link against aarch64 cuBLAS + cudart stubs"
-# Stub libs live in $CUDA/lib (for libcudart) and $CUDA/lib/stubs (for
+echo "  [6/6] link against CUDA libraries for $GPU_TRIPLE"
+# Stub libs live in $CUDA_LIBDIR (for libcudart) and $CUDA_LIBDIR/stubs (for
 # libcublas). Both are aarch64 ELF; the actual .so files resolve against
 # JetPack's installed CUDA at runtime via RUNPATH.
 $AARCH64_CC -O2 \
     $WORK/kernel.o $WORK/rt.o $WORK/thrust_runtime.o "${HARNESS_OBJS[@]}" \
-    -L$CUDA/lib -L$CUDA/lib/stubs -L$CUDNN_LIB \
+    -L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs -L$CUDNN_LIB \
     "${RT_EXTRA_LIBS[@]}" \
     "${ACCEL_LIBS[@]}" -lcudart \
     "${RT_LINK_FLAGS[@]}" \
     -lm -lpthread -ldl -lstdc++ \
-    '-Wl,-rpath,$ORIGIN:/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu' \
+    "-Wl,-rpath,\$ORIGIN:$GPU_RPATH" \
     -o "$OUT_EXE"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════"
-echo "Cross-build complete:"
+echo "CUDA build complete:"
 file "$OUT_EXE"
 echo ""
 echo "DT_NEEDED (must show libcublas.so.12 + libcudart.so.12):"
@@ -432,5 +431,5 @@ $AARCH64_READELF -d "$OUT_EXE" | grep -E 'NEEDED|RUNPATH'
 echo ""
 echo "Binary size: $(stat -c '%s bytes' "$OUT_EXE")"
 echo ""
-echo "Run this executable locally on a compatible AArch64 CUDA system."
+echo "Execution target: $GPU_TRIPLE, GPU architecture: $GPU_ARCH."
 echo "═══════════════════════════════════════════════════════════════════════"

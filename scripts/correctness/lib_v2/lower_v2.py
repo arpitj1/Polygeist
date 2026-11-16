@@ -175,6 +175,85 @@ def mark_tensor_roots(text: str, specs: dict, names: dict) -> str:
     return text
 
 
+def reuse_elementwise_destinations(text: str, specs: dict, names: dict) -> str:
+    """Choose an existing tensor for a validated overwrite-only destination.
+
+    Only reuse a private library result with no other users. External memrefs
+    may be read through pointers that tensor bufferization cannot track.
+    One-shot bufferization still checks the selected destination normally.
+    """
+    import mlir_lite as ML
+    module = ML.Module(text)
+    views = {'tensor.cast', 'tensor.collapse_shape', 'tensor.expand_shape'}
+    uses = {}
+    for user in module.ops:
+        for value in user.operands:
+            if (definition := module.def_of(value, user)):
+                uses.setdefault((definition[0].idx, definition[1]), set()).add(user.idx)
+
+    def root(value, user, through_submap=False, sole_use=False):
+        seen = set()
+        while (definition := module.def_of(value, user)):
+            op, result = definition
+            if op.idx in seen:
+                return None
+            seen.add(op.idx)
+            if sole_use and uses.get((op.idx, result)) != {user.idx}:
+                return None
+            if op.name not in views and not (through_submap and op.name == 'polygeist.submap'):
+                return op
+            if not op.operands:
+                return None
+            value, user = op.operands[0], op
+        return None
+
+    for op in reversed(module.ops):
+        if op.name != 'kernel.launch':
+            continue
+        match = LAUNCH_RE.match(op.text)
+        if not match or 'polygeist.elementwise_exact_alias' not in (match['attrs'] or ''):
+            continue
+        spec = specs.get(names.get(match['sym'], match['sym']))
+        if not spec:
+            continue
+        outputs = [i for i, arg in enumerate(spec.args) if arg.kind == 'array' and arg.intent != 'in']
+        if len(outputs) != 1 or spec.args[outputs[0]].intent != 'out':
+            continue
+        operands, types = split_top(match['ops']), split_top(match['tys'])
+        dest = outputs[0]
+        if len(operands) != len(spec.args) or len(types) != len(operands):
+            continue
+        allocation = root(operands[dest], op)
+        if allocation is None or allocation.name != 'tensor.empty':
+            continue
+        for i, arg in enumerate(spec.args):
+            if arg.kind != 'array' or arg.intent != 'in' or types[i] != types[dest]:
+                continue
+            source = root(operands[i], op, through_submap=True, sole_use=True)
+            if source is None or source.name != 'kernel.launch':
+                continue
+            producer = LAUNCH_RE.match(source.text)
+            producer_spec = specs.get(names.get(producer['sym'], producer['sym'])) if producer else None
+            if not producer_spec:
+                continue
+            producer_outputs = [j for j, a in enumerate(producer_spec.args)
+                                if a.kind == 'array' and a.intent != 'in']
+            producer_operands = split_top(producer['ops'])
+            if len(producer_outputs) != 1 or producer_outputs[0] >= len(producer_operands):
+                continue
+            # tensor.empty may be shared by several overwrite-only results;
+            # its contents do not carry a computed value. The produced result
+            # itself (including its views) must still have only this user.
+            storage = root(producer_operands[producer_outputs[0]], source)
+            if storage is None or storage.name != 'tensor.empty':
+                continue
+            operands[dest] = operands[i]
+            replacement = op.text[:match.start('ops')] + ', '.join(operands) + op.text[match.end('ops'):]
+            text = text[:op.start] + replacement + text[op.end:]
+            break
+    return text
+
+
 def prepare(text: str, specs: dict, calls: dict | None = None) -> tuple[str, dict]:
     """-> (text, defn name -> spec)"""
     text = strip_defns(text)
@@ -214,8 +293,9 @@ def prepare(text: str, specs: dict, calls: dict | None = None) -> tuple[str, dic
                  if a.strip().split("=", 1)[0].strip() != capability]
         call = (calls or {}).get(specs[sym].call)
         cfg = call.runtime_adapter if call else None
-        if (cfg and cfg.get("kind") == "pointwise_reference" and
-                cfg.get("alias_policy") == "exact_or_disjoint"):
+        if (cfg and cfg.get("alias_policy") == "exact_or_disjoint" and
+                (cfg.get("kind") == "pointwise_reference" or
+                 cfg.get("elementwise_exact_alias") is True)):
             attrs.append(capability)
         attr_text = " {" + ", ".join(attrs) + "}" if attrs else ""
         prefix = ln[:m.start("attrs")] if m.group("attrs") else ln[:m.start("tys")].rsplit(":", 1)[0]
@@ -259,6 +339,7 @@ def prepare(text: str, specs: dict, calls: dict | None = None) -> tuple[str, dic
     if stubs:
         text = insert_after_module_open(text, "".join(stubs))
     text = mark_tensor_roots(text, specs, names)
+    text = reuse_elementwise_destinations(text, specs, names)
     return text, names
 
 
