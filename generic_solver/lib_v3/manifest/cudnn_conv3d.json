@@ -167,7 +167,183 @@
           ]
         }
       }
+    },
+    {
+      "name": "cudnn_conv3d_valid_accumulate_f32",
+      "args": [
+        "N",
+        "IC",
+        "ID",
+        "IH",
+        "IW",
+        "OC",
+        "KD",
+        "KH",
+        "KW",
+        "OD",
+        "OH",
+        "OW",
+        "input",
+        "filter",
+        "output"
+      ],
+      "target": {
+        "library": "cuDNN",
+        "call": "cudnnConvolutionForward",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_reference_conv3d_batched_accumulate_f32",
+          "arguments": [
+            "N",
+            "IC",
+            "ID",
+            "IH",
+            "IW",
+            "OC",
+            "KD",
+            "KH",
+            "KW",
+            "OD",
+            "OH",
+            "OW",
+            "input",
+            "filter",
+            "output"
+          ],
+          "arrays": {
+            "input": [
+              "N",
+              "IC",
+              "ID",
+              "IH",
+              "IW"
+            ],
+            "filter": [
+              "OC",
+              "IC",
+              "KD",
+              "KH",
+              "KW"
+            ],
+            "output": [
+              "N",
+              "OC",
+              "OD",
+              "OH",
+              "OW"
+            ]
+          },
+          "bounds": {
+            "IC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ID": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "IW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OC": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KD": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "KW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OD": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OH": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "OW": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required"
+        }
+      },
+      "assumptions": [
+        "NCDHW, disjoint FP32, positive valid output domain, unit stride/dilation",
+        "int32-representable tensor strides, output dimensions equal input dimensions minus filter dimensions plus one; runtime checked",
+        "cuDNN can reorder FP arithmetic; numerical validation is required",
+        "beta=1 adds the existing output after the convolution; matching may use only explicitly permitted FP32 reassociation"
+      ],
+      "deviations": [
+        "Select existing cross-correlation branch; delinearize spatial loops preserving per-output order"
+      ],
+      "validation": {
+        "scalars": {
+          "IC": 2,
+          "ID": 5,
+          "IH": 6,
+          "IW": 8,
+          "OC": 3,
+          "KD": 2,
+          "KH": 3,
+          "KW": 2,
+          "OD": 4,
+          "OH": 4,
+          "OW": 7,
+          "N": 2
+        },
+        "arrays": {
+          "input": [
+            2,
+            2,
+            5,
+            6,
+            8
+          ],
+          "filter": [
+            3,
+            2,
+            2,
+            3,
+            2
+          ],
+          "output": [
+            2,
+            3,
+            4,
+            4,
+            7
+          ]
+        }
+      },
+      "defines": {
+        "NETLIB_ACCUMULATE_OUTPUT": "1",
+        "NETLIB_BATCHED": "1"
+      }
     }
   ],
-  "adaptation": "Single-batch NCDHW float specialization of conv_cpu_ref; expose its existing cross-correlation branch, alpha=1,beta=0,unit stride/dilation,no padding. Lexicographic spatial delinearization preserves per-output scalar fold order."
+  "adaptation": "NCDHW float specializations of conv_cpu_ref; expose its existing cross-correlation branch, alpha=1, beta=0 or 1, unit stride/dilation, no padding. Beta=0 fixes one batch; beta=1 retains the upstream batch loop. Spatial delinearization preserves each output scalar fold order."
 }

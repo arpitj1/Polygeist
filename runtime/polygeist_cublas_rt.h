@@ -1431,6 +1431,12 @@ void polygeist_reference_conv3d_f32(
     int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
     const float *input, const float *filter, float *output);
 
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuDNN cudnnConvolutionForward polygeist_reference_conv3d_batched_accumulate_f32 */
+void polygeist_reference_conv3d_batched_accumulate_f32(
+    int32_t N, int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output);
+
 
 /* Descriptor program derived from a validated parallel reference. */
 typedef struct {

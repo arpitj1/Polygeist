@@ -1537,7 +1537,8 @@ def _lit_checker(spec: Spec, rename=None):
     return ok
 
 
-def _single_search(app: System, specs: list[Spec], tried: list, can_emit=None):
+def _single_search(app: System, specs: list[Spec], tried: list, can_emit=None,
+                   direct_only=False):
     found = []
     if can_emit is not None:
         # First try bindings attaining the cost model's lower bound: no
@@ -1558,6 +1559,8 @@ def _single_search(app: System, specs: list[Spec], tried: list, can_emit=None):
                     return [{"cost": (0, 0, 0), "key": spec.name, "kind": "single",
                              "spec": spec, "b": b, "r": r,
                              "ms": (time.perf_counter() - t1) * 1000}]
+    if direct_only:
+        return found
     for spec in specs:
         t1 = time.perf_counter()
         cache: dict = {}
@@ -2012,7 +2015,13 @@ def match_function(text: str, prog: Program, specs: list[Spec], log=None, stats=
     func_budget = float(os.environ.get("REGION_MATCH_FUNC_BUDGET", "300"))
     comp_budget = float(os.environ.get("REGION_MATCH_COMPOSITE_BUDGET", "20"))
     composites_on = os.environ.get("REGION_MATCH_NO_COMPOSITE", "") in ("", "0")
-    for (lo, hi, end) in _windows(prog):
+    # Try direct, emittable bindings across all regions before spending the
+    # function budget on permutations or compositions for any one region.
+    # A large region with an extra epilogue must not hide a direct library
+    # match in a subregion. Both rounds use the same equivalence proof.
+    windows = list(_windows(prog))
+    rounds = [(w, direct) for direct in (True, False) for w in windows]
+    for ((lo, hi, end), direct_only) in rounds:
         if time.perf_counter() - t_func > func_budget:
             rejections.append(f"function time budget ({func_budget:.0f}s) exhausted; "
                               "remaining windows skipped")
@@ -2063,7 +2072,9 @@ def match_function(text: str, prog: Program, specs: list[Spec], log=None, stats=
                 return True
             except Reject:
                 return False
-        found = _single_search(app, specs, tried, can_emit)
+        found = _single_search(app, specs, tried, can_emit, direct_only=direct_only)
+        if direct_only and not found:
+            continue
         if not found and composites_on:
             found = _composite_search(app, specs, tried, comp_budget, wstats)
         if not found and os.environ.get("REGION_MATCH_NO_PARTIAL", "") in ("", "0"):

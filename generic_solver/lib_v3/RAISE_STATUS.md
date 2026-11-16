@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 394, UNSOUND: 2 (total 485)
+Summary: NOT_RAISED: 23, PARTIAL: 67, RAISED: 394, UNSOUND: 2 (total 486)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -243,6 +243,7 @@ Summary: NOT_RAISED: 23, PARTIAL: 66, RAISED: 394, UNSOUND: 2 (total 485)
 | `cudnn_conv2d_valid_unbatched_d2_f32` | cudnn_conv | RAISED | 2 | - | EXACT / EXACT |  |
 | `cudnn_conv1d_bias_f32` | cudnn_conv1d_bias | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (2 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_valid_f32` | cudnn_conv3d | RAISED | 2 | - | EXACT / EXACT |  |
+| `cudnn_conv3d_valid_accumulate_f32` | cudnn_conv3d | PARTIAL | 3 | affine.for | EXACT / EXACT | 3 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv2d_backward_data_valid_f32` | cudnn_conv_backward_data2d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv3d_backward_data_valid_f32` | cudnn_conv_backward_data3d | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (5 loop ops, 0 scalar memory accesses) |
 | `cudnn_conv1d_backward_data_tbc_f32` | cudnn_conv_backward_data_tbc | PARTIAL | 2 | affine.for | EXACT / EXACT | 2 linalg.generic but residual affine.for (1 loop ops, 0 scalar memory accesses) |
@@ -690,6 +691,18 @@ Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_co
 build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.c --function=cudnn_conv1d_bias_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.mlir
 build/bin/polygeist-opt '--select-func=func-name=cudnn_conv1d_bias_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_linalg.mlir
 build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv1d_bias_f32_debuf.mlir
+```
+
+### `cudnn_conv3d_valid_accumulate_f32` -- PARTIAL
+
+Reason: 3 linalg.generic but residual affine.for (4 loop ops, 0 scalar memory accesses)
+
+Validation harness (defn route): `generic_solver/lib_v2/raised/validate/cudnn_conv3d_valid_accumulate_f32/defn/` (`harness.c`, `ref_wrapper.c`, `log.txt`); rerun with `scripts/correctness/lib_v2/validate_specs.py --only cudnn_conv3d_valid_accumulate_f32`.
+
+```sh
+build/bin/cgeist generic_solver/lib_v3/raised/cudnn_conv3d_valid_accumulate_f32.c --function=cudnn_conv3d_valid_accumulate_f32 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/cudnn_conv3d_valid_accumulate_f32.mlir
+build/bin/polygeist-opt '--select-func=func-name=cudnn_conv3d_valid_accumulate_f32 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/cudnn_conv3d_valid_accumulate_f32.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_valid_accumulate_f32_linalg.mlir
+build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/cudnn_conv3d_valid_accumulate_f32_linalg.mlir -o generic_solver/lib_v3/raised/cudnn_conv3d_valid_accumulate_f32_debuf.mlir
 ```
 
 ### `cudnn_conv2d_backward_data_valid_f32` -- PARTIAL

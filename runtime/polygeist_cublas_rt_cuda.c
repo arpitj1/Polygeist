@@ -8422,10 +8422,11 @@ void polygeist_cudnn_log_sigmoid_f32(
       x, buffer, x, x, output);
 }
 
-void polygeist_cudnn_conv3d_channels_f32(
-    int32_t IC, int32_t inD, int32_t inH, int32_t inW,
+static void cudnn_conv3d_channels_f32(
+    int32_t N, int32_t IC, int32_t inD, int32_t inH, int32_t inW,
     int32_t OC, int32_t kD, int32_t kH, int32_t kW,
-    const float *input, const float *filter, const float *bias, float *output) {
+    const float *input, const float *filter, const float *bias, float *output,
+    float beta) {
   polygeist_cublas_init();
   ensure_cudnn();
   double host_start_ms = timing_enabled() ? wall_time_ms() : 0.0;
@@ -8433,11 +8434,11 @@ void polygeist_cudnn_conv3d_channels_f32(
   const int32_t outH = inH - kH + 1;
   const int32_t outW = inW - kW + 1;
 
-  size_t inputBytes = (size_t)IC * inD * inH * inW * sizeof(float);
+  size_t inputBytes = (size_t)N * IC * inD * inH * inW * sizeof(float);
   size_t filterBytes =
       (size_t)OC * IC * kD * kH * kW * sizeof(float);
   size_t outputBytes =
-      (size_t)OC * outD * outH * outW * sizeof(float);
+      (size_t)N * OC * outD * outH * outW * sizeof(float);
   float *dInput = (float *)register_host_safe((void *)input, inputBytes);
   float *dFilter = (float *)register_host_safe((void *)filter, filterBytes);
   float *dOutput = (float *)register_host_safe(output, outputBytes);
@@ -8449,10 +8450,10 @@ void polygeist_cudnn_conv3d_channels_f32(
   cudnnTensorDescriptor_t biasDesc = NULL;
   cudnnFilterDescriptor_t filterDesc = NULL;
   cudnnConvolutionDescriptor_t convDesc = NULL;
-  int inputDims[5] = {1, IC, inD, inH, inW};
+  int inputDims[5] = {N, IC, inD, inH, inW};
   int inputStrides[5] = {IC * inD * inH * inW, inD * inH * inW,
                          inH * inW, inW, 1};
-  int outputDims[5] = {1, OC, outD, outH, outW};
+  int outputDims[5] = {N, OC, outD, outH, outW};
   int outputStrides[5] = {OC * outD * outH * outW, outD * outH * outW,
                           outH * outW, outW, 1};
   int filterDims[5] = {OC, IC, kD, kH, kW};
@@ -8462,7 +8463,7 @@ void polygeist_cudnn_conv3d_channels_f32(
   PolygeistCudnnConvFwdPlan *cachedPlan = get_cudnn_conv_fwd_plan(
       5, inputDims, inputStrides, filterDims, outputDims, outputStrides, 3,
       pad, stride, dilation, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
-      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, 1, CUDNN_DEFAULT_MATH);
+      CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT, 1, CUDNN_FMA_MATH);
   cudnnConvolutionFwdAlgo_t algorithm;
   size_t workspaceBytes = 0;
   void *workspace = NULL;
@@ -8486,6 +8487,7 @@ void polygeist_cudnn_conv3d_channels_f32(
     CUDNN_CHECK(cudnnSetConvolutionNdDescriptor(
         convDesc, 3, pad, stride, dilation,
         CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT));
+    CUDNN_CHECK(cudnnSetConvolutionMathType(convDesc, CUDNN_FMA_MATH));
     CUDNN_CHECK(cudnnSetTensorNdDescriptor(
         outputDesc, CUDNN_DATA_FLOAT, 5, outputDims, outputStrides));
     cudnnConvolutionFwdAlgoPerf_t algorithmPerformance;
@@ -8506,11 +8508,11 @@ void polygeist_cudnn_conv3d_channels_f32(
       DEVICE_MALLOC(&workspace, workspaceBytes);
   }
 
-  float one = 1.0f, zero = 0.0f;
+  float one = 1.0f;
   timing_gpu_begin();
   CUDNN_CHECK(cudnnConvolutionForward(
       g_cudnn, &one, inputDesc, dInput, filterDesc, dFilter, convDesc,
-      algorithm, workspace, workspaceBytes, &zero, outputDesc, dOutput));
+      algorithm, workspace, workspaceBytes, &beta, outputDesc, dOutput));
   if (dBias) {
     CUDNN_CHECK(cudnnCreateTensorDescriptor(&biasDesc));
     int biasDims[5] = {1, OC, 1, 1, 1};
@@ -8537,6 +8539,14 @@ void polygeist_cudnn_conv3d_channels_f32(
   unregister_host_safe((void *)filter);
   if (bias) unregister_host_safe((void *)bias);
   unregister_host_safe(output);
+}
+
+void polygeist_cudnn_conv3d_channels_f32(
+    int32_t IC, int32_t inD, int32_t inH, int32_t inW,
+    int32_t OC, int32_t kD, int32_t kH, int32_t kW,
+    const float *input, const float *filter, const float *bias, float *output) {
+  cudnn_conv3d_channels_f32(1, IC, inD, inH, inW, OC, kD, kH, kW,
+                          input, filter, bias, output, 0.0f);
 }
 
 void polygeist_cudnn_conv2d_im2col_gemm_f32(
@@ -11737,14 +11747,14 @@ void polygeist_cublas_geam_vector_f64(int32_t n, double alpha,
 }
 
 // Mechanical typed adapter for the imported public NCDHW reference.
-void polygeist_reference_conv3d_f32(
-    int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
+static void reference_conv3d_f32(
+    int32_t N, int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
     int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
-    const float *input, const float *filter, float *output) {
-  if (IC <= 0 || ID <= 0 || IH <= 0 || IW <= 0 || OC <= 0 || KD <= 0 || KH <= 0 || KW <= 0 ||
+    const float *input, const float *filter, float *output, float beta) {
+  if (N <= 0 || IC <= 0 || ID <= 0 || IH <= 0 || IW <= 0 || OC <= 0 || KD <= 0 || KH <= 0 || KW <= 0 ||
       OD <= 0 || OH <= 0 || OW <= 0 || OD != (int64_t)ID-KD+1 ||
       OH != (int64_t)IH-KH+1 || OW != (int64_t)IW-KW+1) abort();
-  int dims[3][5] = {{1,IC,ID,IH,IW},{OC,IC,KD,KH,KW},{1,OC,OD,OH,OW}};
+  int dims[3][5] = {{N,IC,ID,IH,IW},{OC,IC,KD,KH,KW},{N,OC,OD,OH,OW}};
   for (int a=0;a<3;++a) {
     int64_t count=1;
     for (int d=0;d<5;++d) {
@@ -11752,7 +11762,21 @@ void polygeist_reference_conv3d_f32(
       count *= dims[a][d];
     }
   }
-  polygeist_cudnn_conv3d_channels_f32(IC,ID,IH,IW,OC,KD,KH,KW,input,filter,NULL,output);
+  cudnn_conv3d_channels_f32(N,IC,ID,IH,IW,OC,KD,KH,KW,input,filter,NULL,output,beta);
+}
+
+void polygeist_reference_conv3d_f32(
+    int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output) {
+  reference_conv3d_f32(1,IC,ID,IH,IW,OC,KD,KH,KW,OD,OH,OW,input,filter,output,0.0f);
+}
+
+void polygeist_reference_conv3d_batched_accumulate_f32(
+    int32_t N, int32_t IC, int32_t ID, int32_t IH, int32_t IW, int32_t OC,
+    int32_t KD, int32_t KH, int32_t KW, int32_t OD, int32_t OH, int32_t OW,
+    const float *input, const float *filter, float *output) {
+  reference_conv3d_f32(N,IC,ID,IH,IW,OC,KD,KH,KW,OD,OH,OW,input,filter,output,1.0f);
 }
 
 // Descriptor-only emission of imported parallel library references.

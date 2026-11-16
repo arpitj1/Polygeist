@@ -2607,11 +2607,10 @@ collectNestedGenericLoopSizes(linalg::GenericOp generic, OpBuilder &builder,
 //
 // This first implementation intentionally handles only the common single-
 // output additive form.  The structural checks below make the transformation
-// independent of loop rank, trip counts, and operand layouts.  Floating-point
-// reductions in this pipeline are already represented as linalg reduction
-// iterators; seeding that reduction with the destination preserves the same
-// mathematical reduction semantics, though—as with other floating-point
-// reduction lowering—it is not a promise of bitwise-identical association.
+// independent of loop rank, trip counts, and operand layouts. Moving the
+// epilogue into a floating-point reduction changes its association and can
+// remove an addition of zero. Require explicit permission on every affected
+// addition; a Linalg reduction iterator alone does not grant that permission.
 struct FuseScalarAddReductionIntoOutput
     : public OpRewritePattern<affine::AffineForOp> {
   using OpRewritePattern<affine::AffineForOp>::OpRewritePattern;
@@ -2741,6 +2740,23 @@ struct FuseScalarAddReductionIntoOutput
     if ((innerIsFloat && !isa<arith::AddFOp>(outerAdd)) ||
         (innerIsInteger && !isa<arith::AddIOp>(outerAdd)))
       return failure();
+
+    if (innerIsFloat) {
+      auto permitsFusion = [](Operation *op) {
+        auto add = dyn_cast<arith::AddFOp>(op);
+        return add && bitEnumContainsAll(
+                          add.getFastmath(), arith::FastMathFlags::reassoc |
+                                                 arith::FastMathFlags::nsz);
+      };
+      if (!permitsFusion(outerAdd))
+        return failure();
+      bool permitted = true;
+      generic.walk([&](arith::AddFOp add) {
+        permitted &= permitsFusion(add);
+      });
+      if (!permitted)
+        return failure();
+    }
 
     Value other = outerAdd->getOperand(0) == scratchLoad.getResult()
                       ? outerAdd->getOperand(1)

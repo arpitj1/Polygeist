@@ -44,3 +44,55 @@ proto3d='extern "C" void ref3d(int,int,int,int,int,int,int,int,int,int,int,const
 subprocess.run(['gcc','-O0','-ffp-contract=off','-DNETLIB_SPEC=ref3d','-c',str(ROOT/'generic_solver/lib_v3/ref_c/cudnn_conv3d.c'),'-o',str(D/'ref3d.o')],check=True)
 subprocess.run(['g++','-std=c++17','-O0','-ffp-contract=off',str(D/'source_check_3d.cpp'),str(D/'ref3d.o'),'-o',str(D/'source_check_3d')],check=True)
 subprocess.run([str(D/'source_check_3d')],check=True)
+
+# Select beta=1 in the same upstream function. Preserve the reference's
+# post-reduction addition, including signed zeros and nonfinite values.
+accumulate3d = main3d.replace('ref3d(', 'ref3d_accumulate(').replace(
+    'a.data()+4,1,0,1,0,', 'a.data()+4,1,1,1,0,').replace(
+    'auto oldx=x,oldf=f;',
+    'for(size_t i=4;i<a.size()-4;++i) a[i]=b[i]=mode==1?edges[(i+7)%15]:float(int(i%19)-9)/8;\n auto oldx=x,oldf=f;')
+accumulate3d = accumulate3d.replace('for(int C:', 'for(int B:{1,2})for(int C:').replace(
+    'x(C*ID*H*W)', 'x(B*C*ID*H*W)').replace('a(O*OD*OH*OW+8', 'a(B*O*OD*OH*OW+8').replace(
+    'in[]={1,C,ID,H,W}', 'in[]={B,C,ID,H,W}').replace(
+    'out[]={1,O,OD,OH,OW}', 'out[]={B,O,OD,OH,OW}').replace(
+    'ref3d_accumulate(C,', 'ref3d_accumulate(B,C,')
+(D/'source_check_3d_accumulate.cpp').write_text(
+    header+'\n'.join(parts)+'\n'+proto3d.replace('ref3d(', 'ref3d_accumulate(int,')+accumulate3d)
+subprocess.run(['gcc','-O0','-ffp-contract=off','-DNETLIB_SPEC=ref3d_accumulate',
+                '-DNETLIB_ACCUMULATE_OUTPUT=1','-DNETLIB_BATCHED=1','-c',
+                str(ROOT/'generic_solver/lib_v3/ref_c/cudnn_conv3d.c'),
+                '-o',str(D/'ref3d_accumulate.o')],check=True)
+subprocess.run(['g++','-std=c++17','-O0','-ffp-contract=off',
+                str(D/'source_check_3d_accumulate.cpp'),str(D/'ref3d_accumulate.o'),
+                '-o',str(D/'source_check_3d_accumulate')],check=True)
+subprocess.run([str(D/'source_check_3d_accumulate')],check=True)
+
+# Batch layout and output accumulation are independent reference options.
+# Check the other two combinations against the same upstream implementation.
+for name, batched, accumulate in [('batched_overwrite', True, False),
+                                  ('unbatched_accumulate', False, True)]:
+    symbol = 'ref3d_' + name
+    body = accumulate3d.replace('ref3d_accumulate(', symbol + '(')
+    declaration = proto3d.replace('ref3d(', symbol + '(')
+    defines = ['-DNETLIB_SPEC=' + symbol]
+    if batched:
+        declaration = declaration.replace(symbol + '(', symbol + '(int,')
+        defines.append('-DNETLIB_BATCHED=1')
+    else:
+        body = body.replace('for(int B:{1,2})', 'for(int B:{1})')
+        body = body.replace(symbol + '(B,C,', symbol + '(C,')
+    if accumulate:
+        defines.append('-DNETLIB_ACCUMULATE_OUTPUT=1')
+    else:
+        body = body.replace('a.data()+4,1,1,1,0,', 'a.data()+4,1,0,1,0,')
+    body = body.replace('3D source outputs', name + ' 3D source outputs')
+    check_source = D / (name + '.cpp')
+    obj = D / (name + '.o')
+    exe = D / name
+    check_source.write_text(header+'\n'.join(parts)+'\n'+declaration+body)
+    subprocess.run(['gcc','-O0','-ffp-contract=off',*defines,'-c',
+                    str(ROOT/'generic_solver/lib_v3/ref_c/cudnn_conv3d.c'),
+                    '-o',str(obj)],check=True)
+    subprocess.run(['g++','-std=c++17','-O0','-ffp-contract=off',
+                    str(check_source),str(obj),'-o',str(exe)],check=True)
+    subprocess.run([str(exe)],check=True)
