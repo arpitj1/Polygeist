@@ -48,6 +48,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional
@@ -309,7 +310,8 @@ class SpecArg:
 def _manifest_entries() -> dict[str, tuple[dict, dict]]:
     out = {}
     for mp in sorted(glob.glob(str(SPEC_DIR / "manifest" / "*.json"))):
-        man = json.load(open(mp))
+        with open(mp) as stream:
+            man = json.load(stream)
         for e in man.get("specs", []):
             out[e["name"]] = (man, e)
     return out
@@ -606,14 +608,35 @@ def _classify_managed(proto: CProto, managed_names: list[str], returns: bool, li
 
 
 def build_table(specs: Optional[list[str]] = None) -> tuple[dict[str, CallAbi], dict[str, SpecAbi], dict[str, str]]:
-    """Return (calls, specs, errors)."""
+    """Return current (calls, specs, errors), reusing validated metadata."""
+    import abi_cache
+    started = time.monotonic()
     global MANIFEST
     MANIFEST = _manifest_entries()
     names = specs if specs is not None else sorted(MANIFEST)
+    # These helpers otherwise retain stale declarations if an input changes
+    # between two build_table calls in the same Python process.
+    for function in (spec_c_prototype, spec_intents, header_info, fortran_proto):
+        function.cache_clear()
     # warm the preprocessor cache in parallel (one clang -E per spec)
     from concurrent.futures import ThreadPoolExecutor
+    def prototype_input(name):
+        try:
+            return (True, spec_c_prototype(name))
+        except (AbiError, OSError) as error:
+            return (False, type(error).__name__, str(error))
     with ThreadPoolExecutor(min(16, os.cpu_count() or 4)) as ex:
-        list(ex.map(lambda s: _safe(spec_c_prototype, s), names))
+        prototypes = list(ex.map(prototype_input, names))
+    cache_dir = abi_cache.directory()
+    key = None
+    if cache_dir is not None:
+        key = abi_cache.fingerprint(sys.modules[__name__], names, prototypes)
+        classes = {cls.__name__: cls for cls in (CParam, CProto, FParam, FProto,
+                    SpecArg, AbiParam, Managed, CallAbi, SpecAbi)}
+        cached = abi_cache.load(cache_dir, key, classes)
+        if cached is not None:
+            abi_cache.event("hit", key, time.monotonic() - started)
+            return cached
     spec_abis: dict[str, SpecAbi] = {}
     errors: dict[str, str] = {}
     for s in names:
@@ -632,7 +655,12 @@ def build_table(specs: Optional[list[str]] = None) -> tuple[dict[str, CallAbi], 
             for sa in sas:
                 errors[sa.spec] = f"call {call}: {e}"
                 spec_abis.pop(sa.spec, None)
-    return calls, spec_abis, errors
+    table = calls, spec_abis, errors
+    if cache_dir is not None:
+        abi_cache.save(cache_dir, key, table)
+    abi_cache.event("miss" if cache_dir is not None else "disabled", key,
+                    time.monotonic() - started)
+    return table
 
 
 def _build_call(call: str, sas: list[SpecAbi]) -> CallAbi:

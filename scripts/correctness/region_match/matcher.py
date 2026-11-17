@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import glob
 import hashlib
+import importlib.metadata
 import itertools
 import json
 import os
@@ -65,7 +66,7 @@ class Spec:
 
 _SPEC_CACHE: dict[str, list[Spec]] = {}
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_CACHE_FORMAT = 4
+_CACHE_FORMAT = 5
 
 
 def _c_prototype_dims(c_path: str) -> dict[str, tuple[str, int]]:
@@ -222,9 +223,13 @@ def _cache_key(spec_dir: str) -> str:
     from kernel_match import numeric_model
     h.update(numeric_model().encode())
     h.update(os.environ.get("EQSAT_ABLATION", "full").encode())
+    from proof_metrics import deadline_seconds
+    h.update(str(deadline_seconds()).encode())
     h.update(f"fmt{_CACHE_FORMAT} py{sys.version_info[:3]}".encode())
     files = sorted(glob.glob(os.path.join(_HERE, "*.py")))
-    files.append(os.path.join(os.path.dirname(_HERE), "kernel_match.py"))
+    files += [os.path.join(os.path.dirname(_HERE), name) for name in
+              ("kernel_match.py", "eqsat_ablation.py", "proof_metrics.py", "proof_worker.py",
+               "lib_v2/spec_provenance.py")]
     files += sorted(glob.glob(os.path.join(spec_dir, "manifest", "*.json")))
     files += sorted(glob.glob(os.path.join(spec_dir, "ref_c", "*.c")))
     files += sorted(glob.glob(os.path.join(spec_dir, "raised", "*.mlir")))
@@ -237,10 +242,9 @@ def _cache_key(spec_dir: str) -> str:
         except OSError:
             h.update(b"<missing>")
     try:
-        import egglog
-        h.update(str(getattr(egglog, "__version__", "")).encode())
-    except Exception:  # noqa: BLE001
-        pass
+        h.update(importlib.metadata.version("egglog").encode())
+    except importlib.metadata.PackageNotFoundError:
+        h.update(b"egglog-version-unavailable")
     return h.hexdigest()
 
 
@@ -254,11 +258,13 @@ def load_specs(spec_dir: str, log=None, use_cache: Optional[bool] = None, allowe
     (pickle keyed by `_cache_key`; any change to a raised spec file, manifest,
     C reference or matcher source invalidates it).  REGION_MATCH_NO_CACHE=1
     disables the disk cache."""
+    from proof_metrics import emit
     ck = _cache_key(spec_dir)
     if allowed_specs is not None:
         ck = hashlib.sha256((ck + json.dumps(sorted(allowed_specs))).encode()).hexdigest()
     key = (os.path.abspath(spec_dir), ck)
     if key in _SPEC_CACHE:
+        emit("region_catalog_cache", status="memory_hit", key=ck)
         return _SPEC_CACHE[key]
     if use_cache is None:
         use_cache = os.environ.get("REGION_MATCH_NO_CACHE", "") in ("", "0")
@@ -272,12 +278,15 @@ def load_specs(spec_dir: str, log=None, use_cache: Optional[bool] = None, allowe
                 for m in logs:
                     log(m)
             for s in specs:      # index atoms of systems built in another process
+                s.source_dir = spec_dir
                 register_atoms(getattr(s.system, "atoms", {}))
             _SPEC_CACHE[key] = specs
+            emit("region_catalog_cache", status="disk_hit", key=ck)
             return specs
         except (OSError, EOFError, pickle.PickleError, AttributeError, ImportError):
             pass
     logs: list[str] = []
+    emit("region_catalog_cache", status="miss" if use_cache else "disabled", key=ck)
     specs = _load_specs_uncached(spec_dir, logs.append, allowed_specs)
     if log:
         for m in logs:
@@ -2227,7 +2236,8 @@ def _launch_output_resolver(specs: list[Spec], spec_dir: str):
     lib = os.path.join(os.path.dirname(os.path.abspath(spec_dir)),
                        f"kernel_library_{suite.removeprefix('lib_')}.mlir")
     try:
-        txt = open(lib).read()
+        with open(lib) as source:
+            txt = source.read()
         for m in re.finditer(r"//\s*lib_v2-meta:\s*(\{.*\})\s*$", txt, re.M):
             d = json.loads(m.group(1))
             if d.get("spec") in table:
@@ -2239,8 +2249,41 @@ def _launch_output_resolver(specs: list[Spec], spec_dir: str):
     return lambda name: table.get(name)
 
 
+def has_matchable_work(mlir_text: str, spec_dir: str) -> bool:
+    """Return False only when no generic matching window can start.
+
+    A launch followed by a copy back to its output is already matched. A copy
+    to an independent buffer is still work. Use the same memory semantics as
+    matching to distinguish them, without preparing any reference systems.
+    Unknown syntax/semantics retain the normal matching path.
+    """
+    # Avoid symbolically executing real loops twice. These operations may
+    # contain work even when the remainder is an already matched launch.
+    if re.search(r"\b(?:linalg\.|affine\.(?:for|parallel|if)\b|scf\.|"
+                 r"memref\.store\b|tensor\.(?:insert|generate))", mlir_text):
+        return True
+    try:
+        funcs, aliases = parse_module(mlir_text)
+        # The parser accepts the custom, one-line function header emitted by
+        # our pipeline. Do not infer emptiness from an unparsed definition.
+        if not funcs or len(funcs) != len(re.findall(r"\bfunc\.func\b", mlir_text)):
+            return True
+        resolver = _launch_output_resolver([], spec_dir)
+        for func in funcs:
+            prog = execute(func, aliases, None, resolver, coordinate_views=True)
+            if "work" in prog.top_kinds:
+                return True
+    except Exception:
+        return True
+    return False
+
+
 def match_text(mlir_text: str, spec_dir: str, log=None, stats=None,
                allowed_specs=None) -> list[RegionMatch]:
+    if not has_matchable_work(mlir_text, spec_dir):
+        if stats is not None:
+            stats["region_match_skipped"] = "no remaining computation"
+        return []
     specs = load_specs(spec_dir, log, allowed_specs=allowed_specs)
     if not specs:
         return []

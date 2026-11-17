@@ -15,11 +15,11 @@ Pipeline (see issues/region_match/REPORT.md):
   4. matcher     : generic search over operand / parameter / layout bindings
                    against every specification in <spec_dir>/manifest
 """
-from .matcher import RegionMatch, load_specs, match_text
+from .matcher import RegionMatch, has_matchable_work, load_specs, match_text
 
 
 def match_regions(mlir_text: str, spec_dir: str, allowed_specs=None) -> list[RegionMatch]:
     return match_text(mlir_text, spec_dir, allowed_specs=allowed_specs)
 
 
-__all__ = ["RegionMatch", "match_regions", "load_specs"]
+__all__ = ["RegionMatch", "match_regions", "load_specs", "has_matchable_work"]

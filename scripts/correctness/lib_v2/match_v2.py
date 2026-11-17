@@ -1748,11 +1748,15 @@ def splice_region_matches(text: str, report: list, budget: int = 600,
                           allowed_specs=None) -> str:
     try:
         sys.path.insert(0, str(HERE.parent))
-        from region_match import load_specs, match_regions  # type: ignore
+        from region_match import has_matchable_work, load_specs, match_regions  # type: ignore
     except Exception as e:  # module absent or broken: linalg-level result stands
         report.append({"region_match": f"unavailable ({type(e).__name__})"})
         return text
     import signal
+
+    if not has_matchable_work(text, str(SPEC_DIR)):
+        report.append({"region_match_skipped": "no remaining computation"})
+        return text
 
     # Cold catalog loading also validates the imported source stages.  It is
     # shared setup, not application search: otherwise a cold cache can consume

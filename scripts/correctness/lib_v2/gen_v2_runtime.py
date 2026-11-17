@@ -340,13 +340,28 @@ def splice(path: Path, tag: str, body: str) -> str:
     return text[:m.start(2)] + body + text[m.end(2):]
 
 
+def required_calls(calls, ir):
+    """Retain adapters referenced by the lowered application, including addresses."""
+    names = set(re.findall(r'@polygeist_v2_([\w]+)', ir))
+    # This helper is supplied by the runtime template, not the imported ABI table.
+    names.discard('memref_copy')
+    unknown = names - calls.keys()
+    if unknown:
+        raise ValueError('Unknown runtime adapters: ' + ', '.join(sorted(unknown)))
+    return {name: call for name, call in calls.items() if name in names}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--output-dir", type=Path,
                     help="write generated runtime beside build artifacts, preserving source templates")
+    ap.add_argument("--required-ir", type=Path,
+                    help="generate only adapters referenced by this lowered MLIR")
     a = ap.parse_args()
     calls, _specs, errors = A.build_table()
+    if a.required_ir:
+        calls = required_calls(calls, a.required_ir.read_text())
     for s, e in sorted(errors.items()):
         print(f"note: spec {s} not in the ABI table: {e}", file=sys.stderr)
     new = {HDR: splice(HDR, "PROTOTYPES", gen_header(calls)),

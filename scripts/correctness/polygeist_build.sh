@@ -46,6 +46,13 @@
 #                       source kernel or linker-level replacement participates.
 #
 # Optional environment:
+#   POLYGEIST_ABI_CACHE_DIR=/path/to/cache
+#                       Content-validated library-call metadata cache. Set
+#                       POLYGEIST_ABI_NO_CACHE=1 to disable metadata reuse.
+#   POLYGEIST_RUNTIME_CACHE_DIR=/path/to/cache
+#                       Shared runtime object cache (requires ccache). Set
+#                       POLYGEIST_RUNTIME_NO_CACHE=1 to disable object reuse.
+#                       CCACHE_DISABLE is also respected.
 #   POLYGEIST_CPU_BLAS=1
 #                       Host or jetson-cpu target. Compile the CPU runtime with
 #                       CBLAS calls for BLAS-like symbols and link OpenBLAS by
@@ -140,6 +147,17 @@ MLIR_TRANSLATE="${MLIR_TRANSLATE:-$REPO_ROOT/llvm-project/build/bin/mlir-transla
 CLANG="${CLANG:-$REPO_ROOT/llvm-project/build/bin/clang}"
 PYTHON=$PYTHON
 SCRIPTS=$REPO_ROOT/scripts/correctness
+
+# Only shared runtime translation units use ccache. Application objects,
+# harnesses, wrappers and linking remain fresh on every invocation.
+runtime_compile() {
+  if [ "${POLYGEIST_RUNTIME_NO_CACHE:-0}" = 0 ] && command -v ccache >/dev/null 2>&1; then
+    CCACHE_DIR="${POLYGEIST_RUNTIME_CACHE_DIR:-${CCACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/polygeist/runtime}}" \
+    CCACHE_COMPILERCHECK=content CCACHE_BASEDIR="$WORK" ccache "$@"
+  else
+    "$@"
+  fi
+}
 RT=$REPO_ROOT/runtime
 
 # Cross toolchain (used only when --target=jetson).
@@ -820,20 +838,20 @@ fi
 SPEC_RUNTIME_OBJECTS=()
 N_RUNTIME_CALL=$(grep -cE 'call @polygeist_v2_' "$WORK/abi_canon.mlir" || true)
 if [ "$N_RUNTIME_CALL" -gt 0 ]; then
-  $PYTHON "$SCRIPTS/lib_v2/gen_v2_runtime.py" --output-dir "$WORK/spec_runtime" \
+  $PYTHON "$SCRIPTS/lib_v2/gen_v2_runtime.py" --output-dir "$WORK/spec_runtime" --required-ir "$WORK/abi_canon.mlir" \
     >"$WORK/spec_runtime.log" 2>&1
   if [ "$ABI_BACKEND" = pva ]; then
-    $CC -O2 -ffunction-sections -fdata-sections -I"$REPO_ROOT/runtime" \
+    runtime_compile $CC -O2 -ffunction-sections -fdata-sections -I"$REPO_ROOT/runtime" \
       -c "$WORK/spec_runtime/polygeist_v2_rt_pva.c" -o "$WORK/spec_runtime.o"
   elif [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; then
-    $CC -O2 -ffunction-sections -fdata-sections -I"$CUDA_CROSS/include" \
+    runtime_compile $CC -O2 -ffunction-sections -fdata-sections -I"$CUDA_CROSS/include" \
       -I"$REPO_ROOT/runtime" \
       -I"${POLYGEIST_DEPENDENCY_ROOT:-$REPO_ROOT/third_party}/cuda_headers/cusolver/include" \
       -I"$CUDNN_CROSS_INC" \
       -c "$WORK/spec_runtime/polygeist_v2_rt_cuda.c" -o "$WORK/spec_runtime.o"
     RT_LIBS="-L$CUDA_LIBDIR -L$CUDA_LIBDIR/stubs -L$CUDNN_CROSS_LIB -lcudnn -lcublas -lcusolver -lcudart $RT_LIBS"
   else
-    $CC -O2 -ffunction-sections -fdata-sections \
+    runtime_compile $CC -O2 -ffunction-sections -fdata-sections \
       -I"$REPO_ROOT/runtime" \
       -c "$WORK/spec_runtime/polygeist_v2_rt_cpu.c" -o "$WORK/spec_runtime.o"
     RT_LIBS="${POLYGEIST_CPU_BLAS_LIBS:--lopenblas} $RT_LIBS"
@@ -843,8 +861,10 @@ fi
 
 # Pointwise DIV stages use the actual Thrust FP32 transform implementation.
 # Precise division and subnormal support are part of this backend's contract.
-if { [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; } && [ "$ABI_BACKEND" = cuda ]; then
-  "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
+if { [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; } && [ "$ABI_BACKEND" = cuda ] &&
+   { grep -Eq 'polygeist_thrust_|polygeist_aten_special_' "$WORK/spec_runtime/polygeist_v2_rt_cuda.c" 2>/dev/null ||
+     grep -Eq '@polygeist_v2_memref_copy\b' "$WORK/abi_canon.mlir"; }; then
+  runtime_compile "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
     -arch="$GPU_ARCH" \
     "${GPU_NVCC_ARGS[@]}" \
     --fmad=false --ftz=false --prec-div=true \
@@ -855,7 +875,7 @@ if { [ "$TARGET" = jetson ] || [ "$TARGET" = cuda ]; } && [ "$ABI_BACKEND" = cud
   # Link the actual ATen scalar templates only when an imported special-function
   # ABI entry is referenced. Other GPU builds do not require PyTorch headers.
   if grep -Eq '@polygeist_v2_transform_thrust_(calc_|bessel_|modified_bessel_)' "$WORK/kernel.ll"; then
-    "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
+    runtime_compile "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
       -arch="$GPU_ARCH" \
       "${GPU_NVCC_ARGS[@]}" \
       --fmad=false --ftz=false --prec-div=true --expt-relaxed-constexpr \
@@ -881,7 +901,7 @@ if [ "${POLYGEIST_ENABLE_CUB:-0}" != "0" ] || [ "$NEEDS_CUB" -gt 0 ]; then
     echo "ERROR: CUB runtime requires a CUDA target" >&2
     exit 1
   fi
-  "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
+  runtime_compile "${POLYGEIST_NVCC:-/usr/local/cuda-12.6/bin/nvcc}" -O2 -std=c++17 \
     --fmad=false --ftz=false --prec-div=true \
     -arch="$GPU_ARCH" \
     "${GPU_NVCC_ARGS[@]}" \
@@ -993,14 +1013,14 @@ fi
 
 # Runtime shim. For jetson target we also need cuda + cudnn headers.
 if [ "$ABI_BACKEND" = cpu ]; then
-  $CC -O2 -ffunction-sections -fdata-sections "${RT_CFLAGS[@]}" \
+  runtime_compile $CC -O2 -ffunction-sections -fdata-sections "${RT_CFLAGS[@]}" \
     -c $RT_SRC -o $WORK/rt.o
-  $CC -O2 -c $RT/polygeist_mlir_runner_utils.c -o $WORK/mlir_runner_utils.o
+  runtime_compile $CC -O2 -c $RT/polygeist_mlir_runner_utils.c -o $WORK/mlir_runner_utils.o
 else
-  $CC -O2 -ffunction-sections -fdata-sections "${RT_CFLAGS[@]}" \
+  runtime_compile $CC -O2 -ffunction-sections -fdata-sections "${RT_CFLAGS[@]}" \
     -I$CUDA_CROSS/include -I$CUDNN_CROSS_INC \
     -c $RT_SRC -o $WORK/rt.o
-  $CC -O2 -c $RT/polygeist_mlir_runner_utils.c -o $WORK/mlir_runner_utils.o
+  runtime_compile $CC -O2 -c $RT/polygeist_mlir_runner_utils.c -o $WORK/mlir_runner_utils.o
 fi
 
 # Polybench utility .c — only if the harness uses POLYBENCH macros and the

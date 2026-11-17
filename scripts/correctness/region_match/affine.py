@@ -46,6 +46,12 @@ class Aff:
     def __hash__(self):
         return self._h
 
+    def __reduce__(self):
+        # String hashes are randomized per Python process. Reconstruct the
+        # expression so a prepared-specification cache never restores _h
+        # from the process that wrote it.
+        return type(self), (dict(self.terms), self.const)
+
     def __eq__(self, other):
         return isinstance(other, Aff) and self.terms == other.terms and self.const == other.const
 
