@@ -49,6 +49,22 @@ int main(int argc, char **argv) {
   }
   if (polygeist_v2_matrix_pack(a,sizeof(a),4,5,20,1,8)!=a) return 4;
   if (polygeist_v2_matrix_pack(a,sizeof(a),4,1,20,4,8)!=a) return 5;
-  puts("PASS actual OpenBLAS strided GEMV, transposed output GEMM, guards, fast paths");
+  double padded[28], original[28];
+  for (int i=0; i<28; ++i) padded[i]=original[i]=i*0.25;
+  packed=polygeist_v2_matrix_pack_dense(padded,24*sizeof(double),4,3,7,1,8);
+  if (packed==padded) return 6;
+  for (int r=0; r<4; ++r) for (int c=0; c<3; ++c) {
+    if (packed[r*3+c]!=original[r*7+c]) return 7;
+    packed[r*3+c]+=1;
+  }
+  polygeist_v2_matrix_release(packed,padded,24*sizeof(double),4,3,7,1,8,1);
+  for (int i=0; i<28; ++i)
+    if (padded[i]!=original[i]+(i%7<3 ? 1.0 : 0.0)) return 8;
+  if (polygeist_v2_matrix_pack_dense(a,sizeof(a),4,5,5,1,8)!=a) return 9;
+  packed=polygeist_v2_matrix_pack_dense(a,sizeof(a),4,1,20,4,8);
+  if (packed==a) return 10;
+  for (int r=0; r<4; ++r) if (packed[r]!=a[r*20]) return 11;
+  polygeist_v2_matrix_release(packed,a,sizeof(a),4,1,20,4,8,0);
+  puts("PASS strided GEMV, transposed GEMM, dense padded arrays, guards, fast paths");
   return 0;
 }

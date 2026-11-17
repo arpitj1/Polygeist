@@ -423,6 +423,12 @@ if [ -n "${POLYGEIST_MATCH_ONLY_KERNELS:-}" ]; then
     MATCHER_ARGS+=(--only-kernel "$SELECTED_KERNEL")
   done
 fi
+if [ -n "${POLYGEIST_MATCH_DISABLED_KERNELS:-}" ]; then
+  read -r -a DISABLED_KERNELS <<< "$POLYGEIST_MATCH_DISABLED_KERNELS"
+  for DISABLED_KERNEL in "${DISABLED_KERNELS[@]}"; do
+    MATCHER_ARGS+=(--disable-kernel "$DISABLED_KERNEL")
+  done
+fi
 if [ "${POLYGEIST_NORMALIZE_PARALLEL_DIMS:-0}" != 0 ]; then
   MATCHER_ARGS+=(--normalize-parallel-dims)
 fi

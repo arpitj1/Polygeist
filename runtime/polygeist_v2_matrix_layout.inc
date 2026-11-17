@@ -115,11 +115,12 @@ static void pv2_matrix_copy(void *dense, void *view, int64_t rows, int64_t cols,
   }
 }
 
-void *polygeist_v2_matrix_pack(void *data, int64_t available, int64_t rows,
-                               int64_t cols, int64_t s0, int64_t s1,
-                               int32_t element) {
+static void *pv2_matrix_pack(void *data, int64_t available, int64_t rows,
+                            int64_t cols, int64_t s0, int64_t s1,
+                            int32_t element, int require_dense) {
   int64_t dense = pv2_matrix_validate(data, available, rows, cols, s0, s1, element);
-  if (!dense || cols <= 1 || s1 == 1)
+  if (!dense || ((cols <= 1 || s1 == 1) &&
+                 (!require_dense || rows <= 1 || s0 == cols)))
     return data;
   int device = pv2_matrix_device(data);
   pv2_matrix_synchronize(device);
@@ -137,6 +138,20 @@ void *polygeist_v2_matrix_pack(void *data, int64_t available, int64_t rows,
   pv2_matrix_copy(packed, data, rows, cols, s0, s1, element, device, 0);
   pv2_matrix_synchronize(device);
   return packed;
+}
+
+void *polygeist_v2_matrix_pack(void *data, int64_t available, int64_t rows,
+                               int64_t cols, int64_t s0, int64_t s1,
+                               int32_t element) {
+  return pv2_matrix_pack(data, available, rows, cols, s0, s1, element, 0);
+}
+
+/* Typed C array interfaces require dense rows, unlike a BLAS interface that
+ * accepts a separate leading dimension. Keep their padding out of the copy. */
+void *polygeist_v2_matrix_pack_dense(void *data, int64_t available, int64_t rows,
+                                     int64_t cols, int64_t s0, int64_t s1,
+                                     int32_t element) {
+  return pv2_matrix_pack(data, available, rows, cols, s0, s1, element, 1);
 }
 
 void polygeist_v2_matrix_release(void *packed, void *data, int64_t available,

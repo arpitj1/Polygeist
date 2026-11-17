@@ -6966,6 +6966,8 @@ void polygeist_cutensornet_network_f64_device(
   polygeist_cutensornet_network_impl(pointers, metadata, 1, 1);
 }
 
+#include "polygeist_cutensornet_matrix.inc"
+
 // FP16 variant. cuDNN tensor cores light up here on Ampere+ (Orin) when the
 // shape is large enough and channel-aligned. Single-batch single-channel may
 // still fall back to a generic path — but for batched/channeled workloads

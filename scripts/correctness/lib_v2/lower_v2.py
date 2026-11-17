@@ -542,14 +542,15 @@ def matrix_needs_layout_adapter(ty: str) -> bool:
     return ',' in ty  # nontrivial/unknown layout; helper has a no-copy fast path
 
 
-def pack_matrix(e: Emitter, av: ArrayVal, written: bool) -> str:
+def pack_matrix(e: Emitter, av: ArrayVal, written: bool, dense_layout=False) -> str:
     original = [av.ptr, av.bytes]
     shape = [e.op(f"arith.index_cast {v} : index to i64", "dim")
              for v in av.sizes + av.strides]
     element = e.const(ELEM_BYTES[memref_info(av.ty)[1]], 'i32')
     arguments = original + shape + [element]
     types = '!llvm.ptr, i64, i64, i64, i64, i64, i32'
-    av.ptr = e.op(f"func.call @polygeist_v2_matrix_pack({', '.join(arguments)}) : ({types}) -> !llvm.ptr", 'packed')
+    helper = 'polygeist_v2_matrix_pack_dense' if dense_layout else 'polygeist_v2_matrix_pack'
+    av.ptr = e.op(f"func.call @{helper}({', '.join(arguments)}) : ({types}) -> !llvm.ptr", 'packed')
     c1 = e.const(1, 'index')
     nonunit = e.op(f"arith.cmpi ne, {av.strides[1]}, {c1} : index", 'nonunit')
     multiple = e.op(f"arith.cmpi ugt, {av.sizes[1]}, {c1} : index", 'multiple')
@@ -558,8 +559,8 @@ def pack_matrix(e: Emitter, av: ArrayVal, written: bool) -> str:
     count = e.op(f"arith.muli {shape[0]}, {shape[1]} : i64", 'count')
     size = e.const(ELEM_BYTES[memref_info(av.ty)[1]], 'i64')
     dense = e.op(f"arith.muli {count}, {size} : i64", 'dense')
-    av.bytes = e.op(f"arith.select {copied}, {dense}, {av.bytes} : i64", 'bytes')
-    av.strides = [row, c1]
+    av.bytes = dense if dense_layout else e.op(f"arith.select {copied}, {dense}, {av.bytes} : i64", 'bytes')
+    av.strides = [av.sizes[1] if dense_layout else row, c1]
     write = e.const(int(written), 'i32')
     return (f"func.call @polygeist_v2_matrix_release({', '.join([av.ptr] + arguments + [write])}) : "
             f"(!llvm.ptr, {types}, i32) -> ()")
@@ -659,10 +660,11 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
                 equal = e.op(f'arith.cmpi eq, {actual}, {expected} : index', 'shape')
                 e.raw(f'cf.assert {equal}, "typed array extent differs from declared shape"')
 
-    # Ordinary BLAS matrices and contiguous vector-only CUDA adapters need
-    # packing. Pointwise graphs already accept strides directly. Preserve
+    # Ordinary BLAS matrices and contiguous CUDA adapters need packing.
+    # Typed C matrices also require dense outer strides. Preserve
     # original alias checks before any packing can hide an overlap.
     packed_indices = set()
+    dense_matrices = set()
     if not ca.descriptor_adapter and not ca.runtime_adapter:
         for p in ca.params:
             if p.tkind == 'int' and p.layout_of:
@@ -676,6 +678,10 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
                 i = sa.binding[p.name][1]
                 if vector_needs_layout_adapter(tys[i]):
                     packed_indices.add(i)
+                elif (ca.runtime_adapter.get('kind') == 'typed_c_wrapper' and
+                      memref_info(tys[i])[0] == 2):
+                    packed_indices.add(i)
+                    dense_matrices.add(i)
     if packed_indices:
         # Resolve every original descriptor before allocating any copy, so
         # packing cannot hide original operand overlap from the ABI guards.
@@ -689,14 +695,20 @@ def lower_launch(m: re.Match, sa: A.SpecAbi, ca: A.CallAbi, tag: str) -> tuple[l
             nonunit = e.op(f"arith.cmpi ne, {av.strides[axis]}, {c1} : index", 'nonunit')
             multiple = e.op(f"arith.cmpi ugt, {av.sizes[axis]}, {c1} : index", 'multiple')
             needed = e.op(f"arith.andi {nonunit}, {multiple} : i1", 'pack_needed')
+            if i in dense_matrices:
+                padded = e.op(f"arith.cmpi ne, {av.strides[0]}, {av.sizes[1]} : index", 'padded')
+                rows = e.op(f"arith.cmpi ugt, {av.sizes[0]}, {c1} : index", 'rows')
+                outer = e.op(f"arith.andi {padded}, {rows} : i1", 'outer_copy')
+                needed = e.op(f"arith.ori {needed}, {outer} : i1", 'dense_needed')
             flag = e.op(f"arith.extui {needed} : i1 to i32", 'pack_flag')
             for j, other in arrays.items():
                 if i != j:
                     e.raw(f"func.call @polygeist_v2_matrix_require_disjoint({av.ptr}, {av.bytes}, "
                           f"{other.ptr}, {other.bytes}, {flag}) : (!llvm.ptr, i64, !llvm.ptr, i64, i32) -> ()")
         for i in sorted(packed_indices):
-            pack = pack_vector if arrays[i].rank == 1 else pack_matrix
-            releases.append(pack(e, arrays[i], sa.args[i].intent in ('out', 'inout')))
+            written = sa.args[i].intent in ('out', 'inout')
+            releases.append(pack_vector(e, arrays[i], written) if arrays[i].rank == 1
+                            else pack_matrix(e, arrays[i], written, i in dense_matrices))
     args, atys = [], []
     for p in ca.params:
         b = sa.binding[p.name]
@@ -784,11 +796,15 @@ def rewrite(text: str, names: dict, specs: dict, calls: dict, report: list,
                        "gpu_entry": ca.header_symbol,
                        "operand_types": split_top(m.group("tys"))})
     text = strip_defns("\n".join(out))
-    if 'func.call @polygeist_v2_matrix_pack(' in text:
+    if ('func.call @polygeist_v2_matrix_pack(' in text or
+            'func.call @polygeist_v2_matrix_pack_dense(' in text):
         decls['matrix_disjoint'] = ('  func.func private @polygeist_v2_matrix_require_disjoint('
             '!llvm.ptr, i64, !llvm.ptr, i64, i32)')
         decls['matrix_pack'] = ('  func.func private @polygeist_v2_matrix_pack('
             '!llvm.ptr, i64, i64, i64, i64, i64, i32) -> !llvm.ptr')
+        if 'func.call @polygeist_v2_matrix_pack_dense(' in text:
+            decls['matrix_pack_dense'] = ('  func.func private @polygeist_v2_matrix_pack_dense('
+                '!llvm.ptr, i64, i64, i64, i64, i64, i32) -> !llvm.ptr')
         decls['matrix_release'] = ('  func.func private @polygeist_v2_matrix_release('
             '!llvm.ptr, !llvm.ptr, i64, i64, i64, i64, i64, i32, i32)')
     if decls:

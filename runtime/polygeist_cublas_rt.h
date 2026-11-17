@@ -619,6 +619,15 @@ void polygeist_cutensornet_network_f64(
 void polygeist_cutensornet_network_f64_device(
     const int64_t *pointers, const int64_t *metadata);
 
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuTensorNet cutensornetNetworkContract polygeist_cutensornet_matrix_f64 */
+void polygeist_cutensornet_matrix_f64(
+    int M, int N, int K, int lda, const double *A, int ldb, const double *B,
+    int ldc, double *C, int transpose_a, int transpose_b, int accumulate);
+/* POLYGEIST_TYPED_VENDOR_ENTRY cuTensorNet cutensornetNetworkContract polygeist_cutensornet_matvec_f64 */
+void polygeist_cutensornet_matvec_f64(
+    int m, int n, int lda, const double *A, const double *x, double *y,
+    int transpose_a, int accumulate);
+
 // FP16 / BF16 variants. The shim args use compiler-provided half-precision
 // types (`_Float16` for IEEE half, `__bf16` for brain-float) because MLIR's
 // `f16` / `bf16` lower to LLVM `half` / `bfloat` and use the FP-register ABI

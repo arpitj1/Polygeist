@@ -1,0 +1,401 @@
+{
+  "routine": "openblas_tensor_vector_contraction",
+  "ref_c": "openblas_dgemv.c",
+  "source": "OpenBLAS 0.3.31 portable C GEMV, used as an alternate reference for a two-input cuTensorNet contraction with one output dimension; not cuTensorNet implementation source.",
+  "specs": [
+    {
+      "name": "openblas_dgemv_n_beta0_alpha1_cutensornet",
+      "defines": {
+        "TRANS": "78",
+        "BETA_CASE": "0",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "m",
+        "n",
+        "lda",
+        "A",
+        "x",
+        "y"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matvec_f64",
+          "arguments": [
+            "m",
+            "n",
+            "lda",
+            "A",
+            "x",
+            "y",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "n",
+              "lda"
+            ],
+            "x": [
+              "n"
+            ],
+            "y": [
+              "m"
+            ]
+          },
+          "bounds": {
+            "m": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANS",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANS - 78) // 6"
+            },
+            "checks": [
+              "(TRANS - 78) * (TRANS - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimension; unit vector strides.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "interface/gemv.c:L269-L294 + kernel/arm/scal.c + kernel/arm/gemv_n.c"
+    },
+    {
+      "name": "openblas_dgemv_t_beta0_alpha1_cutensornet",
+      "defines": {
+        "TRANS": "84",
+        "BETA_CASE": "0",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "m",
+        "n",
+        "lda",
+        "A",
+        "x",
+        "y"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matvec_f64",
+          "arguments": [
+            "m",
+            "n",
+            "lda",
+            "A",
+            "x",
+            "y",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "n",
+              "lda"
+            ],
+            "x": [
+              "m"
+            ],
+            "y": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "m": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANS",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANS - 78) // 6"
+            },
+            "checks": [
+              "(TRANS - 78) * (TRANS - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimension; unit vector strides.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "interface/gemv.c:L269-L294 + kernel/arm/scal.c + kernel/arm/gemv_t.c"
+    },
+    {
+      "name": "openblas_dgemv_n_beta1_alpha1_cutensornet",
+      "defines": {
+        "TRANS": "78",
+        "BETA_CASE": "1",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "m",
+        "n",
+        "lda",
+        "A",
+        "x",
+        "y"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matvec_f64",
+          "arguments": [
+            "m",
+            "n",
+            "lda",
+            "A",
+            "x",
+            "y",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "n",
+              "lda"
+            ],
+            "x": [
+              "n"
+            ],
+            "y": [
+              "m"
+            ]
+          },
+          "bounds": {
+            "m": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANS",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANS - 78) // 6"
+            },
+            "checks": [
+              "(TRANS - 78) * (TRANS - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimension; unit vector strides.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "interface/gemv.c:L269-L294 + kernel/arm/scal.c + kernel/arm/gemv_n.c"
+    },
+    {
+      "name": "openblas_dgemv_t_beta1_alpha1_cutensornet",
+      "defines": {
+        "TRANS": "84",
+        "BETA_CASE": "1",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "m",
+        "n",
+        "lda",
+        "A",
+        "x",
+        "y"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matvec_f64",
+          "arguments": [
+            "m",
+            "n",
+            "lda",
+            "A",
+            "x",
+            "y",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "n",
+              "lda"
+            ],
+            "x": [
+              "m"
+            ],
+            "y": [
+              "n"
+            ]
+          },
+          "bounds": {
+            "m": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "n": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANS",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANS - 78) // 6"
+            },
+            "checks": [
+              "(TRANS - 78) * (TRANS - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimension; unit vector strides.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "interface/gemv.c:L269-L294 + kernel/arm/scal.c + kernel/arm/gemv_t.c"
+    }
+  ],
+  "upstream_files": [
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/interface/gemv.c",
+      "sha256": "0c53e50dac15087fc51cc14232e63b74c273a763fb25c338120e5208eafcaac6"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/arm/scal.c",
+      "sha256": "db4c028546c30863e96b7c28dadab6bd9e219323612a860b9ba9b5400830482f"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/arm/gemv_n.c",
+      "sha256": "a391db27baf282bd5f06bf1b53d17d2f131471ef09042817f6b2dae4c3c5c312"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/arm/gemv_t.c",
+      "sha256": "2d8bfde330a21d356b9490635bd26a626ae6a0531def74e329665fce9a7a8f75"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/LICENSE",
+      "sha256": "190b5a9c8d9723fe958ad33916bd7346d96fab3c5ea90832bb02d854f620fcff"
+    }
+  ]
+}

@@ -18965,6 +18965,234 @@
   }
  },
  {
+  "spec": "openblas_dgemv_n_beta0_alpha1",
+  "routine": "openblas_gemv_unit_scale",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1.c --function=openblas_dgemv_n_beta0_alpha1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_n_beta0_alpha1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 5
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 5
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_n_beta0_alpha1",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "openblas_dgemv_t_beta0_alpha1",
+  "routine": "openblas_gemv_unit_scale",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1.c --function=openblas_dgemv_t_beta0_alpha1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_t_beta0_alpha1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_t_beta0_alpha1",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "openblas_dgemv_n_beta1_alpha1",
+  "routine": "openblas_gemv_unit_scale",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1.c --function=openblas_dgemv_n_beta1_alpha1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_n_beta1_alpha1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_n_beta1_alpha1",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "openblas_dgemv_t_beta1_alpha1",
+  "routine": "openblas_gemv_unit_scale",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1.c --function=openblas_dgemv_t_beta1_alpha1 --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_t_beta1_alpha1 externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_t_beta1_alpha1",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
   "spec": "openblas_scopy_f32",
   "routine": "openblas_scopy",
   "wrapper": "generic_solver/lib_v3/raised/openblas_scopy_f32.c",
@@ -19625,6 +19853,776 @@
   },
   "validation_reuse": {
    "input_sha256": "e9dc9204bb40cc4039a59bbedf4002c1ac27818b87ae48876aebd05a0d5fc0ef"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_nn_b0_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet.c --function=openblas_dgemm_nn_b0_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_nn_b0_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nn_b0_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_nn_b0_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "f19f245fc21227860ee38101bdbe8bb65c0e9817e64959a73b21fe7bdfe35e78"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_nt_b0_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet.c --function=openblas_dgemm_nt_b0_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_nt_b0_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nt_b0_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_nt_b0_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "fa7952e14ee7d3e2fd48133c998cf9c7be36e5db3e1778871b640dd9d1ccc3dd"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_tn_b0_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet.c --function=openblas_dgemm_tn_b0_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_tn_b0_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tn_b0_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_tn_b0_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "74558e6a1e83863c0e0fa34b30c0f2779edab3a26af7055e15a8525cd1ba4221"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_tt_b0_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet.c --function=openblas_dgemm_tt_b0_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_tt_b0_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tt_b0_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_tt_b0_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "228e279dee364dae5f5aa1a778432813dc977c10e2933243b290f8cf0d355aa5"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_nn_b1_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet.c --function=openblas_dgemm_nn_b1_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_nn_b1_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nn_b1_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_nn_b1_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "fed39a057fca773d7e181bf9b8cd5fbcea65e2bab13e10305bd98cc766d3b52a"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_nt_b1_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet.c --function=openblas_dgemm_nt_b1_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_nt_b1_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_nt_b1_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_nt_b1_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "51666336667549777a6df1f995a1659675485cc06fcce11087c9d5c092fba15a"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_tn_b1_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet.c --function=openblas_dgemm_tn_b1_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_tn_b1_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tn_b1_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_tn_b1_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "09ad13eb505ebbc86a81e05f45ba7894be2d452ebf1b494a7658043793c7384d"
+  }
+ },
+ {
+  "spec": "openblas_dgemm_tt_b1_alpha1_cutensornet",
+  "routine": "openblas_tensor_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet.c --function=openblas_dgemm_tt_b1_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemm_tt_b1_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemm_tt_b1_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemm_tt_b1_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "M",
+    "N",
+    "K",
+    "lda",
+    "A",
+    "ldb",
+    "B",
+    "ldc",
+    "C"
+   ],
+   "outputs": [
+    "C"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "ldc": "C",
+    "lda": "A",
+    "ldb": "B"
+   },
+   "unreferenced": [
+    "lda",
+    "ldb",
+    "ldc"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "f666af50a12045ff7a365414821ad5a3eba13329baaf87c2358c10475840c129"
+  }
+ },
+ {
+  "spec": "openblas_dgemv_n_beta0_alpha1_cutensornet",
+  "routine": "openblas_tensor_vector_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet.c --function=openblas_dgemv_n_beta0_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_n_beta0_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta0_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 5
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 5
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_n_beta0_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "openblas_dgemv_t_beta0_alpha1_cutensornet",
+  "routine": "openblas_tensor_vector_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet.c --function=openblas_dgemv_t_beta0_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_t_beta0_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta0_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 2,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_t_beta0_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "2f42490378f5a3dd13b723cd24f842930ba4085b75c17289ff4b0867450e675c"
+  }
+ },
+ {
+  "spec": "openblas_dgemv_n_beta1_alpha1_cutensornet",
+  "routine": "openblas_tensor_vector_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet.c --function=openblas_dgemv_n_beta1_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_n_beta1_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_n_beta1_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 4
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_n_beta1_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "LOWER_FAIL",
+   "linalg_maxabs": null,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  }
+ },
+ {
+  "spec": "openblas_dgemv_t_beta1_alpha1_cutensornet",
+  "routine": "openblas_tensor_vector_contraction",
+  "wrapper": "generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet.c",
+  "commands": [
+   "build/bin/cgeist generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet.c --function=openblas_dgemv_t_beta1_alpha1_cutensornet --resource-dir=/usr/lib/clang/14 -O3 --no-inline --raise-scf-to-affine -fPIC -S -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet.mlir",
+   "build/bin/polygeist-opt '--select-func=func-name=openblas_dgemv_t_beta1_alpha1_cutensornet externalize-dependencies=true' --delinearize-memref-accesses --remove-iter-args --affine-loop-normalize --affine-parallelize --raise-affine-to-linalg-pipeline generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet_linalg.mlir",
+   "build/bin/polygeist-opt --linalg-debufferize=use-multi-root=true generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet_linalg.mlir -o generic_solver/lib_v3/raised/openblas_dgemv_t_beta1_alpha1_cutensornet_debuf.mlir"
+  ],
+  "recoveries": {},
+  "analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "linalg_analysis": {
+   "generics": 1,
+   "loops": [],
+   "loop_count": 0,
+   "memref_access": 0,
+   "submaps": 3
+  },
+  "status": "RAISED",
+  "reason": "",
+  "meta": {
+   "spec": "openblas_dgemv_t_beta1_alpha1_cutensornet",
+   "declarations": [],
+   "params": [
+    "m",
+    "n",
+    "lda",
+    "A",
+    "x",
+    "y"
+   ],
+   "outputs": [
+    "y"
+   ],
+   "returns": [],
+   "leading_dims": {
+    "lda": "A"
+   },
+   "unreferenced": [
+    "lda"
+   ]
+  },
+  "validation": {
+   "defn": "EXACT",
+   "defn_maxabs": 0.0,
+   "linalg": "EXACT",
+   "linalg_maxabs": 0.0,
+   "affine": "EXACT",
+   "affine_maxabs": 0.0
+  },
+  "validation_reuse": {
+   "input_sha256": "2a69b2da71900e383ecc0e0c5f6acc957a162c9e64c56613a9bb31a8f9c2b677"
   }
  },
  {

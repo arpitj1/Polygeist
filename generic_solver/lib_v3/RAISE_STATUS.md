@@ -6,7 +6,7 @@ Status legend: **RAISED** = every loop became `linalg.generic`, the debufferized
 
 Validation columns: `defn` = the debufferized tensor function (what `--lower-kernel-launch` inlines), lowered via `legalize_tensor_submaps.py` + the production residual lowering; `linalg` = the memref-form Linalg before debufferization, lowered with the in-tree loop path (an independent second route).  EXACT = bitwise equal on deterministic random inputs (sizes 7/5/6, padded leading dims 16, increments 2).
 
-Summary: NOT_RAISED: 23, PARTIAL: 67, RAISED: 394, UNSOUND: 2 (total 486)
+Summary: NOT_RAISED: 23, PARTIAL: 67, RAISED: 410, UNSOUND: 2 (total 502)
 
 | spec | routine | status | generics | residual (debuf) | validation defn / linalg | reason |
 |---|---|---|---:|---|---|---|
@@ -355,6 +355,10 @@ Summary: NOT_RAISED: 23, PARTIAL: 67, RAISED: 394, UNSOUND: 2 (total 486)
 | `openblas_dgemm_nn_k1_b0_alpha1` | openblas_gemm_unit_dimensions | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_sgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_dgemm_nn_b0_alpha1` | openblas_gemm_unit_scale | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemv_n_beta0_alpha1` | openblas_gemv_unit_scale | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_t_beta0_alpha1` | openblas_gemv_unit_scale | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemv_n_beta1_alpha1` | openblas_gemv_unit_scale | RAISED | 1 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_t_beta1_alpha1` | openblas_gemv_unit_scale | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_scopy_f32` | openblas_scopy | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_sgemm_nn_m1_b0_alpha1` | openblas_sgemm | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_sgemm_batched_nn_b0_alpha1` | openblas_sgemm_batched | RAISED | 2 | - | EXACT / EXACT |  |
@@ -365,6 +369,18 @@ Summary: NOT_RAISED: 23, PARTIAL: 67, RAISED: 394, UNSOUND: 2 (total 486)
 | `openblas_sgemv_t_beta0_alpha1` | openblas_sgemv | RAISED | 2 | - | EXACT / EXACT |  |
 | `openblas_somatcopy_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / EXACT |  |
 | `openblas_somatcopy_transpose_f32` | openblas_somatcopy | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nn_b0_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nt_b0_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemm_tn_b0_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemm_tt_b0_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nn_b1_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_nt_b1_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_tn_b1_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemm_tt_b1_alpha1_cutensornet` | openblas_tensor_contraction | RAISED | 1 | - | EXACT / EXACT |  |
+| `openblas_dgemv_n_beta0_alpha1_cutensornet` | openblas_tensor_vector_contraction | RAISED | 2 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_t_beta0_alpha1_cutensornet` | openblas_tensor_vector_contraction | RAISED | 2 | - | EXACT / EXACT |  |
+| `openblas_dgemv_n_beta1_alpha1_cutensornet` | openblas_tensor_vector_contraction | RAISED | 1 | - | EXACT / LOWER_FAIL |  |
+| `openblas_dgemv_t_beta1_alpha1_cutensornet` | openblas_tensor_vector_contraction | RAISED | 1 | - | EXACT / EXACT |  |
 | `opencv_bilateral3x3_square_u8` | opencv_bilateral_square | PARTIAL | 4 | affine.for | LOWER_FAIL / EXACT | 4 linalg.generic but residual affine.for (3 loop ops, 0 scalar memory accesses) |
 | `opencv_bilinear2x_f32` | opencv_bilinear | RAISED | 1 | - | EXACT / EXACT |  |
 | `opencv_box3x3_u8` | opencv_box_fixed | RAISED | 2 | - | EXACT / EXACT |  |

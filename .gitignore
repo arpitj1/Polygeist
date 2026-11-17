@@ -94,3 +94,4 @@ scripts/correctness/logs/
 
 # Handwritten source for descriptor-based vendor emission.
 !runtime/polygeist_tensor_pointwise_rt.inc
+!runtime/polygeist_cutensornet_matrix.inc

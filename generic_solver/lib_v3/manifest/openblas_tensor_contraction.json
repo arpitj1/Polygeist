@@ -1,0 +1,1033 @@
+{
+  "routine": "openblas_tensor_contraction",
+  "ref_c": "openblas_dgemm.c",
+  "source": "OpenBLAS 0.3.31 portable C GEMM, used as an alternate reference for two-input cuTensorNet contractions; not cuTensorNet implementation source.",
+  "specs": [
+    {
+      "name": "openblas_dgemm_nn_b0_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "78",
+        "TRANSB": "78",
+        "BETA_CASE": "0",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "K",
+              "lda"
+            ],
+            "B": [
+              "N",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_nn.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_nt_b0_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "78",
+        "TRANSB": "84",
+        "BETA_CASE": "0",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "K",
+              "lda"
+            ],
+            "B": [
+              "K",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_nt.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_tn_b0_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "84",
+        "TRANSB": "78",
+        "BETA_CASE": "0",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "M",
+              "lda"
+            ],
+            "B": [
+              "N",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_tn.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_tt_b0_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "84",
+        "TRANSB": "84",
+        "BETA_CASE": "0",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "M",
+              "lda"
+            ],
+            "B": [
+              "K",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_tt.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_nn_b1_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "78",
+        "TRANSB": "78",
+        "BETA_CASE": "1",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "K",
+              "lda"
+            ],
+            "B": [
+              "N",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_nn.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_nt_b1_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "78",
+        "TRANSB": "84",
+        "BETA_CASE": "1",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "K",
+              "lda"
+            ],
+            "B": [
+              "K",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_nt.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_tn_b1_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "84",
+        "TRANSB": "78",
+        "BETA_CASE": "1",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "M",
+              "lda"
+            ],
+            "B": [
+              "N",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_tn.c:L31-L56"
+    },
+    {
+      "name": "openblas_dgemm_tt_b1_alpha1_cutensornet",
+      "defines": {
+        "TRANSA": "84",
+        "TRANSB": "84",
+        "BETA_CASE": "1",
+        "ALPHA_CASE": "1"
+      },
+      "args": [
+        "M",
+        "N",
+        "K",
+        "lda",
+        "A",
+        "ldb",
+        "B",
+        "ldc",
+        "C"
+      ],
+      "target": {
+        "library": "cuTensorNet",
+        "call": "cutensornetNetworkContract",
+        "backends": [
+          "cuda"
+        ],
+        "runtime_adapter": {
+          "schema": 1,
+          "kind": "typed_c_wrapper",
+          "entry": "polygeist_cutensornet_matrix_f64",
+          "arguments": [
+            "M",
+            "N",
+            "K",
+            "lda",
+            "A",
+            "ldb",
+            "B",
+            "ldc",
+            "C",
+            {
+              "configuration": "transpose_a",
+              "type": "int"
+            },
+            {
+              "configuration": "transpose_b",
+              "type": "int"
+            },
+            {
+              "configuration": "BETA_CASE",
+              "type": "int"
+            }
+          ],
+          "arrays": {
+            "A": [
+              "M",
+              "lda"
+            ],
+            "B": [
+              "K",
+              "ldb"
+            ],
+            "C": [
+              "N",
+              "ldc"
+            ]
+          },
+          "bounds": {
+            "M": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "N": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "K": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "lda": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldb": {
+              "min": 1,
+              "max": 2147483647
+            },
+            "ldc": {
+              "min": 1,
+              "max": 2147483647
+            }
+          },
+          "alias_policy": "disjoint",
+          "linkage": "required",
+          "configuration": {
+            "schema": 1,
+            "inputs": [
+              "TRANSA",
+              "TRANSB",
+              "BETA_CASE"
+            ],
+            "values": {
+              "transpose_a": "(TRANSA - 78) // 6",
+              "transpose_b": "(TRANSB - 78) // 6"
+            },
+            "checks": [
+              "(TRANSA - 78) * (TRANSA - 84) == 0",
+              "(TRANSB - 78) * (TRANSB - 84) == 0",
+              "BETA_CASE * (BETA_CASE - 1) == 0"
+            ]
+          }
+        }
+      },
+      "assumptions": [
+        "FP64, alpha=1; beta specialized to overwrite or accumulate.",
+        "Disjoint column-major arrays with positive extents and valid leading dimensions.",
+        "cuTensorNet may reorder reductions; numerical output validation is required."
+      ],
+      "deviations": [],
+      "source_lines": "gemm_small_matrix_kernel_tt.c:L31-L56"
+    }
+  ],
+  "upstream_files": [
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/generic/gemm_small_matrix_kernel_nn.c",
+      "sha256": "c5c53dc8976afa639953317e5b62231b03df99af174ebcc837c1d8f5f8bb8b2d"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/generic/gemm_small_matrix_kernel_nt.c",
+      "sha256": "e41822080b20f953e2b65b9bce89650d46cc494c3c1f218149ce49947733c5b7"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/generic/gemm_small_matrix_kernel_tn.c",
+      "sha256": "2e3388f279da2bd6cddef0ebef96d05beffccc0d4f07601ab1e3159a5b87aff2"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/kernel/generic/gemm_small_matrix_kernel_tt.c",
+      "sha256": "6b6b40cde969fbcdeb9bfe81b246034400c3adbec122187a4de49ef62e1e8b3f"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/interface/gemm.c",
+      "sha256": "acbaa6fac3fd3054982b4dd71d07608d548a2771ffbb8ca0192683b3dc7500cf"
+    },
+    {
+      "path": "generic_solver/lib_v3/upstream/openblas-0.3.31/LICENSE",
+      "sha256": "190b5a9c8d9723fe958ad33916bd7346d96fab3c5ea90832bb02d854f620fcff"
+    }
+  ],
+  "api_documentation": "https://docs.nvidia.com/cuda/cuquantum/26.06.0/python/bindings/generated/cuquantum.bindings.cutensornet.network_contract.html",
+  "layout_transpose": {
+    "about": "Declarative layout-transpose equivalences used by the region matcher's launch emitter. A binding that stores the listed rank-2 operands transposed (the spec reads op^T of the memory it is given) is equivalent to the spec whose defines have each listed flag flipped between its two values, with the listed argument pairs swapped (flips first, then swaps). Leading dimensions always follow their array. The transposed operand set must be covered exactly by disjoint rules.",
+    "flags": {
+      "TRANSA": [
+        "78",
+        "84"
+      ],
+      "TRANSB": [
+        "78",
+        "84"
+      ]
+    },
+    "rules": [
+      {
+        "operands": [
+          "A"
+        ],
+        "flip": [
+          "TRANSA"
+        ]
+      },
+      {
+        "operands": [
+          "B"
+        ],
+        "flip": [
+          "TRANSB"
+        ]
+      }
+    ]
+  }
+}
